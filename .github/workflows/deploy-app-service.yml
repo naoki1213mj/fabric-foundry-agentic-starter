@@ -38,7 +38,7 @@ on:
 
 env:
   # Azure Container Registry
-  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER || 'crda672axowukix3.azurecr.io' }}
   # App Service names
   FRONTEND_APP_NAME: ${{ vars.FRONTEND_APP_NAME || 'app-daj6dri4yf3k3z' }}
   API_APP_NAME: ${{ vars.API_APP_NAME || 'api-daj6dri4yf3k3z' }}
@@ -99,7 +99,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: azure/docker-login@v2
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          login-server: ${{ env.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
@@ -107,7 +107,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/da-app
+          images: ${{ env.ACR_LOGIN_SERVER }}/da-app
           tags: |
             type=sha,prefix=,format=short
             type=ref,event=branch
@@ -128,7 +128,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.ACR_LOGIN_SERVER }}/da-app:${{ steps.meta.outputs.version }}'
+          image-ref: '${{ env.ACR_LOGIN_SERVER }}/da-app:${{ steps.meta.outputs.version }}'
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
@@ -136,7 +136,7 @@ jobs:
       - name: Output image info
         run: |
           echo "### 🖼️ Frontend Image Built" >> $GITHUB_STEP_SUMMARY
-          echo "- Image: \`${{ secrets.ACR_LOGIN_SERVER }}/da-app\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: \`${{ env.ACR_LOGIN_SERVER }}/da-app\`" >> $GITHUB_STEP_SUMMARY
           echo "- Tag: \`${{ steps.meta.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
@@ -161,7 +161,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: azure/docker-login@v2
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          login-server: ${{ env.ACR_LOGIN_SERVER }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
@@ -169,7 +169,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/da-api
+          images: ${{ env.ACR_LOGIN_SERVER }}/da-api
           tags: |
             type=sha,prefix=,format=short
             type=ref,event=branch
@@ -190,7 +190,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.ACR_LOGIN_SERVER }}/da-api:${{ steps.meta.outputs.version }}'
+          image-ref: '${{ env.ACR_LOGIN_SERVER }}/da-api:${{ steps.meta.outputs.version }}'
           format: 'table'
           exit-code: '0'
           severity: 'CRITICAL,HIGH'
@@ -198,7 +198,7 @@ jobs:
       - name: Output image info
         run: |
           echo "### 🖼️ API Image Built" >> $GITHUB_STEP_SUMMARY
-          echo "- Image: \`${{ secrets.ACR_LOGIN_SERVER }}/da-api\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: \`${{ env.ACR_LOGIN_SERVER }}/da-api\`" >> $GITHUB_STEP_SUMMARY
           echo "- Tag: \`${{ steps.meta.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
@@ -222,13 +222,13 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.FRONTEND_APP_NAME }}
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/da-app:${{ needs.build-frontend.outputs.image_tag }}
+          images: ${{ env.ACR_LOGIN_SERVER }}/da-app:${{ needs.build-frontend.outputs.image_tag }}
 
       - name: Output deployment info
         run: |
           echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
           echo "- App Service: \`${{ env.FRONTEND_APP_NAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Image: \`${{ secrets.ACR_LOGIN_SERVER }}/da-app:${{ needs.build-frontend.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: \`${{ env.ACR_LOGIN_SERVER }}/da-app:${{ needs.build-frontend.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- URL: ${{ steps.deploy.outputs.webapp-url }}" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
@@ -252,13 +252,13 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.API_APP_NAME }}
-          images: ${{ secrets.ACR_LOGIN_SERVER }}/da-api:${{ needs.build-api.outputs.image_tag }}
+          images: ${{ env.ACR_LOGIN_SERVER }}/da-api:${{ needs.build-api.outputs.image_tag }}
 
       - name: Output deployment info
         run: |
           echo "### 🚀 API Deployed" >> $GITHUB_STEP_SUMMARY
           echo "- App Service: \`${{ env.API_APP_NAME }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- Image: \`${{ secrets.ACR_LOGIN_SERVER }}/da-api:${{ needs.build-api.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: \`${{ env.ACR_LOGIN_SERVER }}/da-api:${{ needs.build-api.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- URL: ${{ steps.deploy.outputs.webapp-url }}" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
