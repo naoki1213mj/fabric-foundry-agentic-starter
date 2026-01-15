@@ -7,7 +7,7 @@ To deploy this solution, ensure you have access to an [Azure subscription](https
 Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/?products=all&regions=all) page and select a **region** where the following services are available:
 
 - [Microsoft Fabric](https://learn.microsoft.com/en-us/fabric/)
-- [Azure AI Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry)
+- [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry)
 - [GPT Model Capacity](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)
 - [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/)
 - [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/)
@@ -156,7 +156,7 @@ When you start the deployment, most parameters will have **default values**, but
 | **Image Tag**                               | Docker image tag to deploy. Common values: `latest`, `dev`, `hotfix`.                  | latest       |
 | **Use Local Build**                         | Boolean flag to determine if local container builds should be used.                         | false             |
 | **Existing Log Analytics Workspace**        | To reuse an existing Log Analytics Workspace ID.                                                          | *(empty)*              |
-| **Existing Azure AI Foundry Project**        | To reuse an existing Azure AI Foundry Project ID instead of creating a new one.              | *(empty)*          |
+| **Existing Microsoft Foundry Project**        | To reuse an existing Microsoft Foundry Project ID instead of creating a new one.              | *(empty)*          |
 
 
 
@@ -183,7 +183,7 @@ Depending on your subscription quota and capacity, you can [adjust quota setting
 </details>
 <details>
 
-  <summary><b>Reusing an Existing Azure AI Foundry Project</b></summary>
+  <summary><b>Reusing an Existing Microsoft Foundry Project</b></summary>
 
   Guide to get your [Existing Project ID](/documents/re-use-foundry-project.md)
 

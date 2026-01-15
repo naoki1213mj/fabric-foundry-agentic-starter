@@ -1,5 +1,5 @@
 # Web Agent Tools Configuration
-# Uses official BingGroundingAgentTool from Azure AI Foundry
+# Uses official BingGroundingAgentTool from Microsoft Foundry
 
 tools:
   - type: bing_grounding

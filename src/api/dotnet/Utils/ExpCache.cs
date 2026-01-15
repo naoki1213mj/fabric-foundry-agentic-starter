@@ -57,19 +57,19 @@ namespace CsApi.Utils
         {
             var expiresAt = DateTime.UtcNow.AddSeconds(_ttlSeconds);
             var item = new CacheItem(value, expiresAt);
-            
+
             _cache.AddOrUpdate(key, item, (k, v) => item);
-            
+
             // If we exceed max size, remove oldest items immediately and delete their threads
             if (_cache.Count > _maxSize)
             {
                 var now = DateTime.UtcNow;
-                
+
                 // First, try to remove expired items
                 var expiredItems = _cache
                     .Where(kvp => kvp.Value.ExpiresAt <= now)
                     .ToList();
-                
+
                 foreach (var kvp in expiredItems)
                 {
                     if (_cache.TryRemove(kvp.Key, out var removedItem))
@@ -77,7 +77,7 @@ namespace CsApi.Utils
                         Task.Run(() => DeleteThreadAsync(removedItem.Value));
                     }
                 }
-                
+
                 // If still over max size after removing expired items, remove oldest non-expired items
                 if (_cache.Count > _maxSize)
                 {
@@ -138,7 +138,7 @@ namespace CsApi.Utils
         }
 
         /// <summary>
-        /// Delete thread from Azure AI Foundry when removed from cache
+        /// Delete thread from Microsoft Foundry when removed from cache
         /// </summary>
         private async Task DeleteThreadAsync(TValue value)
         {

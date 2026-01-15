@@ -1,5 +1,5 @@
 # Agent Update Script - PowerShell Version
-# This script updates Azure AI Foundry agents using azd environment values
+# This script updates Microsoft Foundry agents using azd environment values
 
 param(
     [string]$ProjectEndpoint,
@@ -14,7 +14,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 Write-Host "==========================================" -ForegroundColor Cyan
-Write-Host "Azure AI Foundry Agent Update Script" -ForegroundColor Cyan
+Write-Host "Microsoft Foundry Agent Update Script" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
 # Get script directory

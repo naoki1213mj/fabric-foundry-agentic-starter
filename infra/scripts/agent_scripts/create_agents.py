@@ -1,7 +1,7 @@
 """
 Agent Management Script - Refactored Version
 
-This script creates or updates Azure AI Foundry agents using external configuration files.
+This script creates or updates Microsoft Foundry agents using external configuration files.
 Supports modular instructions, tools, and schema definitions.
 
 Usage:
@@ -36,7 +36,7 @@ from azure_credential_utils import get_azure_credential
 
 
 class AgentManager:
-    """Manages Azure AI Foundry agent creation and updates."""
+    """Manages Microsoft Foundry agent creation and updates."""
 
     def __init__(self, config_path: str = None):
         """Initialize with configuration file path."""
@@ -119,7 +119,7 @@ class AgentManager:
                     print("  ⚠ Skipping bing_grounding: BING_CONNECTION_NAME not set")
                     continue
 
-                # Get Bing connection ID from Azure AI Foundry
+                # Get Bing connection ID from Microsoft Foundry
                 # This will be resolved at agent creation time
                 tools.append(
                     {"_bing_grounding": True, "connection_name": bing_connection_name}
@@ -159,7 +159,7 @@ class AgentManager:
         # Also update the shared tables.json for backward compatibility
         self._update_shared_tables_json(usecase)
 
-        # Connect to Azure AI Foundry
+        # Connect to Microsoft Foundry
         project_client = AIProjectClient(
             endpoint=ai_project_endpoint,
             credential=get_azure_credential(),
@@ -265,10 +265,10 @@ def get_azd_env_value(key: str) -> Optional[str]:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(
-        description="Create or update Azure AI Foundry agents"
+        description="Create or update Microsoft Foundry agents"
     )
     parser.add_argument(
-        "--ai_project_endpoint", help="Azure AI Foundry project endpoint"
+        "--ai_project_endpoint", help="Microsoft Foundry project endpoint"
     )
     parser.add_argument("--solution_name", help="Solution name suffix for agent names")
     parser.add_argument("--gpt_model_name", help="GPT model deployment name")

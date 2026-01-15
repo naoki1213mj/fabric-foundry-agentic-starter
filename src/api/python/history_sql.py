@@ -57,7 +57,7 @@ logging.getLogger("azure.monitor.opentelemetry.exporter.export._base").setLevel(
     logging.WARNING
 )
 
-# Azure AI Foundry configuration
+# Microsoft Foundry configuration
 AZURE_AI_AGENT_ENDPOINT = os.getenv("AZURE_AI_AGENT_ENDPOINT")
 AGENT_NAME_TITLE = os.getenv("AGENT_NAME_TITLE")
 
@@ -532,7 +532,7 @@ async def rename_conversation(user_id: str, conversation_id, title) -> bool:
 
 async def generate_title(conversation_messages):
     """
-    Generate a concise title for a conversation using Azure AI Foundry agent.
+    Generate a concise title for a conversation using Microsoft Foundry agent.
 
     Args:
         conversation_messages (list): List of messages in the conversation.
@@ -584,13 +584,13 @@ async def generate_title(conversation_messages):
 
     except ServiceResponseException as sre:
         logger.warning(
-            "ServiceResponseException generating title with Azure AI Foundry agent: %s",
+            "ServiceResponseException generating title with Microsoft Foundry agent: %s",
             sre,
         )
         return generate_fallback_title(conversation_messages)
 
     except Exception as e:
-        logger.warning("Error generating title with Azure AI Foundry agent: %s", e)
+        logger.warning("Error generating title with Microsoft Foundry agent: %s", e)
         return generate_fallback_title(conversation_messages)
 
 

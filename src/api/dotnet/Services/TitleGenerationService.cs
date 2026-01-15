@@ -22,7 +22,7 @@ public class TitleGenerationService : ITitleGenerationService
 
     public async Task<string> GenerateTitleAsync(List<Models.ChatMessage> messages, CancellationToken cancellationToken = default)
     {
-        
+
         try
         {
             var userMessages = messages.Where(m => m.Role == "user").ToList();
@@ -49,7 +49,7 @@ public class TitleGenerationService : ITitleGenerationService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error generating title with Azure AI Foundry agent: {ErrorMessage}", ex.Message);
+            _logger.LogWarning(ex, "Error generating title with Microsoft Foundry agent: {ErrorMessage}", ex.Message);
             return GenerateFallbackTitle(messages);
         }
     }
@@ -61,7 +61,7 @@ public class TitleGenerationService : ITitleGenerationService
         {
             var lastUserMessage = userMessages.Last();
             var content = lastUserMessage.GetContentAsString();
-            
+
             if (!string.IsNullOrEmpty(content))
             {
                 // Take first 4 words like the prompt asks for
@@ -75,7 +75,7 @@ public class TitleGenerationService : ITitleGenerationService
     }
 
     /// <summary>
-    /// Generates a title using the specified Azure AI Foundry agent and the last user message from the conversation.
+    /// Generates a title using the specified Microsoft Foundry agent and the last user message from the conversation.
     /// </summary>
     /// <param name="titleAgentName">The agent ID to use for title generation</param>
     /// <param name="messages">The conversation messages</param>
@@ -97,7 +97,7 @@ public class TitleGenerationService : ITitleGenerationService
         {
             var credentialFactory = new AzureCredentialFactory(_configuration);
             var credential = credentialFactory.Create();
-           
+
             var projectClient = new AIProjectClient(new Uri(_endpoint), credential);
             AIAgent titleAgent = projectClient.GetAIAgent(titleAgentName);
 
@@ -109,7 +109,7 @@ public class TitleGenerationService : ITitleGenerationService
             }
 
             var lastUserMessage = userMessages.Last();
-            var content = lastUserMessage.GetContentAsString();            
+            var content = lastUserMessage.GetContentAsString();
             if (string.IsNullOrEmpty(content))
             {
                 _logger.LogWarning("Last user message is empty for title generation with agent {titleAgentName}", titleAgentName);

@@ -1,10 +1,10 @@
 #!/bin/bash
-# Agent Update Script - PowerShell Version
-# This script updates Azure AI Foundry agents using azd environment values
+# Agent Update Script - Bash Version
+# This script updates Microsoft Foundry agents using azd environment values
 set -e
 
 echo "=========================================="
-echo "Azure AI Foundry Agent Update Script"
+echo "Microsoft Foundry Agent Update Script"
 echo "=========================================="
 
 # Get script directory

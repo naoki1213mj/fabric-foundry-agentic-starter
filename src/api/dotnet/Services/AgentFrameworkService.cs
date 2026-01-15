@@ -32,7 +32,7 @@ namespace CsApi.Services
         public AITool SqlTool => _sqlTool;
 
         public AgentFrameworkService(
-            IConfiguration config, 
+            IConfiguration config,
             ILogger<AgentFrameworkService> logger,
             ISqlConversationRepository sqlRepo)
         {
@@ -41,7 +41,7 @@ namespace CsApi.Services
             _sqlRepo = sqlRepo;
 
             // Create Agent Framework client similar to Python implementation
-            var endpoint = config["AZURE_AI_AGENT_ENDPOINT"] 
+            var endpoint = config["AZURE_AI_AGENT_ENDPOINT"]
                 ?? throw new InvalidOperationException("AZURE_AI_AGENT_ENDPOINT is required");
 
             _chatAgentName = config["AGENT_NAME_CHAT"]
@@ -56,7 +56,7 @@ namespace CsApi.Services
             // Use Azure AI Projects client (Foundry v2 approach)
             _projectClient = new AIProjectClient(new Uri(endpoint), credential);
 
-            // Get the existing Azure AI Foundry agent by name with latest version
+            // Get the existing Microsoft Foundry agent by name with latest version
             _agent = _projectClient.GetAIAgent(name: _chatAgentName, tools: [_sqlTool]);
         }
 
@@ -71,7 +71,7 @@ namespace CsApi.Services
             {
                 // Clean up the SQL query similar to the original implementation
                 var cleanedQuery = sql_query.Replace("```sql", string.Empty).Replace("```", string.Empty).Trim();
-                
+
                 // Execute SQL query directly like Python SqlQueryTool
                 var answerRaw = await _sqlRepo.ExecuteChatQuery(cleanedQuery, CancellationToken.None);
                 string answer = answerRaw?.Length > 20000 ? answerRaw.Substring(0, 20000) : answerRaw ?? string.Empty;

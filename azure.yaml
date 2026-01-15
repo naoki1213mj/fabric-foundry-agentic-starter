@@ -21,7 +21,7 @@ hooks:
         Write-Host ""
 
         # Auto-update agents
-        Write-Host "Updating Azure AI Foundry agents..." -ForegroundColor Yellow
+        Write-Host "Updating Microsoft Foundry agents..." -ForegroundColor Yellow
         & ./infra/scripts/agent_scripts/update_agents.ps1
 
         Write-Host ""
@@ -37,7 +37,7 @@ hooks:
         echo ""
 
         # Auto-update agents
-        echo "Updating Azure AI Foundry agents..."
+        echo "Updating Microsoft Foundry agents..."
         bash ./infra/scripts/agent_scripts/update_agents.sh
 
         echo ""

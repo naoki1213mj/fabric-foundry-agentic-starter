@@ -1,8 +1,8 @@
-# VS Code for the Web - Azure AI Foundry Templates
+# VS Code for the Web - Microsoft Foundry Templates
 
 We've generated a simple development environment for you to deploy the templates.
 
-The Azure AI Foundry extension provides tools to help you build, test, and deploy AI models and AI Applications directly from VS Code. It offers simplified operations for interacting with your models, agents, and threads without leaving your development environment. Click on the Azure AI Foundry Icon on the left to see more.
+The Microsoft Foundry extension provides tools to help you build, test, and deploy AI models and AI Applications directly from VS Code. It offers simplified operations for interacting with your models, agents, and threads without leaving your development environment. Click on the Microsoft Foundry Icon on the left to see more.
 
 Follow the instructions below to get started!
 
@@ -40,4 +40,4 @@ Check out [Azure AI Projects client library for Python](https://github.com/Azure
 
 ## Troubleshooting
 
-- If you are instantiating your client via endpoint on an Azure AI Foundry project, ensure the endpoint is set in the `.env` as https://{your-foundry-resource-name}.services.ai.azure.com/api/projects/{your-foundry-project-name}`
+- If you are instantiating your client via endpoint on a Microsoft Foundry project, ensure the endpoint is set in the `.env` as https://{your-foundry-resource-name}.services.ai.azure.com/api/projects/{your-foundry-project-name}`

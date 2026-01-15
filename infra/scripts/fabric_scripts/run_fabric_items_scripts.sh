@@ -80,8 +80,8 @@ fi
 # # echo "Assigning the Key Vault Administrator role to the user..."
 # # az role assignment create --assignee $signed_user_id --role "Key Vault Administrator" --scope $key_vault_resource_id
 
-# # Define the scope for the Azure AI Foundry resource
-# echo "Getting Azure AI Foundry id"
+# # Define the scope for the Microsoft Foundry resource
+# echo "Getting Microsoft Foundry id"
 # # aiFoundryId=$(az resource show --name $aiFoundryName --resource-type "Microsoft.AI" --resource-group $resource_group --query id --output tsv)
 
 # az account set --subscription ""
@@ -90,7 +90,7 @@ fi
 #   --name "$aiFoundryName" --resource-group "$resource_group" \
 #   --query id -o tsv)
 
-# echo "Azure AI Foundry ID: $ai_foundry_resource_id"
+# echo "Microsoft Foundry ID: $ai_foundry_resource_id"
 
 # echo "Assigning the Azure AI User role to the user..."
 # az role assignment create --assignee $signed_user_id --role "53ca6127-db72-4b80-b1b0-d745d6d5456d" --scope $ai_foundry_resource_id

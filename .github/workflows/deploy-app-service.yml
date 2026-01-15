@@ -305,7 +305,7 @@ jobs:
           echo "- API: https://${{ env.API_APP_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
 
   # ============================================
-  # Update Azure AI Foundry Agents
+  # Update Microsoft Foundry Agents
   # ============================================
   update-agents:
     runs-on: ubuntu-latest
@@ -336,10 +336,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r infra/scripts/agent_scripts/requirements.txt
 
-      - name: Update Azure AI Foundry Agents
+      - name: Update Microsoft Foundry Agents
         env:
-          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT }}
-          SOLUTION_NAME: ${{ vars.SOLUTION_NAME }}
+          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT || 'https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z' }}
+          SOLUTION_NAME: ${{ vars.SOLUTION_NAME || 'daj6dri4yf3k3z' }}
           AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: ${{ vars.AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME || 'gpt-5' }}
           USE_CASE: ${{ vars.USE_CASE || 'retail' }}
           API_APP_NAME: ${{ env.API_APP_NAME }}
@@ -353,8 +353,8 @@ jobs:
 
       - name: Update App Service Agent Names
         env:
-          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT }}
-          SOLUTION_NAME: ${{ vars.SOLUTION_NAME }}
+          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT || 'https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z' }}
+          SOLUTION_NAME: ${{ vars.SOLUTION_NAME || 'daj6dri4yf3k3z' }}
         run: |
           CHAT_AGENT_NAME="ChatAgent-${SOLUTION_NAME}"
           TITLE_AGENT_NAME="TitleAgent-${SOLUTION_NAME}"
