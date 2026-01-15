@@ -15,9 +15,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.9.0"
+APP_VERSION = "2.9.1"
 BUILD_DATE = "2026-01-16"
-BUILD_INFO = "Multi-agent handoff processing implementation"
+BUILD_INFO = "Support XML and JSON handoff formats"
 
 from chat import router as chat_router
 from history import router as history_router

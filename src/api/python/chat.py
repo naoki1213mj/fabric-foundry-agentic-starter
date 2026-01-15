@@ -48,35 +48,82 @@ AGENT_NAME_SQL = os.getenv("AGENT_NAME_SQL")
 AGENT_NAME_WEB = os.getenv("AGENT_NAME_WEB")
 AGENT_NAME_CHAT = os.getenv("AGENT_NAME_CHAT")  # Legacy single-agent mode
 
-# Handoff tag patterns for multi-agent routing
-HANDOFF_PATTERNS = {
+# Handoff tag patterns for multi-agent routing (XML format)
+HANDOFF_PATTERNS_XML = {
     "sql": re.compile(r"<handoff_to_sql_agent>(.*?)</handoff_to_sql_agent>", re.DOTALL),
     "web": re.compile(r"<handoff_to_web_agent>(.*?)</handoff_to_web_agent>", re.DOTALL),
+}
+
+# Handoff patterns for JSON format
+HANDOFF_PATTERNS_JSON = {
+    "sql": re.compile(r'"tool"\s*:\s*"handoff_to_sql_agent"', re.IGNORECASE),
+    "web": re.compile(r'"tool"\s*:\s*"handoff_to_web_agent"', re.IGNORECASE),
 }
 
 
 def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
     """
-    Parse handoff tags from orchestrator response.
+    Parse handoff from orchestrator response (supports both XML and JSON formats).
 
     Returns:
         tuple: (agent_type, handoff_params) or (None, None) if no handoff detected
     """
-    for agent_type, pattern in HANDOFF_PATTERNS.items():
+    # Try XML format first
+    for agent_type, pattern in HANDOFF_PATTERNS_XML.items():
         match = pattern.search(response_text)
         if match:
             try:
                 params = json.loads(match.group(1).strip())
                 return agent_type, params
             except json.JSONDecodeError:
-                logger.warning(f"Failed to parse handoff params for {agent_type}")
+                logger.warning(f"Failed to parse XML handoff params for {agent_type}")
                 return agent_type, {"query": match.group(1).strip()}
+
+    # Try JSON format
+    try:
+        # Try to parse as JSON object
+        data = json.loads(response_text.strip())
+        if isinstance(data, dict):
+            tool = data.get("tool", "").lower()
+            if "sql" in tool:
+                return "sql", data
+            elif "web" in tool:
+                return "web", data
+    except json.JSONDecodeError:
+        # Check for JSON pattern in text
+        for agent_type, pattern in HANDOFF_PATTERNS_JSON.items():
+            if pattern.search(response_text):
+                # Extract JSON from response
+                try:
+                    # Find JSON object in response
+                    json_match = re.search(r'\{[^{}]*"tool"[^{}]*\}', response_text)
+                    if json_match:
+                        data = json.loads(json_match.group())
+                        return agent_type, data
+                except (json.JSONDecodeError, AttributeError):
+                    return agent_type, {"query": response_text}
+
     return None, None
 
 
 def is_handoff_response(response_text: str) -> bool:
-    """Check if response contains handoff tags."""
-    return any(pattern.search(response_text) for pattern in HANDOFF_PATTERNS.values())
+    """Check if response contains handoff indicators (XML or JSON format)."""
+    # Check XML patterns
+    if any(pattern.search(response_text) for pattern in HANDOFF_PATTERNS_XML.values()):
+        return True
+    # Check JSON patterns
+    if any(pattern.search(response_text) for pattern in HANDOFF_PATTERNS_JSON.values()):
+        return True
+    # Check for JSON with tool field
+    try:
+        data = json.loads(response_text.strip())
+        if isinstance(data, dict) and "tool" in data:
+            tool = data.get("tool", "").lower()
+            if "handoff" in tool or "agent" in tool:
+                return True
+    except (json.JSONDecodeError, TypeError):
+        pass
+    return False
 
 
 router = APIRouter()
