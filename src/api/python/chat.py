@@ -42,6 +42,12 @@ HOST_INSTRUCTIONS = "Answer questions about Sales, Products and Orders data."
 # Multi-Agent Configuration
 MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 
+# Agent Names from environment
+AGENT_NAME_ORCHESTRATOR = os.getenv("AGENT_NAME_ORCHESTRATOR")
+AGENT_NAME_SQL = os.getenv("AGENT_NAME_SQL")
+AGENT_NAME_WEB = os.getenv("AGENT_NAME_WEB")
+AGENT_NAME_CHAT = os.getenv("AGENT_NAME_CHAT")  # Legacy single-agent mode
+
 router = APIRouter()
 
 # Configure logging
@@ -203,13 +209,25 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
             my_tools = [custom_tool.run_sql_query]
 
             # Determine which agent to use based on mode
-            if MULTI_AGENT_MODE:
-                # Multi-agent mode: Use Orchestrator/SQL/Web agents
-                agent_name = os.getenv("AGENT_NAME_SQL", os.getenv("AGENT_NAME_CHAT"))
-                logger.info(f"Multi-agent mode: Using SQL Agent '{agent_name}'")
+            if MULTI_AGENT_MODE and AGENT_NAME_ORCHESTRATOR:
+                # Multi-agent mode: Use Orchestrator for intelligent routing
+                # Orchestrator will handoff to SqlAgent or WebAgent as needed
+                agent_name = AGENT_NAME_ORCHESTRATOR
+                logger.info(
+                    f"Multi-agent mode: Using Orchestrator Agent '{agent_name}'"
+                )
+                logger.info(
+                    f"  Available agents: SQL='{AGENT_NAME_SQL}', Web='{AGENT_NAME_WEB}'"
+                )
+            elif MULTI_AGENT_MODE and AGENT_NAME_SQL:
+                # Fallback to SQL Agent if Orchestrator not configured
+                agent_name = AGENT_NAME_SQL
+                logger.info(
+                    f"Multi-agent mode (no orchestrator): Using SQL Agent '{agent_name}'"
+                )
             else:
                 # Single agent mode: Use legacy AGENT_NAME_CHAT
-                agent_name = os.getenv("AGENT_NAME_CHAT")
+                agent_name = AGENT_NAME_CHAT
                 logger.info(f"Single agent mode: Using Chat Agent '{agent_name}'")
 
             # Create chat client with existing agent

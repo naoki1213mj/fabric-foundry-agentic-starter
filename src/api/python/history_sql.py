@@ -605,7 +605,7 @@ async def generate_title(conversation_messages):
             model_deployment_name = os.getenv(
                 "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
             ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
-            
+
             chat_client = AzureAIClient(
                 project_client=project_client,
                 agent_name=AGENT_NAME_TITLE,
