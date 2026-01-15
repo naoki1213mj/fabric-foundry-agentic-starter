@@ -8,6 +8,10 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./App.css";
+
+// Application version for display
+const APP_VERSION = "2.2.0";
+
 import Chat from "./components/Chat/Chat";
 import { ChatHistoryPanel } from "./components/ChatHistoryPanel/ChatHistoryPanel";
 
@@ -288,6 +292,17 @@ const Dashboard: React.FC = () => {
             useAppContext?.state.isCosmosDBAvailable?.status !== CosmosDBStatus.NotConfigured && <ChatHistoryPanel />} */}
             </div>
           )}
+      </div>
+      {/* Version footer */}
+      <div style={{
+        position: 'fixed',
+        bottom: 4,
+        right: 8,
+        fontSize: '10px',
+        color: '#999',
+        zIndex: 1000
+      }}>
+        v{APP_VERSION}
       </div>
     </FluentProvider>
   );

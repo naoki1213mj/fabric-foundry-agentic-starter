@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.1.0"
+APP_VERSION = "2.2.0"
 BUILD_DATE = "2026-01-16"
 
 from chat import router as chat_router
@@ -31,7 +31,7 @@ def build_app() -> FastAPI:
     """
     fastapi_app = FastAPI(
         title="Agentic Applications for Unified Data Foundation Solution Accelerator",
-        version="1.0.0",
+        version=APP_VERSION,
     )
 
     fastapi_app.add_middleware(
@@ -62,6 +62,7 @@ def build_app() -> FastAPI:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "environment": os.getenv("AZURE_ENV_NAME", "development"),
             "model": os.getenv("AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME", "unknown"),
+            "platform": "Microsoft Foundry",
         }
 
     @fastapi_app.get("/")
