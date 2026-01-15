@@ -25,15 +25,16 @@ openai>=2.8.0
 pyodbc==5.2.0
 pandas==2.3.3
 
-# OpenTelemetry (versions aligned with agent-framework dependencies)
-opentelemetry-api==1.39.1
-opentelemetry-sdk==1.39.1
-opentelemetry-semantic-conventions==0.60b1
-opentelemetry-instrumentation==0.60b1
-opentelemetry-exporter-otlp-proto-grpc==1.39.1
-opentelemetry-exporter-otlp-proto-http==1.39.1
-azure-monitor-events-extension==0.1.0
-azure-monitor-opentelemetry==1.8.1
+# OpenTelemetry (versions aligned with agent-framework and azure-monitor dependencies)
+# Note: azure-monitor-opentelemetry 1.8.4 requires specific opentelemetry versions
+opentelemetry-api>=1.28.0,<2.0.0
+opentelemetry-sdk>=1.28.0,<2.0.0
+opentelemetry-semantic-conventions>=0.49b0
+opentelemetry-instrumentation>=0.49b0
+opentelemetry-exporter-otlp-proto-grpc>=1.28.0,<2.0.0
+opentelemetry-exporter-otlp-proto-http>=1.28.0,<2.0.0
+azure-monitor-events-extension>=0.1.0
+azure-monitor-opentelemetry==1.8.4
 
 # Development tools
 pytest==8.4.2
