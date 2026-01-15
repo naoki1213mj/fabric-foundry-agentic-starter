@@ -173,7 +173,7 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
     thread = None
     complete_response = ""
     credential = None
-    db_connection = None
+    custom_tool = None
 
     try:
         if not query:
@@ -197,7 +197,9 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
                 logger.error("Failed to establish database connection")
                 raise Exception("Database connection failed")
 
-            custom_tool = SqlQueryTool(pyodbc_conn=db_connection)
+            # Create pickle-safe SqlQueryTool using connection cache
+            # The tool manages its own connection lifecycle
+            custom_tool = SqlQueryTool.create_with_connection(db_connection)
             my_tools = [custom_tool.run_sql_query]
 
             # Determine which agent to use based on mode
@@ -272,8 +274,8 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
         ) from e
 
     finally:
-        if db_connection:
-            db_connection.close()
+        if custom_tool:
+            custom_tool.close_connection()
         if credential is not None:
             await credential.close()
         # Provide a fallback response when no data is received from OpenAI.

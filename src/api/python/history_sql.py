@@ -235,17 +235,54 @@ async def run_query_params(sql_query, params: Tuple[Any, ...] = ()):
         conn.close()
 
 
+# Global connection cache for SqlQueryTool
+# This allows the tool to be pickled while still accessing the connection
+_connection_cache: dict = {}
+
+
 class SqlQueryTool(BaseModel):
-    """SQL query tool for executing database queries using Agent Framework."""
+    """SQL query tool for executing database queries using Agent Framework.
+
+    This tool uses a connection_id to reference a cached pyodbc.Connection
+    rather than storing the connection directly, making it pickle-safe.
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    pyodbc_conn: pyodbc.Connection
+    connection_id: str = ""
 
-    async def run_sql_query(self, sql_query):
+    @classmethod
+    def create_with_connection(cls, conn: pyodbc.Connection) -> "SqlQueryTool":
+        """Create a SqlQueryTool with a cached connection."""
+        import uuid
+
+        connection_id = str(uuid.uuid4())
+        _connection_cache[connection_id] = conn
+        return cls(connection_id=connection_id)
+
+    def get_connection(self) -> pyodbc.Connection:
+        """Get the cached connection."""
+        return _connection_cache.get(self.connection_id)
+
+    def close_connection(self):
+        """Close and remove the cached connection."""
+        conn = _connection_cache.pop(self.connection_id, None)
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    async def run_sql_query(self, sql_query: str) -> str:
         """Execute parameterized SQL query and return results as JSON string."""
-        # Connect to the database
+        cursor = None
         try:
-            cursor = self.pyodbc_conn.cursor()
+            conn = self.get_connection()
+            if not conn:
+                return json.dumps(
+                    {"error": "Database connection not available"}, ensure_ascii=False
+                )
+
+            cursor = conn.cursor()
             cursor.execute(sql_query)
             columns = [desc[0] for desc in cursor.description]
             result = []

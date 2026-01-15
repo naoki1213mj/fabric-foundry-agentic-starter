@@ -15,9 +15,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.4.0"
+APP_VERSION = "2.5.0"
 BUILD_DATE = "2026-01-16"
-BUILD_INFO = "OpenTelemetry 1.8.4 compatibility fix"
+BUILD_INFO = "SqlQueryTool pickle-safe fix"
 
 from chat import router as chat_router
 from history import router as history_router
