@@ -231,6 +231,9 @@ const Dashboard: React.FC = () => {
           </Subtitle2>
         </div>
         <div className="header-right-section">
+          <Body2 style={{ color: "#666", marginRight: "16px", fontSize: "12px" }}>
+            {t("header.version")} ({t("header.buildDate")})
+          </Body2>
           <div>
             <Avatar name={name} title={name} />
           </div>

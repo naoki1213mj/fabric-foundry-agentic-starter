@@ -7,6 +7,8 @@ export const ja = {
       settings: "設定",
       help: "ヘルプ",
       logout: "ログアウト",
+      version: "v2.0.0",
+      buildDate: "2026年1月15日",
     },
 
     // チャット
@@ -25,7 +27,7 @@ export const ja = {
       showHistory: "履歴を表示",
       hideHistory: "履歴を非表示",
       startChatting: "チャットを開始",
-      landingText: "売上、商品、注文に関する質問ができます。",
+      landingText: "売上データ、商品情報、注文履歴について自然言語で質問できます。\n\n💡 例: 「今月の売上トップ10の製品は？」",
       createNewConversation: "新しい会話を作成",
       sendQuestion: "質問を送信",
     },
