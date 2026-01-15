@@ -15,9 +15,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.6.0"
+APP_VERSION = "2.7.0"
 BUILD_DATE = "2026-01-16"
-BUILD_INFO = "Add model_deployment_name to AzureAIClient"
+BUILD_INFO = "Fix model_deployment_name in history_sql.py"
 
 from chat import router as chat_router
 from history import router as history_router

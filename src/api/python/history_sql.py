@@ -601,9 +601,15 @@ async def generate_title(conversation_messages):
             endpoint=AZURE_AI_AGENT_ENDPOINT,
             credential=await get_azure_credential_async(),
         ) as project_client:
+            # model_deployment_name is required in agent-framework 1.0.0b260114+
+            model_deployment_name = os.getenv(
+                "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
+            ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
+            
             chat_client = AzureAIClient(
                 project_client=project_client,
                 agent_name=AGENT_NAME_TITLE,
+                model_deployment_name=model_deployment_name,
                 use_latest_version=True,
             )
 
