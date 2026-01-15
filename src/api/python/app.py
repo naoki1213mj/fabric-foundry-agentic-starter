@@ -15,8 +15,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 BUILD_DATE = "2026-01-16"
+BUILD_INFO = "Azure AI User RBAC configured"
 
 from chat import router as chat_router
 from history import router as history_router
