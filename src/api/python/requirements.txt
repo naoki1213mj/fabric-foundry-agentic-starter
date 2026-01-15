@@ -16,8 +16,7 @@ agent-framework-azure-ai==1.0.0b251120
 agent-framework-core==1.0.0b251120
 azure-identity==1.25.1
 # azure-search-documents==11.6.0
-azure-ai-projects==2.0.0b4
-azure-ai-agents==1.2.0b1
+azure-ai-projects==2.0.0b3
 # azure-ai-inference==1.0.0b9
 azure-cosmos==4.9.0
 
