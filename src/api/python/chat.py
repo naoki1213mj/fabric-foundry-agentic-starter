@@ -48,6 +48,37 @@ AGENT_NAME_SQL = os.getenv("AGENT_NAME_SQL")
 AGENT_NAME_WEB = os.getenv("AGENT_NAME_WEB")
 AGENT_NAME_CHAT = os.getenv("AGENT_NAME_CHAT")  # Legacy single-agent mode
 
+# Handoff tag patterns for multi-agent routing
+HANDOFF_PATTERNS = {
+    "sql": re.compile(r"<handoff_to_sql_agent>(.*?)</handoff_to_sql_agent>", re.DOTALL),
+    "web": re.compile(r"<handoff_to_web_agent>(.*?)</handoff_to_web_agent>", re.DOTALL),
+}
+
+
+def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
+    """
+    Parse handoff tags from orchestrator response.
+
+    Returns:
+        tuple: (agent_type, handoff_params) or (None, None) if no handoff detected
+    """
+    for agent_type, pattern in HANDOFF_PATTERNS.items():
+        match = pattern.search(response_text)
+        if match:
+            try:
+                params = json.loads(match.group(1).strip())
+                return agent_type, params
+            except json.JSONDecodeError:
+                logger.warning(f"Failed to parse handoff params for {agent_type}")
+                return agent_type, {"query": match.group(1).strip()}
+    return None, None
+
+
+def is_handoff_response(response_text: str) -> bool:
+    """Check if response contains handoff tags."""
+    return any(pattern.search(response_text) for pattern in HANDOFF_PATTERNS.values())
+
+
 router = APIRouter()
 
 # Configure logging
@@ -154,6 +185,105 @@ def track_event_if_configured(event_name: str, event_data: dict):
             "Skipping track_event for %s as Application Insights is not configured",
             event_name,
         )
+
+
+async def call_specialist_agent(
+    agent_type: str,
+    query: str,
+    conversation_id: str,
+    handoff_params: dict | None = None,
+):
+    """
+    Call a specialist agent (SQL or Web) after orchestrator handoff.
+
+    Args:
+        agent_type: 'sql' or 'web'
+        query: The original user query or extracted query from handoff
+        conversation_id: Conversation ID for thread management
+        handoff_params: Parameters extracted from handoff tag
+
+    Yields:
+        Response chunks from the specialist agent
+    """
+    from sql_query_tool import SqlQueryTool, get_fabric_db_connection
+
+    # Determine which agent to use
+    if agent_type == "sql":
+        agent_name = AGENT_NAME_SQL
+    elif agent_type == "web":
+        agent_name = AGENT_NAME_WEB
+    else:
+        logger.error(f"Unknown agent type: {agent_type}")
+        yield f"Unknown agent type: {agent_type}"
+        return
+
+    if not agent_name:
+        logger.error(f"Agent name not configured for type: {agent_type}")
+        yield f"Agent {agent_type} is not configured"
+        return
+
+    logger.info(f"Handoff to {agent_type} agent: {agent_name}")
+    logger.info(f"Handoff params: {handoff_params}")
+
+    # Use query from handoff params if available
+    actual_query = handoff_params.get("query", query) if handoff_params else query
+
+    credential = None
+    custom_tool = None
+
+    try:
+        credential = await get_azure_credential_async()
+
+        async with AIProjectClient(
+            endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"), credential=credential
+        ) as project_client:
+            # Set up tools for SQL agent
+            my_tools = []
+            if agent_type == "sql":
+                db_connection = await get_fabric_db_connection()
+                if db_connection:
+                    custom_tool = SqlQueryTool.create_with_connection(db_connection)
+                    my_tools = [custom_tool.run_sql_query]
+
+            model_deployment_name = os.getenv(
+                "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
+            ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
+
+            chat_client = AzureAIClient(
+                project_client=project_client,
+                agent_name=agent_name,
+                model_deployment_name=model_deployment_name,
+                use_latest_version=True,
+            )
+
+            async with ChatAgent(
+                chat_client=chat_client,
+                tools=my_tools,
+                tool_choice="auto",
+            ) as chat_agent:
+                # Create new thread for specialist agent
+                openai_client = project_client.get_openai_client()
+                conversation = await openai_client.conversations.create()
+                thread = chat_agent.get_new_thread(service_thread_id=conversation.id)
+
+                truncation_strategy = TruncationObject(type="auto")
+
+                async for chunk in chat_agent.run_stream(
+                    messages=actual_query,
+                    thread=thread,
+                    truncation_strategy=truncation_strategy,
+                ):
+                    if chunk is not None and chunk.text != "":
+                        yield chunk.text
+
+    except Exception as e:
+        logger.error(f"Error calling specialist agent {agent_type}: {e}")
+        yield f"Error processing request with {agent_type} agent"
+    finally:
+        if custom_tool:
+            custom_tool.close_connection()
+        if credential:
+            await credential.close()
 
 
 # Global thread cache
@@ -314,17 +444,78 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
 
 async def stream_chat_request(conversation_id, query):
     """
-    Handles streaming chat requests.
+    Handles streaming chat requests with multi-agent handoff support.
+
+    In multi-agent mode:
+    1. Orchestrator receives the query first
+    2. If orchestrator returns handoff tags, route to specialist agent
+    3. Stream specialist agent's response to the client
     """
 
     async def generate():
         try:
             assistant_content = ""
+            orchestrator_response = ""
+            handoff_detected = False
+
+            # First, collect response from orchestrator (or single agent)
             async for chunk in stream_openai_text(conversation_id, query):
                 if isinstance(chunk, dict):
-                    chunk = json.dumps(chunk)  # Convert dict to JSON string
-                assistant_content += str(chunk)
+                    chunk = json.dumps(chunk)
+                orchestrator_response += str(chunk)
 
+                # Check if this is a handoff response (in multi-agent mode)
+                if MULTI_AGENT_MODE and is_handoff_response(orchestrator_response):
+                    handoff_detected = True
+                    # Continue collecting until we have the complete handoff tag
+                    continue
+
+            # If handoff detected, route to specialist agent
+            if handoff_detected and MULTI_AGENT_MODE:
+                agent_type, handoff_params = parse_handoff(orchestrator_response)
+                if agent_type:
+                    logger.info(f"Processing handoff to {agent_type} agent")
+                    logger.info(f"Handoff params: {handoff_params}")
+
+                    # Stream response from specialist agent
+                    async for specialist_chunk in call_specialist_agent(
+                        agent_type=agent_type,
+                        query=query,
+                        conversation_id=conversation_id,
+                        handoff_params=handoff_params,
+                    ):
+                        assistant_content += str(specialist_chunk)
+                        if assistant_content:
+                            response = {
+                                "choices": [
+                                    {
+                                        "messages": [
+                                            {
+                                                "role": "assistant",
+                                                "content": assistant_content,
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                            yield json.dumps(response, ensure_ascii=False) + "\n\n"
+                else:
+                    # Handoff tag detected but couldn't parse - return original response
+                    logger.warning("Handoff detected but couldn't parse agent type")
+                    assistant_content = orchestrator_response
+                    response = {
+                        "choices": [
+                            {
+                                "messages": [
+                                    {"role": "assistant", "content": assistant_content}
+                                ]
+                            }
+                        ]
+                    }
+                    yield json.dumps(response, ensure_ascii=False) + "\n\n"
+            else:
+                # No handoff - stream the orchestrator/single agent response directly
+                assistant_content = orchestrator_response
                 if assistant_content:
                     response = {
                         "choices": [
