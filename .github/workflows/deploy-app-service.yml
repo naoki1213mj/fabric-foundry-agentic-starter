@@ -185,12 +185,10 @@ jobs:
       name: ${{ github.event.inputs.environment || 'dev' }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-      - name: Azure Login (OIDC)
+      - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure App Service (Frontend)
         id: deploy
@@ -217,12 +215,10 @@ jobs:
       name: ${{ github.event.inputs.environment || 'dev' }}
       url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
-      - name: Azure Login (OIDC)
+      - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure App Service (API)
         id: deploy
