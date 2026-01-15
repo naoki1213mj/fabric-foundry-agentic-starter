@@ -1,0 +1,4 @@
+# Title Agent Tools Configuration
+# This agent does not use any tools
+
+tools: []

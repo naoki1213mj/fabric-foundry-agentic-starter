@@ -1,0 +1,61 @@
+# Agent Configuration
+# This file defines all agents and their settings
+
+agents:
+  orchestrator_agent:
+    name_prefix: OrchestratorAgent
+    description: Intelligent routing agent that delegates to specialists
+    instructions_file: agents/orchestrator_agent/instructions.md
+    tools_file: agents/orchestrator_agent/tools.yaml
+    settings: {}
+
+  sql_agent:
+    name_prefix: SqlAgent
+    description: SQL query agent for Fabric database analysis
+    instructions_file: agents/sql_agent/instructions.md
+    tools_file: agents/sql_agent/tools.yaml
+    settings:
+      # Placeholder for schema - will be replaced at runtime
+      tables_schema_placeholder: "{{TABLES_SCHEMA}}"
+
+  web_agent:
+    name_prefix: WebAgent
+    description: Web search agent using Bing Grounding
+    instructions_file: agents/web_agent/instructions.md
+    tools_file: agents/web_agent/tools.yaml
+    settings: {}
+
+  title_agent:
+    name_prefix: TitleAgent
+    description: Generates concise conversation titles
+    instructions_file: agents/title_agent/instructions.md
+    tools_file: agents/title_agent/tools.yaml
+    settings: {}
+
+# Workflow configuration
+workflow:
+  # Start agent for handoff workflow
+  start_agent: orchestrator_agent
+  # Handoff routing
+  handoffs:
+    orchestrator_agent:
+      - sql_agent
+      - web_agent
+    sql_agent:
+      - orchestrator_agent
+    web_agent:
+      - orchestrator_agent
+
+# Use case configurations
+usecases:
+  retail:
+    tables_file: ../fabric_scripts/data/retail_tables.json
+    schema_format: simple  # tablename + columns list
+
+  insurance:
+    tables_file: ../fabric_scripts/data/insurance_tables.json
+    schema_format: detailed  # column name + title
+
+# Default settings
+defaults:
+  usecase: retail

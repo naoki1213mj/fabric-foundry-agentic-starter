@@ -1,5 +1,10 @@
 """
 Chat API module for handling chat interactions and responses.
+
+Supports multi-agent orchestration:
+- SqlAgent: Database queries using Fabric SQL Database
+- WebAgent: Web search using Bing Grounding (if configured)
+- OrchestratorAgent: Routes queries to appropriate specialist agents
 """
 
 import asyncio
@@ -9,19 +14,6 @@ import os
 import random
 import re
 
-from cachetools import TTLCache
-from dotenv import load_dotenv
-from fastapi import APIRouter, Request, HTTPException, status
-from fastapi.responses import JSONResponse, StreamingResponse
-from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
-
-# Azure SDK
-from azure.ai.agents.models import TruncationObject
-from azure.monitor.events.extension import track_event
-from azure.monitor.opentelemetry import configure_azure_monitor
-from azure.ai.projects.aio import AIProjectClient
-
 from agent_framework import ChatAgent
 from agent_framework.azure import AzureAIClient
 from agent_framework.exceptions import ServiceResponseException
@@ -29,11 +21,26 @@ from agent_framework.exceptions import ServiceResponseException
 # Azure Auth
 from auth.azure_credential_utils import get_azure_credential_async
 
+# Azure SDK
+from azure.ai.agents.models import TruncationObject
+from azure.ai.projects.aio import AIProjectClient
+from azure.monitor.events.extension import track_event
+from azure.monitor.opentelemetry import configure_azure_monitor
+from cachetools import TTLCache
+from dotenv import load_dotenv
+from fastapi import APIRouter, HTTPException, Request, status
+from fastapi.responses import JSONResponse, StreamingResponse
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode
+
 load_dotenv()
 
 # Constants
 HOST_NAME = "Agentic Applications for Unified Data Foundation"
 HOST_INSTRUCTIONS = "Answer questions about Sales, Products and Orders data."
+
+# Multi-Agent Configuration
+MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 
 router = APIRouter()
 
@@ -46,10 +53,14 @@ instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
 if instrumentation_key:
     # Configure Application Insights if the Instrumentation Key is found
     configure_azure_monitor(connection_string=instrumentation_key)
-    logging.info("Application Insights configured with the provided Instrumentation Key")
+    logging.info(
+        "Application Insights configured with the provided Instrumentation Key"
+    )
 else:
     # Log a warning if the Instrumentation Key is not found
-    logging.warning("No Application Insights Instrumentation Key found. Skipping configuration")
+    logging.warning(
+        "No Application Insights Instrumentation Key found. Skipping configuration"
+    )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -82,7 +93,9 @@ class ExpCache(TTLCache):
                 asyncio.create_task(self._delete_thread_async(thread_conversation_id))
                 logger.info("Scheduled thread deletion: %s", thread_conversation_id)
             except Exception as e:
-                logger.error("Failed to schedule thread deletion for key %s: %s", key, e)
+                logger.error(
+                    "Failed to schedule thread deletion for key %s: %s", key, e
+                )
         return items
 
     def popitem(self):
@@ -91,9 +104,13 @@ class ExpCache(TTLCache):
         try:
             # Create task for async deletion with proper session management
             asyncio.create_task(self._delete_thread_async(thread_conversation_id))
-            logger.info("Scheduled thread deletion (LRU evict): %s", thread_conversation_id)
+            logger.info(
+                "Scheduled thread deletion (LRU evict): %s", thread_conversation_id
+            )
         except Exception as e:
-            logger.error("Failed to schedule thread deletion for key %s (LRU evict): %s", key, e)
+            logger.error(
+                "Failed to schedule thread deletion for key %s (LRU evict): %s", key, e
+            )
         return key, thread_conversation_id
 
     async def _delete_thread_async(self, thread_conversation_id: str):
@@ -104,12 +121,15 @@ class ExpCache(TTLCache):
                 # Get credential and use async context managers to ensure proper cleanup
                 credential = await get_azure_credential_async()
                 async with AIProjectClient(
-                    endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"),
-                    credential=credential
+                    endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"), credential=credential
                 ) as project_client:
                     openai_client = project_client.get_openai_client()
-                    await openai_client.conversations.delete(conversation_id=thread_conversation_id)
-                    logger.info("Thread deleted successfully: %s", thread_conversation_id)
+                    await openai_client.conversations.delete(
+                        conversation_id=thread_conversation_id
+                    )
+                    logger.info(
+                        "Thread deleted successfully: %s", thread_conversation_id
+                    )
         except Exception as e:
             logger.error("Failed to delete thread %s: %s", thread_conversation_id, e)
         finally:
@@ -124,7 +144,10 @@ def track_event_if_configured(event_name: str, event_data: dict):
     if instrumentation_key:
         track_event(event_name, event_data)
     else:
-        logging.warning("Skipping track_event for %s as Application Insights is not configured", event_name)
+        logging.warning(
+            "Skipping track_event for %s as Application Insights is not configured",
+            event_name,
+        )
 
 
 # Global thread cache
@@ -142,6 +165,10 @@ def get_thread_cache():
 async def stream_openai_text(conversation_id: str, query: str) -> StreamingResponse:
     """
     Get a streaming text response from OpenAI.
+
+    Supports two modes:
+    - Single Agent Mode (default): Uses AGENT_NAME_CHAT for SQL queries
+    - Multi Agent Mode (MULTI_AGENT_MODE=true): Routes via OrchestratorAgent to SqlAgent/WebAgent
     """
     thread = None
     complete_response = ""
@@ -155,15 +182,16 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
         credential = await get_azure_credential_async()
 
         async with AIProjectClient(
-            endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"),
-            credential=credential
+            endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"), credential=credential
         ) as project_client:
-
             cache = get_thread_cache()
             thread_conversation_id = cache.get(conversation_id, None)
-            truncation_strategy = TruncationObject(type="last_messages", last_messages=4)
+            truncation_strategy = TruncationObject(
+                type="last_messages", last_messages=4
+            )
 
             from history_sql import SqlQueryTool, get_fabric_db_connection
+
             db_connection = await get_fabric_db_connection()
             if not db_connection:
                 logger.error("Failed to establish database connection")
@@ -172,10 +200,20 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
             custom_tool = SqlQueryTool(pyodbc_conn=db_connection)
             my_tools = [custom_tool.run_sql_query]
 
+            # Determine which agent to use based on mode
+            if MULTI_AGENT_MODE:
+                # Multi-agent mode: Use Orchestrator/SQL/Web agents
+                agent_name = os.getenv("AGENT_NAME_SQL", os.getenv("AGENT_NAME_CHAT"))
+                logger.info(f"Multi-agent mode: Using SQL Agent '{agent_name}'")
+            else:
+                # Single agent mode: Use legacy AGENT_NAME_CHAT
+                agent_name = os.getenv("AGENT_NAME_CHAT")
+                logger.info(f"Single agent mode: Using Chat Agent '{agent_name}'")
+
             # Create chat client with existing agent
             chat_client = AzureAIClient(
                 project_client=project_client,
-                agent_name=os.getenv("AGENT_NAME_CHAT"),
+                agent_name=agent_name,
                 use_latest_version=True,
             )
 
@@ -185,19 +223,26 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
                 tool_choice="auto",
                 store=True,
             ) as chat_agent:
-
                 if thread_conversation_id:
-                    thread = chat_agent.get_new_thread(service_thread_id=thread_conversation_id)
+                    thread = chat_agent.get_new_thread(
+                        service_thread_id=thread_conversation_id
+                    )
                     assert thread.is_initialized
                 else:
                     # Create a conversation using openAI client
                     openai_client = project_client.get_openai_client()
                     conversation = await openai_client.conversations.create()
                     thread_conversation_id = conversation.id
-                    thread = chat_agent.get_new_thread(service_thread_id=thread_conversation_id)
+                    thread = chat_agent.get_new_thread(
+                        service_thread_id=thread_conversation_id
+                    )
                     cache[conversation_id] = thread_conversation_id
 
-                async for chunk in chat_agent.run_stream(messages=query, thread=thread, truncation_strategy=truncation_strategy):
+                async for chunk in chat_agent.run_stream(
+                    messages=query,
+                    thread=thread,
+                    truncation_strategy=truncation_strategy,
+                ):
                     if chunk is not None and chunk.text != "":
                         complete_response += chunk.text
                         yield chunk.text
@@ -209,7 +254,9 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
             raise ServiceResponseException(f"Rate limit is exceeded. {str(e)}") from e
         else:
             logger.error("RuntimeError: %s", e)
-            raise ServiceResponseException(f"An unexpected runtime error occurred: {str(e)}") from e
+            raise ServiceResponseException(
+                f"An unexpected runtime error occurred: {str(e)}"
+            ) from e
 
     except Exception as e:
         complete_response = str(e)
@@ -219,7 +266,10 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
         if thread_conversation_id is not None:
             corrupt_key = f"{conversation_id}_corrupt_{random.randint(1000, 9999)}"
             cache[corrupt_key] = thread_conversation_id
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error streaming OpenAI text") from e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error streaming OpenAI text",
+        ) from e
 
     finally:
         if db_connection:
@@ -236,6 +286,7 @@ async def stream_chat_request(conversation_id, query):
     """
     Handles streaming chat requests.
     """
+
     async def generate():
         try:
             assistant_content = ""
@@ -246,9 +297,13 @@ async def stream_chat_request(conversation_id, query):
 
                 if assistant_content:
                     response = {
-                        "choices": [{
-                            "messages": [{"role": "assistant", "content": assistant_content}]
-                        }]
+                        "choices": [
+                            {
+                                "messages": [
+                                    {"role": "assistant", "content": assistant_content}
+                                ]
+                            }
+                        ]
                     }
                     yield json.dumps(response, ensure_ascii=False) + "\n\n"
 
@@ -260,14 +315,26 @@ async def stream_chat_request(conversation_id, query):
                 if match:
                     retry_after = f"{match.group(1)} seconds"
                 logger.error("Rate limit error: %s", error_message)
-                yield json.dumps({"error": f"Rate limit is exceeded. Try again in {retry_after}."}) + "\n\n"
+                yield (
+                    json.dumps(
+                        {
+                            "error": f"Rate limit is exceeded. Try again in {retry_after}."
+                        }
+                    )
+                    + "\n\n"
+                )
             else:
                 logger.error("ServiceResponseException: %s", error_message)
-                yield json.dumps({"error": "An error occurred. Please try again later."}) + "\n\n"
+                yield (
+                    json.dumps({"error": "An error occurred. Please try again later."})
+                    + "\n\n"
+                )
 
         except Exception as e:
             logger.error("Unexpected error: %s", e)
-            error_response = {"error": "An error occurred while processing the request."}
+            error_response = {
+                "error": "An error occurred while processing the request."
+            }
             yield json.dumps(error_response) + "\n\n"
 
     return generate()
@@ -284,21 +351,16 @@ async def conversation(request: Request):
 
         # Validate required parameters
         if not query:
-            return JSONResponse(
-                content={"error": "Query is required"},
-                status_code=400
-            )
+            return JSONResponse(content={"error": "Query is required"}, status_code=400)
 
         if not conversation_id:
             return JSONResponse(
-                content={"error": "Conversation ID is required"},
-                status_code=400
+                content={"error": "Conversation ID is required"}, status_code=400
             )
 
         result = await stream_chat_request(conversation_id, query)
         track_event_if_configured(
-            "ChatStreamSuccess",
-            {"conversation_id": conversation_id, "query": query}
+            "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query}
         )
         return StreamingResponse(result, media_type="application/json-lines")
 
@@ -308,4 +370,9 @@ async def conversation(request: Request):
         if span is not None:
             span.record_exception(ex)
             span.set_status(Status(StatusCode.ERROR, str(ex)))
-        return JSONResponse(content={"error": "An internal error occurred while processing the conversation."}, status_code=500)
+        return JSONResponse(
+            content={
+                "error": "An internal error occurred while processing the conversation."
+            },
+            status_code=500,
+        )

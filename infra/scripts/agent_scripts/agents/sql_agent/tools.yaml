@@ -1,0 +1,30 @@
+# Chat Agent Tools Configuration
+# Add new tools here to extend agent capabilities
+
+tools:
+  - name: run_sql_query
+    description: Execute parameterized SQL query and return results as list of dictionaries.
+    parameters:
+      type: object
+      properties:
+        sql_query:
+          type: string
+          description: Valid T-SQL query to execute against the SQL database in Fabric.
+      required:
+        - sql_query
+
+# Example: Add new tool (uncomment to enable)
+# - name: search_documents
+#   description: Search for relevant documents in Azure AI Search.
+#   parameters:
+#     type: object
+#     properties:
+#       query:
+#         type: string
+#         description: Search query string.
+#       top_k:
+#         type: integer
+#         description: Number of results to return.
+#         default: 5
+#     required:
+#       - query

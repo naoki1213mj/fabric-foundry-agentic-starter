@@ -1,0 +1,8 @@
+# Web Agent Tools Configuration
+# Uses official BingGroundingAgentTool from Azure AI Foundry
+
+tools:
+  - type: bing_grounding
+    # Connection name will be resolved from BING_CONNECTION_NAME environment variable
+    # or can be specified explicitly here:
+    # connection_name: bingglobal00149elbd

@@ -16,28 +16,49 @@ hooks:
   postprovision:
     windows:
       run: |
-        Write-Host "Web app URL: "
+        Write-Host "Web app URL: " -ForegroundColor Green
         Write-Host "$env:WEB_APP_URL" -ForegroundColor Cyan
+        Write-Host ""
 
-        # Build the exact command string (quoted to survive spaces)
-        Write-Host "`nRun the following 2 commands in the bash terminal to create agents and fabric items respectively:"
-        Write-Host "bash ./infra/scripts/agent_scripts/run_create_agents_scripts.sh" -ForegroundColor Cyan
+        # Auto-update agents
+        Write-Host "Updating Azure AI Foundry agents..." -ForegroundColor Yellow
+        & ./infra/scripts/agent_scripts/update_agents.ps1
 
-        Write-Host "`nbash ./infra/scripts/fabric_scripts/run_fabric_items_scripts.sh <fabric_workspace_id>" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "For Fabric setup, run:" -ForegroundColor Yellow
+        Write-Host "bash ./infra/scripts/fabric_scripts/run_fabric_items_scripts.sh <fabric_workspace_id>" -ForegroundColor Cyan
 
       shell: pwsh
       continueOnError: false
       interactive: true
     posix:
       run: |
-        echo "Web app URL: "
-        echo $WEB_APP_URL
+        echo "Web app URL: $WEB_APP_URL"
         echo ""
-        echo "Run the following 2 commands in the bash terminal to create agents and fabric items respectively:"
-        echo "bash ./infra/scripts/agent_scripts/run_create_agents_scripts.sh"
+
+        # Auto-update agents
+        echo "Updating Azure AI Foundry agents..."
+        bash ./infra/scripts/agent_scripts/update_agents.sh
+
         echo ""
+        echo "For Fabric setup, run:"
         echo "bash ./infra/scripts/fabric_scripts/run_fabric_items_scripts.sh <fabric_workspace_id>"
 
       shell: sh
       continueOnError: false
       interactive: true
+
+  # Post-deploy hook - also update agents after app deployment
+  postdeploy:
+    windows:
+      run: |
+        Write-Host "Ensuring agents are up to date..." -ForegroundColor Yellow
+        & ./infra/scripts/agent_scripts/update_agents.ps1
+      shell: pwsh
+      continueOnError: true
+    posix:
+      run: |
+        echo "Ensuring agents are up to date..."
+        bash ./infra/scripts/agent_scripts/update_agents.sh
+      shell: sh
+      continueOnError: true

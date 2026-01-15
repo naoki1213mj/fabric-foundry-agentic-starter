@@ -8,11 +8,11 @@ and cleanup.
 
 import os
 from datetime import datetime, timezone
+
+import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from dotenv import load_dotenv
-import uvicorn
 
 # Application version - updated for CI/CD pipeline validation
 APP_VERSION = "2.1.0"
@@ -21,6 +21,7 @@ BUILD_DATE = "2026-01-16"
 from chat import router as chat_router
 from history import router as history_router
 from history_sql import router as history_sql_router
+
 load_dotenv()
 
 
@@ -30,7 +31,7 @@ def build_app() -> FastAPI:
     """
     fastapi_app = FastAPI(
         title="Agentic Applications for Unified Data Foundation Solution Accelerator",
-        version="1.0.0"
+        version="1.0.0",
     )
 
     fastapi_app.add_middleware(
@@ -44,7 +45,9 @@ def build_app() -> FastAPI:
     # Include routers
     fastapi_app.include_router(chat_router, prefix="/api", tags=["chat"])
     fastapi_app.include_router(history_router, prefix="/history", tags=["history"])
-    fastapi_app.include_router(history_sql_router, prefix="/historyfab", tags=["historyfab"])
+    fastapi_app.include_router(
+        history_sql_router, prefix="/historyfab", tags=["historyfab"]
+    )
 
     @fastapi_app.get("/health")
     async def health_check():
