@@ -6,12 +6,17 @@ registers API routers, and manages application lifespan events such as agent ini
 and cleanup.
 """
 
-
+import os
+from datetime import datetime, timezone
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from dotenv import load_dotenv
 import uvicorn
+
+# Application version - updated for CI/CD pipeline validation
+APP_VERSION = "2.1.0"
+BUILD_DATE = "2026-01-16"
 
 from chat import router as chat_router
 from history import router as history_router
@@ -43,8 +48,28 @@ def build_app() -> FastAPI:
 
     @fastapi_app.get("/health")
     async def health_check():
-        """Health check endpoint"""
-        return {"status": "healthy"}
+        """
+        Health check endpoint with extended diagnostics.
+        Returns application status, version, and environment info.
+        """
+        return {
+            "status": "healthy",
+            "version": APP_VERSION,
+            "build_date": BUILD_DATE,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "environment": os.getenv("AZURE_ENV_NAME", "development"),
+            "model": os.getenv("AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME", "unknown"),
+        }
+
+    @fastapi_app.get("/")
+    async def root():
+        """Root endpoint with API information."""
+        return {
+            "name": "Agentic AI API",
+            "version": APP_VERSION,
+            "docs": "/docs",
+            "health": "/health",
+        }
 
     return fastapi_app
 

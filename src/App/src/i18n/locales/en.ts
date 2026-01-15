@@ -7,8 +7,8 @@ export const en = {
       settings: "Settings",
       help: "Help",
       logout: "Logout",
-      version: "v2.0.0",
-      buildDate: "Jan 15, 2026",
+      version: "v2.1.0",
+      buildDate: "Jan 16, 2026",
     },
 
     // Chat

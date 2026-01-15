@@ -7,8 +7,8 @@ export const ja = {
       settings: "設定",
       help: "ヘルプ",
       logout: "ログアウト",
-      version: "v2.0.0",
-      buildDate: "2026年1月15日",
+      version: "v2.1.0",
+      buildDate: "2026年1月16日",
     },
 
     // チャット
