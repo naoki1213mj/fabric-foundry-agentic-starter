@@ -1,28 +1,29 @@
-import React, { useEffect, useState, useRef } from "react";
-import Chat from "./components/Chat/Chat";
 import {
-  FluentProvider,
-  Subtitle2,
-  Body2,
-  webLightTheme,
-  Avatar,
+    Avatar,
+    Body2,
+    FluentProvider,
+    Subtitle2,
+    webLightTheme,
 } from "@fluentui/react-components";
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./App.css";
+import Chat from "./components/Chat/Chat";
 import { ChatHistoryPanel } from "./components/ChatHistoryPanel/ChatHistoryPanel";
 
 
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import {
-  fetchChatHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
-  fetchConversationMessages, // eslint-disable-line @typescript-eslint/no-unused-vars
-  deleteAllConversations,
-} from "./store/chatHistorySlice";
-import { setSelectedConversationId, setAppSpinner, startNewConversation, fetchUserInfo } from "./store/appSlice";
-import { clearCitation } from "./store/citationSlice";
-import { setMessages, clearChat } from "./store/chatSlice";
-import { AppLogo } from "./components/Svg/Svg";
-import CustomSpinner from "./components/CustomSpinner/CustomSpinner";
 import CitationPanel from "./components/CitationPanel/CitationPanel";
+import CustomSpinner from "./components/CustomSpinner/CustomSpinner";
+import { AppLogo } from "./components/Svg/Svg";
+import { fetchUserInfo, setSelectedConversationId, startNewConversation } from "./store/appSlice";
+import {
+    deleteAllConversations,
+    fetchChatHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fetchConversationMessages, // eslint-disable-line @typescript-eslint/no-unused-vars
+} from "./store/chatHistorySlice";
+import { clearChat, setMessages } from "./store/chatSlice";
+import { clearCitation } from "./store/citationSlice";
+import { useAppDispatch, useAppSelector } from "./store/hooks";
 const panels = {
   CHAT: "CHAT",
   CHATHISTORY: "CHATHISTORY",
@@ -39,6 +40,7 @@ const defaultPanelShowStates = {
 };
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { appConfig } = useAppSelector((state) => state.app.config);
   const showAppSpinner = useAppSelector((state) => state.app.showAppSpinner);
@@ -125,7 +127,7 @@ const Dashboard: React.FC = () => {
           break;
         }
       }
-    } 
+    }
   };
 
   useEffect(() => {
@@ -167,7 +169,7 @@ const Dashboard: React.FC = () => {
     setClearing(true);
     try {
       await dispatch(deleteAllConversations()).unwrap();
-      
+
       dispatch(startNewConversation());
       dispatch(clearChat());
       setOffset(0);
@@ -220,12 +222,12 @@ const Dashboard: React.FC = () => {
       theme={webLightTheme}
       style={{ height: "100%", backgroundColor: "#F5F5F5" }}
     >
-      <CustomSpinner loading={showAppSpinner} label="Please wait.....!" />
+      <CustomSpinner loading={showAppSpinner} label={t("loading.pleaseWait")} />
       <div className="header">
         <div className="header-left-section">
           <AppLogo />
           <Subtitle2>
-            Contoso <Body2 style={{ gap: "10px" }}>| Unified Data Analysis Agents</Body2>
+            {t("header.title")} <Body2 style={{ gap: "10px" }}>| {t("header.subtitle")}</Body2>
           </Subtitle2>
         </div>
         <div className="header-right-section">

@@ -1,48 +1,49 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import {
-  Button,
-  Textarea,
-  Subtitle2,
-  Body1,
-} from "@fluentui/react-components";
-import "./Chat.css";
 import { DefaultButton, Spinner, SpinnerSize } from "@fluentui/react";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  setUserMessage as setUserMessageAction,
-  setGeneratingResponse,
-  addMessages,
-  updateMessageById,
-  setStreamingFlag,
-  clearChat,
-  sendMessage,
-} from "../../store/chatSlice";
+    Body1,
+    Button,
+    Subtitle2,
+    Textarea,
+} from "@fluentui/react-components";
+import { ChatAdd24Regular } from "@fluentui/react-icons";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { getChatLandingText } from "../../config";
+import { generateUUIDv4 } from "../../configs/Utils";
 import {
-  setSelectedConversationId,
-  startNewConversation,
+    setSelectedConversationId,
+    startNewConversation,
 } from "../../store/appSlice";
 import {
-  addNewConversation,
-  updateConversation, // eslint-disable-line @typescript-eslint/no-unused-vars
+    addNewConversation,
+    updateConversation, // eslint-disable-line @typescript-eslint/no-unused-vars
 } from "../../store/chatHistorySlice";
+import {
+    addMessages,
+    clearChat,
+    sendMessage,
+    setGeneratingResponse,
+    setStreamingFlag,
+    setUserMessage as setUserMessageAction,
+    updateMessageById,
+} from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  type ChartDataResponse,
-  type Conversation,
-  type ConversationRequest,
-  type ParsedChunk,
-  type ChatMessage,
-  ToolMessageContent,
+    type ChartDataResponse,
+    type ChatMessage,
+    type Conversation,
+    type ConversationRequest,
+    type ParsedChunk,
+    ToolMessageContent,
 } from "../../types/AppTypes";
-import { ChatAdd24Regular } from "@fluentui/react-icons";
-import { generateUUIDv4 } from "../../configs/Utils";
-import ChatMessageComponent from "../ChatMessage/ChatMessage";
-import { getChatLandingText } from "../../config";
 import {
-  parseChartContent,
-  isMalformedChartJSON,
+    isMalformedChartJSON,
+    parseChartContent,
 } from "../../utils/jsonUtils";
 import { extractAnswerAndCitations } from "../../utils/messageUtils";
+import ChatMessageComponent from "../ChatMessage/ChatMessage";
+import "./Chat.css";
 
 type ChatProps = {
   onHandlePanelStates: (name: string) => void;
@@ -59,6 +60,7 @@ const Chat: React.FC<ChatProps> = ({
   panelShowStates,
   panels,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { userMessage, generatingResponse, messages, isStreamingInProgress } = useAppSelector((state) => state.chat);
   const selectedConversationId = useAppSelector((state) => state.app.selectedConversationId);
@@ -68,25 +70,25 @@ const Chat: React.FC<ChatProps> = ({
   const [isChartLoading, setIsChartLoading] = useState(false)
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
-  
+
   // Memoized computed values
-  const currentConversationId = useMemo(() => 
+  const currentConversationId = useMemo(() =>
     selectedConversationId || generatedConversationId,
     [selectedConversationId, generatedConversationId]
   );
 
   const hasMessages = useMemo(() => messages.length > 0, [messages.length]);
-  
-  const isInputDisabled = useMemo(() => 
+
+  const isInputDisabled = useMemo(() =>
     generatingResponse || isHistoryUpdateAPIPending,
     [generatingResponse, isHistoryUpdateAPIPending]
   );
 
-  const isSendDisabled = useMemo(() => 
+  const isSendDisabled = useMemo(() =>
     generatingResponse || !userMessage.trim() || isHistoryUpdateAPIPending,
     [generatingResponse, userMessage, isHistoryUpdateAPIPending]
   );
-  
+
   const saveToDB = useCallback(async (newMessages: ChatMessage[], convId: string, reqType: string = 'Text') => {
     if (!convId || !newMessages.length) {
       return;
@@ -103,7 +105,7 @@ const Chat: React.FC<ChatProps> = ({
 
     try {
       const result = await dispatch(updateConversation({ conversationId: convId, messages: newMessages })).unwrap();
-      
+
       if (isNewConversation && result?.success) {
         const newConversation: Conversation = {
           id: result?.data?.conversation_id,
@@ -139,12 +141,12 @@ const Chat: React.FC<ChatProps> = ({
 
   const isChartQuery = useCallback((query: string) => {
     const chartKeywords = ["chart", "graph", "visualize", "plot"];
-    
+
     // Convert to lowercase for case-insensitive matching
     const lowerCaseQuery = query.toLowerCase();
-    
+
     // Use word boundary regex to match whole words only
-    return chartKeywords.some(keyword => 
+    return chartKeywords.some(keyword =>
       new RegExp(`\\b${keyword}\\b`).test(lowerCaseQuery)
     );
   }, []);
@@ -191,23 +193,23 @@ const Chat: React.FC<ChatProps> = ({
       content,
       date: new Date().toISOString(),
     };
-    
+
     dispatch(addMessages([message]));
-    
+
     if (shouldScroll) scrollChatToBottom();
-    
+
     return message;
   }, [dispatch, scrollChatToBottom]);
 
   // Helper function to extract chart data from response
   const extractChartData = useCallback((chartResponse: ChartDataResponse | string): ChartDataResponse | string => {
     if (typeof chartResponse === 'object' && 'answer' in chartResponse) {
-      return !chartResponse.answer || 
+      return !chartResponse.answer ||
              (typeof chartResponse.answer === "object" && Object.keys(chartResponse.answer).length === 0)
         ? "Chart can't be generated, please try again."
         : chartResponse.answer;
-    } 
-    
+    }
+
     if (typeof chartResponse === 'string') {
       try {
         const parsed = JSON.parse(chartResponse);
@@ -222,7 +224,7 @@ const Chat: React.FC<ChatProps> = ({
       }
       return "Chart can't be generated, please try again.";
     }
-    
+
     return chartResponse;
   }, []);
 
@@ -238,15 +240,15 @@ const Chat: React.FC<ChatProps> = ({
       content: question,
       date: new Date().toISOString()
     };
-    
+
     dispatch(setGeneratingResponse(true));
-    
+
     dispatch(addMessages([newMessage]));
-    
+
     dispatch(setUserMessageAction(questionInputRef?.current?.value || ""));
-    
+
     scrollChatToBottom();
-    
+
     const abortController = new AbortController();
     abortFuncs.current.unshift(abortController);
 
@@ -256,7 +258,7 @@ const Chat: React.FC<ChatProps> = ({
     };
 
     let updatedMessages: ChatMessage[] = [];
-    
+
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
@@ -268,12 +270,12 @@ const Chat: React.FC<ChatProps> = ({
         const reader = response.body.getReader();
         let runningText = "";
         let hasError = false;
-        
+
         // Read stream
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
+
           const text = new TextDecoder("utf-8").decode(value);
           try {
             const textObj = JSON.parse(text);
@@ -288,7 +290,7 @@ const Chat: React.FC<ChatProps> = ({
             // Non-JSON chunk, continue
           }
         }
-        
+
         // Process response
         if (hasError) {
           const errorMsg = JSON.parse(runningText).error;
@@ -297,10 +299,10 @@ const Chat: React.FC<ChatProps> = ({
         } else if (isChartQuery(question)) {
           try {
             const parsedResponse = JSON.parse(runningText);
-            
+
             if ((parsedResponse?.object?.type || parsedResponse?.object?.chartType) && parsedResponse?.object?.data) {
               const chartMessage = createAndDispatchMessage(
-                ASSISTANT, 
+                ASSISTANT,
                 parsedResponse.object as unknown as ChartDataResponse
               );
               updatedMessages = [newMessage, chartMessage];
@@ -314,7 +316,7 @@ const Chat: React.FC<ChatProps> = ({
           }
         }
       }
-      
+
       if (updatedMessages.length > 0) {
         saveToDB(updatedMessages, conversationId, 'graph');
       }
@@ -327,7 +329,7 @@ const Chat: React.FC<ChatProps> = ({
       } else if (e instanceof Error) {
         alert(e.message);
       } else {
-        alert("An error occurred. Please try again. If the problem persists, please contact the site administrator.");
+        alert(t("error.tryAgainLater") + " " + t("error.contactAdmin"));
       }
     } finally {
       dispatch(setGeneratingResponse(false));
@@ -342,7 +344,7 @@ const Chat: React.FC<ChatProps> = ({
     conversationId: string
   ) => {
     if (generatingResponse || !question.trim()) return;
-    
+
     const isChatReq = isChartQuery(userMessage) ? "graph" : "Text";
     const newMessage: ChatMessage = {
       id: generateUUIDv4(),
@@ -350,15 +352,15 @@ const Chat: React.FC<ChatProps> = ({
       content: question,
       date: new Date().toISOString(),
     };
-    
+
     dispatch(setGeneratingResponse(true));
-    
+
     dispatch(addMessages([newMessage]));
-    
+
     dispatch(setUserMessageAction(""));
-    
+
     scrollChatToBottom();
-    
+
     const abortController = new AbortController();
     abortFuncs.current.unshift(abortController);
 
@@ -374,9 +376,9 @@ const Chat: React.FC<ChatProps> = ({
       content: "",
       citations: "",
     };
-    
+
     let updatedMessages: ChatMessage[] = [];
-    
+
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
@@ -389,14 +391,14 @@ const Chat: React.FC<ChatProps> = ({
         const reader = response.body.getReader();
         let runningText = "";
         let hasError = false;
-        
+
         // Read and process stream
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
+
           const text = new TextDecoder("utf-8").decode(value);
-          
+
           try {
             const textObj = JSON.parse(text);
             if (textObj?.object?.data || textObj?.object?.message) {
@@ -410,17 +412,17 @@ const Chat: React.FC<ChatProps> = ({
           } catch (e) {
             // Not JSON, continue processing as stream
           }
-          
+
           if (!isChartResponseReceived) {
             // Text-based streaming response
             const objects = text.split("\n").filter((val) => val !== "");
-            
+
             objects.forEach((textValue) => {
               if (!textValue || textValue === "{}") return;
-              
+
               try {
                 const parsed: ParsedChunk = JSON.parse(textValue);
-                
+
                 if (parsed?.error && !hasError) {
                   hasError = true;
                   runningText = parsed?.error;
@@ -428,7 +430,7 @@ const Chat: React.FC<ChatProps> = ({
                   runningText += textValue;
                 } else if (typeof parsed === "object" && !hasError) {
                   const responseContent = parsed?.choices?.[0]?.messages?.[0]?.content;
-                  
+
                   if (responseContent) {
                     const { answerText, citationString } = extractAnswerAndCitations(responseContent);
                     // Backend sends accumulated content, so we use it directly
@@ -436,7 +438,7 @@ const Chat: React.FC<ChatProps> = ({
                     streamMessage.content = answerText || "";
                     streamMessage.role = parsed?.choices?.[0]?.messages?.[0]?.role || ASSISTANT;
                     streamMessage.citations = citationString;
-                    
+
                     // Dispatch with a new object reference to trigger re-render
                     dispatch(updateMessageById({ ...streamMessage }));
                     scrollChatToBottom();
@@ -446,30 +448,30 @@ const Chat: React.FC<ChatProps> = ({
                 // Skip malformed chunks
               }
             });
-            
+
             if (hasError) break;
           }
         }
-        
+
         // END OF STREAMING - Process final response
         if (hasError) {
           const parsedError = JSON.parse(runningText);
-          const errorMsg = parsedError.error === "Attempted to access streaming response content, without having called `read()`." 
-            ? "An error occurred. Please try again later." 
+          const errorMsg = parsedError.error === "Attempted to access streaming response content, without having called `read()`."
+            ? "An error occurred. Please try again later."
             : parsedError.error;
-          
+
           const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
           updatedMessages = [newMessage, errorMessage];
         } else if (isChartQuery(userMessage)) {
           try {
             const splitRunningText = runningText.split("}{");
             const parsedChartResponse = JSON.parse("{" + splitRunningText[splitRunningText.length - 1]);
-            
+
             const rawChartContent = parsedChartResponse?.choices[0]?.messages[0]?.content;
-            
+
             // **OPTIMIZED: Use helper function for parsing**
-            let chartResponse = typeof rawChartContent === "string" 
-              ? parseChartContent(rawChartContent) 
+            let chartResponse = typeof rawChartContent === "string"
+              ? parseChartContent(rawChartContent)
               : rawChartContent || "Chart can't be generated, please try again.";
 
             chartResponse = extractChartData(chartResponse);
@@ -478,14 +480,14 @@ const Chat: React.FC<ChatProps> = ({
             if ((chartResponse?.type || chartResponse?.chartType) && chartResponse?.data) {
               // Valid chart data
               const chartMessage = createAndDispatchMessage(
-                ASSISTANT, 
+                ASSISTANT,
                 chartResponse as unknown as ChartDataResponse
               );
               updatedMessages = [newMessage, chartMessage];
             } else if (parsedChartResponse?.error || parsedChartResponse?.choices[0]?.messages[0]?.content) {
               let content = parsedChartResponse?.choices[0]?.messages[0]?.content;
               let displayContent = content;
-              
+
               try {
                 const parsed = typeof content === "string" ? JSON.parse(content) : content;
                 if (parsed && typeof parsed === "object" && "answer" in parsed) {
@@ -494,14 +496,14 @@ const Chat: React.FC<ChatProps> = ({
               } catch {
                 displayContent = content;
               }
-              
+
               let errorMsg = parsedChartResponse?.error || displayContent;
-              
+
               // **OPTIMIZED: Use helper function for validation**
               if (isMalformedChartJSON(errorMsg, !!parsedChartResponse?.error)) {
                 errorMsg = "Chart can not be generated, please try again later";
               }
-              
+
               const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
               updatedMessages = [newMessage, errorMessage];
             }
@@ -512,7 +514,7 @@ const Chat: React.FC<ChatProps> = ({
           updatedMessages = [newMessage, streamMessage];
         }
       }
-      
+
       if (updatedMessages.length > 0 && updatedMessages[updatedMessages.length - 1]?.role !== ERROR) {
         saveToDB(updatedMessages, conversationId, isChatReq);
       }
@@ -523,12 +525,12 @@ const Chat: React.FC<ChatProps> = ({
         updatedMessages = streamMessage.content
           ? [newMessage, streamMessage]
           : [newMessage];
-        
+
         saveToDB(updatedMessages, conversationId, 'error');
       } else if (e instanceof Error) {
         alert(e.message);
       } else {
-        alert("An error occurred. Please try again. If the problem persists, please contact the site administrator.");
+        alert(t("error.tryAgainLater") + " " + t("error.contactAdmin"));
       }
     } finally {
       dispatch(setGeneratingResponse(false));
@@ -576,46 +578,45 @@ const Chat: React.FC<ChatProps> = ({
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <Subtitle2>Chat</Subtitle2>
+        <Subtitle2>{t("chat.title")}</Subtitle2>
         <span>
           <Button
             appearance="outline"
             onClick={() => onHandlePanelStates(panels.CHATHISTORY)}
             className="hide-chat-history"
           >
-            {`${panelShowStates?.[panels.CHATHISTORY] ? "Hide" : "Show"
-              } Chat History`}
+            {panelShowStates?.[panels.CHATHISTORY] ? t("chat.hideHistory") : t("chat.showHistory")}
           </Button>
         </span>
       </div>
       <div className="chat-messages">
         {Boolean(isFetchingConvMessages) && (
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: '100%',
             minHeight: '300px'
           }}>
             <Spinner
               size={SpinnerSize.medium}
-              aria-label="Fetching Chat messages"
+              aria-label={t("loading.fetchingMessages")}
             />
           </div>
         )}
         {!isFetchingConvMessages && !hasMessages && (
           <div className="initial-msg">
             <h2>✨</h2>
-            <Subtitle2>Start Chatting</Subtitle2>
+            <Subtitle2>{t("chat.startChatting")}</Subtitle2>
             <Body1 style={{ textAlign: "center" }}>
-              {chatLandingText}
+              {t("chat.landingText")}
             </Body1>
           </div>
         )}
         {!isFetchingConvMessages &&
           messages.map((msg, index) => {
             const isLastAssistantMessage = msg.role === "assistant" && index === messages.length - 1;
-            
+
             return (
               <div key={msg.id || index} className={`chat-message ${msg.role}`}>
                 <ChatMessageComponent
@@ -631,7 +632,7 @@ const Chat: React.FC<ChatProps> = ({
         {((generatingResponse && !isStreamingInProgress) || isChartLoading)  && (
           <div className="assistant-message loading-indicator">
             <div className="typing-indicator">
-              <span className="generating-text">{isChartLoading ? "Generating chart if possible with the provided data" : "Generating answer"} </span>
+              <span className="generating-text">{isChartLoading ? t("chat.generatingChart") : t("chat.generating")} </span>
               <span className="dot"></span>
               <span className="dot"></span>
               <span className="dot"></span>
@@ -647,7 +648,7 @@ const Chat: React.FC<ChatProps> = ({
           appearance="primary"
           icon={<ChatAdd24Regular />}
           onClick={onNewConversation}
-          title="Create new Conversation"
+          title={t("chat.createNewConversation")}
           disabled={isInputDisabled}
         />
         <div className="text-area-container">
@@ -655,7 +656,7 @@ const Chat: React.FC<ChatProps> = ({
             className="textarea-field"
             value={userMessage}
             onChange={(e, data) => setUserMessage(data.value || "")}
-            placeholder="Ask a question..."
+            placeholder={t("chat.placeholder")}
             onKeyDown={handleKeyDown}
             ref={questionInputRef}
             rows={2}
@@ -669,7 +670,7 @@ const Chat: React.FC<ChatProps> = ({
             disabled={isSendDisabled}
             className="send-button"
             aria-disabled={isSendDisabled}
-            title="Send Question"
+            title={t("chat.sendQuestion")}
           />
         </div>
       </div>

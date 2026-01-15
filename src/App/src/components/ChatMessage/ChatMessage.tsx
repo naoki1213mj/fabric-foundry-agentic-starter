@@ -1,10 +1,11 @@
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import supersub from "remark-supersub";
+import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
 import ChatChart from "../ChatChart/ChatChart";
 import Citations from "../Citations/Citations";
-import { ChatMessage as ChatMessageType, ChartDataResponse } from "../../types/AppTypes";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -21,6 +22,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
   generatingResponse,
   parseCitationFromMessage
 }) => {
+  const { t } = useTranslation();
   // Handle user messages
   if (message.role === "user" && typeof message.content === "string") {
     if (message.content === "show in a graph by default") return null;
@@ -40,7 +42,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
             <ChatChart chartContent={message.content as ChartDataResponse} />
             <div className="answerDisclaimerContainer">
               <span className="answerDisclaimer">
-                AI-generated content may be incorrect
+                {t("message.aiDisclaimer")}
               </span>
             </div>
           </div>
@@ -48,7 +50,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       } catch {
         return (
           <div className="assistant-message error-message">
-            ⚠️ Sorry, we couldn't display the chart for this response.
+            ⚠️ {t("error.chartDisplay")}
           </div>
         );
       }
@@ -62,7 +64,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
         <p>{message.content}</p>
         <div className="answerDisclaimerContainer">
           <span className="answerDisclaimer">
-            AI-generated content may be incorrect
+            {t("message.aiDisclaimer")}
           </span>
         </div>
       </div>
@@ -83,7 +85,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     // If parsed successfully and it's a chart object
     if (parsedContent && typeof parsedContent === "object") {
       let chartData = null;
-      
+
       // SCENARIO 1: Direct chart object {type, data, options}
       if (("type" in parsedContent || "chartType" in parsedContent) && "data" in parsedContent) {
         chartData = parsedContent;
@@ -104,7 +106,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
               <ChatChart chartContent={chartData} />
               <div className="answerDisclaimerContainer">
                 <span className="answerDisclaimer">
-                  AI-generated content may be incorrect
+                  {t("message.aiDisclaimer")}
                 </span>
               </div>
             </div>
@@ -112,7 +114,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
         } catch {
           return (
             <div className="assistant-message error-message">
-              ⚠️ Sorry, we couldn't display the chart for this response.
+              ⚠️ {t("error.chartDisplay")}
             </div>
           );
         }
@@ -121,11 +123,11 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
     // Plain text message (most common case)
     const containsHTML = /<\/?[a-z][\s\S]*>/i.test(message.content);
-    
+
     return (
       <div className="assistant-message">
         {containsHTML ? (
-          <div 
+          <div
             dangerouslySetInnerHTML={{ __html: message.content }}
             className="html-content"
           />
@@ -135,7 +137,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
             children={message.content}
           />
         )}
-        
+
         {/* Citation Loader: Show only while citations are fetching */}
         {isLastAssistantMessage && generatingResponse ? (
           <div className="typing-indicator">
@@ -158,7 +160,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
         <div className="answerDisclaimerContainer">
           <span className="answerDisclaimer">
-            AI-generated content may be incorrect
+            {t("message.aiDisclaimer")}
           </span>
         </div>
       </div>

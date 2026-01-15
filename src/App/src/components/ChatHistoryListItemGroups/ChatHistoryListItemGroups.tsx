@@ -1,19 +1,20 @@
+import {
+    List,
+    Separator,
+    Spinner,
+    SpinnerSize,
+    Stack,
+    StackItem,
+    Text,
+} from "@fluentui/react";
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import {
-  List,
-  Separator,
-  Spinner,
-  SpinnerSize,
-  Stack,
-  StackItem,
-  Text,
-} from "@fluentui/react";
-import styles from "./ChatHistoryListItemGroups.module.css";
-import { ChatHistoryListItemCell } from "../ChatHistoryListItemCell/ChatHistoryListItemCell";
-import { Conversation } from "../../types/AppTypes";
-import { useAppSelector } from "../../store/hooks";
+import { useTranslation } from "react-i18next";
 import { segregateItems } from "../../configs/Utils";
+import { useAppSelector } from "../../store/hooks";
+import { Conversation } from "../../types/AppTypes";
+import { ChatHistoryListItemCell } from "../ChatHistoryListItemCell/ChatHistoryListItemCell";
+import styles from "./ChatHistoryListItemGroups.module.css";
 
 export interface GroupedChatHistory {
   title: string;
@@ -30,6 +31,7 @@ export const ChatHistoryListItemGroups: React.FC<
   handleFetchHistory,
   onSelectConversation,
 }) => {
+  const { t } = useTranslation();
   const observerTarget = useRef(null);
   const initialCall = useRef(true);
   const chatHistory = useAppSelector((state) => state.chatHistory);
@@ -97,7 +99,7 @@ export const ChatHistoryListItemGroups: React.FC<
         <StackItem>
           <Spinner
             size={SpinnerSize.medium}
-            aria-label="Loading chat history"
+            aria-label={t("history.loading")}
           />
         </StackItem>
       </Stack>
@@ -116,7 +118,7 @@ export const ChatHistoryListItemGroups: React.FC<
           <Text
             style={{ alignSelf: "center", fontWeight: "400", fontSize: 14 }}
           >
-            <span>No chat history.</span>
+            <span>{t("history.noHistory")}</span>
           </Text>
         </StackItem>
       </Stack>
@@ -169,7 +171,7 @@ export const ChatHistoryListItemGroups: React.FC<
         <div className={styles.spinnerContainer}>
           <Spinner
             size={SpinnerSize.small}
-            aria-label="loading more chat history"
+            aria-label={t("history.loadingMore")}
             className={styles.spinner}
           />
         </div>

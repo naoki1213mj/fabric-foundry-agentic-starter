@@ -142,17 +142,17 @@ export const segregateItems = (items: Conversation[]) => {
   });
 
   const finalResult = [
-    { title: `Today`, entries: groupedItems.Today },
+    { title: `今日`, entries: groupedItems.Today },
     {
-      title: `Yesterday`,
+      title: `昨日`,
       entries: groupedItems.Yesterday,
     },
     {
-      title: `Last 7 days`,
+      title: `過去7日間`,
       entries: groupedItems.Last7Days,
     },
     {
-      title: `Older`,
+      title: `それ以前`,
       entries: groupedItems.Older,
     },
   ];
@@ -198,7 +198,7 @@ export function normalize(
 
   let [x1, x2] = originalRange;
   const [y1, y2] = referenceRange;
-  //orginalrange min and max values are same 
+  //orginalrange min and max values are same
   if (x1 === x2) {
     x1 = y1;
     x2 = y2;

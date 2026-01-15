@@ -1,25 +1,23 @@
-import React, { useState } from "react";
 import {
-  CommandBarButton,
-  ContextualMenu,
-  DefaultButton,
-  Dialog,
-  DialogFooter,
-  DialogType,
-  ICommandBarStyles,
-  IContextualMenuItem,
-  PrimaryButton,
-  Stack,
-  StackItem,
-  Text,
-  Spinner,
-  SpinnerSize,
+    CommandBarButton,
+    ContextualMenu,
+    DefaultButton,
+    Dialog,
+    DialogFooter,
+    DialogType,
+    ICommandBarStyles,
+    IContextualMenuItem,
+    PrimaryButton,
+    Spinner,
+    SpinnerSize,
+    Stack
 } from "@fluentui/react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import styles from "./ChatHistoryPanel.module.css";
-import { type Conversation } from "../../types/AppTypes";
-import { ChatHistoryListItemGroups } from "../ChatHistoryListItemGroups/ChatHistoryListItemGroups";
 import { useAppSelector } from "../../store/hooks";
+import { ChatHistoryListItemGroups } from "../ChatHistoryListItemGroups/ChatHistoryListItemGroups";
+import styles from "./ChatHistoryPanel.module.css";
 
 const commandBarStyle: ICommandBarStyles = {
   root: {
@@ -59,6 +57,7 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
     showClearAllConfirmationDialog,
     onClickClearAllOption,
   } = props;
+  const { t } = useTranslation();
   const chatHistory = useAppSelector((state) => state.chatHistory);
   const generatingResponse = useAppSelector((state) => state.chat.generatingResponse);
   const [showClearAllContextMenu, setShowClearAllContextMenu] =
@@ -66,12 +65,12 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
   const clearAllDialogContentProps = {
     type: DialogType.close,
     title: !clearingError
-      ? "Are you sure you want to clear all chat history?"
-      : "Error deleting all of chat history",
-    closeButtonAriaLabel: "Close",
+      ? t("history.clearAllConfirm")
+      : t("history.clearAllError"),
+    closeButtonAriaLabel: t("common.close"),
     subText: !clearingError
-      ? "All chat history will be permanently removed."
-      : "Please try again. If the problem persists, please contact the site administrator.",
+      ? t("history.clearAllSubtext")
+      : t("history.clearAllErrorSubtext"),
   };
 
   const disableClearAllChatHistory =
@@ -81,7 +80,7 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
   const menuItems: IContextualMenuItem[] = [
     {
       key: "clearAll",
-      text: "Clear all chat history",
+      text: t("history.title") + "をすべて削除",
       disabled: disableClearAllChatHistory,
       iconProps: { iconName: "Delete" },
       onClick: () => {
@@ -115,15 +114,15 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
             fontWeight: "600",
           }}
         >
-          Chat history
+          {t("history.title")}
         </div>
         <Stack horizontal className={styles.historyPanelTopRightButtons}>
           <Stack horizontal>
             <CommandBarButton
               iconProps={{ iconName: "More" }}
-              title={"Clear all chat history"}
+              title={t("history.title") + "をすべて削除"}
               onClick={handleClearAllContextualMenu}
-              aria-label={"clear all chat history"}
+              aria-label={t("history.title") + "をすべて削除"}
               styles={commandBarStyle}
               role="button"
               id="moreButton"
@@ -131,7 +130,7 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
             <ContextualMenu
               items={menuItems}
               hidden={!showClearAllContextMenu}
-              target={"#moreButton"} 
+              target={"#moreButton"}
               onDismiss={handleClearAllContextualMenu}
             />
           </Stack>
@@ -161,9 +160,9 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
               zIndex: 1000,
             }}
           >
-            <Spinner
+          <Spinner
               size={SpinnerSize.large}
-              label="Clearing chat history..."
+              label={t("history.clearing")}
               ariaLive="assertive"
               labelPosition="bottom"
             />
@@ -187,13 +186,13 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
             <PrimaryButton
               onClick={onClearAllChatHistory}
               disabled={clearing}
-              text="Clear All"
+              text={t("common.clearAll")}
             />
           )}
           <DefaultButton
             onClick={onHideClearAllDialog}
             disabled={clearing}
-            text={!clearingError ? "Cancel" : "Close"}
+            text={!clearingError ? t("common.cancel") : t("common.close")}
           />
         </DialogFooter>
       </Dialog>

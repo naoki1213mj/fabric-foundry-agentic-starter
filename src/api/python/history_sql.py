@@ -3,12 +3,17 @@ import logging
 import os
 import struct
 import uuid
-from datetime import datetime, date
-from typing import Tuple, Any
+from datetime import date, datetime
 from decimal import Decimal
-from azure.ai.projects.aio import AIProjectClient
-from pydantic import BaseModel, ConfigDict
+from typing import Any, Tuple
+
 import pyodbc
+from agent_framework import ChatAgent
+from agent_framework.azure import AzureAIClient
+from agent_framework.exceptions import ServiceResponseException
+from auth.auth_utils import get_authenticated_user_details
+from auth.azure_credential_utils import get_azure_credential_async
+from azure.ai.projects.aio import AIProjectClient
 from azure.identity.aio import AzureCliCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -16,13 +21,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
-
-from auth.auth_utils import get_authenticated_user_details
-from auth.azure_credential_utils import get_azure_credential_async
-
-from agent_framework import ChatAgent
-from agent_framework.azure import AzureAIClient
-from agent_framework.exceptions import ServiceResponseException
+from pydantic import BaseModel, ConfigDict
 
 router = APIRouter()
 
@@ -35,10 +34,14 @@ instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
 if instrumentation_key:
     # Configure Application Insights if the Instrumentation Key is found
     configure_azure_monitor(connection_string=instrumentation_key)
-    logging.info("Historyfab API: Application Insights configured with the provided Instrumentation Key")
+    logging.info(
+        "Historyfab API: Application Insights configured with the provided Instrumentation Key"
+    )
 else:
     # Log a warning if the Instrumentation Key is not found
-    logging.warning("Historyfab API: No Application Insights Instrumentation Key found. Skipping configuration")
+    logging.warning(
+        "Historyfab API: No Application Insights Instrumentation Key found. Skipping configuration"
+    )
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -73,7 +76,10 @@ def track_event_if_configured(event_name: str, event_data: dict):
     if instrumentation_key:
         track_event(event_name, event_data)
     else:
-        logging.warning("Skipping track_event for %s as Application Insights is not configured", event_name)
+        logging.warning(
+            "Skipping track_event for %s as Application Insights is not configured",
+            event_name,
+        )
 
 
 async def get_fabric_db_connection():
@@ -95,42 +101,66 @@ async def get_fabric_db_connection():
     try:
         conn = None
         try:
-            if app_env == 'dev':
+            if app_env == "dev":
                 credential = AzureCliCredential()
                 try:
-                    token = await credential.get_token("https://database.windows.net/.default")
+                    token = await credential.get_token(
+                        "https://database.windows.net/.default"
+                    )
                     token_bytes = token.token.encode("utf-16-LE")
                     token_struct = struct.pack(
-                        f"<I{len(token_bytes)}s",
-                        len(token_bytes),
-                        token_bytes
+                        f"<I{len(token_bytes)}s", len(token_bytes), token_bytes
                     )
                     SQL_COPT_SS_ACCESS_TOKEN = 1256
-                    connection_string = f"DRIVER={driver18};SERVER={server};DATABASE={database};"
-                    conn = pyodbc.connect(connection_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
+                    connection_string = (
+                        f"DRIVER={driver18};SERVER={server};DATABASE={database};"
+                    )
+                    conn = pyodbc.connect(
+                        connection_string,
+                        attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct},
+                    )
                 finally:
                     await credential.close()
             else:
                 # connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={api_uid};Authentication=ActiveDirectoryMSI;"
+                logging.info("FABRIC-SQL: Attempting connection with Driver 18...")
+                logging.info(
+                    "FABRIC-SQL: Connection string (masked): SERVER=%s;DATABASE=%s",
+                    server,
+                    database,
+                )
                 conn = pyodbc.connect(fabric_sql_connection_string18)
-        except Exception:
-            if app_env == 'dev':
+                logging.info("FABRIC-SQL: Connection successful with Driver 18")
+        except Exception as e:
+            logging.error(
+                "FABRIC-SQL: Driver 18 connection failed with error: %s", str(e)
+            )
+            if app_env == "dev":
                 credential = AzureCliCredential()
                 try:
-                    token = await credential.get_token("https://database.windows.net/.default")
+                    token = await credential.get_token(
+                        "https://database.windows.net/.default"
+                    )
                     token_bytes = token.token.encode("utf-16-LE")
                     token_struct = struct.pack(
-                        f"<I{len(token_bytes)}s",
-                        len(token_bytes),
-                        token_bytes
+                        f"<I{len(token_bytes)}s", len(token_bytes), token_bytes
                     )
                     SQL_COPT_SS_ACCESS_TOKEN = 1256
-                    connection_string = f"DRIVER={driver17};SERVER={server};DATABASE={database};"
-                    conn = pyodbc.connect(connection_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
+                    connection_string = (
+                        f"DRIVER={driver17};SERVER={server};DATABASE={database};"
+                    )
+                    conn = pyodbc.connect(
+                        connection_string,
+                        attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct},
+                    )
                 finally:
                     await credential.close()
             else:
+                logging.info(
+                    "FABRIC-SQL: Attempting fallback connection with Driver 17..."
+                )
                 conn = pyodbc.connect(fabric_sql_connection_string17)
+                logging.info("FABRIC-SQL: Connection successful with Driver 17")
 
         return conn
     except pyodbc.Error as e:
@@ -207,11 +237,12 @@ async def run_query_params(sql_query, params: Tuple[Any, ...] = ()):
 
 class SqlQueryTool(BaseModel):
     """SQL query tool for executing database queries using Agent Framework."""
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
     pyodbc_conn: pyodbc.Connection
 
     async def run_sql_query(self, sql_query):
-        """Execute parameterized SQL query and return results as list of dictionaries."""
+        """Execute parameterized SQL query and return results as JSON string."""
         # Connect to the database
         try:
             cursor = self.pyodbc_conn.cursor()
@@ -229,17 +260,20 @@ class SqlQueryTool(BaseModel):
                         row_dict[col_name] = value
                 result.append(row_dict)
 
-            return result
+            # Agent Framework expects a string, not a list
+            return json.dumps(result, ensure_ascii=False)
         except Exception as e:
             logging.error("Error executing SQL query: %s", e)
-            return None
+            return json.dumps({"error": str(e)}, ensure_ascii=False)
         finally:
             if cursor:
                 cursor.close()
 
 
 # Configuration variable
-USE_CHAT_HISTORY_ENABLED = os.getenv("USE_CHAT_HISTORY_ENABLED", "true").lower() == "true"
+USE_CHAT_HISTORY_ENABLED = (
+    os.getenv("USE_CHAT_HISTORY_ENABLED", "true").lower() == "true"
+)
 
 
 async def get_conversations(user_id, limit, sort_order="DESC", offset=0):
@@ -275,7 +309,9 @@ async def get_conversations(user_id, limit, sort_order="DESC", offset=0):
         raise
 
 
-async def get_conversation_messages(user_id: str, conversation_id: str, sort_order="ASC"):
+async def get_conversation_messages(
+    user_id: str, conversation_id: str, sort_order="ASC"
+):
     """
     Retrieve all messages for a specific conversation.
 
@@ -288,7 +324,9 @@ async def get_conversation_messages(user_id: str, conversation_id: str, sort_ord
     """
     try:
         if not conversation_id:
-            logger.warning("No conversation_id found, cannot retrieve conversation messages.")
+            logger.warning(
+                "No conversation_id found, cannot retrieve conversation messages."
+            )
             return None
 
         query = ""
@@ -308,7 +346,9 @@ async def get_conversation_messages(user_id: str, conversation_id: str, sort_ord
             # Deserialize citations from JSON string back to list
             if processed_message.get("citations"):
                 try:
-                    processed_message["citations"] = json.loads(processed_message["citations"])
+                    processed_message["citations"] = json.loads(
+                        processed_message["citations"]
+                    )
                 except (json.JSONDecodeError, TypeError) as e:
                     logger.warning("Failed to deserialize citations: %s", e)
                     processed_message["citations"] = []
@@ -359,7 +399,9 @@ async def delete_conversation(user_id: str, conversation_id: str) -> bool:
         # If the userId in the conversation does not match the user_id, deny access
         if user_id and conversation and conversation[0]["userId"] != user_id:
             logger.warning(
-                "User %s does not have permission to delete %s.", user_id, conversation_id
+                "User %s does not have permission to delete %s.",
+                user_id,
+                conversation_id,
             )
             return False
 
@@ -374,7 +416,7 @@ async def delete_conversation(user_id: str, conversation_id: str) -> bool:
             query_m = "DELETE FROM hst_conversations where userId = ?  and conversation_id = ?"
             await run_nonquery_params(query_m, params)
         else:
-            params = (conversation_id)
+            params = conversation_id
             # Delete associated messages first (if applicable)
             query_m = "DELETE FROM hst_conversation_messages where conversation_id = ?"
             await run_nonquery_params(query_m, params)
@@ -401,7 +443,6 @@ async def delete_all_conversations(user_id: str) -> bool:
         bool: True if all conversations were successfully deleted, False otherwise.
     """
     try:
-
         if user_id:
             # Delete all associated messages
             query_m = "DELETE FROM hst_conversation_messages WHERE userId = ?"
@@ -447,7 +488,10 @@ async def rename_conversation(user_id: str, conversation_id, title) -> bool:
             raise ValueError("No conversation_id found")
 
         if title is None:
-            logger.warning("Title is None, cannot rename title of the conversation %s.", conversation_id)
+            logger.warning(
+                "Title is None, cannot rename title of the conversation %s.",
+                conversation_id,
+            )
             return False
 
         query = "SELECT userId, conversation_id FROM hst_conversations where conversation_id = ?"
@@ -461,7 +505,9 @@ async def rename_conversation(user_id: str, conversation_id, title) -> bool:
         # Check if the user has permission to rename it
         if user_id and conversation and conversation[0]["userId"] != user_id:
             logger.warning(
-                "User %s does not have permission to rename %s.", user_id, conversation_id
+                "User %s does not have permission to rename %s.",
+                user_id,
+                conversation_id,
             )
             return False
 
@@ -475,7 +521,12 @@ async def rename_conversation(user_id: str, conversation_id, title) -> bool:
 
         return True
     except Exception as e:
-        logger.exception("Error updating title of conversation %s to '%s': %s", conversation_id, title, e)
+        logger.exception(
+            "Error updating title of conversation %s to '%s': %s",
+            conversation_id,
+            title,
+            e,
+        )
         return False
 
 
@@ -500,14 +551,18 @@ async def generate_title(conversation_messages):
 
         # Combine all user messages with the title prompt
         combined_content = "\n".join([msg["content"] for msg in user_messages])
-        final_prompt = f"Generate a 4-word or less title for this request:\n{combined_content}"
+        final_prompt = (
+            f"Generate a 4-word or less title for this request:\n{combined_content}"
+        )
         if not AZURE_AI_AGENT_ENDPOINT:
-            logger.warning("Azure AI Agent endpoint not configured, using fallback title generation")
+            logger.warning(
+                "Azure AI Agent endpoint not configured, using fallback title generation"
+            )
             return generate_fallback_title(conversation_messages)
 
         async with AIProjectClient(
             endpoint=AZURE_AI_AGENT_ENDPOINT,
-            credential=await get_azure_credential_async()
+            credential=await get_azure_credential_async(),
         ) as project_client:
             chat_client = AzureAIClient(
                 project_client=project_client,
@@ -521,10 +576,17 @@ async def generate_title(conversation_messages):
             ) as chat_agent:
                 thread = chat_agent.get_new_thread()
                 result = await chat_agent.run(messages=final_prompt, thread=thread)
-                return str(result).strip() if result is not None else generate_fallback_title(conversation_messages)
+                return (
+                    str(result).strip()
+                    if result is not None
+                    else generate_fallback_title(conversation_messages)
+                )
 
     except ServiceResponseException as sre:
-        logger.warning("ServiceResponseException generating title with Azure AI Foundry agent: %s", sre)
+        logger.warning(
+            "ServiceResponseException generating title with Azure AI Foundry agent: %s",
+            sre,
+        )
         return generate_fallback_title(conversation_messages)
 
     except Exception as e:
@@ -633,7 +695,9 @@ async def create_message(uuid, conversation_id, user_id, input_message: dict):
         #     return None
 
         if not conversation_id:
-            logger.warning("No conversation_id found, cannot create conversation message.")
+            logger.warning(
+                "No conversation_id found, cannot create conversation message."
+            )
             return None
 
         # Ensure the conversation exists
@@ -673,13 +737,24 @@ async def create_message(uuid, conversation_id, user_id, input_message: dict):
         if isinstance(content, dict):
             content = json.dumps(content)
             print(content)
-        params = (user_id, conversation_id, input_message["role"], input_message["id"],
-                  content, citations_json, feedback, utc_now, utc_now)
+        params = (
+            user_id,
+            conversation_id,
+            input_message["role"],
+            input_message["id"],
+            content,
+            citations_json,
+            feedback,
+            utc_now,
+            utc_now,
+        )
         resp = await run_nonquery_params(query, params)
 
         if resp:
             # Update the conversation's updatedAt timestamp
-            query_t = "UPDATE hst_conversations SET updatedAt = ? WHERE conversation_id = ?"
+            query_t = (
+                "UPDATE hst_conversations SET updatedAt = ? WHERE conversation_id = ?"
+            )
             resp = await run_nonquery_params(query_t, (utc_now, conversation_id))
 
             return resp
@@ -720,7 +795,9 @@ async def update_conversation(user_id: str, request_json: dict):
 
         if not conversation or len(conversation) == 0:
             title = await generate_title(messages)
-            await create_conversation(user_id=user_id, conversation_id=conversation_id, title=title)
+            await create_conversation(
+                user_id=user_id, conversation_id=conversation_id, title=title
+            )
 
         messages = request_json["messages"]
         if len(messages) > 0 and messages[0]["role"] == "user":
@@ -743,13 +820,12 @@ async def update_conversation(user_id: str, request_json: dict):
                 logger.warning("Conversation not found for ID: %s", conversation_id)
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Conversation not found"
+                    detail="Conversation not found",
                 )
         else:
             logger.warning("No user message found in request")
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User message not found"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User message not found"
             )
 
         messages = request_json["messages"]
@@ -773,7 +849,7 @@ async def update_conversation(user_id: str, request_json: dict):
             logger.warning("No assistant message found in request")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Assistant message not found"
+                detail="Assistant message not found",
             )
 
         queryReturn = "SELECT * FROM hst_conversations where conversation_id = ?"
@@ -783,7 +859,8 @@ async def update_conversation(user_id: str, request_json: dict):
             return {
                 "id": conversationUpdated[0].get("conversation_id"),
                 "title": conversationUpdated[0].get("title"),
-                "updatedAt": conversationUpdated[0].get("updatedAt")}
+                "updatedAt": conversationUpdated[0].get("updatedAt"),
+            }
         else:
             return None
 
@@ -796,7 +873,7 @@ async def update_conversation(user_id: str, request_json: dict):
 async def list_conversations(
     request: Request,
     offset: int = Query(0, alias="offset"),
-    limit: int = Query(25, alias="limit")
+    limit: int = Query(25, alias="limit"),
 ):
     """
     List conversations for authenticated user with pagination.
@@ -821,17 +898,25 @@ async def list_conversations(
         )
         user_id = authenticated_user["user_principal_id"]
 
-        logger.info("Historyfab list-API: user_id: %s, offset: %s, limit: %s", user_id, offset, limit)
+        logger.info(
+            "Historyfab list-API: user_id: %s, offset: %s, limit: %s",
+            user_id,
+            offset,
+            limit,
+        )
 
         # Get conversations
         conversations = await get_conversations(user_id, offset=offset, limit=limit)
         if user_id:
-            track_event_if_configured("ConversationsListed", {
-                "user_id": user_id,
-                "offset": offset,
-                "limit": limit,
-                "conversation_count": len(conversations)
-            })
+            track_event_if_configured(
+                "ConversationsListed",
+                {
+                    "user_id": user_id,
+                    "offset": offset,
+                    "limit": limit,
+                    "conversation_count": len(conversations),
+                },
+            )
 
         return JSONResponse(content=conversations, status_code=200)
     except HTTPException:
@@ -842,7 +927,9 @@ async def list_conversations(
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )
 
 
 @router.get("/read")
@@ -870,36 +957,41 @@ async def get_conversation_messages_endpoint(request: Request, id: str = Query(.
 
         if not conversation_id:
             if user_id:
-                track_event_if_configured("ReadConversationValidationError", {
-                    "error": "conversation_id is required",
-                    "user_id": user_id
-                })
+                track_event_if_configured(
+                    "ReadConversationValidationError",
+                    {"error": "conversation_id is required", "user_id": user_id},
+                )
             raise HTTPException(status_code=400, detail="conversation_id is required")
 
         # Get conversation message details
         conversationMessages = await get_conversation_messages(user_id, conversation_id)
         if not conversationMessages or len(conversationMessages) == 0:
             if user_id:
-                track_event_if_configured("ReadConversationNotFound", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id
-                })
+                track_event_if_configured(
+                    "ReadConversationNotFound",
+                    {"user_id": user_id, "conversation_id": conversation_id},
+                )
             raise HTTPException(
                 status_code=404,
-                detail=f"Conversation {conversation_id} was not found. It either does not exist or the user does not have access to it."
+                detail=f"Conversation {conversation_id} was not found. It either does not exist or the user does not have access to it.",
             )
 
         if user_id:
-            track_event_if_configured("ConversationRead", {
-                "user_id": user_id,
-                "conversation_id": conversation_id,
-                "message_count": len(conversationMessages)
-            })
+            track_event_if_configured(
+                "ConversationRead",
+                {
+                    "user_id": user_id,
+                    "conversation_id": conversation_id,
+                    "message_count": len(conversationMessages),
+                },
+            )
         return JSONResponse(
             content={
                 "conversation_id": conversation_id,
-                "messages": conversationMessages},
-            status_code=200)
+                "messages": conversationMessages,
+            },
+            status_code=200,
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -908,7 +1000,9 @@ async def get_conversation_messages_endpoint(request: Request, id: str = Query(.
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )
 
 
 @router.delete("/delete")
@@ -935,35 +1029,37 @@ async def delete_conversation_endpoint(request: Request, id: str = Query(...)):
 
         conversation_id = id
         if not conversation_id:
-            track_event_if_configured("DeleteConversationValidationError", {
-                "error": "conversation_id is missing",
-                "user_id": user_id
-            })
+            track_event_if_configured(
+                "DeleteConversationValidationError",
+                {"error": "conversation_id is missing", "user_id": user_id},
+            )
             raise HTTPException(status_code=400, detail="conversation_id is required")
 
         # Delete conversation using HistoryService
         deleted = await delete_conversation(user_id, conversation_id)
         if deleted:
             if user_id:
-                track_event_if_configured("ConversationDeleted", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id
-                })
+                track_event_if_configured(
+                    "ConversationDeleted",
+                    {"user_id": user_id, "conversation_id": conversation_id},
+                )
             return JSONResponse(
                 content={
                     "message": "Successfully deleted conversation and messages",
-                    "conversation_id": conversation_id},
+                    "conversation_id": conversation_id,
+                },
                 status_code=200,
             )
         else:
             if user_id:
-                track_event_if_configured("DeleteConversationNotFound", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id
-                })
+                track_event_if_configured(
+                    "DeleteConversationNotFound",
+                    {"user_id": user_id, "conversation_id": conversation_id},
+                )
             raise HTTPException(
                 status_code=404,
-                detail=f"Conversation {conversation_id} not found or user does not have permission to delete.")
+                detail=f"Conversation {conversation_id} not found or user does not have permission to delete.",
+            )
     except HTTPException:
         raise
     except Exception as e:
@@ -972,7 +1068,9 @@ async def delete_conversation_endpoint(request: Request, id: str = Query(...)):
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )
 
 
 @router.delete("/delete_all")
@@ -992,7 +1090,8 @@ async def delete_all_conversations_endpoint(request: Request):
     try:
         # Get the user ID from request headers
         authenticated_user = get_authenticated_user_details(
-            request_headers=request.headers)
+            request_headers=request.headers
+        )
         user_id = authenticated_user["user_principal_id"]
 
         # if not user_id:
@@ -1004,33 +1103,35 @@ async def delete_all_conversations_endpoint(request: Request):
         # Get all user conversations
         conversations = await get_conversations(user_id, offset=0, limit=None)
         if not conversations:
-            track_event_if_configured("DeleteAllConversationsNotFound", {
-                "user_id": user_id
-            })
-            raise HTTPException(status_code=404,
-                                detail=f"No conversations for {user_id} were found")
+            track_event_if_configured(
+                "DeleteAllConversationsNotFound", {"user_id": user_id}
+            )
+            raise HTTPException(
+                status_code=404, detail=f"No conversations for {user_id} were found"
+            )
 
         # Delete all conversations
         deleted = await delete_all_conversations(user_id)
         if deleted:
             if user_id:
-                track_event_if_configured("AllConversationsDeleted", {
-                    "user_id": user_id,
-                    "deleted_count": len(conversations)
-                })
+                track_event_if_configured(
+                    "AllConversationsDeleted",
+                    {"user_id": user_id, "deleted_count": len(conversations)},
+                )
             return JSONResponse(
                 content={
-                    "message": f"Successfully deleted all conversations for user {user_id}"},
+                    "message": f"Successfully deleted all conversations for user {user_id}"
+                },
                 status_code=200,
             )
         else:
             if user_id:
-                track_event_if_configured("DeleteAllConversationsNotFound", {
-                    "user_id": user_id
-                })
+                track_event_if_configured(
+                    "DeleteAllConversationsNotFound", {"user_id": user_id}
+                )
             raise HTTPException(
-                status_code=404,
-                detail=f"Conversation not found for user {user_id}")
+                status_code=404, detail=f"Conversation not found for user {user_id}"
+            )
     except HTTPException:
         raise
     except Exception as e:
@@ -1039,7 +1140,9 @@ async def delete_all_conversations_endpoint(request: Request):
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )
 
 
 @router.post("/rename")
@@ -1058,7 +1161,8 @@ async def rename_conversation_endpoint(request: Request):
     """
     try:
         authenticated_user = get_authenticated_user_details(
-            request_headers=request.headers)
+            request_headers=request.headers
+        )
         user_id = authenticated_user["user_principal_id"]
 
         # Parse request body
@@ -1068,43 +1172,51 @@ async def rename_conversation_endpoint(request: Request):
 
         if not conversation_id:
             if user_id:
-                track_event_if_configured("RenameConversationValidationError", {
-                    "error": "conversation_id is required",
-                    "user_id": user_id
-                })
+                track_event_if_configured(
+                    "RenameConversationValidationError",
+                    {"error": "conversation_id is required", "user_id": user_id},
+                )
             raise HTTPException(status_code=400, detail="conversation_id is required")
         if not title:
             if user_id:
-                track_event_if_configured("RenameConversationValidationError", {
-                    "error": "title is required",
-                    "user_id": user_id
-                })
+                track_event_if_configured(
+                    "RenameConversationValidationError",
+                    {"error": "title is required", "user_id": user_id},
+                )
             raise HTTPException(status_code=400, detail="title is required")
 
         rename_result = await rename_conversation(user_id, conversation_id, title)
 
         if rename_result:
             if user_id:
-                track_event_if_configured("ConversationRenamedTitle", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id,
-                    "new_title": title
-                })
+                track_event_if_configured(
+                    "ConversationRenamedTitle",
+                    {
+                        "user_id": user_id,
+                        "conversation_id": conversation_id,
+                        "new_title": title,
+                    },
+                )
             return JSONResponse(
                 content={
-                    "message": f"Successfully renamed title of conversation {conversation_id} to title '{title}'"},
+                    "message": f"Successfully renamed title of conversation {conversation_id} to title '{title}'"
+                },
                 status_code=200,
             )
         else:
             if user_id:
-                track_event_if_configured("ConversationRenamedTitleNotFound", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id,
-                    "new_title": title
-                })
+                track_event_if_configured(
+                    "ConversationRenamedTitleNotFound",
+                    {
+                        "user_id": user_id,
+                        "conversation_id": conversation_id,
+                        "new_title": title,
+                    },
+                )
             raise HTTPException(
                 status_code=404,
-                detail=f"Conversation {conversation_id} not found or user does not have permission to rename.")
+                detail=f"Conversation {conversation_id} not found or user does not have permission to rename.",
+            )
     except HTTPException:
         raise
     except Exception as e:
@@ -1113,7 +1225,9 @@ async def rename_conversation_endpoint(request: Request):
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )
 
 
 @router.post("/update")
@@ -1132,7 +1246,8 @@ async def update_conversation_endpoint(request: Request):
     """
     try:
         authenticated_user = get_authenticated_user_details(
-            request_headers=request.headers)
+            request_headers=request.headers
+        )
         user_id = authenticated_user["user_principal_id"]
 
         # Parse request body
@@ -1147,11 +1262,14 @@ async def update_conversation_endpoint(request: Request):
 
         if not update_response:
             if user_id:
-                track_event_if_configured("ConversationUpdated", {
-                    "user_id": user_id,
-                    "conversation_id": conversation_id,
-                    "title": update_response["title"]
-                })
+                track_event_if_configured(
+                    "ConversationUpdated",
+                    {
+                        "user_id": user_id,
+                        "conversation_id": conversation_id,
+                        "title": update_response["title"],
+                    },
+                )
             raise HTTPException(status_code=500, detail="Failed to update conversation")
 
         return JSONResponse(
@@ -1173,4 +1291,6 @@ async def update_conversation_endpoint(request: Request):
         if span is not None:
             span.record_exception(e)
             span.set_status(Status(StatusCode.ERROR, str(e)))
-        return JSONResponse(content={"error": "An internal error has occurred!"}, status_code=500)
+        return JSONResponse(
+            content={"error": "An internal error has occurred!"}, status_code=500
+        )

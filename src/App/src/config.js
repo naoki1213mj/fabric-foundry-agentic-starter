@@ -3,11 +3,11 @@ function getRuntimeConfigValue(runtimeKey, envKey, defaultValue) {
     const val = window._env_[runtimeKey].trim();
     if (val && val !== `$${runtimeKey}`) {
       return val;
-    }   
+    }
   }
   if (process.env[envKey]) {
     return process.env[envKey];
-  }  
+  }
   return defaultValue;
 }
 export function getApiBaseUrl() {
@@ -17,6 +17,6 @@ export function getChatLandingText() {
   return getRuntimeConfigValue(
     "CHAT_LANDING_TEXT",
     "REACT_APP_CHAT_LANDING_TEXT",
-    "You can ask questions around sales, products and orders."
+    "売上、商品、注文に関する質問ができます。"
   );
 }

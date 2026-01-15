@@ -1,0 +1,138 @@
+name: CI - Pull Request Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # ===================================
+  # Python Lint & Test
+  # ===================================
+  python-check:
+    name: 🐍 Python Lint & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/api
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest pytest-asyncio pytest-cov
+          pip install -r requirements.txt
+      
+      - name: Lint with Ruff
+        run: |
+          ruff check . --output-format=github
+          ruff format --check .
+      
+      - name: Run tests
+        run: |
+          pytest tests/ -v --cov=. --cov-report=xml --cov-report=term-missing
+        env:
+          DEMO_MODE: "true"
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ===================================
+  # Frontend Build Check
+  # ===================================
+  frontend-check:
+    name: ⚛️ Frontend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/web
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: src/web/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npm run lint --if-present
+      
+      - name: Type check
+        run: npm run type-check --if-present
+      
+      - name: Build
+        run: npm run build
+
+  # ===================================
+  # Infrastructure Validation
+  # ===================================
+  infra-check:
+    name: 🏗️ Bicep Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure CLI Login (for validation only)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+        continue-on-error: true
+      
+      - name: Validate Bicep
+        run: |
+          az bicep build --file infra/main.bicep --stdout > /dev/null
+        continue-on-error: true
+      
+      - name: Bicep Linter
+        run: |
+          az bicep lint --file infra/main.bicep
+        continue-on-error: true
+
+  # ===================================
+  # Summary
+  # ===================================
+  ci-summary:
+    name: 📊 CI Summary
+    needs: [python-check, frontend-check, infra-check]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🔍 CI Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Lint & Test | ${{ needs.python-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend Build | ${{ needs.frontend-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bicep Validation | ${{ needs.infra-check.result }} |" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check for failures
+        if: contains(needs.*.result, 'failure')
+        run: exit 1

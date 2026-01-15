@@ -1,0 +1,428 @@
+# Azure Agentic AI Hackathon 2025 - Fabric + Foundry Configuration
+
+> **Mission**: Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI アプリで、TDM が10分で意思決定できる「Why Microsoft, Why Now」デモを実現する
+>
+> **Base**: [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
+>
+> **Last Updated**: 2026/1/15
+
+---
+
+## 📊 サービス状態（2026年1月時点）
+
+| サービス | 状態 | 備考 |
+|----------|------|------|
+| **Microsoft Agent Framework** | Public Preview | GA予定: 2026年Q1 |
+| **Foundry Agent Service** | GA | 2025年5月〜 |
+| **Hosted Agents** | GA | azd deploy対応 |
+| **Foundry Guardrails** | Public Preview | Task Adherence, Prompt Shields, PII |
+| **SQL Database in Fabric** | GA | 2025年11月〜 |
+| **OneLake Security** | Preview | RLS/CLS対応 |
+
+---
+
+## 🏛️ Azure Cloud Adoption Framework (CAF) 準拠
+
+### 命名規則
+
+```
+{resource-type}-{workload}-{environment}[-{region}][-{instance}]
+
+Solution Accelerator 構成例:
+├── rg-aiagent-prod-jpe                    # リソースグループ
+├── ai-aiagent-prod-jpe                    # Microsoft Foundry
+├── oai-aiagent-prod-jpe                   # Azure OpenAI
+├── ca-aiagent-api-prod-jpe                # Container Apps (API)
+├── ca-aiagent-web-prod-jpe                # Container Apps (Frontend)
+├── acr-aiagent-prod-jpe                   # Container Registry
+├── fabric-aiagent-prod                    # Fabric Workspace
+├── sqldb-aiagent-prod                     # SQL Database in Fabric
+├── log-aiagent-prod-jpe                   # Log Analytics
+├── appi-aiagent-prod-jpe                  # Application Insights
+└── kv-aiagent-prod-jpe                    # Key Vault
+```
+
+### CAF標準リソース略称
+
+| サービス | 略称 | 用途 |
+|----------|------|------|
+| Microsoft Foundry | ai | AI基盤・エージェント管理 |
+| Azure OpenAI | oai | LLM (GPT-4o, GPT-4o-mini) |
+| Container Apps | ca | API / Frontend ホスティング |
+| Container Registry | acr | コンテナイメージ管理 |
+| Fabric Workspace | fabric | データ統合基盤 |
+| SQL Database (Fabric) | sqldb | 構造化データ |
+| Log Analytics | log | ログ収集・分析 |
+| Application Insights | appi | APM・分散トレーシング |
+
+### 必須タグ
+
+```bicep
+var tags = {
+  workload: 'aiagent'
+  environment: 'prod'
+  costCenter: 'CC-HACKATHON'
+  owner: 'team-ai@contoso.com'
+  architecture: 'fabric-foundry'
+  solutionAccelerator: 'unified-data-foundation'
+  dataClassification: 'confidential'
+}
+```
+
+---
+
+## 🎯 審査基準への対応
+
+| 基準 | 対応方法 | 技術要素 |
+|------|----------|----------|
+| **Why Microsoft** | Unified Data Foundation | Fabric + Foundry + Agent Framework |
+| **Why Now** | Agentic AI の統合プラットフォーム | Agent Framework GA + Foundry Agent Service |
+| **技術統合** | 5領域カバー | AI App + Data + Infra + Security + GitHub |
+| **ACRインパクト** | エンタープライズAI消費 | Fabric F2+ / OpenAI PTU |
+
+---
+
+## 🏗️ Solution Accelerator アーキテクチャ
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Client Layer                                        │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure Container Apps - Frontend (ca-aiagent-web)                    │    │
+│  │ ├─ React + TypeScript                                               │    │
+│  │ ├─ Natural Language Query Interface                                 │    │
+│  │ ├─ Chat History / Session Management                                │    │
+│  │ └─ Built-in Auth (Entra ID)                                        │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────┬──────────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────────┐
+│                          API Layer                                           │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure Container Apps - API (ca-aiagent-api)                         │    │
+│  │ ├─ Microsoft Agent Framework (Python/.NET)                          │    │
+│  │ ├─ REST API Endpoints                                               │    │
+│  │ ├─ Agent Orchestration                                              │    │
+│  │ └─ Tool Invocation / MCP Integration                               │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────┬──────────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────────┐
+│                       AI / Agent Layer                                       │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Microsoft Foundry (ai-aiagent-prod)                                 │    │
+│  │ ├─ Foundry Agent Service                                            │    │
+│  │ │   ├─ Agent Runtime (Conversation, Tool Call, Safety)             │    │
+│  │ │   ├─ Hosted Agents (azd deploy)                                  │    │
+│  │ │   └─ OpenTelemetry Integration                                   │    │
+│  │ ├─ Foundry IQ (Agentic RAG) [Optional]                             │    │
+│  │ │   ├─ Query Decomposition                                          │    │
+│  │ │   └─ SharePoint / OneLake Integration                            │    │
+│  │ └─ Foundry Guardrails                                               │    │
+│  │     ├─ Task Adherence                                               │    │
+│  │     ├─ Prompt Shields + Spotlighting                               │    │
+│  │     └─ Groundedness Detection                                       │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure OpenAI (oai-aiagent-prod)                                     │    │
+│  │ ├─ GPT-4o (Reasoning / Chat)                                       │    │
+│  │ ├─ GPT-4o-mini (Cost Optimized)                                    │    │
+│  │ └─ text-embedding-3-large (Vector Embedding)                       │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Microsoft Agent Framework                                           │    │
+│  │ ├─ ChatAgent (Multi-turn Conversation)                             │    │
+│  │ ├─ Tools (@ai_function decorator)                                  │    │
+│  │ │   ├─ SQL Query Tool (Fabric連携)                                 │    │
+│  │ │   ├─ Search Tool (AI Search連携)                                 │    │
+│  │ │   └─ Custom Business Tools                                       │    │
+│  │ ├─ Workflow Orchestration (Graph-based)                            │    │
+│  │ │   ├─ Sequential / Concurrent / HandOff                           │    │
+│  │ │   └─ Magentic (Manager-Specialist)                               │    │
+│  │ └─ Memory (Cosmos DB / Redis / Postgres)                           │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────┬──────────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────────┐
+│                       Data Layer (Unified Data Foundation)                   │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Microsoft Fabric (fabric-aiagent-prod)                              │    │
+│  │ ├─ OneLake (Unified Data Lake)                                     │    │
+│  │ │   ├─ Bronze: Raw Data                                             │    │
+│  │ │   ├─ Silver: Validated/Cleansed                                  │    │
+│  │ │   └─ Gold: Business-Ready                                         │    │
+│  │ ├─ SQL Database in Fabric (sqldb-aiagent-prod)                     │    │
+│  │ │   ├─ Structured Data Storage                                      │    │
+│  │ │   ├─ T-SQL Queries                                                │    │
+│  │ │   └─ Agent Memory / Chat History                                 │    │
+│  │ ├─ Fabric Data Agent [Optional]                                    │    │
+│  │ │   ├─ NL2SQL (Natural Language → T-SQL)                          │    │
+│  │ │   ├─ NL2DAX (Natural Language → DAX)                            │    │
+│  │ │   └─ Ontology (Business Context)                                 │    │
+│  │ └─ Power BI Semantic Models                                         │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────┬──────────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼──────────────────────────────────────────┐
+│                    Observability & Security Layer                            │
+│  ┌──────────────────────────────┐  ┌────────────────────────────────────┐   │
+│  │ Azure Monitor               │  │ Microsoft Defender for Cloud       │   │
+│  │ ├─ Application Insights    │  │ ├─ AI Security Posture            │   │
+│  │ ├─ Log Analytics          │  │ └─ Container Security             │   │
+│  │ └─ OpenTelemetry          │  └────────────────────────────────────┘   │
+│  └──────────────────────────────┘                                          │
+│  ┌──────────────────────────────┐  ┌────────────────────────────────────┐   │
+│  │ Key Vault                   │  │ Managed Identity                   │   │
+│  │ └─ Secrets / Keys          │  │ └─ RBAC (最小権限)                │   │
+│  └──────────────────────────────┘  └────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Azure Developer CLI (azd) デプロイ
+
+### 基本コマンド
+
+```bash
+# 認証
+azd auth login
+
+# 初期化（既存リポジトリの場合はスキップ）
+azd init
+
+# 全リソースデプロイ（推奨）
+azd up
+
+# 個別操作
+azd provision      # インフラのみ
+azd deploy         # アプリのみ
+
+# クリーンアップ
+azd down
+```
+
+### azure.yaml 構造
+
+```yaml
+name: agentic-unified-data-foundation
+metadata:
+  template: microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator
+
+services:
+  api:
+    project: src/api
+    host: containerapp
+    language: python
+    docker:
+      path: ./Dockerfile
+      context: .
+  
+  web:
+    project: src/web
+    host: containerapp
+    language: typescript
+    docker:
+      path: ./Dockerfile
+      context: .
+
+infra:
+  provider: bicep
+  path: ./infra
+  module: main
+```
+
+---
+
+## 🔐 セキュリティ設計
+
+### 認証・認可
+
+```yaml
+authentication:
+  frontend:
+    provider: "Entra ID (Container Apps EasyAuth)"
+  
+  api:
+    method: "Managed Identity (SystemAssigned)"
+    credential: "DefaultAzureCredential"
+  
+  foundry:
+    method: "Entra ID + RBAC"
+    roles:
+      - "Azure AI Developer"
+      - "Cognitive Services OpenAI User"
+  
+  fabric:
+    method: "Entra ID"
+    roles:
+      - "Fabric Workspace Contributor"
+```
+
+### Foundry Guardrails
+
+```python
+guardrails_config = {
+    "task_adherence": {
+        "enabled": True,
+        "action": "block",
+        "description": "エージェントの目的逸脱を防止"
+    },
+    "prompt_shields": {
+        "enabled": True,
+        "spotlighting": True,
+        "jailbreak_detection": True
+    },
+    "groundedness_detection": {
+        "enabled": True,
+        "threshold": 0.7,
+        "description": "ハルシネーション防止"
+    }
+}
+```
+
+---
+
+## 🔧 技術スタック詳細
+
+### Compute
+
+| コンポーネント | サービス | 特徴 |
+|----------------|----------|------|
+| API Server | Azure Container Apps | Serverless, Auto-scale |
+| Frontend | Azure Container Apps | React + TypeScript |
+| Container Registry | Azure Container Registry | Basic Tier |
+
+### AI/Agent
+
+| コンポーネント | サービス | 状態 (2026/1) |
+|----------------|----------|---------------|
+| Agent Framework | Microsoft Agent Framework | Public Preview (GA: Q1 2026) |
+| Agent Service | Foundry Agent Service | GA |
+| Hosted Agents | Foundry Hosted Agents | GA |
+| LLM | Azure OpenAI | GPT-4o, GPT-4o-mini |
+| Guardrails | Foundry Guardrails | Public Preview |
+
+### Data
+
+| コンポーネント | サービス | 状態 (2026/1) |
+|----------------|----------|---------------|
+| Data Platform | Microsoft Fabric | F2 Capacity以上 |
+| Database | SQL Database in Fabric | GA |
+| Data Lake | OneLake | Medallion Architecture |
+| Security | OneLake Security | Preview (RLS/CLS) |
+
+---
+
+## 📐 カスタマイズガイド
+
+### 1. 業界シナリオのカスタマイズ
+
+```
+元のシナリオ: Sales Analyst（汎用）
+        ↓
+カスタマイズ例:
+├─ 製造業: 品質管理 + 予知保全 Agent
+├─ 金融: リスク分析 + コンプライアンス Agent
+├─ 小売: 在庫最適化 + 需要予測 Agent
+└─ ヘルスケア: 患者分析 + 治療推奨 Agent
+```
+
+### 2. Agent Tool のカスタマイズ
+
+```python
+from agent_framework import ChatAgent, ai_function
+
+class CustomSalesAgent(ChatAgent):
+    @ai_function
+    async def query_sales_data(self, query: str) -> str:
+        """売上データをクエリする"""
+        # Fabric SQL Database への接続
+        result = await self.fabric_client.execute_sql(query)
+        return result
+    
+    @ai_function
+    async def get_customer_insights(self, customer_id: str) -> str:
+        """顧客インサイトを取得する"""
+        # カスタムロジック
+        return insights
+```
+
+### 3. Guardrails のカスタマイズ
+
+```python
+# 業界固有のGuardrails追加
+industry_guardrails = {
+    "pii_detection": {
+        "enabled": True,
+        "categories": ["医療情報", "金融情報", "個人識別情報"],
+        "action": "redact"
+    },
+    "compliance_check": {
+        "enabled": True,
+        "regulations": ["GDPR", "HIPAA", "金融商品取引法"],
+        "action": "warn"
+    }
+}
+```
+
+---
+
+## 📁 Solution Accelerator ファイル構成
+
+```
+agentic-applications-for-unified-data-foundation-solution-accelerator/
+├── .azdo/pipelines/           # Azure DevOps CI/CD
+├── .devcontainer/             # Dev Container設定
+├── .github/                   # GitHub設定
+│   ├── copilot-instructions.md  ← このファイルを追加
+│   ├── instructions/            ← 追加
+│   ├── prompts/                 ← 追加
+│   ├── agents/                  ← 追加
+│   ├── chatmodes/               ← 追加
+│   └── skills/                  ← 追加
+├── documents/                 # ドキュメント
+├── infra/                     # Bicep IaC
+├── src/                       # ソースコード
+│   ├── api/                   # Backend API (Python)
+│   └── web/                   # Frontend (React)
+├── tests/                     # テスト
+├── azure.yaml                 # azd設定
+├── AGENTS.md                  ← 追加
+├── DEMO.md                    ← 追加
+└── README.md
+```
+
+---
+
+## 💰 コスト見積もり
+
+### 必須コスト
+
+| サービス | SKU | 月額概算 |
+|----------|-----|----------|
+| Microsoft Fabric | F2 | ¥15,000〜 |
+| Azure OpenAI | S0 (Pay-per-token) | ¥10,000〜 |
+| Container Apps | Consumption | ¥3,000〜 |
+| Container Registry | Basic | ¥800 |
+| Application Insights | Pay-as-you-go | ¥1,000〜 |
+| **合計** | | **約¥30,000〜/月** |
+
+### 注意事項
+
+- Fabric F2 Capacity は固定コスト（使用量に関わらず発生）
+- OpenAI はトークン数に応じた従量課金
+- Container Apps は使用しない時間帯はほぼ¥0
+
+---
+
+## 🔗 参照リソース
+
+| リソース | URL |
+|----------|-----|
+| Solution Accelerator | https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator |
+| Microsoft Agent Framework | https://learn.microsoft.com/agent-framework/ |
+| Foundry Agent Service | https://learn.microsoft.com/azure/ai-foundry/agents/ |
+| Microsoft Fabric | https://learn.microsoft.com/fabric/ |
+| Azure Developer CLI | https://learn.microsoft.com/azure/developer/azure-developer-cli/ |
+| Azure CAF Naming | https://learn.microsoft.com/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming |

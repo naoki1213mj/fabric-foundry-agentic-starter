@@ -28,7 +28,7 @@ param backendRuntimeStack string
   'Retail-sales-analysis'
   'Insurance-improve-customer-meetings'
 ])
-param usecase string 
+param usecase string
 
 // @minLength(1)
 // @description('Location for the Content Understanding service deployment:')
@@ -67,7 +67,7 @@ param azureAiAgentApiVersion string = '2025-05-01'
 @description('Capacity of the GPT deployment:')
 // You can increase this, but capacity is limited per model/region, so you will get errors if you go over
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
-param gptDeploymentCapacity int = 150
+param gptDeploymentCapacity int = 30
 
 @description('Optional. The tags to apply to all deployed Azure resources.')
 param tags resourceInput<'Microsoft.Resources/resourceGroups@2025-04-01'>.tags = {}
@@ -93,10 +93,10 @@ var uniqueId = toLower(uniqueString(subscription().id, environmentName, solution
 @metadata({
   azd:{
     type: 'location'
-    usageName: [
-      'OpenAI.GlobalStandard.gpt-4o-mini,150'
-      // 'OpenAI.GlobalStandard.text-embedding-ada-002,80'
-    ]
+    // usageName: [
+    //   'OpenAI.Standard.gpt-4o-mini,30'
+    //   // 'OpenAI.GlobalStandard.text-embedding-ada-002,80'
+    // ]
   }
 })
 @description('Location for AI Foundry deployment. This is the location where the AI Foundry resources will be deployed.')
@@ -117,8 +117,8 @@ resource resourceGroupTags 'Microsoft.Resources/tags@2021-04-01' = {
   properties: {
     tags: union(
       reference(
-        resourceGroup().id, 
-        '2021-04-01', 
+        resourceGroup().id,
+        '2021-04-01',
         'Full'
       ).tags ?? {},
       {
@@ -244,7 +244,7 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
     // keyVaultName: kvault.outputs.keyvaultName
     aiServicesName: aifoundry.outputs.aiServicesName
     azureExistingAIProjectResourceId: azureExistingAIProjectResourceId
-    // aiSearchName: aifoundry.outputs.aiSearchName 
+    // aiSearchName: aifoundry.outputs.aiSearchName
     appSettings: {
       AZURE_OPENAI_DEPLOYMENT_MODEL: gptModelName
       AZURE_OPENAI_ENDPOINT: aifoundry.outputs.aiServicesTarget
@@ -298,7 +298,7 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
     // keyVaultName: kvault.outputs.keyvaultName
     aiServicesName: aifoundry.outputs.aiServicesName
     azureExistingAIProjectResourceId: azureExistingAIProjectResourceId
-    // aiSearchName: aifoundry.outputs.aiSearchName 
+    // aiSearchName: aifoundry.outputs.aiSearchName
     appSettings: {
       AZURE_OPENAI_DEPLOYMENT_MODEL: gptModelName
       AZURE_OPENAI_ENDPOINT: aifoundry.outputs.aiServicesTarget
