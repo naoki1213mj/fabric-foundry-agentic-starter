@@ -8,14 +8,8 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./App.css";
-
-// Application version for display
-const APP_VERSION = "2.2.0";
-
 import Chat from "./components/Chat/Chat";
 import { ChatHistoryPanel } from "./components/ChatHistoryPanel/ChatHistoryPanel";
-
-
 import CitationPanel from "./components/CitationPanel/CitationPanel";
 import CustomSpinner from "./components/CustomSpinner/CustomSpinner";
 import { AppLogo } from "./components/Svg/Svg";
@@ -28,6 +22,10 @@ import {
 import { clearChat, setMessages } from "./store/chatSlice";
 import { clearCitation } from "./store/citationSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
+
+// Application version for display
+const APP_VERSION = "2.2.0";
+
 const panels = {
   CHAT: "CHAT",
   CHATHISTORY: "CHATHISTORY",
