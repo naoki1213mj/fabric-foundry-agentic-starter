@@ -1,0 +1,1341 @@
+2026-01-15T07:53:39.0866805Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T07:53:39.1058209Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T07:53:39.1157172Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T07:53:39.1272415Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.1561080Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.1669553Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.1842260Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.3012332Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T07:53:39.4146057Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T07:53:39.4621968Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T07:53:39.4793737Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.5007893Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.5189211Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.5300536Z [2026-01-15 07:53:39 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:53:39.5860970Z INFO:     Started server process [1]
+2026-01-15T07:53:39.5985486Z INFO:     Waiting for application startup.
+2026-01-15T07:53:39.6060316Z INFO:     Application startup complete.
+2026-01-15T07:53:39.6081957Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T07:53:40.3269719Z INFO:     169.254.129.1:19995 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T07:56:27.7713283Z INFO:     169.254.129.1:19833 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T07:56:37.6752800Z INFO:     169.254.129.1:42385 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T07:57:41.5068445Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T07:57:41.6046998Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T07:57:41.6235695Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T07:57:41.6986297Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:41.8844949Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:41.9719598Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:41.9914255Z [2026-01-15 07:57:41 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:42.3276477Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T07:57:42.4240254Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T07:57:42.4240759Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T07:57:42.4723523Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:42.5517342Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:42.5910676Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:42.6837520Z [2026-01-15 07:57:42 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T07:57:42.8770349Z INFO:     Started server process [1]
+2026-01-15T07:57:42.8867683Z INFO:     Waiting for application startup.
+2026-01-15T07:57:42.8951091Z INFO:     Application startup complete.
+2026-01-15T07:57:42.9058532Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T07:57:43.4173088Z INFO:     169.254.129.1:46519 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T07:58:05.0166164Z INFO:     Shutting down
+2026-01-15T07:58:05.1179887Z INFO:     Waiting for application shutdown.
+2026-01-15T07:58:05.1180446Z INFO:     Application shutdown complete.
+2026-01-15T07:58:05.1180484Z INFO:     Finished server process [1]
+2026-01-15T07:59:28.7808199Z INFO:     169.254.129.1:22629 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T07:59:29.2635534Z [2026-01-15 07:59:29 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T07:59:29.2819581Z [2026-01-15 07:59:29 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T07:59:29.2819891Z Traceback (most recent call last):
+2026-01-15T07:59:29.2819929Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T07:59:29.2819961Z     result = await run_query_params(query, params)
+2026-01-15T07:59:29.2819990Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T07:59:29.2820053Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T07:59:29.2820082Z     conn.close()
+2026-01-15T07:59:29.2820109Z     ^^^^^^^^^^
+2026-01-15T07:59:29.2820139Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T07:59:29.2820222Z [2026-01-15 07:59:29 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T07:59:29.2820251Z Traceback (most recent call last):
+2026-01-15T07:59:29.2820462Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T07:59:29.2820512Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T07:59:29.2820543Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T07:59:29.2820571Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T07:59:29.2820599Z     result = await run_query_params(query, params)
+2026-01-15T07:59:29.2820627Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T07:59:29.2820662Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T07:59:29.2820714Z     conn.close()
+2026-01-15T07:59:29.2820741Z     ^^^^^^^^^^
+2026-01-15T07:59:29.2820770Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T07:59:29.2823042Z INFO:     169.254.129.1:22629 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T07:59:31.2345001Z INFO:     169.254.129.1:22629 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T07:59:31.5902971Z INFO:     169.254.129.1:22629 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T07:59:31.7814364Z [2026-01-15 07:59:31 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T07:59:31.8310230Z [2026-01-15 07:59:31 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T07:59:31.8410939Z [2026-01-15 07:59:31 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:01:48.1245203Z INFO:     169.254.129.1:45601 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:02:40.2819145Z [2026-01-15 08:02:40 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:02:40.2897365Z [2026-01-15 08:02:40 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:02:40.2898026Z Traceback (most recent call last):
+2026-01-15T08:02:40.2898073Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:02:40.2898104Z     result = await run_query_params(query, params)
+2026-01-15T08:02:40.2898141Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:40.2898170Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:02:40.2898197Z     conn.close()
+2026-01-15T08:02:40.2898223Z     ^^^^^^^^^^
+2026-01-15T08:02:40.2898252Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:40.3049933Z INFO:     169.254.129.1:33861 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:02:40.3050491Z [2026-01-15 08:02:40 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:40.3050534Z Traceback (most recent call last):
+2026-01-15T08:02:40.3050567Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:02:40.3050598Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:02:40.3050628Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:40.3050665Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:02:40.3050694Z     result = await run_query_params(query, params)
+2026-01-15T08:02:40.3050723Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:40.3050752Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:02:40.3050780Z     conn.close()
+2026-01-15T08:02:40.3050813Z     ^^^^^^^^^^
+2026-01-15T08:02:40.3050872Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:43.2484107Z INFO:     169.254.129.1:33861 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:02:43.2571273Z [2026-01-15 08:02:43 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:02:43.2594460Z [2026-01-15 08:02:43 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:02:43.2594717Z [2026-01-15 08:02:43 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:02:46.6804098Z [2026-01-15 08:02:46 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:02:46.6987050Z INFO:     169.254.129.1:33861 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:02:49.6826028Z [2026-01-15 08:02:46 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:02:49.6826316Z Traceback (most recent call last):
+2026-01-15T08:02:49.6826352Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:02:49.6826381Z     result = await run_query_params(query, params)
+2026-01-15T08:02:49.6826410Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:49.6826439Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:02:49.6826466Z     conn.close()
+2026-01-15T08:02:49.6826511Z     ^^^^^^^^^^
+2026-01-15T08:02:49.6826542Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:49.6826576Z [2026-01-15 08:02:46 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:49.6826603Z Traceback (most recent call last):
+2026-01-15T08:02:49.6826634Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:02:49.6826664Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:02:49.6826693Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:49.6826721Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:02:49.6826750Z     result = await run_query_params(query, params)
+2026-01-15T08:02:49.6826778Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:02:49.6826806Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:02:49.6826849Z     conn.close()
+2026-01-15T08:02:49.6826877Z     ^^^^^^^^^^
+2026-01-15T08:02:49.6826905Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:02:58.1540405Z INFO:     169.254.129.1:31995 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:03:08.1587889Z INFO:     169.254.129.1:55203 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:03:57.4312960Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:03:57.4513899Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:03:57.4999465Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:03:57.5000023Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:57.5863981Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:57.6340968Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:57.7336339Z [2026-01-15 08:03:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:58.0996830Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:03:58.1169534Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:03:58.1772009Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:03:58.2542238Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:58.3108959Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:58.3391886Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:58.4267551Z [2026-01-15 08:03:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:03:58.5578324Z INFO:     Started server process [1]
+2026-01-15T08:03:58.5606919Z INFO:     Waiting for application startup.
+2026-01-15T08:03:58.5693285Z INFO:     Application startup complete.
+2026-01-15T08:03:58.5790659Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:03:58.6844314Z INFO:     169.254.129.1:62573 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T08:04:19.7228910Z INFO:     Shutting down
+2026-01-15T08:04:19.8320972Z INFO:     Waiting for application shutdown.
+2026-01-15T08:04:19.8321669Z INFO:     Application shutdown complete.
+2026-01-15T08:04:19.8331930Z INFO:     Finished server process [1]
+2026-01-15T08:07:33.2457552Z INFO:     Shutting down
+2026-01-15T08:07:33.2458487Z INFO:     Waiting for application shutdown.
+2026-01-15T08:07:33.2458529Z INFO:     Application shutdown complete.
+2026-01-15T08:07:33.2458560Z INFO:     Finished server process [1]
+2026-01-15T08:09:12.8141629Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:09:12.8329076Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:09:12.8426578Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:09:12.8538519Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:12.8807801Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:12.8932433Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:12.9106120Z [2026-01-15 08:09:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:13.1267668Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:09:13.1269962Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:09:13.1558710Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:09:13.1842876Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:13.1941306Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:13.2379334Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:13.2864246Z [2026-01-15 08:09:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:09:13.4300894Z INFO:     Started server process [1]
+2026-01-15T08:09:13.4301406Z INFO:     Waiting for application startup.
+2026-01-15T08:09:13.4393247Z INFO:     Application startup complete.
+2026-01-15T08:09:13.4606673Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:09:14.5552278Z INFO:     169.254.129.1:32739 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T08:09:14.9426902Z INFO:     169.254.129.1:32753 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:09:15.1722809Z [2026-01-15 08:09:15 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:09:15.1752119Z [2026-01-15 08:09:15 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:09:15.1752462Z Traceback (most recent call last):
+2026-01-15T08:09:15.1752603Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:09:15.1752688Z     result = await run_query_params(query, params)
+2026-01-15T08:09:15.1752719Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:09:15.1752775Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:09:15.1752803Z     conn.close()
+2026-01-15T08:09:15.1752830Z     ^^^^^^^^^^
+2026-01-15T08:09:15.1752860Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:09:15.1836920Z [2026-01-15 08:09:15 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:09:15.1837488Z Traceback (most recent call last):
+2026-01-15T08:09:15.1837528Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:09:15.1837600Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:09:15.1837632Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:09:15.1837662Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:09:15.1837691Z     result = await run_query_params(query, params)
+2026-01-15T08:09:15.1837720Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:09:15.1837750Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:09:15.1837776Z     conn.close()
+2026-01-15T08:09:15.1837803Z     ^^^^^^^^^^
+2026-01-15T08:09:15.1837833Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:09:15.1926061Z INFO:     169.254.129.1:32759 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:09:16.0883902Z INFO:     169.254.129.1:32759 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:09:17.1637100Z INFO:     169.254.129.1:32759 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:09:29.0179943Z INFO:     169.254.129.1:13155 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:09:29.0450719Z [2026-01-15 08:09:29 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:09:29.0654489Z [2026-01-15 08:09:29 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:09:29.0748949Z [2026-01-15 08:09:29 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:10:24.0762141Z INFO:     169.254.129.1:43147 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:11:25.4433857Z INFO:     169.254.129.1:52283 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:11:25.8591248Z [2026-01-15 08:11:25 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:11:25.8591645Z [2026-01-15 08:11:25 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:11:25.8591681Z Traceback (most recent call last):
+2026-01-15T08:11:25.8591713Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:11:25.8591743Z     result = await run_query_params(query, params)
+2026-01-15T08:11:25.8591772Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:25.8591802Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:11:25.8591830Z     conn.close()
+2026-01-15T08:11:25.8591856Z     ^^^^^^^^^^
+2026-01-15T08:11:25.8591886Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:25.8591920Z [2026-01-15 08:11:25 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:25.8591975Z Traceback (most recent call last):
+2026-01-15T08:11:25.8592007Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:11:25.8592038Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:11:25.8592232Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:25.8592265Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:11:25.8592294Z     result = await run_query_params(query, params)
+2026-01-15T08:11:25.8592354Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:25.8592385Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:11:25.8592412Z     conn.close()
+2026-01-15T08:11:25.8592439Z     ^^^^^^^^^^
+2026-01-15T08:11:25.8592487Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:25.8784782Z INFO:     169.254.129.1:52283 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:11:33.8917218Z INFO:     169.254.129.1:42399 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:11:34.1739053Z [2026-01-15 08:11:34 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:11:34.1842654Z [2026-01-15 08:11:34 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:11:34.1843038Z Traceback (most recent call last):
+2026-01-15T08:11:34.1843077Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:11:34.1843111Z     result = await run_query_params(query, params)
+2026-01-15T08:11:34.1843139Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:34.1843169Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:11:34.1843200Z     conn.close()
+2026-01-15T08:11:34.1843228Z     ^^^^^^^^^^
+2026-01-15T08:11:34.1843258Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:34.1854386Z [2026-01-15 08:11:34 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:34.1854695Z Traceback (most recent call last):
+2026-01-15T08:11:34.1854734Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:11:34.1854865Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:11:34.1854900Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:34.1854931Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:11:34.1854962Z     result = await run_query_params(query, params)
+2026-01-15T08:11:34.1854991Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:11:34.1855022Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:11:34.1855049Z     conn.close()
+2026-01-15T08:11:34.1855075Z     ^^^^^^^^^^
+2026-01-15T08:11:34.1855148Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:11:34.2023190Z INFO:     169.254.129.1:42399 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:11:35.9586868Z INFO:     169.254.129.1:42399 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:11:36.6444853Z INFO:     169.254.129.1:42399 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:11:36.6548376Z [2026-01-15 08:11:36 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:11:36.6714000Z [2026-01-15 08:11:36 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:11:36.6714358Z [2026-01-15 08:11:36 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:11:44.9855581Z INFO:     169.254.129.1:26269 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:11:45.2550179Z INFO:     169.254.129.1:26269 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:11:45.2709133Z [2026-01-15 08:11:45 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:11:45.2709529Z [2026-01-15 08:11:45 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:11:45.2709569Z [2026-01-15 08:11:45 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:12:28.0708549Z INFO:     169.254.129.1:54151 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:12:45.3090281Z INFO:     169.254.129.1:21511 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:12:45.4656150Z [2026-01-15 08:12:45 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:12:45.4754962Z [2026-01-15 08:12:45 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:12:45.4755276Z [2026-01-15 08:12:45 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:12:47.6416350Z INFO:     169.254.129.1:21511 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:12:47.7982809Z [2026-01-15 08:12:47 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:12:47.8272696Z [2026-01-15 08:12:47 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:12:47.8273021Z [2026-01-15 08:12:47 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:13:08.8270243Z INFO:     169.254.129.1:38107 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:13:15.9244053Z INFO:     169.254.129.1:53231 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:13:15.9246306Z [2026-01-15 08:13:15 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:13:15.9398852Z [2026-01-15 08:13:15 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:13:15.9399123Z [2026-01-15 08:13:15 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:13:30.3089658Z INFO:     169.254.129.1:45411 - "POST /conversation HTTP/1.1" 404 Not Found
+2026-01-15T08:14:33.4074716Z INFO:     169.254.129.1:19705 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:14:33.4249202Z [2026-01-15 08:14:33 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:14:33.4347862Z [2026-01-15 08:14:33 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:14:33.4348185Z [2026-01-15 08:14:33 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:15:08.5635295Z INFO:     169.254.129.1:58811 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:15:08.5636338Z [2026-01-15 08:15:08 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:15:08.5743426Z [2026-01-15 08:15:08 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:15:08.5905617Z [2026-01-15 08:15:08 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:15:12.1733616Z [2026-01-15 08:15:12 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:15:12.1825902Z [2026-01-15 08:15:12 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:15:12.1826607Z Traceback (most recent call last):
+2026-01-15T08:15:12.1826654Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:15:12.1826684Z     result = await run_query_params(query, params)
+2026-01-15T08:15:12.1826715Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:12.1826747Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:15:12.1826775Z     conn.close()
+2026-01-15T08:15:12.1826802Z     ^^^^^^^^^^
+2026-01-15T08:15:12.1826831Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:12.1846580Z [2026-01-15 08:15:12 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:12.1846758Z Traceback (most recent call last):
+2026-01-15T08:15:12.1846795Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:15:12.1846826Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:15:12.1846856Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:12.1846888Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:15:12.1846919Z     result = await run_query_params(query, params)
+2026-01-15T08:15:12.1846948Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:12.1847080Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:15:12.1847110Z     conn.close()
+2026-01-15T08:15:12.1847139Z     ^^^^^^^^^^
+2026-01-15T08:15:12.1847223Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:12.1907435Z INFO:     169.254.129.1:58811 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:15:22.2680227Z [2026-01-15 08:15:22 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:15:22.3119798Z [2026-01-15 08:15:22 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:15:22.3120157Z Traceback (most recent call last):
+2026-01-15T08:15:22.3120202Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:15:22.3120239Z     result = await run_query_params(query, params)
+2026-01-15T08:15:22.3120270Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:22.3120301Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:15:22.3120329Z     conn.close()
+2026-01-15T08:15:22.3120356Z     ^^^^^^^^^^
+2026-01-15T08:15:22.3120387Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:22.3122043Z INFO:     169.254.129.1:34617 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:15:22.3344120Z [2026-01-15 08:15:22 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:22.3344459Z Traceback (most recent call last):
+2026-01-15T08:15:22.3344498Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:15:22.3344532Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:15:22.3344567Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:22.3344598Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:15:22.3344628Z     result = await run_query_params(query, params)
+2026-01-15T08:15:22.3344657Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:15:22.3345813Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:15:22.3345856Z     conn.close()
+2026-01-15T08:15:22.3345893Z     ^^^^^^^^^^
+2026-01-15T08:15:22.3346016Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:15:40.2549910Z INFO:     169.254.129.1:37779 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:15:40.5189856Z [2026-01-15 08:15:40 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:15:40.5849855Z [2026-01-15 08:15:40 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:15:40.5850236Z [2026-01-15 08:15:40 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:15:50.5359971Z INFO:     169.254.129.1:45261 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:16:59.1847597Z INFO:     169.254.129.1:52339 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:17:09.0825422Z INFO:     169.254.129.1:37475 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:17:12.4971067Z [2026-01-15 08:17:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:17:12.5880797Z [2026-01-15 08:17:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:17:12.6512718Z [2026-01-15 08:17:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:17:12.7650023Z [2026-01-15 08:17:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:12.9706585Z [2026-01-15 08:17:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.0466160Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.0851964Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.3377278Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:17:13.4359506Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:17:13.4842882Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:17:13.4944699Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.5609469Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.5816306Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.5993678Z [2026-01-15 08:17:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:17:13.6689899Z INFO:     Started server process [1]
+2026-01-15T08:17:13.6760903Z INFO:     Waiting for application startup.
+2026-01-15T08:17:13.7654707Z INFO:     Application startup complete.
+2026-01-15T08:17:13.7723911Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:17:13.7738960Z ERROR:    Traceback (most recent call last):
+2026-01-15T08:17:13.7739131Z   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 701, in lifespan
+2026-01-15T08:17:13.7739170Z     await receive()
+2026-01-15T08:17:13.7739203Z   File "/usr/local/lib/python3.11/site-packages/uvicorn/lifespan/on.py", line 137, in receive
+2026-01-15T08:17:13.7739259Z     return await self.receive_queue.get()
+2026-01-15T08:17:13.7739309Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:17:13.7739340Z   File "/usr/local/lib/python3.11/asyncio/queues.py", line 158, in get
+2026-01-15T08:17:13.7739367Z     await getter
+2026-01-15T08:17:13.7739396Z asyncio.exceptions.CancelledError
+2026-01-15T08:17:13.7739426Z 
+2026-01-15T08:17:19.3724269Z INFO:     169.254.129.1:13921 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:17:22.3860834Z [2026-01-15 08:17:22 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:17:22.3861798Z [2026-01-15 08:17:22 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:17:22.3861845Z [2026-01-15 08:17:22 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:17:22.3865752Z INFO:     169.254.129.1:13921 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:17:48.7152613Z INFO:     Shutting down
+2026-01-15T08:17:48.8487528Z INFO:     Waiting for application shutdown.
+2026-01-15T08:17:48.8865047Z INFO:     Application shutdown complete.
+2026-01-15T08:17:48.9825544Z INFO:     Finished server process [1]
+2026-01-15T08:19:08.9311159Z [2026-01-15 08:19:08 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:19:08.9814299Z [2026-01-15 08:19:08 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:19:08.9883440Z [2026-01-15 08:19:08 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:19:09.0001957Z [2026-01-15 08:19:08 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.0581038Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.0967167Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.1338970Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.4025086Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:19:09.4142644Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:19:09.4403808Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:19:09.4683183Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.5056349Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.5331074Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.5432834Z [2026-01-15 08:19:09 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:19:09.6036004Z INFO:     Started server process [1]
+2026-01-15T08:19:09.6121896Z INFO:     Waiting for application startup.
+2026-01-15T08:19:09.6221076Z INFO:     Application startup complete.
+2026-01-15T08:19:09.6330282Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:19:10.6695497Z INFO:     169.254.129.1:41291 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T08:19:11.6363210Z INFO:     169.254.129.1:16039 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:19:19.1064993Z [2026-01-15 08:19:19 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:19:19.1260273Z [2026-01-15 08:19:19 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:19:19.1260656Z Traceback (most recent call last):
+2026-01-15T08:19:19.1260697Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:19.1260731Z     result = await run_query_params(query, params)
+2026-01-15T08:19:19.1260761Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:19.1260903Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:19.1260934Z     conn.close()
+2026-01-15T08:19:19.1260961Z     ^^^^^^^^^^
+2026-01-15T08:19:19.1260991Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:19.1447097Z [2026-01-15 08:19:19 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:19.1539651Z Traceback (most recent call last):
+2026-01-15T08:19:19.1539745Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:19:19.1539781Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:19:19.1539813Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:19.1539842Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:19.1539938Z     result = await run_query_params(query, params)
+2026-01-15T08:19:19.1539968Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:19.1539997Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:19.1540024Z     conn.close()
+2026-01-15T08:19:19.1540051Z     ^^^^^^^^^^
+2026-01-15T08:19:19.1540081Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:19.1700303Z INFO:     169.254.129.1:16029 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:19:19.4219267Z INFO:     169.254.129.1:16019 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:19:22.0593274Z [2026-01-15 08:19:22 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:19:26.7745172Z [2026-01-15 08:19:26 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:19:26.7745544Z [2026-01-15 08:19:26 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:19:26.7745584Z Traceback (most recent call last):
+2026-01-15T08:19:26.7745622Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:26.7745655Z     result = await run_query_params(query, params)
+2026-01-15T08:19:26.7745684Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:26.7745713Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:26.7745741Z     conn.close()
+2026-01-15T08:19:26.7745768Z     ^^^^^^^^^^
+2026-01-15T08:19:26.7745801Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:26.9184780Z [2026-01-15 08:19:26 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:26.9185283Z Traceback (most recent call last):
+2026-01-15T08:19:26.9185330Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:19:26.9185367Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:19:26.9185401Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:26.9185433Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:26.9185469Z     result = await run_query_params(query, params)
+2026-01-15T08:19:26.9185500Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:26.9185533Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:26.9185563Z     conn.close()
+2026-01-15T08:19:26.9185622Z     ^^^^^^^^^^
+2026-01-15T08:19:26.9185655Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:26.9955285Z INFO:     169.254.129.1:16005 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:19:27.2359310Z [2026-01-15 08:19:27 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:19:27.4511663Z [2026-01-15 08:19:27 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:19:27.4958455Z INFO:     169.254.129.1:16039 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:19:30.7939561Z [2026-01-15 08:19:30 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:19:33.4955917Z INFO:     169.254.129.1:16029 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:19:33.4956309Z INFO:     169.254.129.1:16047 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:19:33.4981274Z [2026-01-15 08:19:33 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:19:33.5645467Z INFO:     169.254.129.1:36925 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:19:33.6281946Z [2026-01-15 08:19:33 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:19:33.6282480Z Traceback (most recent call last):
+2026-01-15T08:19:33.6282516Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:33.6282547Z     result = await run_query_params(query, params)
+2026-01-15T08:19:33.6282589Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:33.6282619Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:33.6282646Z     conn.close()
+2026-01-15T08:19:33.6282674Z     ^^^^^^^^^^
+2026-01-15T08:19:33.6282704Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:33.6282784Z [2026-01-15 08:19:33 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:33.6282813Z Traceback (most recent call last):
+2026-01-15T08:19:33.6282843Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:19:33.6282874Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:19:33.6282905Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:33.6282934Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:33.6282963Z     result = await run_query_params(query, params)
+2026-01-15T08:19:33.6283086Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:33.6283147Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:33.6283193Z     conn.close()
+2026-01-15T08:19:33.6283221Z     ^^^^^^^^^^
+2026-01-15T08:19:33.6283251Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:33.6283283Z [2026-01-15 08:19:33 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:19:33.6283315Z [2026-01-15 08:19:33 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:19:36.5456573Z [2026-01-15 08:19:36 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:19:36.5456949Z [2026-01-15 08:19:36 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:19:36.5456988Z [2026-01-15 08:19:36 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:19:43.0150480Z INFO:     169.254.129.1:31695 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:19:45.8966262Z [2026-01-15 08:19:45 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:19:45.8989577Z [2026-01-15 08:19:45 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:19:45.9189451Z [2026-01-15 08:19:45 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:19:50.0973166Z [2026-01-15 08:19:50 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:19:50.1679036Z [2026-01-15 08:19:50 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:19:50.1679678Z Traceback (most recent call last):
+2026-01-15T08:19:50.1679728Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:50.1679758Z     result = await run_query_params(query, params)
+2026-01-15T08:19:50.1679787Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:50.1679900Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:50.1679929Z     conn.close()
+2026-01-15T08:19:50.1679957Z     ^^^^^^^^^^
+2026-01-15T08:19:50.1679988Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:50.2268217Z [2026-01-15 08:19:50 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:50.2268919Z Traceback (most recent call last):
+2026-01-15T08:19:50.2268961Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:19:50.2268993Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:19:50.2269028Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:50.2269061Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:19:50.2269175Z     result = await run_query_params(query, params)
+2026-01-15T08:19:50.2269207Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:19:50.2269236Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:19:50.2269267Z     conn.close()
+2026-01-15T08:19:50.2269293Z     ^^^^^^^^^^
+2026-01-15T08:19:50.2269323Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:19:50.2542937Z INFO:     169.254.129.1:31705 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:19:50.6615611Z INFO:     169.254.129.1:31705 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:19:54.1682293Z [2026-01-15 08:19:54 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:19:54.1682668Z [2026-01-15 08:19:54 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:19:54.1682709Z [2026-01-15 08:19:54 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:20:16.8560073Z INFO:     169.254.129.1:17343 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:21:06.1019908Z [2026-01-15 08:21:06 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:21:06.1400991Z [2026-01-15 08:21:06 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:21:06.1402197Z Traceback (most recent call last):
+2026-01-15T08:21:06.1402266Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:21:06.1402310Z     result = await run_query_params(query, params)
+2026-01-15T08:21:06.1402349Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:06.1402391Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:21:06.1402429Z     conn.close()
+2026-01-15T08:21:06.1402466Z     ^^^^^^^^^^
+2026-01-15T08:21:06.1402509Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:06.1507018Z [2026-01-15 08:21:06 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:06.1507293Z Traceback (most recent call last):
+2026-01-15T08:21:06.1507330Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:21:06.1507362Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:21:06.1507402Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:06.1507432Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:21:06.1507461Z     result = await run_query_params(query, params)
+2026-01-15T08:21:06.1507489Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:06.1507519Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:21:06.1507549Z     conn.close()
+2026-01-15T08:21:06.1507579Z     ^^^^^^^^^^
+2026-01-15T08:21:06.1507667Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:06.1518079Z INFO:     169.254.129.1:50805 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:21:06.2363348Z INFO:     169.254.129.1:50807 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:21:08.4034655Z [2026-01-15 08:21:08 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:21:08.4799315Z [2026-01-15 08:21:08 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:21:09.1593517Z [2026-01-15 08:21:08 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:21:10.0671142Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:21:10.0850549Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:21:10.0875177Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:21:10.1033101Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.1236945Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.1349450Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.1460116Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.2807390Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:21:10.2891239Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:21:10.2968536Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:21:10.3063704Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.3269028Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.3369022Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.3467022Z [2026-01-15 08:21:10 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:21:10.3965373Z INFO:     Started server process [1]
+2026-01-15T08:21:10.3969741Z INFO:     Waiting for application startup.
+2026-01-15T08:21:10.4037042Z INFO:     Application startup complete.
+2026-01-15T08:21:10.4061967Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:21:11.1718995Z INFO:     169.254.129.1:20505 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T08:21:32.4090311Z INFO:     169.254.129.1:38093 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:21:33.7117293Z INFO:     Shutting down
+2026-01-15T08:21:33.8470610Z INFO:     Waiting for application shutdown.
+2026-01-15T08:21:33.8471136Z INFO:     Application shutdown complete.
+2026-01-15T08:21:33.8471176Z INFO:     Finished server process [1]
+2026-01-15T08:21:42.2286240Z [2026-01-15 08:21:42 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:21:42.3437861Z [2026-01-15 08:21:42 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:21:42.3503677Z Traceback (most recent call last):
+2026-01-15T08:21:42.3503773Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:21:42.3503808Z     result = await run_query_params(query, params)
+2026-01-15T08:21:42.3503843Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:42.3503876Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:21:42.3503903Z     conn.close()
+2026-01-15T08:21:42.3503930Z     ^^^^^^^^^^
+2026-01-15T08:21:42.3504021Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:42.4299873Z [2026-01-15 08:21:42 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:42.4300271Z Traceback (most recent call last):
+2026-01-15T08:21:42.4300310Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:21:42.4300344Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:21:42.4300375Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:42.4300409Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:21:42.4300439Z     result = await run_query_params(query, params)
+2026-01-15T08:21:42.4300468Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:21:42.4300497Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:21:42.4300525Z     conn.close()
+2026-01-15T08:21:42.4300557Z     ^^^^^^^^^^
+2026-01-15T08:21:42.4300655Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:21:42.4477699Z INFO:     169.254.129.1:38093 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:21:43.1351796Z INFO:     169.254.129.1:38099 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:21:46.1829221Z [2026-01-15 08:21:46 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:21:46.3500953Z [2026-01-15 08:21:46 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:21:46.4559563Z [2026-01-15 08:21:46 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:22:19.8201100Z INFO:     169.254.129.1:55057 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:26:45.2507869Z [2026-01-15 08:26:45 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:26:45.2618773Z [2026-01-15 08:26:45 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:26:45.2668285Z Traceback (most recent call last):
+2026-01-15T08:26:45.2668388Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:26:45.2668427Z     result = await run_query_params(query, params)
+2026-01-15T08:26:45.2668456Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:26:45.2668486Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:26:45.2668514Z     conn.close()
+2026-01-15T08:26:45.2668541Z     ^^^^^^^^^^
+2026-01-15T08:26:45.2668574Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:26:45.2699669Z [2026-01-15 08:26:45 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:26:45.2699855Z Traceback (most recent call last):
+2026-01-15T08:26:45.2699896Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:26:45.2699929Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:26:45.2699962Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:26:45.2699992Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:26:45.2700022Z     result = await run_query_params(query, params)
+2026-01-15T08:26:45.2700054Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:26:45.2700083Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:26:45.2700112Z     conn.close()
+2026-01-15T08:26:45.2700140Z     ^^^^^^^^^^
+2026-01-15T08:26:45.2700221Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:26:45.2784115Z INFO:     169.254.129.1:39445 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:26:45.7493603Z INFO:     169.254.129.1:39445 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:26:46.0641882Z INFO:     169.254.129.1:39445 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:26:47.6915500Z [2026-01-15 08:26:47 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:26:47.7204213Z [2026-01-15 08:26:47 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:26:47.7204798Z [2026-01-15 08:26:47 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:27:19.8591556Z INFO:     169.254.129.1:19937 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:32:20.5328297Z INFO:     169.254.129.1:51023 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:33:45.7999143Z INFO:     169.254.129.1:56973 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:33:49.0106030Z [2026-01-15 08:33:49 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:33:49.0203822Z [2026-01-15 08:33:49 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:33:49.0204281Z Traceback (most recent call last):
+2026-01-15T08:33:49.0204322Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:33:49.0204353Z     result = await run_query_params(query, params)
+2026-01-15T08:33:49.0204382Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:33:49.0204412Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:33:49.0204439Z     conn.close()
+2026-01-15T08:33:49.0204466Z     ^^^^^^^^^^
+2026-01-15T08:33:49.0204499Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:33:49.0219928Z [2026-01-15 08:33:49 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:33:49.0220091Z Traceback (most recent call last):
+2026-01-15T08:33:49.0220125Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:33:49.0220160Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:33:49.0220558Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:33:49.0220595Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:33:49.0220625Z     result = await run_query_params(query, params)
+2026-01-15T08:33:49.0220655Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:33:49.0220686Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:33:49.0220713Z     conn.close()
+2026-01-15T08:33:49.0220740Z     ^^^^^^^^^^
+2026-01-15T08:33:49.0220813Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:33:49.0365623Z INFO:     169.254.129.1:56973 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:33:50.1076781Z INFO:     169.254.129.1:56973 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:33:51.7122013Z [2026-01-15 08:33:51 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:33:51.7199862Z [2026-01-15 08:33:51 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:33:51.7223573Z [2026-01-15 08:33:51 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:37:20.5493488Z INFO:     169.254.129.1:53263 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:38:18.7115369Z INFO:     169.254.129.1:58217 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:38:22.8458366Z INFO:     169.254.129.1:58217 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:42:21.7270129Z INFO:     169.254.129.1:17103 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:42:22.6533965Z INFO:     169.254.129.1:51683 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:43:10.2537559Z INFO:     Shutting down
+2026-01-15T08:43:10.4090957Z INFO:     Waiting for application shutdown.
+2026-01-15T08:43:10.4284224Z INFO:     Application shutdown complete.
+2026-01-15T08:43:10.4284540Z INFO:     Finished server process [1]
+2026-01-15T08:45:07.5429632Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:45:07.5630325Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:45:07.5793168Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:45:07.5901476Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.6384002Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.6788929Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.6991962Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.8632177Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T08:45:07.8632921Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T08:45:07.8632977Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T08:45:07.8633023Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.9303996Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.9514418Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:07.9601117Z [2026-01-15 08:45:07 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T08:45:08.0098226Z INFO:     Started server process [1]
+2026-01-15T08:45:08.0199142Z INFO:     Waiting for application startup.
+2026-01-15T08:45:08.0268409Z INFO:     Application startup complete.
+2026-01-15T08:45:08.0292578Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T08:45:08.7980380Z INFO:     169.254.129.1:40299 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T08:45:09.1985237Z INFO:     169.254.129.1:40305 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:45:10.4037229Z INFO:     169.254.129.1:40305 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:45:24.7515525Z INFO:     169.254.129.1:59341 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:45:32.1763471Z [2026-01-15 08:45:32 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:45:32.1764064Z [2026-01-15 08:45:32 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:45:32.1764099Z Traceback (most recent call last):
+2026-01-15T08:45:32.1764130Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:45:32.1764159Z     result = await run_query_params(query, params)
+2026-01-15T08:45:32.1764217Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:32.1764247Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:45:32.1764274Z     conn.close()
+2026-01-15T08:45:32.1764301Z     ^^^^^^^^^^
+2026-01-15T08:45:32.1764334Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:32.1957090Z INFO:     169.254.129.1:59341 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:45:32.1957750Z [2026-01-15 08:45:32 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:32.1957797Z Traceback (most recent call last):
+2026-01-15T08:45:32.1957829Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:45:32.1957860Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:45:32.1957892Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:32.1957927Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:45:32.1957959Z     result = await run_query_params(query, params)
+2026-01-15T08:45:32.1957988Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:32.1958017Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:45:32.1958044Z     conn.close()
+2026-01-15T08:45:32.1958111Z     ^^^^^^^^^^
+2026-01-15T08:45:32.1958142Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:32.2137318Z INFO:     169.254.129.1:59349 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:45:32.5820117Z INFO:     169.254.129.1:59341 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:45:34.0246525Z [2026-01-15 08:45:34 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:45:34.0531123Z [2026-01-15 08:45:34 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:45:34.0634615Z [2026-01-15 08:45:34 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:45:40.7933434Z INFO:     169.254.129.1:61039 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:45:42.3259573Z [2026-01-15 08:45:42 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:45:42.3306650Z [2026-01-15 08:45:42 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:45:42.3310573Z [2026-01-15 08:45:42 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:45:42.3332434Z INFO:     169.254.129.1:49799 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:45:43.4897696Z INFO:     169.254.129.1:49799 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:45:44.6219698Z INFO:     169.254.129.1:49799 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T08:45:47.3287930Z INFO:     169.254.129.1:49799 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T08:45:49.5404537Z [2026-01-15 08:45:49 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:45:49.5466485Z INFO:     169.254.129.1:49799 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:45:49.5469133Z [2026-01-15 08:45:49 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:45:49.5469177Z Traceback (most recent call last):
+2026-01-15T08:45:49.5469210Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:45:49.5469241Z     result = await run_query_params(query, params)
+2026-01-15T08:45:49.5469270Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:49.5469299Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:45:49.5469326Z     conn.close()
+2026-01-15T08:45:49.5469352Z     ^^^^^^^^^^
+2026-01-15T08:45:49.5469384Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:49.5469445Z [2026-01-15 08:45:49 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:49.5469474Z Traceback (most recent call last):
+2026-01-15T08:45:49.5469505Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:45:49.5469535Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:45:49.5469565Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:49.5469594Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:45:49.5469645Z     result = await run_query_params(query, params)
+2026-01-15T08:45:49.5469676Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:45:49.5469707Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:45:49.5469750Z     conn.close()
+2026-01-15T08:45:49.5469777Z     ^^^^^^^^^^
+2026-01-15T08:45:49.5469806Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:45:49.8314591Z INFO:     169.254.129.1:49799 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:45:50.2163437Z INFO:     169.254.129.1:49799 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:45:51.8824252Z [2026-01-15 08:45:51 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:45:51.8848469Z [2026-01-15 08:45:51 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:45:51.8848666Z [2026-01-15 08:45:51 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:46:18.9617674Z [2026-01-15 08:46:18 - /app/history_sql.py:200 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T08:46:18.9696915Z [2026-01-15 08:46:18 - /app/history_sql.py:274 - ERROR] Error in get_conversation
+2026-01-15T08:46:18.9697291Z Traceback (most recent call last):
+2026-01-15T08:46:18.9697331Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:46:18.9697362Z     result = await run_query_params(query, params)
+2026-01-15T08:46:18.9697391Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:46:18.9697482Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:46:18.9697512Z     conn.close()
+2026-01-15T08:46:18.9697539Z     ^^^^^^^^^^
+2026-01-15T08:46:18.9697569Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:46:18.9793057Z [2026-01-15 08:46:18 - /app/history_sql.py:840 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T08:46:18.9793508Z Traceback (most recent call last):
+2026-01-15T08:46:18.9793548Z   File "/app/history_sql.py", line 827, in list_conversations
+2026-01-15T08:46:18.9793581Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T08:46:18.9793612Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:46:18.9793647Z   File "/app/history_sql.py", line 271, in get_conversations
+2026-01-15T08:46:18.9793676Z     result = await run_query_params(query, params)
+2026-01-15T08:46:18.9793761Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T08:46:18.9793793Z   File "/app/history_sql.py", line 205, in run_query_params
+2026-01-15T08:46:18.9793821Z     conn.close()
+2026-01-15T08:46:18.9793848Z     ^^^^^^^^^^
+2026-01-15T08:46:18.9793879Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T08:46:18.9897626Z INFO:     169.254.129.1:29685 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T08:46:24.3304110Z INFO:     169.254.129.1:53801 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:46:26.3758659Z [2026-01-15 08:46:26 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:46:26.3759069Z [2026-01-15 08:46:26 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:46:26.3759109Z [2026-01-15 08:46:26 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:46:33.5348663Z INFO:     169.254.129.1:46725 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T08:46:36.3719912Z [2026-01-15 08:46:36 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T08:46:36.5290691Z [2026-01-15 08:46:36 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T08:46:36.5291096Z [2026-01-15 08:46:36 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T08:47:21.2306937Z INFO:     169.254.129.1:36351 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:52:21.4311901Z INFO:     169.254.129.1:20517 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:54:21.4765161Z INFO:     169.254.129.1:26961 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:54:31.5384480Z INFO:     169.254.129.1:27515 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T08:55:02.1305973Z INFO:     Shutting down
+2026-01-15T08:55:02.2306888Z INFO:     Waiting for application shutdown.
+2026-01-15T08:55:02.2486440Z INFO:     Application shutdown complete.
+2026-01-15T08:55:02.2581700Z INFO:     Finished server process [1]
+2026-01-15T09:00:37.1371355Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T09:00:37.2462931Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T09:00:37.2554561Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T09:00:37.2630315Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.2807004Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.2831653Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.3011289Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.4043139Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T09:00:37.4184624Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T09:00:37.4220366Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T09:00:37.4402331Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.4606229Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.4769902Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.4932630Z [2026-01-15 09:00:37 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:00:37.5283062Z INFO:     Started server process [1]
+2026-01-15T09:00:37.5361785Z INFO:     Waiting for application startup.
+2026-01-15T09:00:37.5374815Z INFO:     Application startup complete.
+2026-01-15T09:00:37.5449898Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T09:00:38.1529375Z INFO:     169.254.129.1:31977 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T09:01:15.6380354Z INFO:     Shutting down
+2026-01-15T09:01:15.7385901Z INFO:     Waiting for application shutdown.
+2026-01-15T09:01:15.7398912Z INFO:     Application shutdown complete.
+2026-01-15T09:01:15.7408615Z INFO:     Finished server process [1]
+2026-01-15T09:04:20.7371621Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T09:04:20.7489590Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T09:04:20.7675175Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T09:04:20.7838269Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:20.8472933Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:20.8967017Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:20.9243159Z [2026-01-15 09:04:20 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:21.1349751Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T09:04:21.1623416Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T09:04:21.1724807Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T09:04:21.1844141Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:21.2119145Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:21.2293001Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:21.2397245Z [2026-01-15 09:04:21 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T09:04:21.2780424Z INFO:     Started server process [1]
+2026-01-15T09:04:21.2789782Z INFO:     Waiting for application startup.
+2026-01-15T09:04:21.2812390Z INFO:     Application startup complete.
+2026-01-15T09:04:21.2893516Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T09:04:22.0021718Z INFO:     169.254.129.1:24005 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T09:08:42.3342171Z INFO:     169.254.129.1:48697 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:13:42.7318932Z INFO:     169.254.129.1:44463 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:18:42.9564262Z INFO:     169.254.129.1:21671 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:23:43.2886540Z INFO:     169.254.129.1:42977 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:28:43.6636735Z INFO:     169.254.129.1:60119 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:33:43.9534035Z INFO:     169.254.129.1:41617 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:38:44.2701197Z INFO:     169.254.129.1:27643 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:43:44.5644935Z INFO:     169.254.129.1:32155 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:48:44.8164210Z INFO:     169.254.129.1:48067 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:53:45.1499763Z INFO:     169.254.129.1:54237 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T09:58:45.4668597Z INFO:     169.254.129.1:27471 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:03:45.7722462Z INFO:     169.254.129.1:32721 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:08:46.0827156Z INFO:     169.254.129.1:33759 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:13:46.4363188Z INFO:     169.254.129.1:61633 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:16:44.8015962Z INFO:     169.254.129.1:44403 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T10:17:06.3387211Z [2026-01-15 10:17:06 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:17:09.5328144Z [2026-01-15 10:17:06 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T10:17:09.5652798Z [2026-01-15 10:17:09 - /app/history_sql.py:307 - ERROR] Error in get_conversation
+2026-01-15T10:17:09.5655682Z Traceback (most recent call last):
+2026-01-15T10:17:09.5655753Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:17:09.5655788Z     result = await run_query_params(query, params)
+2026-01-15T10:17:09.5655822Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:17:09.5655882Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:17:09.5655916Z     conn.close()
+2026-01-15T10:17:09.5656026Z     ^^^^^^^^^^
+2026-01-15T10:17:09.5656061Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:17:09.6184018Z [2026-01-15 10:17:09 - /app/history_sql.py:924 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T10:17:09.6346233Z Traceback (most recent call last):
+2026-01-15T10:17:09.6346357Z   File "/app/history_sql.py", line 908, in list_conversations
+2026-01-15T10:17:09.6346396Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T10:17:09.6346428Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:17:09.6346458Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:17:09.6346486Z     result = await run_query_params(query, params)
+2026-01-15T10:17:09.6346605Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:17:09.6346637Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:17:09.6346664Z     conn.close()
+2026-01-15T10:17:09.6346691Z     ^^^^^^^^^^
+2026-01-15T10:17:09.6346720Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:17:09.6367449Z INFO:     169.254.129.1:44403 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T10:17:09.6531025Z INFO:     169.254.129.1:44413 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:17:11.4644912Z INFO:     169.254.129.1:44413 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:17:13.7199476Z [2026-01-15 10:17:13 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:17:13.7375689Z [2026-01-15 10:17:13 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T10:17:13.8065874Z [2026-01-15 10:17:13 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T10:17:13.8751665Z [2026-01-15 10:17:13 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T10:17:45.9211719Z INFO:     169.254.129.1:44631 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T10:17:54.1285120Z INFO:     169.254.129.1:57735 - "POST /api/chats HTTP/1.1" 404 Not Found
+2026-01-15T10:18:00.8875899Z [2026-01-15 10:18:00 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:18:00.9142245Z [2026-01-15 10:18:00 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:18:00.9326932Z [2026-01-15 10:18:00 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:18:00.9440375Z [2026-01-15 10:18:00 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:00.9732916Z [2026-01-15 10:18:00 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.0033702Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.0219531Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.3394195Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:18:01.3607848Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:18:01.3682825Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:18:01.3955431Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.5160191Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.5437261Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.5794869Z [2026-01-15 10:18:01 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:18:01.6899474Z INFO:     Started server process [1]
+2026-01-15T10:18:01.6960006Z INFO:     Waiting for application startup.
+2026-01-15T10:18:01.6960270Z INFO:     Application startup complete.
+2026-01-15T10:18:01.7176865Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T10:18:02.6708926Z INFO:     169.254.129.1:48973 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T10:18:25.1236020Z INFO:     Shutting down
+2026-01-15T10:18:25.2286951Z INFO:     Waiting for application shutdown.
+2026-01-15T10:18:25.2371470Z INFO:     Application shutdown complete.
+2026-01-15T10:18:25.2573372Z INFO:     Finished server process [1]
+2026-01-15T10:18:46.6785182Z INFO:     169.254.129.1:58733 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:20:14.2907779Z [2026-01-15 10:20:14 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:20:14.3287891Z [2026-01-15 10:20:14 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T10:20:14.3946619Z [2026-01-15 10:20:14 - /app/history_sql.py:307 - ERROR] Error in get_conversation
+2026-01-15T10:20:14.3947217Z Traceback (most recent call last):
+2026-01-15T10:20:14.3947261Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:20:14.3947292Z     result = await run_query_params(query, params)
+2026-01-15T10:20:14.3947325Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:20:14.3947386Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:20:14.3947415Z     conn.close()
+2026-01-15T10:20:14.3947536Z     ^^^^^^^^^^
+2026-01-15T10:20:14.3947733Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:20:14.4145831Z [2026-01-15 10:20:14 - /app/history_sql.py:924 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T10:20:14.4146167Z Traceback (most recent call last):
+2026-01-15T10:20:14.4146206Z   File "/app/history_sql.py", line 908, in list_conversations
+2026-01-15T10:20:14.4146237Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T10:20:14.4146269Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:20:14.4146304Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:20:14.4146332Z     result = await run_query_params(query, params)
+2026-01-15T10:20:14.4146450Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:20:14.4146481Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:20:14.4146507Z     conn.close()
+2026-01-15T10:20:14.4146533Z     ^^^^^^^^^^
+2026-01-15T10:20:14.4146594Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:20:14.4531071Z INFO:     169.254.129.1:18333 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T10:21:37.6752808Z INFO:     169.254.129.1:55023 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T10:21:48.5748567Z [2026-01-15 10:21:48 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:21:48.5749000Z [2026-01-15 10:21:48 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T10:21:48.6129607Z INFO:     169.254.129.1:55023 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T10:21:48.6310782Z [2026-01-15 10:21:48 - /app/history_sql.py:307 - ERROR] Error in get_conversation
+2026-01-15T10:21:48.6311097Z Traceback (most recent call last):
+2026-01-15T10:21:48.6311135Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:21:48.6311165Z     result = await run_query_params(query, params)
+2026-01-15T10:21:48.6311193Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:21:48.6311223Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:21:48.6311254Z     conn.close()
+2026-01-15T10:21:48.6311281Z     ^^^^^^^^^^
+2026-01-15T10:21:48.6311356Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:21:48.6311390Z [2026-01-15 10:21:48 - /app/history_sql.py:924 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T10:21:48.6311418Z Traceback (most recent call last):
+2026-01-15T10:21:48.6311447Z   File "/app/history_sql.py", line 908, in list_conversations
+2026-01-15T10:21:48.6311477Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T10:21:48.6311507Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:21:48.6311535Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:21:48.6311563Z     result = await run_query_params(query, params)
+2026-01-15T10:21:48.6311591Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:21:48.6311649Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:21:48.6311693Z     conn.close()
+2026-01-15T10:21:48.6311720Z     ^^^^^^^^^^
+2026-01-15T10:21:48.6311748Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:22:54.8567241Z [2026-01-15 10:22:54 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:22:55.3021410Z [2026-01-15 10:22:55 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T10:22:55.3305674Z [2026-01-15 10:22:55 - /app/history_sql.py:307 - ERROR] Error in get_conversation
+2026-01-15T10:22:55.3306171Z Traceback (most recent call last):
+2026-01-15T10:22:55.3306211Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:22:55.3306240Z     result = await run_query_params(query, params)
+2026-01-15T10:22:55.3306269Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:22:55.3306306Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:22:55.3306336Z     conn.close()
+2026-01-15T10:22:55.3306365Z     ^^^^^^^^^^
+2026-01-15T10:22:55.3306433Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:22:55.3408452Z [2026-01-15 10:22:55 - /app/history_sql.py:924 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T10:22:55.3683704Z Traceback (most recent call last):
+2026-01-15T10:22:55.3683877Z   File "/app/history_sql.py", line 908, in list_conversations
+2026-01-15T10:22:55.3683916Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T10:22:55.3683946Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:22:55.3683980Z   File "/app/history_sql.py", line 304, in get_conversations
+2026-01-15T10:22:55.3684012Z     result = await run_query_params(query, params)
+2026-01-15T10:22:55.3684040Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T10:22:55.3684069Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T10:22:55.3684165Z     conn.close()
+2026-01-15T10:22:55.3684193Z     ^^^^^^^^^^
+2026-01-15T10:22:55.3684223Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T10:22:55.6113675Z INFO:     169.254.129.1:18413 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T10:22:56.3300012Z INFO:     169.254.129.1:41573 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:23:01.2919491Z [2026-01-15 10:23:01 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('28000', "[28000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Login failed for user '<token-identified principal>'. (18456) (SQLDriverConnect)")
+2026-01-15T10:23:01.3393082Z [2026-01-15 10:23:01 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T10:23:01.4915988Z [2026-01-15 10:23:01 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T10:23:01.5085132Z [2026-01-15 10:23:01 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T10:23:12.5478714Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:23:12.5767914Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:23:12.6234205Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:23:12.7428217Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:12.8708377Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:12.9576000Z [2026-01-15 10:23:12 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.0147906Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.2564061Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:23:13.2860179Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:23:13.3515445Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:23:13.4207507Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.5267795Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.5448966Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.5847886Z [2026-01-15 10:23:13 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:23:13.6529753Z INFO:     Started server process [1]
+2026-01-15T10:23:13.6596018Z INFO:     Waiting for application startup.
+2026-01-15T10:23:13.6610371Z INFO:     Application startup complete.
+2026-01-15T10:23:13.6700908Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T10:23:14.4211588Z INFO:     169.254.129.1:45251 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T10:23:35.0278478Z INFO:     Shutting down
+2026-01-15T10:23:35.1376520Z INFO:     Waiting for application shutdown.
+2026-01-15T10:23:35.1377073Z INFO:     Application shutdown complete.
+2026-01-15T10:23:35.1485985Z INFO:     Finished server process [1]
+2026-01-15T10:23:47.0043632Z INFO:     169.254.129.1:44901 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:28:47.4025444Z INFO:     169.254.129.1:62367 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:30:41.2156562Z INFO:     169.254.129.1:33651 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T10:31:03.4612451Z INFO:     169.254.129.1:33651 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T10:31:03.5365332Z INFO:     169.254.129.1:33663 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:31:04.4100631Z INFO:     169.254.129.1:33663 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:31:32.7664277Z INFO:     169.254.129.1:14119 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T10:31:39.0376880Z INFO:     169.254.129.1:33663 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T10:31:50.6605146Z INFO:     169.254.129.1:33663 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T10:32:00.3056772Z INFO:     169.254.129.1:28321 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:32:04.4832134Z [2026-01-15 10:32:04 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T10:32:04.4832440Z client_session: <aiohttp.client.ClientSession object at 0x79af5c0dd350>
+2026-01-15T10:32:55.5376134Z [2026-01-15 10:32:55 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:32:55.9610056Z [2026-01-15 10:32:55 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:32:55.9977287Z [2026-01-15 10:32:55 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:32:56.1885750Z [2026-01-15 10:32:56 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:56.6027179Z [2026-01-15 10:32:56 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:56.8886918Z [2026-01-15 10:32:56 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:57.1218472Z [2026-01-15 10:32:57 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:58.0476393Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T10:32:58.1617912Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T10:32:58.4124302Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T10:32:58.6261556Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:58.9042284Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:58.9245151Z [2026-01-15 10:32:58 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:59.1484880Z [2026-01-15 10:32:59 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T10:32:59.2996376Z INFO:     Started server process [1]
+2026-01-15T10:32:59.3062721Z INFO:     Waiting for application startup.
+2026-01-15T10:32:59.3080496Z INFO:     Application startup complete.
+2026-01-15T10:32:59.5174092Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T10:33:00.3506139Z INFO:     169.254.129.1:26365 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T10:33:22.0114974Z INFO:     Shutting down
+2026-01-15T10:33:22.3094671Z INFO:     Waiting for connections to close. (CTRL+C to force quit)
+2026-01-15T10:33:47.7499301Z INFO:     169.254.129.1:46571 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:38:48.0524313Z INFO:     169.254.129.1:20567 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:43:48.3448005Z INFO:     169.254.129.1:33701 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:48:36.2418793Z INFO:     169.254.129.1:63689 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T10:48:43.2593441Z INFO:     169.254.129.1:63689 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T10:48:48.6564984Z INFO:     169.254.129.1:39627 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:49:12.2673052Z INFO:     169.254.129.1:62277 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:49:12.6915591Z INFO:     169.254.129.1:62277 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T10:51:02.8262126Z INFO:     169.254.129.1:62277 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T10:51:10.7236876Z INFO:     169.254.129.1:62277 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T10:53:48.9911706Z INFO:     169.254.129.1:55003 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T10:58:49.3021493Z INFO:     169.254.129.1:24655 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:03:49.6932006Z INFO:     169.254.129.1:35395 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:08:49.9922634Z INFO:     169.254.129.1:21575 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:13:50.3033662Z INFO:     169.254.129.1:39809 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:18:50.5812158Z INFO:     169.254.129.1:65019 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:23:50.9249910Z INFO:     169.254.129.1:63071 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:28:51.2162301Z INFO:     169.254.129.1:34415 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:33:51.5914366Z INFO:     169.254.129.1:63913 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:38:51.8997493Z INFO:     169.254.129.1:39001 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:43:50.4159289Z INFO:     169.254.129.1:50419 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:48:50.7048086Z INFO:     169.254.129.1:18525 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:53:51.0969890Z INFO:     169.254.129.1:45879 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T11:58:51.3931055Z INFO:     169.254.129.1:10181 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:02:23.6514301Z INFO:     169.254.129.1:18407 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:07:22.3378826Z INFO:     169.254.129.1:33599 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:12:23.2038262Z INFO:     169.254.129.1:39385 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:17:23.1113282Z INFO:     169.254.129.1:23031 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:22:23.3106034Z INFO:     169.254.129.1:21589 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:25:19.1768189Z INFO:     169.254.129.1:63503 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T12:25:23.6073016Z INFO:     169.254.129.1:63503 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T12:27:23.5657611Z INFO:     169.254.129.1:55575 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:29:34.9040016Z INFO:     169.254.129.1:38993 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T12:29:35.2441026Z INFO:     169.254.129.1:38993 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T12:29:45.7139143Z INFO:     169.254.129.1:38993 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T12:29:45.9730079Z INFO:     169.254.129.1:38993 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T12:29:47.4993659Z INFO:     169.254.129.1:20249 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T12:29:51.5527097Z INFO:     169.254.129.1:38993 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T12:29:56.6285379Z INFO:     169.254.129.1:26061 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T12:29:56.9052776Z INFO:     169.254.129.1:26061 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T12:29:59.5928820Z [2026-01-15 12:29:59 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T12:29:59.5929414Z client_session: <aiohttp.client.ClientSession object at 0x7110c3cc74d0>
+2026-01-15T12:29:59.5945887Z [2026-01-15 12:29:59 - /usr/local/lib/python3.11/site-packages/aiohttp/connector.py:388 - ERROR] Unclosed connector
+2026-01-15T12:29:59.5946097Z connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7110c4b9a900>, 21746.1813586)])']
+2026-01-15T12:29:59.5946140Z connector: <aiohttp.connector.TCPConnector object at 0x7110c3cc6a90>
+2026-01-15T12:30:09.7933626Z INFO:     169.254.129.1:26061 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T12:30:15.2412864Z INFO:     169.254.129.1:26061 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T12:32:23.8654946Z INFO:     169.254.129.1:49059 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:37:24.1309638Z INFO:     169.254.129.1:61137 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:42:25.1003155Z INFO:     169.254.129.1:31343 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:47:24.6736637Z INFO:     169.254.129.1:17905 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:51:33.6417319Z INFO:     169.254.129.1:43189 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T12:56:33.9583832Z INFO:     169.254.129.1:22149 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:01:34.2364255Z INFO:     169.254.129.1:45425 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:06:34.4958973Z INFO:     169.254.129.1:47161 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:10:16.0744744Z INFO:     169.254.129.1:48167 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:15:16.4607854Z INFO:     169.254.129.1:39349 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:16:21.5238117Z INFO:     169.254.129.1:59979 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:16:25.4521313Z INFO:     169.254.129.1:59979 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:20:16.7991449Z INFO:     169.254.129.1:40127 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:25:17.1096702Z INFO:     169.254.129.1:23953 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:30:17.4234021Z INFO:     169.254.129.1:43321 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:34:45.0930580Z INFO:     169.254.129.1:57369 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:34:48.0489032Z INFO:     169.254.129.1:57369 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:35:17.6977819Z INFO:     169.254.129.1:59351 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:40:18.0072391Z INFO:     169.254.129.1:35953 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:45:18.3589934Z INFO:     169.254.129.1:19535 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:46:25.8557887Z INFO:     169.254.129.1:58309 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:46:29.0371663Z INFO:     169.254.129.1:58309 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T13:50:18.6490498Z INFO:     169.254.129.1:38263 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T13:55:18.8744832Z INFO:     169.254.129.1:43999 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:00:19.3394398Z INFO:     169.254.129.1:39327 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:00:47.5943922Z INFO:     169.254.129.1:61913 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:05:47.8872496Z INFO:     169.254.129.1:12505 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:08:16.4835323Z INFO:     169.254.129.1:28211 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:08:16.4835809Z INFO:     169.254.129.1:28225 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:08:19.2237160Z INFO:     169.254.129.1:28225 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:08:19.2276862Z INFO:     169.254.129.1:28211 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:09:13.7905747Z INFO:     169.254.129.1:43785 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:09:14.0855189Z INFO:     169.254.129.1:43785 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:09:29.7410289Z INFO:     169.254.129.1:43785 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:09:34.1269211Z [2026-01-15 14:09:34 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T14:09:34.1269878Z client_session: <aiohttp.client.ClientSession object at 0x7110c46b6ed0>
+2026-01-15T14:09:37.3227590Z INFO:     169.254.129.1:43785 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:09:39.1811202Z INFO:     169.254.129.1:43785 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:09:46.2481228Z [2026-01-15 14:09:46 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '5c2dab09c01ba04e126a44bdf11af757'}}}
+2026-01-15T14:09:46.2665430Z [2026-01-15 14:09:46 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '5c2dab09c01ba04e126a44bdf11af757'}}}
+2026-01-15T14:09:51.1019082Z INFO:     169.254.129.1:43785 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:09:54.8331797Z [2026-01-15 14:09:54 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_kMurXDekvRVkLHl6pGvkf8dR.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:09:54.8502717Z [2026-01-15 14:09:54 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_kMurXDekvRVkLHl6pGvkf8dR.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:10:04.3906987Z INFO:     169.254.129.1:38931 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:10:08.0889220Z [2026-01-15 14:10:08 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_kMurXDekvRVkLHl6pGvkf8dR.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:10:08.0906972Z [2026-01-15 14:10:08 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_kMurXDekvRVkLHl6pGvkf8dR.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:10:48.1557019Z INFO:     169.254.129.1:27915 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:11:55.1271136Z INFO:     169.254.129.1:12891 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:11:55.1467110Z INFO:     169.254.129.1:12899 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:12:08.6690899Z INFO:     169.254.129.1:12899 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:12:11.6252818Z INFO:     169.254.129.1:12899 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:12:17.1265536Z [2026-01-15 14:12:17 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T14:12:17.1265881Z client_session: <aiohttp.client.ClientSession object at 0x7110c48661d0>
+2026-01-15T14:12:17.1265921Z [2026-01-15 14:12:17 - /usr/local/lib/python3.11/site-packages/aiohttp/connector.py:388 - ERROR] Unclosed connector
+2026-01-15T14:12:17.1265955Z connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7110c3e684b0>, 27883.670905099)])']
+2026-01-15T14:12:17.1265986Z connector: <aiohttp.connector.TCPConnector object at 0x7110c4864ad0>
+2026-01-15T14:12:38.1317302Z INFO:     169.254.129.1:12899 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:13:18.2559177Z INFO:     169.254.129.1:23801 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:13:28.2778504Z INFO:     169.254.129.1:47501 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:13:28.7707062Z INFO:     169.254.129.1:47501 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:13:41.5160535Z [2026-01-15 14:13:41 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': 'f75250872f49743a51a4c809a29544ff'}}}
+2026-01-15T14:13:41.5163320Z [2026-01-15 14:13:41 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': 'f75250872f49743a51a4c809a29544ff'}}}
+2026-01-15T14:14:12.6947748Z INFO:     Shutting down
+2026-01-15T14:14:12.7980360Z INFO:     Waiting for application shutdown.
+2026-01-15T14:14:12.8039678Z INFO:     Application shutdown complete.
+2026-01-15T14:14:12.8088306Z INFO:     Finished server process [1]
+2026-01-15T14:14:17.2372436Z [2026-01-15 14:14:17 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T14:14:17.2372902Z client_session: <aiohttp.client.ClientSession object at 0x7110c48df8d0>
+2026-01-15T14:14:17.2469459Z [2026-01-15 14:14:17 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T14:14:17.2469742Z client_session: <aiohttp.client.ClientSession object at 0x7110c4f6add0>
+2026-01-15T14:18:33.6295899Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T14:18:33.6425155Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T14:18:33.6510269Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T14:18:33.6612268Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:33.6968095Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:33.7112456Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:33.7267384Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:33.8548997Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T14:18:33.8647204Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T14:18:33.8963502Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T14:18:33.9294226Z [2026-01-15 14:18:33 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:34.0187183Z [2026-01-15 14:18:34 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:34.0650964Z [2026-01-15 14:18:34 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:34.1123223Z [2026-01-15 14:18:34 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:18:34.2379057Z INFO:     Started server process [1]
+2026-01-15T14:18:34.2541234Z INFO:     Waiting for application startup.
+2026-01-15T14:18:34.2541764Z INFO:     Application startup complete.
+2026-01-15T14:18:34.2628793Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T14:18:35.1455512Z INFO:     169.254.129.1:17527 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T14:18:42.4162101Z INFO:     169.254.129.1:17535 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:18:53.6758150Z INFO:     169.254.129.1:43623 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:19:26.1397704Z [2026-01-15 14:19:26 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '6c3a796720b457372773eb0cb4be1f7c'}}}
+2026-01-15T14:19:26.1581270Z [2026-01-15 14:19:26 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '6c3a796720b457372773eb0cb4be1f7c'}}}
+2026-01-15T14:19:41.1163136Z INFO:     169.254.129.1:42723 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:19:43.5994416Z INFO:     169.254.129.1:42723 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:19:44.1454318Z INFO:     169.254.129.1:42723 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:19:44.4317790Z INFO:     169.254.129.1:42723 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:20:08.1829548Z [2026-01-15 14:20:08 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '8368b52580fd2d44d7b68e80addb800e'}}}
+2026-01-15T14:20:08.8740789Z [2026-01-15 14:20:08 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '8368b52580fd2d44d7b68e80addb800e'}}}
+2026-01-15T14:20:30.6698747Z INFO:     169.254.129.1:43661 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:20:34.7480360Z [2026-01-15 14:20:34 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_bNsZ022miDJgng4R5EKgBHLH.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:20:34.7631220Z [2026-01-15 14:20:34 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'message': 'No tool output found for function call call_bNsZ022miDJgng4R5EKgBHLH.', 'type': 'invalid_request_error', 'param': 'input', 'code': None}}
+2026-01-15T14:20:39.8678318Z INFO:     169.254.129.1:43661 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:20:41.8407576Z INFO:     169.254.129.1:43661 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:20:51.9326458Z INFO:     169.254.129.1:43661 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:21:01.7573413Z INFO:     169.254.129.1:43661 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:21:04.0325001Z INFO:     169.254.129.1:43661 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:21:05.1953007Z [2026-01-15 14:21:05 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T14:21:05.1953605Z client_session: <aiohttp.client.ClientSession object at 0x7e310d37a4d0>
+2026-01-15T14:21:05.1964164Z [2026-01-15 14:21:05 - /usr/local/lib/python3.11/site-packages/aiohttp/connector.py:388 - ERROR] Unclosed connector
+2026-01-15T14:21:05.1964319Z connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7e310d99b3f0>, 28414.069905332)])']
+2026-01-15T14:21:05.1964357Z connector: <aiohttp.connector.TCPConnector object at 0x7e310d378c10>
+2026-01-15T14:21:25.3002346Z INFO:     169.254.129.1:43661 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:23:18.8846168Z INFO:     169.254.129.1:56519 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:27:03.6456692Z INFO:     169.254.129.1:64933 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:27:07.6714668Z INFO:     169.254.129.1:64933 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:27:19.0347065Z INFO:     169.254.129.1:25645 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:27:29.0066242Z INFO:     169.254.129.1:14657 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:27:42.3589704Z [2026-01-15 14:27:42 - /app/chat.py:211 - ERROR] RuntimeError: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '6c39a49c071df3171aa0103a71d4d50c'}}}
+2026-01-15T14:27:42.3847087Z [2026-01-15 14:27:42 - /app/chat.py:265 - ERROR] ServiceResponseException: An unexpected runtime error occurred: <class 'agent_framework_azure_ai._client.AzureAIClient'> service failed to complete the prompt: Error code: 400 - {'error': {'code': 'invalid_payload', 'message': 'Invalid payload', 'param': None, 'type': 'invalid_request_error', 'details': [{'code': 'ValidationError', 'message': 'type: Value is "array" but should be "string"', 'param': '/input', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["output"] are not present', 'param': '/input/0', 'type': 'error'}, {'code': 'ValidationError', 'message': 'required: Required properties ["role","content"] are not present', 'param': '/input/0', 'type': 'error'}], 'additionalInfo': {'request_id': '6c39a49c071df3171aa0103a71d4d50c'}}}
+2026-01-15T14:27:49.1180967Z INFO:     169.254.129.1:25181 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:28:21.1134212Z INFO:     Shutting down
+2026-01-15T14:28:21.2688895Z INFO:     Waiting for application shutdown.
+2026-01-15T14:28:21.2689568Z INFO:     Application shutdown complete.
+2026-01-15T14:28:21.2689607Z INFO:     Finished server process [1]
+2026-01-15T14:30:27.2711603Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T14:30:27.2821465Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T14:30:27.2906578Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T14:30:27.3006036Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.3302308Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.3407582Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.3508511Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.4971232Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T14:30:27.5074115Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T14:30:27.5165571Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T14:30:27.5277936Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.5481343Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.5604388Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.5772983Z [2026-01-15 14:30:27 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T14:30:27.6077144Z INFO:     Started server process [1]
+2026-01-15T14:30:27.6147555Z INFO:     Waiting for application startup.
+2026-01-15T14:30:27.6162593Z INFO:     Application startup complete.
+2026-01-15T14:30:27.6354298Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T14:30:28.4366250Z INFO:     169.254.129.1:17097 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T14:30:29.1101275Z INFO:     169.254.129.1:17103 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:30:29.1115543Z INFO:     169.254.129.1:17111 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:30:36.9056742Z INFO:     169.254.129.1:17111 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:30:37.0080146Z INFO:     169.254.129.1:17103 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:31:07.1428928Z INFO:     169.254.129.1:17103 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:31:24.0471038Z INFO:     169.254.129.1:17103 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:32:49.3712916Z INFO:     169.254.129.1:32415 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:37:49.6854971Z INFO:     169.254.129.1:43631 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:42:50.1138871Z INFO:     169.254.129.1:40023 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:45:40.1626076Z INFO:     169.254.129.1:26641 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:50:40.4916119Z INFO:     169.254.129.1:58113 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:55:40.7583336Z INFO:     169.254.129.1:21763 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T14:56:36.4795913Z INFO:     169.254.129.1:39919 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:56:40.8704266Z INFO:     169.254.129.1:39919 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T14:56:42.3750594Z INFO:     169.254.129.1:39919 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:56:42.6862396Z INFO:     169.254.129.1:39919 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T14:56:54.7987781Z INFO:     169.254.129.1:39919 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:57:03.6271423Z INFO:     169.254.129.1:39919 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T14:59:50.8078062Z INFO:     169.254.129.1:34945 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:00:41.0394639Z INFO:     169.254.129.1:60711 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:04:54.6601666Z INFO:     169.254.129.1:12827 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:08:22.2300463Z INFO:     169.254.129.1:44549 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:08:24.9873753Z INFO:     169.254.129.1:44549 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:09:43.6785202Z INFO:     169.254.129.1:25019 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:10:00.0899963Z INFO:     169.254.129.1:21121 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:15:00.4110558Z INFO:     169.254.129.1:51005 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:20:00.6578831Z INFO:     169.254.129.1:34727 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:22:36.1665961Z INFO:     169.254.129.1:16351 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:22:39.5807116Z INFO:     169.254.129.1:16351 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:25:00.9208246Z INFO:     169.254.129.1:15541 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:28:54.2978925Z INFO:     169.254.129.1:43187 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:28:59.7938717Z INFO:     169.254.129.1:56881 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T15:29:00.2248248Z INFO:     169.254.129.1:56881 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T15:29:18.6871130Z [2026-01-15 15:29:18 - /usr/local/lib/python3.11/site-packages/aiohttp/client.py:459 - ERROR] Unclosed client session
+2026-01-15T15:29:18.6875405Z client_session: <aiohttp.client.ClientSession object at 0x7fa732214b50>
+2026-01-15T15:29:31.9974824Z INFO:     169.254.129.1:56881 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T15:29:45.3894127Z INFO:     169.254.129.1:56881 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-15T15:30:01.2672413Z INFO:     169.254.129.1:30957 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:35:01.6123465Z INFO:     169.254.129.1:38839 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:35:12.7420641Z INFO:     169.254.129.1:31119 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T15:35:18.3164861Z INFO:     169.254.129.1:31131 - "GET /health HTTP/1.1" 200 OK
+2026-01-15T15:40:01.8570692Z INFO:     169.254.129.1:31529 - "GET / HTTP/1.1" 404 Not Found
+2026-01-15T15:40:04.8154463Z INFO:     169.254.129.1:31529 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-15T15:40:05.1501796Z INFO:     169.254.129.1:31529 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-15T15:40:05.4110053Z [2026-01-15 15:40:05 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('HY000', '[HY000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]This SQL database has been disabled. Please reach out to your Fabric Capacity administrator for more information. (42131) (SQLDriverConnect)')
+2026-01-15T15:40:05.4338792Z [2026-01-15 15:40:05 - /app/chat.py:169 - ERROR] Failed to establish database connection
+2026-01-15T15:40:05.6123422Z [2026-01-15 15:40:05 - /app/chat.py:216 - ERROR] Error in stream_openai_text: Database connection failed
+2026-01-15T15:40:05.6239194Z [2026-01-15 15:40:05 - /app/chat.py:269 - ERROR] Unexpected error: 500: Error streaming OpenAI text
+2026-01-15T15:40:28.5363514Z INFO:     169.254.129.1:28421 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-15T15:40:28.9133988Z [2026-01-15 15:40:28 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('HY000', '[HY000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]This SQL database has been disabled. Please reach out to your Fabric Capacity administrator for more information. (42131) (SQLDriverConnect)')
+2026-01-15T15:40:28.9328039Z [2026-01-15 15:40:28 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T15:40:28.9495886Z [2026-01-15 15:40:28 - /app/history_sql.py:308 - ERROR] Error in get_conversation
+2026-01-15T15:40:28.9496535Z Traceback (most recent call last):
+2026-01-15T15:40:28.9496576Z   File "/app/history_sql.py", line 305, in get_conversations
+2026-01-15T15:40:28.9496610Z     result = await run_query_params(query, params)
+2026-01-15T15:40:28.9496641Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:40:28.9496707Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T15:40:28.9496736Z     conn.close()
+2026-01-15T15:40:28.9496834Z     ^^^^^^^^^^
+2026-01-15T15:40:28.9496865Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T15:40:28.9530194Z [2026-01-15 15:40:28 - /app/history_sql.py:925 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T15:40:28.9530626Z Traceback (most recent call last):
+2026-01-15T15:40:28.9530671Z   File "/app/history_sql.py", line 909, in list_conversations
+2026-01-15T15:40:28.9530704Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T15:40:28.9530738Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:40:28.9530768Z   File "/app/history_sql.py", line 305, in get_conversations
+2026-01-15T15:40:28.9530796Z     result = await run_query_params(query, params)
+2026-01-15T15:40:28.9530825Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:40:28.9530856Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T15:40:28.9530948Z     conn.close()
+2026-01-15T15:40:28.9530977Z     ^^^^^^^^^^
+2026-01-15T15:40:28.9531006Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T15:40:28.9632895Z INFO:     169.254.129.1:28421 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T15:42:43.7301935Z INFO:     Shutting down
+2026-01-15T15:42:43.8843142Z INFO:     Waiting for application shutdown.
+2026-01-15T15:42:43.9130398Z INFO:     Application shutdown complete.
+2026-01-15T15:42:43.9424079Z INFO:     Finished server process [1]
+2026-01-15T15:45:43.0985710Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T15:45:43.1171877Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T15:45:43.1327541Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T15:45:43.1358492Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.1646625Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.1822145Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.1995794Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.3330213Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/trace/__init__.py:537 - WARNING] Overriding of current TracerProvider is not allowed
+2026-01-15T15:45:43.3434174Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/_logs/_internal/__init__.py:305 - WARNING] Overriding of current LoggerProvider is not allowed
+2026-01-15T15:45:43.3532581Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/metrics/_internal/__init__.py:864 - WARNING] Overriding of current MeterProvider is not allowed
+2026-01-15T15:45:43.3640522Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.3931011Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.4097003Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.4207031Z [2026-01-15 15:45:43 - /usr/local/lib/python3.11/site-packages/opentelemetry/instrumentation/instrumentor.py:103 - WARNING] Attempting to instrument while already instrumented
+2026-01-15T15:45:43.4580648Z INFO:     Started server process [1]
+2026-01-15T15:45:43.4601932Z INFO:     Waiting for application startup.
+2026-01-15T15:45:43.4690550Z INFO:     Application startup complete.
+2026-01-15T15:45:43.4790559Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-15T15:45:43.7052468Z INFO:     169.254.130.1:33531 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-15T15:45:44.5343180Z [2026-01-15 15:45:44 - /app/history_sql.py:135 - ERROR] FABRIC-SQL: Driver 18 connection failed with error: ('HY000', '[HY000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]This SQL database has been disabled. Please reach out to your Fabric Capacity administrator for more information. (42131) (SQLDriverConnect)')
+2026-01-15T15:45:44.5523885Z [2026-01-15 15:45:44 - /app/history_sql.py:230 - ERROR] Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-01-15T15:45:44.5618307Z [2026-01-15 15:45:44 - /app/history_sql.py:308 - ERROR] Error in get_conversation
+2026-01-15T15:45:44.5619148Z Traceback (most recent call last):
+2026-01-15T15:45:44.5619269Z   File "/app/history_sql.py", line 305, in get_conversations
+2026-01-15T15:45:44.5619303Z     result = await run_query_params(query, params)
+2026-01-15T15:45:44.5619332Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:45:44.5619385Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T15:45:44.5619412Z     conn.close()
+2026-01-15T15:45:44.5619439Z     ^^^^^^^^^^
+2026-01-15T15:45:44.5619469Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T15:45:44.5705954Z [2026-01-15 15:45:44 - /app/history_sql.py:925 - ERROR] Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-01-15T15:45:44.5707375Z Traceback (most recent call last):
+2026-01-15T15:45:44.5707423Z   File "/app/history_sql.py", line 909, in list_conversations
+2026-01-15T15:45:44.5707482Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-01-15T15:45:44.5707513Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:45:44.5707542Z   File "/app/history_sql.py", line 305, in get_conversations
+2026-01-15T15:45:44.5707571Z     result = await run_query_params(query, params)
+2026-01-15T15:45:44.5707600Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-01-15T15:45:44.5707650Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-01-15T15:45:44.5707678Z     conn.close()
+2026-01-15T15:45:44.5707704Z     ^^^^^^^^^^
+2026-01-15T15:45:44.5707733Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-01-15T15:45:44.5911462Z INFO:     169.254.130.1:33533 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-01-15T15:46:13.5112865Z INFO:     Shutting down
+2026-01-15T15:46:13.6143921Z INFO:     Waiting for application shutdown.
+2026-01-15T15:46:13.6158918Z INFO:     Application shutdown complete.
+2026-01-15T15:46:13.6159154Z INFO:     Finished server process [1]

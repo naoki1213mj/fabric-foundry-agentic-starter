@@ -213,9 +213,19 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
                 logger.info(f"Single agent mode: Using Chat Agent '{agent_name}'")
 
             # Create chat client with existing agent
+            # model_deployment_name is required in agent-framework 1.0.0b260114+
+            model_deployment_name = os.getenv(
+                "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
+            ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
+            if not model_deployment_name:
+                raise ValueError(
+                    "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME or AZURE_AI_MODEL_DEPLOYMENT_NAME environment variable is required"
+                )
+
             chat_client = AzureAIClient(
                 project_client=project_client,
                 agent_name=agent_name,
+                model_deployment_name=model_deployment_name,
                 use_latest_version=True,
             )
 
