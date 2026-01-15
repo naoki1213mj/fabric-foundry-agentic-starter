@@ -11,13 +11,13 @@ requests==2.32.5
 types-requests==2.32.4.20250913
 aiohttp==3.13.3
 
-# Azure Services
+# Azure Services (with prerelease dependencies)
+# Note: These packages require --pre flag or prerelease versions
 agent-framework-azure-ai==1.0.0b260114
 agent-framework-core==1.0.0b260114
 azure-identity==1.26.0b1
-# azure-search-documents==11.6.0
+azure-ai-agents==1.2.0b5
 azure-ai-projects==2.0.0b3
-# azure-ai-inference==1.0.0b9
 azure-cosmos==4.9.0
 
 # Additional utilities
@@ -25,13 +25,14 @@ openai>=2.8.0
 pyodbc==5.2.0
 pandas==2.3.3
 
-opentelemetry-exporter-otlp-proto-grpc==1.37.0
-opentelemetry-exporter-otlp-proto-http==1.37.0
+# OpenTelemetry (versions aligned with agent-framework dependencies)
+opentelemetry-api==1.39.1
+opentelemetry-sdk==1.39.1
+opentelemetry-semantic-conventions==0.60b1
+opentelemetry-instrumentation==0.60b1
+opentelemetry-exporter-otlp-proto-grpc==1.39.1
+opentelemetry-exporter-otlp-proto-http==1.39.1
 azure-monitor-events-extension==0.1.0
-opentelemetry-sdk==1.37.0
-opentelemetry-api==1.37.0
-opentelemetry-semantic-conventions==0.58b0
-opentelemetry-instrumentation==0.58b0
 azure-monitor-opentelemetry==1.8.1
 
 # Development tools

@@ -25,9 +25,9 @@ WORKDIR /app
 # Copy only the requirements file first to leverage Docker layer caching
 COPY ./requirements.txt .
 
-# Install Python dependencies
+# Install Python dependencies (--pre flag enables prerelease packages like azure-ai-agents)
 RUN pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir -r requirements.txt && rm -rf /root/.cache
+    && pip install --no-cache-dir --pre -r requirements.txt && rm -rf /root/.cache
 
 # Copy the backend application code into the container
 COPY ./ .
