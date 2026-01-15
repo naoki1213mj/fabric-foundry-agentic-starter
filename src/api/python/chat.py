@@ -221,7 +221,7 @@ async def stream_openai_text(conversation_id: str, query: str) -> StreamingRespo
                 chat_client=chat_client,
                 tools=my_tools,
                 tool_choice="auto",
-                store=True,
+                # Note: 'store' parameter removed - not supported in agent-framework 1.0.0b260114
             ) as chat_agent:
                 if thread_conversation_id:
                     thread = chat_agent.get_new_thread(
