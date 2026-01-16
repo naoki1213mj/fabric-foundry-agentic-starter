@@ -1,8 +1,8 @@
 """
-Knowledge Base Tool for MCP integration with Azure AI Search.
+Knowledge Base Tool for Azure AI Search integration.
 
-This module provides a tool for querying the Azure AI Search Knowledge Base
-via MCP (Model Context Protocol) endpoint.
+This module provides a tool for querying the Azure AI Search index
+to retrieve product documentation and specifications.
 """
 
 import logging
@@ -15,17 +15,24 @@ logger = logging.getLogger(__name__)
 
 
 class KnowledgeBaseTool:
-    """Tool for querying MCP Knowledge Base."""
+    """Tool for querying Azure AI Search Knowledge Base."""
 
-    def __init__(self, mcp_endpoint: str, api_key: str | None = None):
+    def __init__(
+        self,
+        search_endpoint: str,
+        index_name: str,
+        api_key: str,
+    ):
         """
         Initialize the Knowledge Base Tool.
 
         Args:
-            mcp_endpoint: The MCP endpoint URL for the knowledge base
-            api_key: Optional API key for authentication
+            search_endpoint: The Azure AI Search endpoint URL
+            index_name: The name of the search index
+            api_key: API key for authentication
         """
-        self.mcp_endpoint = mcp_endpoint
+        self.search_endpoint = search_endpoint.rstrip("/")
+        self.index_name = index_name
         self.api_key = api_key
         self._session: aiohttp.ClientSession | None = None
 
@@ -35,19 +42,33 @@ class KnowledgeBaseTool:
         Create a KnowledgeBaseTool from environment variables.
 
         Environment variables:
-            AI_SEARCH_MCP_ENDPOINT: The MCP endpoint URL
-            AI_SEARCH_API_KEY: Optional API key
+            AI_SEARCH_ENDPOINT: The Azure AI Search endpoint URL
+            AI_SEARCH_INDEX_NAME: The name of the search index
+            AI_SEARCH_API_KEY: API key for authentication
 
         Returns:
             KnowledgeBaseTool instance or None if not configured
         """
-        mcp_endpoint = os.getenv("AI_SEARCH_MCP_ENDPOINT")
-        if not mcp_endpoint:
-            logger.warning("AI_SEARCH_MCP_ENDPOINT not configured")
+        search_endpoint = os.getenv("AI_SEARCH_ENDPOINT")
+        index_name = os.getenv("AI_SEARCH_INDEX_NAME")
+        api_key = os.getenv("AI_SEARCH_API_KEY")
+
+        if not search_endpoint:
+            logger.warning("AI_SEARCH_ENDPOINT not configured")
+            return None
+        if not index_name:
+            logger.warning("AI_SEARCH_INDEX_NAME not configured")
+            return None
+        if not api_key:
+            logger.warning("AI_SEARCH_API_KEY not configured")
             return None
 
-        api_key = os.getenv("AI_SEARCH_API_KEY")
-        return cls(mcp_endpoint=mcp_endpoint, api_key=api_key)
+        logger.info(
+            f"KnowledgeBaseTool configured: endpoint={search_endpoint}, index={index_name}"
+        )
+        return cls(
+            search_endpoint=search_endpoint, index_name=index_name, api_key=api_key
+        )
 
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create an aiohttp session."""
@@ -66,7 +87,7 @@ class KnowledgeBaseTool:
 
     async def search(self, query: str, top: int = 5) -> dict[str, Any]:
         """
-        Search the knowledge base using MCP.
+        Search the knowledge base using Azure AI Search.
 
         Args:
             query: The search query
@@ -77,42 +98,40 @@ class KnowledgeBaseTool:
         """
         session = await self._get_session()
 
-        # MCP request format for knowledge_base_retrieve
-        mcp_request = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "tools/call",
-            "params": {
-                "name": "knowledge_base_retrieve",
-                "arguments": {"query": query, "top": top},
-            },
+        # Azure AI Search request format
+        search_url = f"{self.search_endpoint}/indexes/{self.index_name}/docs/search?api-version=2025-11-01-preview"
+        search_request = {
+            "search": query,
+            "top": top,
+            "select": "snippet,doc_url,uid",
         }
 
         try:
-            async with session.post(self.mcp_endpoint, json=mcp_request) as response:
+            logger.info(f"Searching index {self.index_name} for: {query}")
+            async with session.post(search_url, json=search_request) as response:
                 if response.status == 200:
                     result = await response.json()
-                    return self._parse_mcp_response(result)
+                    return self._parse_search_response(result)
                 else:
                     error_text = await response.text()
                     logger.error(
-                        f"MCP request failed: {response.status} - {error_text}"
+                        f"Search request failed: {response.status} - {error_text}"
                     )
                     return {"error": f"Search failed: {response.status}"}
 
         except aiohttp.ClientError as e:
-            logger.error(f"HTTP error during MCP request: {e}")
+            logger.error(f"HTTP error during search request: {e}")
             return {"error": str(e)}
         except Exception as e:
-            logger.error(f"Unexpected error during MCP request: {e}")
+            logger.error(f"Unexpected error during search request: {e}")
             return {"error": str(e)}
 
-    def _parse_mcp_response(self, response: dict) -> dict[str, Any]:
+    def _parse_search_response(self, response: dict) -> dict[str, Any]:
         """
-        Parse MCP response into a structured format.
+        Parse Azure AI Search response into a structured format.
 
         Args:
-            response: Raw MCP response
+            response: Raw search response
 
         Returns:
             Parsed response with sources and citations
@@ -120,23 +139,30 @@ class KnowledgeBaseTool:
         if "error" in response:
             return {"error": response["error"]}
 
-        result = response.get("result", {})
-        content = result.get("content", [])
+        documents = response.get("value", [])
+        logger.info(f"Found {len(documents)} documents")
 
         sources = []
-        for i, item in enumerate(content):
-            if item.get("type") == "text":
-                text = item.get("text", "")
-                # Parse source metadata if available
-                annotations = item.get("annotations", {})
-                source = {
-                    "index": i,
-                    "content": text,
-                    "source": annotations.get("source", f"source_{i}"),
-                    "title": annotations.get("title", ""),
-                    "url": annotations.get("url", ""),
-                }
-                sources.append(source)
+        for i, doc in enumerate(documents):
+            snippet = doc.get("snippet", "")
+            doc_url = doc.get("doc_url", "")
+
+            # Extract title from doc_url or snippet
+            title = ""
+            if doc_url:
+                # Extract filename from URL path
+                parts = doc_url.split("/")
+                if parts:
+                    title = parts[-1].replace(".pdf", "").replace("_", " ")
+
+            source = {
+                "index": i + 1,
+                "content": snippet,
+                "source": doc_url,
+                "title": title,
+                "url": doc_url,
+            }
+            sources.append(source)
 
         return {"sources": sources, "total": len(sources)}
 
