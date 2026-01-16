@@ -294,22 +294,38 @@ async def call_specialist_agent(
         ) as project_client:
             # Set up tools based on agent type
             my_tools = []
+            augmented_query = actual_query  # Default to original query
+
             if agent_type == "sql":
                 db_connection = await get_fabric_db_connection()
                 if db_connection:
                     custom_tool = SqlQueryTool.create_with_connection(db_connection)
                     my_tools = [custom_tool.run_sql_query]
             elif agent_type == "doc":
-                # Import knowledge base tool
-                from knowledge_base_tool import (
-                    KnowledgeBaseTool,
-                    knowledge_base_retrieve,
-                )
+                # Import knowledge base tool and perform search
+                from knowledge_base_tool import KnowledgeBaseTool
 
                 kb_tool = KnowledgeBaseTool.create_from_env()
                 if kb_tool:
-                    my_tools = [knowledge_base_retrieve]
-                    logger.info("Knowledge base tool configured for doc agent")
+                    logger.info(f"Searching knowledge base for: {actual_query}")
+                    # Perform search and get results
+                    search_results = await kb_tool.retrieve_documents(actual_query)
+                    await kb_tool.close()
+                    logger.info(f"Search results: {search_results[:200]}...")
+
+                    # Augment the query with search results (RAG pattern)
+                    augmented_query = f"""以下の検索結果に基づいて質問に回答してください。
+
+## 検索結果（ナレッジベースから取得）
+{search_results}
+
+## ユーザーの質問
+{actual_query}
+
+検索結果に基づいて、正確に回答し、情報が見つからない場合はその旨を伝えてください。"""
+                    logger.info(
+                        "Knowledge base search completed, augmented query created"
+                    )
 
             model_deployment_name = os.getenv(
                 "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
@@ -335,7 +351,7 @@ async def call_specialist_agent(
                 truncation_strategy = TruncationObject(type="auto")
 
                 async for chunk in chat_agent.run_stream(
-                    messages=actual_query,
+                    messages=augmented_query,
                     thread=thread,
                     truncation_strategy=truncation_strategy,
                 ):
