@@ -252,7 +252,7 @@ async def call_specialist_agent(
     Yields:
         Response chunks from the specialist agent
     """
-    from sql_query_tool import SqlQueryTool, get_fabric_db_connection
+    from history_sql import SqlQueryTool, get_fabric_db_connection
 
     # Determine which agent to use
     if agent_type == "sql":
