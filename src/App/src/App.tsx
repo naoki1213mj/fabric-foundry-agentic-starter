@@ -24,9 +24,9 @@ import { clearCitation } from "./store/citationSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 
 // Application version for display
-const APP_VERSION = "2.5.0";
+const APP_VERSION = "2.6.0";
 const BUILD_DATE = "2026-01-16";
-const BUILD_INFO = "SqlQueryTool fix";
+const BUILD_INFO = "UI refresh and chat test preparation";
 
 const panels = {
   CHAT: "CHAT",
