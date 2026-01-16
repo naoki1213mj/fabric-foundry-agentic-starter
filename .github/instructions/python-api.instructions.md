@@ -63,11 +63,11 @@ async def chat(request: ChatRequest):
             response="デモモードのレスポンスです。",
             thread_id="demo-thread-001"
         )
-    
+
     # Agent Framework を使用
     agent = get_agent()
     result = await agent.run(request.message)
-    
+
     return ChatResponse(
         response=result.content,
         thread_id=result.thread_id
@@ -77,10 +77,33 @@ async def chat(request: ChatRequest):
 async def query_data(query: str):
     if DEMO_MODE:
         return {"data": DEMO_DATA}
-    
+
     result = await execute_fabric_query(query)
     return {"data": result}
 ```
+
+## ローカル開発環境 (uv)
+
+このプロジェクトでは **uv** を使用してPython仮想環境を管理します。
+
+```bash
+# 仮想環境の作成
+uv venv
+
+# 仮想環境の有効化 (PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+# 依存関係のインストール
+uv pip install -r requirements.txt
+
+# パッケージの追加
+uv pip install <package-name>
+
+# 依存関係の同期
+uv pip sync requirements.txt
+```
+
+**重要**: `pip` や `python -m pip` ではなく、必ず `uv pip` を使用してください。
 
 ## Dockerfile
 

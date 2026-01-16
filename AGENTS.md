@@ -60,6 +60,24 @@ async def my_tool(param: str) -> str:
 - Solution Accelerator のコード構造を大幅に変更
 - DEMO_MODE なしの実装
 - Guardrails バイパス
+- **pip や python -m pip の使用** → 必ず `uv pip` を使う
+
+## Python 開発環境 (uv 必須)
+
+このプロジェクトでは **uv** を使用してPython仮想環境を管理します。
+
+```bash
+# 仮想環境の有効化 (PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+# パッケージインストール
+uv pip install -r requirements.txt
+
+# パッケージ追加
+uv pip install <package-name>
+```
+
+**重要**: `pip` ではなく必ず `uv pip` を使用してください。
 
 ## 審査基準
 
