@@ -32,6 +32,15 @@ agents:
     tools_file: agents/title_agent/tools.yaml
     settings: {}
 
+  doc_agent:
+    name_prefix: DocAgent
+    description: Document search agent using Foundry IQ knowledge base for product specifications
+    instructions_file: agents/doc_agent/instructions.md
+    tools_file: agents/doc_agent/tools.yaml
+    settings:
+      # Foundry IQ MCP endpoint configuration
+      mcp_endpoint_placeholder: "{{MCP_KNOWLEDGE_BASE_ENDPOINT}}"
+
 # Workflow configuration
 workflow:
   # Start agent for handoff workflow
@@ -41,9 +50,12 @@ workflow:
     orchestrator_agent:
       - sql_agent
       - web_agent
+      - doc_agent
     sql_agent:
       - orchestrator_agent
     web_agent:
+      - orchestrator_agent
+    doc_agent:
       - orchestrator_agent
 
 # Use case configurations

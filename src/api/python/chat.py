@@ -46,18 +46,21 @@ MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 AGENT_NAME_ORCHESTRATOR = os.getenv("AGENT_NAME_ORCHESTRATOR")
 AGENT_NAME_SQL = os.getenv("AGENT_NAME_SQL")
 AGENT_NAME_WEB = os.getenv("AGENT_NAME_WEB")
+AGENT_NAME_DOC = os.getenv("AGENT_NAME_DOC")
 AGENT_NAME_CHAT = os.getenv("AGENT_NAME_CHAT")  # Legacy single-agent mode
 
 # Handoff tag patterns for multi-agent routing (XML format)
 HANDOFF_PATTERNS_XML = {
     "sql": re.compile(r"<handoff_to_sql_agent>(.*?)</handoff_to_sql_agent>", re.DOTALL),
     "web": re.compile(r"<handoff_to_web_agent>(.*?)</handoff_to_web_agent>", re.DOTALL),
+    "doc": re.compile(r"<handoff_to_doc_agent>(.*?)</handoff_to_doc_agent>", re.DOTALL),
 }
 
 # Handoff patterns for JSON format
 HANDOFF_PATTERNS_JSON = {
     "sql": re.compile(r'"tool"\s*:\s*"handoff_to_sql_agent"', re.IGNORECASE),
     "web": re.compile(r'"tool"\s*:\s*"handoff_to_web_agent"', re.IGNORECASE),
+    "doc": re.compile(r'"tool"\s*:\s*"handoff_to_doc_agent"', re.IGNORECASE),
 }
 
 
@@ -89,6 +92,8 @@ def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
                 return "sql", data
             elif "web" in tool:
                 return "web", data
+            elif "doc" in tool:
+                return "doc", data
     except json.JSONDecodeError:
         # Check for JSON pattern in text
         for agent_type, pattern in HANDOFF_PATTERNS_JSON.items():
@@ -259,6 +264,8 @@ async def call_specialist_agent(
         agent_name = AGENT_NAME_SQL
     elif agent_type == "web":
         agent_name = AGENT_NAME_WEB
+    elif agent_type == "doc":
+        agent_name = AGENT_NAME_DOC
     else:
         logger.error(f"Unknown agent type: {agent_type}")
         yield f"Unknown agent type: {agent_type}"
@@ -277,6 +284,7 @@ async def call_specialist_agent(
 
     credential = None
     custom_tool = None
+    kb_tool = None
 
     try:
         credential = await get_azure_credential_async()
@@ -284,13 +292,24 @@ async def call_specialist_agent(
         async with AIProjectClient(
             endpoint=os.getenv("AZURE_AI_AGENT_ENDPOINT"), credential=credential
         ) as project_client:
-            # Set up tools for SQL agent
+            # Set up tools based on agent type
             my_tools = []
             if agent_type == "sql":
                 db_connection = await get_fabric_db_connection()
                 if db_connection:
                     custom_tool = SqlQueryTool.create_with_connection(db_connection)
                     my_tools = [custom_tool.run_sql_query]
+            elif agent_type == "doc":
+                # Import knowledge base tool
+                from knowledge_base_tool import (
+                    KnowledgeBaseTool,
+                    knowledge_base_retrieve,
+                )
+
+                kb_tool = KnowledgeBaseTool.create_from_env()
+                if kb_tool:
+                    my_tools = [knowledge_base_retrieve]
+                    logger.info("Knowledge base tool configured for doc agent")
 
             model_deployment_name = os.getenv(
                 "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
@@ -329,6 +348,8 @@ async def call_specialist_agent(
     finally:
         if custom_tool:
             custom_tool.close_connection()
+        if kb_tool:
+            await kb_tool.close()
         if credential:
             await credential.close()
 

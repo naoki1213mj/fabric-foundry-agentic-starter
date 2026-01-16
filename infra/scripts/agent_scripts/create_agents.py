@@ -127,8 +127,17 @@ class AgentManager:
                 print(
                     f"  → Bing Grounding configured with connection: {bing_connection_name}"
                 )
+            elif tool_type == "mcp_knowledge_base":
+                # MCP Knowledge Base tool - handled at runtime in chat.py
+                # The agent will use the MCP endpoint configured in environment
+                print("  → MCP Knowledge Base tool configured (handled at runtime)")
+                # Skip adding to tools - MCP is configured via project connection
+                continue
             else:
-                # Standard FunctionTool
+                # Standard FunctionTool - requires name field
+                if "name" not in tool_def:
+                    print(f"  ⚠ Skipping tool without name: {tool_def}")
+                    continue
                 tools.append(
                     FunctionTool(
                         name=tool_def["name"],
@@ -310,6 +319,7 @@ def main():
     print(f"\norchestratorAgentName={results.get('orchestrator_agent', '')}")
     print(f"sqlAgentName={results.get('sql_agent', '')}")
     print(f"webAgentName={results.get('web_agent', '')}")
+    print(f"docAgentName={results.get('doc_agent', '')}")
     print(f"titleAgentName={results.get('title_agent', '')}")
     # Legacy compatibility
     print(f"chatAgentName={results.get('sql_agent', results.get('chat_agent', ''))}")

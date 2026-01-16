@@ -1,0 +1,35 @@
+# Document Agent Tools Configuration
+# Uses Foundry IQ Knowledge Base via MCP Tool
+
+tools:
+  - type: mcp_knowledge_base
+    # MCP endpoint for Foundry IQ knowledge base
+    # Connection will be resolved from environment variables:
+    # - AI_SEARCH_ENDPOINT: Azure AI Search service endpoint
+    # - AI_SEARCH_KNOWLEDGE_BASE_NAME: Knowledge base name
+    # - AI_SEARCH_PROJECT_CONNECTION_NAME: Project connection name for MCP
+    server_label: knowledge-base
+    allowed_tools:
+      - knowledge_base_retrieve
+    require_approval: never
+
+# Alternative: Direct Azure AI Search tool (if MCP is not available)
+# Uncomment if using direct Azure AI Search integration instead of Foundry IQ
+#
+# - name: search_documents
+#   description: Search product specification documents in Azure AI Search.
+#   parameters:
+#     type: object
+#     properties:
+#       query:
+#         type: string
+#         description: Search query for product specifications.
+#       top_k:
+#         type: integer
+#         description: Number of results to return.
+#         default: 5
+#       filter:
+#         type: string
+#         description: Optional OData filter expression.
+#     required:
+#       - query

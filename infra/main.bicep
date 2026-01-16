@@ -276,6 +276,18 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       AGENT_NAME_CHAT: ''
       AGENT_NAME_TITLE: ''
 
+      // Multi-Agent Configuration
+      MULTI_AGENT_MODE: 'true'
+      AGENT_NAME_ORCHESTRATOR: ''
+      AGENT_NAME_SQL: ''
+      AGENT_NAME_WEB: ''
+      AGENT_NAME_DOC: ''
+
+      // Foundry IQ / AI Search Configuration (for DocAgent)
+      AI_SEARCH_ENDPOINT: ''
+      AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
+      AI_SEARCH_MCP_ENDPOINT: ''
+
       FABRIC_SQL_DATABASE: ''
       FABRIC_SQL_SERVER: ''
       FABRIC_SQL_CONNECTION_STRING: ''
@@ -329,6 +341,18 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
 
       AGENT_NAME_CHAT: ''
       AGENT_NAME_TITLE: ''
+
+      // Multi-Agent Configuration
+      MULTI_AGENT_MODE: 'true'
+      AGENT_NAME_ORCHESTRATOR: ''
+      AGENT_NAME_SQL: ''
+      AGENT_NAME_WEB: ''
+      AGENT_NAME_DOC: ''
+
+      // Foundry IQ / AI Search Configuration (for DocAgent)
+      AI_SEARCH_ENDPOINT: ''
+      AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
+      AI_SEARCH_MCP_ENDPOINT: ''
 
       FABRIC_SQL_DATABASE: ''
       FABRIC_SQL_SERVER: ''
