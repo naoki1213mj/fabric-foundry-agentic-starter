@@ -67,20 +67,40 @@ HANDOFF_PATTERNS_JSON = {
 def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
     """
     Parse handoff from orchestrator response (supports both XML and JSON formats).
+    Returns the first handoff found.
 
     Returns:
         tuple: (agent_type, handoff_params) or (None, None) if no handoff detected
     """
-    # Try XML format first
+    handoffs = parse_all_handoffs(response_text)
+    if handoffs:
+        return handoffs[0]
+    return None, None
+
+
+def parse_all_handoffs(response_text: str) -> list[tuple[str, dict]]:
+    """
+    Parse ALL handoffs from orchestrator response (supports both XML and JSON formats).
+    Used for parallel execution of multiple specialist agents.
+
+    Returns:
+        list: List of (agent_type, handoff_params) tuples
+    """
+    handoffs = []
+
+    # Try XML format - find ALL matches for each agent type
     for agent_type, pattern in HANDOFF_PATTERNS_XML.items():
-        match = pattern.search(response_text)
-        if match:
+        for match in pattern.finditer(response_text):
             try:
                 params = json.loads(match.group(1).strip())
-                return agent_type, params
+                handoffs.append((agent_type, params))
             except json.JSONDecodeError:
                 logger.warning(f"Failed to parse XML handoff params for {agent_type}")
-                return agent_type, {"query": match.group(1).strip()}
+                handoffs.append((agent_type, {"query": match.group(1).strip()}))
+
+    # If we found XML handoffs, return them
+    if handoffs:
+        return handoffs
 
     # Try JSON format
     try:
@@ -89,11 +109,11 @@ def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
         if isinstance(data, dict):
             tool = data.get("tool", "").lower()
             if "sql" in tool:
-                return "sql", data
+                return [("sql", data)]
             elif "web" in tool:
-                return "web", data
+                return [("web", data)]
             elif "doc" in tool:
-                return "doc", data
+                return [("doc", data)]
     except json.JSONDecodeError:
         # Check for JSON pattern in text
         for agent_type, pattern in HANDOFF_PATTERNS_JSON.items():
@@ -104,11 +124,11 @@ def parse_handoff(response_text: str) -> tuple[str | None, dict | None]:
                     json_match = re.search(r'\{[^{}]*"tool"[^{}]*\}', response_text)
                     if json_match:
                         data = json.loads(json_match.group())
-                        return agent_type, data
+                        return [(agent_type, data)]
                 except (json.JSONDecodeError, AttributeError):
-                    return agent_type, {"query": response_text}
+                    return [(agent_type, {"query": response_text})]
 
-    return None, None
+    return []
 
 
 def is_handoff_response(response_text: str) -> bool:
@@ -370,6 +390,124 @@ async def call_specialist_agent(
             await credential.close()
 
 
+async def call_specialist_agent_collect(
+    agent_type: str,
+    query: str,
+    conversation_id: str,
+    handoff_params: dict | None = None,
+) -> tuple[str, str]:
+    """
+    Call a specialist agent and collect all response chunks into a single string.
+    Used for parallel execution.
+
+    Args:
+        agent_type: 'sql', 'web', or 'doc'
+        query: The original user query
+        conversation_id: Conversation ID for thread management
+        handoff_params: Parameters extracted from handoff tag
+
+    Returns:
+        tuple: (agent_type, collected_response)
+    """
+    collected_response = ""
+    try:
+        async for chunk in call_specialist_agent(
+            agent_type=agent_type,
+            query=query,
+            conversation_id=conversation_id,
+            handoff_params=handoff_params,
+        ):
+            collected_response += str(chunk)
+    except Exception as e:
+        logger.error(f"Error in parallel agent call {agent_type}: {e}")
+        collected_response = f"[{agent_type}エージェントでエラーが発生しました]"
+
+    return agent_type, collected_response
+
+
+async def call_specialist_agents_parallel(
+    handoffs: list[tuple[str, dict]],
+    query: str,
+    conversation_id: str,
+) -> dict[str, str]:
+    """
+    Call multiple specialist agents in parallel and collect their responses.
+
+    Args:
+        handoffs: List of (agent_type, handoff_params) tuples
+        query: The original user query
+        conversation_id: Conversation ID for thread management
+
+    Returns:
+        dict: Mapping of agent_type to response string
+    """
+    logger.info(f"Starting parallel execution of {len(handoffs)} agents")
+
+    # Create tasks for each agent
+    tasks = []
+    for agent_type, handoff_params in handoffs:
+        task = asyncio.create_task(
+            call_specialist_agent_collect(
+                agent_type=agent_type,
+                query=query,
+                conversation_id=conversation_id,
+                handoff_params=handoff_params,
+            )
+        )
+        tasks.append(task)
+
+    # Wait for all tasks to complete
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Collect results into a dictionary
+    responses = {}
+    for result in results:
+        if isinstance(result, Exception):
+            logger.error(f"Agent task failed with exception: {result}")
+            continue
+        agent_type, response = result
+        responses[agent_type] = response
+        logger.info(f"Agent {agent_type} completed with {len(response)} chars")
+
+    return responses
+
+
+def format_parallel_responses(
+    responses: dict[str, str], handoffs: list[tuple[str, dict]]
+) -> str:
+    """
+    Format responses from multiple agents into a unified response.
+
+    Args:
+        responses: Dict mapping agent_type to response
+        handoffs: Original handoff list (to preserve order)
+
+    Returns:
+        str: Formatted combined response
+    """
+    agent_labels = {
+        "sql": "📊 データベース検索結果",
+        "web": "🌐 Web検索結果",
+        "doc": "📄 ドキュメント検索結果",
+    }
+
+    parts = []
+
+    # Preserve order from handoffs
+    for agent_type, _ in handoffs:
+        if agent_type in responses:
+            label = agent_labels.get(agent_type, agent_type)
+            response = responses[agent_type]
+
+            # Only add section header if multiple responses
+            if len(handoffs) > 1:
+                parts.append(f"\n\n### {label}\n\n{response}")
+            else:
+                parts.append(response)
+
+    return "".join(parts).strip()
+
+
 # Global thread cache
 thread_cache = None
 
@@ -532,8 +670,9 @@ async def stream_chat_request(conversation_id, query):
 
     In multi-agent mode:
     1. Orchestrator receives the query first
-    2. If orchestrator returns handoff tags, route to specialist agent
-    3. Stream specialist agent's response to the client
+    2. If orchestrator returns handoff tags, route to specialist agent(s)
+    3. For multiple handoffs, execute agents in parallel and combine responses
+    4. Stream the final response to the client
     """
 
     async def generate():
@@ -554,11 +693,50 @@ async def stream_chat_request(conversation_id, query):
                     # Continue collecting until we have the complete handoff tag
                     continue
 
-            # If handoff detected, route to specialist agent
+            # If handoff detected, route to specialist agent(s)
             if handoff_detected and MULTI_AGENT_MODE:
-                agent_type, handoff_params = parse_handoff(orchestrator_response)
-                if agent_type:
-                    logger.info(f"Processing handoff to {agent_type} agent")
+                # Parse ALL handoffs for parallel execution
+                handoffs = parse_all_handoffs(orchestrator_response)
+
+                if len(handoffs) > 1:
+                    # Multiple handoffs detected - execute in parallel
+                    logger.info(
+                        f"Multiple handoffs detected ({len(handoffs)}), executing in parallel"
+                    )
+                    for agent_type, params in handoffs:
+                        logger.info(
+                            f"  - {agent_type}: {params.get('query', '')[:50]}..."
+                        )
+
+                    # Execute all agents in parallel
+                    responses = await call_specialist_agents_parallel(
+                        handoffs=handoffs,
+                        query=query,
+                        conversation_id=conversation_id,
+                    )
+
+                    # Format combined response
+                    assistant_content = format_parallel_responses(responses, handoffs)
+
+                    if assistant_content:
+                        response = {
+                            "choices": [
+                                {
+                                    "messages": [
+                                        {
+                                            "role": "assistant",
+                                            "content": assistant_content,
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                        yield json.dumps(response, ensure_ascii=False) + "\n\n"
+
+                elif len(handoffs) == 1:
+                    # Single handoff - stream response
+                    agent_type, handoff_params = handoffs[0]
+                    logger.info(f"Processing single handoff to {agent_type} agent")
                     logger.info(f"Handoff params: {handoff_params}")
 
                     # Stream response from specialist agent
