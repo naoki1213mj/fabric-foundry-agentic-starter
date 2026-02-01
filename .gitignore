@@ -33,3 +33,5 @@ v27_logs.zip
 # ACRビルド用一時フォルダ
 src/App/acr-build/
 src/api/python/acr-build/
+multi_*
+*.zip
