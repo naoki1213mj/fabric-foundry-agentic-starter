@@ -41,8 +41,8 @@ from agent_framework import (
 )
 from agent_framework.azure import AzureOpenAIChatClient
 
-# Azure SDK
-from azure.identity.aio import AzureCliCredential
+# Azure SDK - Use sync credential for SDK compatibility
+from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
@@ -377,10 +377,9 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
 
     これにより、複合的なクエリ（例：「売上データを分析して、最新トレンドと比較」）に対応可能。
     """
-    credential = None
-
     try:
-        credential = AzureCliCredential()
+        # Use sync credential - SDK requires synchronous token acquisition
+        credential = DefaultAzureCredential()
 
         # Get Azure OpenAI configuration from environment variables
         # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
@@ -502,18 +501,15 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
             except Exception:
                 pass
             _db_connection = None
-        if credential:
-            await credential.close()
 
 
 async def stream_single_agent_response(conversation_id: str, query: str):
     """
     Stream response using single agent mode with AzureOpenAIChatClient.
     """
-    credential = None
-
     try:
-        credential = AzureCliCredential()
+        # Use sync credential - SDK requires synchronous token acquisition
+        credential = DefaultAzureCredential()
 
         # Get Azure OpenAI configuration from environment variables
         # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
@@ -585,8 +581,6 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             except Exception:
                 pass
             _db_connection = None
-        if credential:
-            await credential.close()
 
 
 # ============================================================================
