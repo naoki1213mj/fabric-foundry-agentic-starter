@@ -1,0 +1,110 @@
+2026-02-01T23:24:26.5037797Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-02-01T23:24:26.5051921Z Request method: 'POST'
+2026-02-01T23:24:26.5052123Z Request headers:
+2026-02-01T23:24:26.5052217Z     'Content-Type': 'application/json'
+2026-02-01T23:24:26.5052263Z     'Content-Length': '1360'
+2026-02-01T23:24:26.5052313Z     'Accept': 'application/json'
+2026-02-01T23:24:26.5052415Z     'x-ms-client-request-id': '2651ded8-ffc5-11f0-a380-a2f62dcbf893'
+2026-02-01T23:24:26.5052489Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-02-01T23:24:26.5052543Z A body is sent with the request
+2026-02-01T23:24:27.1613079Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-02-01T23:24:27.1613800Z Response headers:
+2026-02-01T23:24:27.1613868Z     'Transfer-Encoding': 'chunked'
+2026-02-01T23:24:27.1613973Z     'Content-Type': 'application/json; charset=utf-8'
+2026-02-01T23:24:27.1614012Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-02-01T23:24:27.1614200Z     'Strict-Transport-Security': 'REDACTED'
+2026-02-01T23:24:27.1614244Z     'X-Content-Type-Options': 'REDACTED'
+2026-02-01T23:24:27.1614285Z     'Date': 'Sun, 01 Feb 2026 23:24:26 GMT'
+2026-02-01T23:24:28.4497090Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T23:24:28.6182785Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T23:24:28.6216679Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T23:24:28.6253127Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T23:24:28.6293376Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.6324526Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.6402110Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.6457676Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.6492937Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T23:24:28.8583717Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T23:24:28.8605981Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T23:24:28.8633576Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T23:24:28.8706902Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.8710241Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.8766699Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.8816734Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T23:24:28.8822587Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-02-01T23:24:28.8941535Z INFO:     Started server process [1]
+2026-02-01T23:24:28.8943786Z INFO:     Waiting for application startup.
+2026-02-01T23:24:28.8957687Z INFO:     Application startup complete.
+2026-02-01T23:24:28.8970209Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-02-01T23:24:29.3077349Z INFO:     169.254.130.1:27771 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-02-01T23:24:29.6591115Z INFO:     169.254.130.1:27779 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-02-01T23:24:29.6620419Z INFO:     169.254.130.1:27785 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-02-01T23:24:29.6620757Z INFO:     169.254.130.1:27799 - "GET / HTTP/1.1" 200 OK
+2026-02-01T23:24:29.6639523Z INFO:     169.254.130.1:27779 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-02-01T23:24:29.6658208Z INFO:     169.254.130.1:27799 - "GET / HTTP/1.1" 200 OK
+2026-02-01T23:24:29.9629593Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-02-01T23:24:29.9654570Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T23:24:29.9654832Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T23:24:35.1623965Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-02-01T23:24:35.1859666Z INFO:     169.254.130.1:27799 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-02-01T23:24:35.2054323Z INFO:     169.254.130.1:27779 - "POST /api/chat HTTP/1.1" 200 OK
+2026-02-01T23:24:35.2054322Z INFO:chat:Using multi-agent mode with HandoffBuilder
+2026-02-01T23:24:35.2054552Z INFO:azure.identity._credentials.environment:No environment configuration found.
+2026-02-01T23:24:35.2086614Z INFO:azure.identity._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-02-01T23:24:35.2096839Z INFO:chat:Azure OpenAI config: deployment=gpt-5, endpoint=https://aisa-daj6dri4yf3k3z.openai.azure.com/
+2026-02-01T23:24:35.3276735Z INFO:azure.identity._credentials.chained:DefaultAzureCredential acquired a token from ManagedIdentityCredential
+2026-02-01T23:24:35.5777930Z INFO:agent_framework._workflows._magentic:Building Magentic workflow with 3 participants
+2026-02-01T23:24:35.5849881Z INFO:chat:Starting MagenticBuilder workflow with query: 売り上げ合計金額top5の製品について、横軸を製品名、縦軸を売り上げ金額の合計額として、棒グラフでグラフを表示して。...
+2026-02-01T23:24:35.5933272Z INFO:chat:Workflow configured with Manager + 3 Specialists (SQL, Web, Doc)
+2026-02-01T23:24:35.5934996Z INFO:chat:Workflow status: IN_PROGRESS
+2026-02-01T23:25:00.5087193Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:25:14.8046668Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:25:50.0638257Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:25:50.0665642Z INFO:agent_framework._workflows._runner:Yielding pre-loop events
+2026-02-01T23:25:50.0685665Z INFO:chat:Orchestrator event: MagenticOrchestratorEvent
+2026-02-01T23:25:50.0685796Z INFO:chat:Orchestrator event: MagenticOrchestratorEvent
+2026-02-01T23:25:50.0685832Z INFO:chat:Request sent to: unknown
+2026-02-01T23:25:50.0685868Z INFO:agent_framework._workflows._runner:Starting superstep 1
+2026-02-01T23:26:05.4468504Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:26:06.4759628Z INFO:agent_framework:Function name: run_sql_query
+2026-02-01T23:26:06.4763775Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T23:26:06.4766832Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T23:26:06.6275110Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-02-01T23:26:06.6718767Z INFO:chat:SQL query executed successfully, returned 0 rows
+2026-02-01T23:26:06.6723741Z INFO:agent_framework:Function run_sql_query succeeded.
+2026-02-01T23:26:22.6266843Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:26:23.4541731Z INFO:agent_framework:Function name: run_sql_query
+2026-02-01T23:26:23.4847988Z INFO:chat:SQL query executed successfully, returned 5 rows
+2026-02-01T23:26:23.4855922Z INFO:agent_framework:Function run_sql_query succeeded.
+2026-02-01T23:26:23.4856130Z INFO:agent_framework:Function name: run_sql_query
+2026-02-01T23:26:23.5302313Z INFO:chat:SQL query executed successfully, returned 0 rows
+2026-02-01T23:26:23.5313688Z INFO:agent_framework:Function run_sql_query succeeded.
+2026-02-01T23:26:43.2770504Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:26:47.3692570Z INFO:agent_framework._workflows._runner:Completed superstep 1
+2026-02-01T23:26:47.3692984Z INFO:agent_framework._workflows._runner:Starting superstep 2
+2026-02-01T23:27:29.3061480Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:27:29.6533997Z INFO:chat:Orchestrator event: MagenticOrchestratorEvent
+2026-02-01T23:27:29.6741604Z INFO:chat:Request sent to: unknown
+2026-02-01T23:27:29.6742045Z INFO:agent_framework._workflows._runner:Completed superstep 2
+2026-02-01T23:27:29.6742088Z INFO:agent_framework._workflows._runner:Starting superstep 3
+2026-02-01T23:27:39.5091684Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:27:39.8815199Z INFO:chat:Agent sql_agent completed response
+2026-02-01T23:27:40.7977487Z INFO:agent_framework:Function name: run_sql_query
+2026-02-01T23:27:40.8269473Z INFO:chat:SQL query executed successfully, returned 5 rows
+2026-02-01T23:27:40.8269958Z INFO:agent_framework:Function run_sql_query succeeded.
+2026-02-01T23:27:47.9628350Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:27:48.0002702Z INFO:chat:Agent sql_agent completed response
+2026-02-01T23:27:54.0694407Z INFO:agent_framework._workflows._runner:Completed superstep 3
+2026-02-01T23:27:54.0698682Z INFO:agent_framework._workflows._runner:Starting superstep 4
+2026-02-01T23:28:18.4053191Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:28:18.4113936Z INFO:agent_framework._workflows._magentic:Magentic Orchestrator: Task completed
+2026-02-01T23:28:18.4129113Z INFO:agent_framework._workflows._magentic:Magentic Orchestrator: Preparing final answer
+2026-02-01T23:28:18.7213067Z INFO:chat:Orchestrator event: MagenticOrchestratorEvent
+2026-02-01T23:28:29.0440011Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.openai.azure.com/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-02-01T23:28:29.4231337Z INFO:chat:MagenticBuilder workflow completed
+2026-02-01T23:28:29.4263166Z INFO:agent_framework._workflows._runner:Completed superstep 4
+2026-02-01T23:28:29.4272265Z INFO:agent_framework._workflows._runner:Starting superstep 5
+2026-02-01T23:28:29.6098203Z INFO:agent_framework._workflows._runner:Completed superstep 5
+2026-02-01T23:28:29.6119557Z INFO:agent_framework._workflows._runner:Workflow completed after 5 supersteps
+2026-02-01T23:28:29.6126488Z INFO:chat:Workflow status: IDLE
+2026-02-01T23:28:31.0977286Z INFO:     169.254.130.1:27779 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK

@@ -1,0 +1,932 @@
+2026-02-01T12:34:53.0743417Z Container start method called.
+2026-02-01T12:34:53.0761055Z Establishing network.
+2026-02-01T12:34:53.0762529Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T12:35:22.7436707Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T12:35:22.7456218Z Container is starting.
+2026-02-01T12:35:22.7479414Z Establishing user namespace if not established already.
+2026-02-01T12:35:22.7481577Z Establishing network if not established already.
+2026-02-01T12:35:22.7483692Z Mounting volumes.
+2026-02-01T12:35:22.7492777Z Nested mountpoint volatile/logs
+2026-02-01T12:35:22.7570105Z Nested mountpoint 
+2026-02-01T12:35:22.7710127Z Creating container.
+2026-02-01T12:35:22.7719325Z Creating pipes for streaming container io.
+2026-02-01T12:35:22.7732002Z Creating stdout named pipe at /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stdout_4b5b0791288c448db61ef608acbfa853.
+2026-02-01T12:35:22.7736227Z Successfully created stdout named pipe at: /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stdout_4b5b0791288c448db61ef608acbfa853.
+2026-02-01T12:35:22.7742288Z Opening named pipe /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stdout_4b5b0791288c448db61ef608acbfa853 for reading in non-blocking mode.
+2026-02-01T12:35:22.7760929Z Successfully opened named pipe: /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stdout_4b5b0791288c448db61ef608acbfa853.
+2026-02-01T12:35:22.7763839Z Successfully removed non-blocking flag from /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stdout_4b5b0791288c448db61ef608acbfa853.
+2026-02-01T12:35:22.7765774Z Creating stderr named pipe at /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stderr_1f45321f425546baab35fbf6bc207e07.
+2026-02-01T12:35:22.7795938Z Successfully created stderr named pipe at: /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stderr_1f45321f425546baab35fbf6bc207e07.
+2026-02-01T12:35:22.7799884Z Opening named pipe /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stderr_1f45321f425546baab35fbf6bc207e07 for reading in non-blocking mode.
+2026-02-01T12:35:22.7810288Z Successfully opened named pipe: /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stderr_1f45321f425546baab35fbf6bc207e07.
+2026-02-01T12:35:22.7814946Z Successfully removed non-blocking flag from /podr/container/pipe/dcd48ee462be_api-daj6dri4yf3k3z/stderr_1f45321f425546baab35fbf6bc207e07.
+2026-02-01T12:35:22.7822321Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T12:35:23.0991894Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T12:35:23.1000525Z Setting value of PORT variable to 80
+2026-02-01T12:35:23.1012095Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T12:35:23.4339812Z Starting container: dcd48ee462be_api-daj6dri4yf3k3z.
+2026-02-01T12:35:23.4754620Z Starting watchers and probes.
+2026-02-01T12:35:23.4856780Z Starting metrics collection.
+2026-02-01T12:35:23.4858745Z Container is running.
+2026-02-01T12:35:23.5076843Z Container start method finished after 30431 ms.
+2026-02-01T12:35:31.9257540Z Site startup probe succeeded after 8.3635535 seconds.
+2026-02-01T12:35:32.0926731Z Site is running with deployment version: 6ce6715a2d5b22d838c1cc8b04d0fd10521a272f1769088773804
+2026-02-01T12:35:32.1072024Z Site started.
+2026-02-01T12:59:14.2608538Z Container start method called.
+2026-02-01T12:59:14.2662150Z Establishing network.
+2026-02-01T12:59:14.2668477Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T12:59:46.3315742Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T12:59:46.3323560Z Container is starting.
+2026-02-01T12:59:46.3467848Z Establishing user namespace if not established already.
+2026-02-01T12:59:46.3470299Z Establishing network if not established already.
+2026-02-01T12:59:46.3472960Z Mounting volumes.
+2026-02-01T12:59:46.3478142Z Nested mountpoint volatile/logs
+2026-02-01T12:59:46.3514251Z Nested mountpoint 
+2026-02-01T12:59:46.3713373Z Creating container.
+2026-02-01T12:59:46.3722886Z Creating pipes for streaming container io.
+2026-02-01T12:59:46.3729061Z Creating stdout named pipe at /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stdout_f30a6b916e6a417383b0a5772fe26c4d.
+2026-02-01T12:59:46.3743359Z Successfully created stdout named pipe at: /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stdout_f30a6b916e6a417383b0a5772fe26c4d.
+2026-02-01T12:59:46.3748213Z Opening named pipe /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stdout_f30a6b916e6a417383b0a5772fe26c4d for reading in non-blocking mode.
+2026-02-01T12:59:46.3752474Z Successfully opened named pipe: /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stdout_f30a6b916e6a417383b0a5772fe26c4d.
+2026-02-01T12:59:46.3763775Z Successfully removed non-blocking flag from /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stdout_f30a6b916e6a417383b0a5772fe26c4d.
+2026-02-01T12:59:46.3767306Z Creating stderr named pipe at /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stderr_790a050a62fb4861992de91ecb3de1fd.
+2026-02-01T12:59:46.3773512Z Successfully created stderr named pipe at: /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stderr_790a050a62fb4861992de91ecb3de1fd.
+2026-02-01T12:59:46.3782632Z Opening named pipe /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stderr_790a050a62fb4861992de91ecb3de1fd for reading in non-blocking mode.
+2026-02-01T12:59:46.3789145Z Successfully opened named pipe: /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stderr_790a050a62fb4861992de91ecb3de1fd.
+2026-02-01T12:59:46.3794974Z Successfully removed non-blocking flag from /podr/container/pipe/220bd9ca34eb_api-daj6dri4yf3k3z/stderr_790a050a62fb4861992de91ecb3de1fd.
+2026-02-01T12:59:46.3796918Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T12:59:46.4518822Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T12:59:46.4520838Z Setting value of PORT variable to 80
+2026-02-01T12:59:46.4528547Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T12:59:47.5330718Z Starting container: 220bd9ca34eb_api-daj6dri4yf3k3z.
+2026-02-01T12:59:47.5669508Z Starting watchers and probes.
+2026-02-01T12:59:47.5680011Z Starting metrics collection.
+2026-02-01T12:59:47.5702341Z Container is running.
+2026-02-01T12:59:47.7032550Z Container start method finished after 33438 ms.
+2026-02-01T12:59:58.7474837Z Site startup probe succeeded after 11.0241956 seconds.
+2026-02-01T12:59:58.8398535Z Site is running with deployment version: b596a17c9bdbaffbc1400ac8e48bd7194f48b9801769950746797
+2026-02-01T12:59:58.8477604Z Site started.
+2026-02-01T13:00:18.9323408Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T13:00:19.0146309Z Stop and delete container. Retry count = 0
+2026-02-01T13:00:19.0164142Z Stopping container: dcd48ee462be_api-daj6dri4yf3k3z.
+2026-02-01T13:00:21.1165164Z Deleting container: dcd48ee462be_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T13:00:21.2579530Z Container spec TerminationMessagePolicy  path 
+2026-02-01T13:00:21.2679762Z Container is terminated. Total time elapsed: 2334 ms.
+2026-02-01T13:00:21.2805297Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T13:14:34.7123479Z Container start method called.
+2026-02-01T13:14:34.7143003Z Establishing network.
+2026-02-01T13:14:34.7152804Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T13:15:00.5866985Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T13:15:00.6060031Z Container is starting.
+2026-02-01T13:15:00.6080119Z Establishing user namespace if not established already.
+2026-02-01T13:15:00.6088085Z Establishing network if not established already.
+2026-02-01T13:15:00.6094416Z Mounting volumes.
+2026-02-01T13:15:00.6103122Z Nested mountpoint volatile/logs
+2026-02-01T13:15:00.6137186Z Nested mountpoint 
+2026-02-01T13:15:00.6389367Z Creating container.
+2026-02-01T13:15:00.6390551Z Creating pipes for streaming container io.
+2026-02-01T13:15:00.6392008Z Creating stdout named pipe at /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stdout_27e1d3f68bb9468db6154a3d841d4e8b.
+2026-02-01T13:15:00.6408428Z Successfully created stdout named pipe at: /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stdout_27e1d3f68bb9468db6154a3d841d4e8b.
+2026-02-01T13:15:00.6409991Z Opening named pipe /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stdout_27e1d3f68bb9468db6154a3d841d4e8b for reading in non-blocking mode.
+2026-02-01T13:15:00.6411355Z Successfully opened named pipe: /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stdout_27e1d3f68bb9468db6154a3d841d4e8b.
+2026-02-01T13:15:00.6412377Z Successfully removed non-blocking flag from /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stdout_27e1d3f68bb9468db6154a3d841d4e8b.
+2026-02-01T13:15:00.6413552Z Creating stderr named pipe at /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stderr_4716d57745c849f88ca85b6e5a57d030.
+2026-02-01T13:15:00.6415847Z Successfully created stderr named pipe at: /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stderr_4716d57745c849f88ca85b6e5a57d030.
+2026-02-01T13:15:00.6417420Z Opening named pipe /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stderr_4716d57745c849f88ca85b6e5a57d030 for reading in non-blocking mode.
+2026-02-01T13:15:00.6431155Z Successfully opened named pipe: /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stderr_4716d57745c849f88ca85b6e5a57d030.
+2026-02-01T13:15:00.6432476Z Successfully removed non-blocking flag from /podr/container/pipe/6b9a7822a0f1_api-daj6dri4yf3k3z/stderr_4716d57745c849f88ca85b6e5a57d030.
+2026-02-01T13:15:00.6433558Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T13:15:00.7580561Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T13:15:00.7586449Z Setting value of PORT variable to 80
+2026-02-01T13:15:00.7608845Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T13:15:01.2682810Z Starting container: 6b9a7822a0f1_api-daj6dri4yf3k3z.
+2026-02-01T13:15:01.3557771Z Starting watchers and probes.
+2026-02-01T13:15:01.3601189Z Starting metrics collection.
+2026-02-01T13:15:01.3687164Z Container is running.
+2026-02-01T13:15:01.4049665Z Container start method finished after 26692 ms.
+2026-02-01T13:15:10.4468246Z Site startup probe succeeded after 9.0275212 seconds.
+2026-02-01T13:15:11.0248745Z Site is running with deployment version: c46366b18455f16161631f6c3a270162b914346a1769951660068
+2026-02-01T13:15:11.0271773Z Site started.
+2026-02-01T13:15:31.0365425Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T13:15:31.0452653Z Stop and delete container. Retry count = 0
+2026-02-01T13:15:31.0453951Z Stopping container: 220bd9ca34eb_api-daj6dri4yf3k3z.
+2026-02-01T13:15:33.5207421Z Deleting container: 220bd9ca34eb_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T13:15:33.6180334Z Container spec TerminationMessagePolicy  path 
+2026-02-01T13:15:33.6182415Z Container is terminated. Total time elapsed: 2581 ms.
+2026-02-01T13:15:33.6189911Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T13:30:08.4324540Z Container start method called.
+2026-02-01T13:30:08.4326692Z Establishing network.
+2026-02-01T13:30:08.4328144Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T13:30:34.9434114Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T13:30:34.9443357Z Container is starting.
+2026-02-01T13:30:34.9566348Z Establishing user namespace if not established already.
+2026-02-01T13:30:34.9568563Z Establishing network if not established already.
+2026-02-01T13:30:34.9570045Z Mounting volumes.
+2026-02-01T13:30:34.9571971Z Nested mountpoint volatile/logs
+2026-02-01T13:30:34.9679019Z Nested mountpoint 
+2026-02-01T13:30:35.0675084Z Creating container.
+2026-02-01T13:30:35.0676549Z Creating pipes for streaming container io.
+2026-02-01T13:30:35.0677535Z Creating stdout named pipe at /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stdout_89feb42a377c4ed0b99988ac0c01df10.
+2026-02-01T13:30:35.0950173Z Successfully created stdout named pipe at: /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stdout_89feb42a377c4ed0b99988ac0c01df10.
+2026-02-01T13:30:35.1039641Z Opening named pipe /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stdout_89feb42a377c4ed0b99988ac0c01df10 for reading in non-blocking mode.
+2026-02-01T13:30:35.1048282Z Successfully opened named pipe: /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stdout_89feb42a377c4ed0b99988ac0c01df10.
+2026-02-01T13:30:35.1066261Z Successfully removed non-blocking flag from /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stdout_89feb42a377c4ed0b99988ac0c01df10.
+2026-02-01T13:30:35.1095207Z Creating stderr named pipe at /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stderr_4fc45a8d2cf24953ae73811f4e34f3fc.
+2026-02-01T13:30:35.1106280Z Successfully created stderr named pipe at: /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stderr_4fc45a8d2cf24953ae73811f4e34f3fc.
+2026-02-01T13:30:35.1114296Z Opening named pipe /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stderr_4fc45a8d2cf24953ae73811f4e34f3fc for reading in non-blocking mode.
+2026-02-01T13:30:35.1115827Z Successfully opened named pipe: /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stderr_4fc45a8d2cf24953ae73811f4e34f3fc.
+2026-02-01T13:30:35.1118116Z Successfully removed non-blocking flag from /podr/container/pipe/c4a812fdf59c_api-daj6dri4yf3k3z/stderr_4fc45a8d2cf24953ae73811f4e34f3fc.
+2026-02-01T13:30:35.1119277Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T13:30:35.3337775Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T13:30:35.3339821Z Setting value of PORT variable to 80
+2026-02-01T13:30:35.3401907Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T13:30:36.2549747Z Starting container: c4a812fdf59c_api-daj6dri4yf3k3z.
+2026-02-01T13:30:36.3372518Z Starting watchers and probes.
+2026-02-01T13:30:36.3398794Z Starting metrics collection.
+2026-02-01T13:30:36.3400572Z Container is running.
+2026-02-01T13:30:36.3678069Z Container start method finished after 27934 ms.
+2026-02-01T13:30:44.7198539Z Site startup probe succeeded after 8.0396047 seconds.
+2026-02-01T13:30:44.8453546Z Site is running with deployment version: 66d08bdb6d30fc403cfb1e2238abd9f18be0baed1769952595673
+2026-02-01T13:30:44.8497813Z Site started.
+2026-02-01T13:31:04.8878044Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T13:31:04.9162597Z Stop and delete container. Retry count = 0
+2026-02-01T13:31:04.9196077Z Stopping container: 6b9a7822a0f1_api-daj6dri4yf3k3z.
+2026-02-01T13:31:07.6070828Z Deleting container: 6b9a7822a0f1_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T13:31:07.7914375Z Container spec TerminationMessagePolicy  path 
+2026-02-01T13:31:07.7916101Z Container is terminated. Total time elapsed: 2902 ms.
+2026-02-01T13:31:07.7935194Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T13:43:00.9297519Z Container start method called.
+2026-02-01T13:43:00.9359428Z Establishing network.
+2026-02-01T13:43:00.9362770Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T13:43:05.2696449Z Container is starting.
+2026-02-01T13:43:05.2779494Z Establishing user namespace if not established already.
+2026-02-01T13:43:05.2789895Z Establishing network if not established already.
+2026-02-01T13:43:05.2814310Z Mounting volumes.
+2026-02-01T13:43:05.2868552Z Nested mountpoint volatile/logs
+2026-02-01T13:43:05.2990148Z Nested mountpoint 
+2026-02-01T13:43:05.3325446Z Creating container.
+2026-02-01T13:43:05.3326902Z Creating pipes for streaming container io.
+2026-02-01T13:43:05.3328040Z Creating stdout named pipe at /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stdout_663f70fce79046deab89ba78f0926d19.
+2026-02-01T13:43:05.3330594Z Successfully created stdout named pipe at: /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stdout_663f70fce79046deab89ba78f0926d19.
+2026-02-01T13:43:05.3422527Z Opening named pipe /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stdout_663f70fce79046deab89ba78f0926d19 for reading in non-blocking mode.
+2026-02-01T13:43:05.3458489Z Successfully opened named pipe: /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stdout_663f70fce79046deab89ba78f0926d19.
+2026-02-01T13:43:05.3460869Z Successfully removed non-blocking flag from /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stdout_663f70fce79046deab89ba78f0926d19.
+2026-02-01T13:43:05.3463182Z Creating stderr named pipe at /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stderr_1f22d2e3c7e14d3a870b5f7639e97e0c.
+2026-02-01T13:43:05.3531670Z Successfully created stderr named pipe at: /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stderr_1f22d2e3c7e14d3a870b5f7639e97e0c.
+2026-02-01T13:43:05.3575025Z Opening named pipe /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stderr_1f22d2e3c7e14d3a870b5f7639e97e0c for reading in non-blocking mode.
+2026-02-01T13:43:05.3591227Z Successfully opened named pipe: /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stderr_1f22d2e3c7e14d3a870b5f7639e97e0c.
+2026-02-01T13:43:05.3748635Z Successfully removed non-blocking flag from /podr/container/pipe/cf2b4dd709e9_api-daj6dri4yf3k3z/stderr_1f22d2e3c7e14d3a870b5f7639e97e0c.
+2026-02-01T13:43:05.3756670Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T13:43:05.4928152Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T13:43:05.5008774Z Setting value of PORT variable to 80
+2026-02-01T13:43:05.5012137Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T13:43:06.1038651Z Starting container: cf2b4dd709e9_api-daj6dri4yf3k3z.
+2026-02-01T13:43:06.2611745Z Starting watchers and probes.
+2026-02-01T13:43:06.2902265Z Starting metrics collection.
+2026-02-01T13:43:06.2919230Z Container is running.
+2026-02-01T13:43:06.3828347Z Container start method finished after 5452 ms.
+2026-02-01T13:43:38.4868394Z Site startup probe succeeded after 32.0371486 seconds.
+2026-02-01T13:43:38.6754427Z Site is running with deployment version: 66d08bdb6d30fc403cfb1e2238abd9f18be0baed1769952595673
+2026-02-01T13:43:38.6781880Z Site started.
+2026-02-01T13:43:58.7968307Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T13:43:58.9485956Z Stop and delete container. Retry count = 0
+2026-02-01T13:43:58.9523743Z Stopping container: c4a812fdf59c_api-daj6dri4yf3k3z.
+2026-02-01T13:44:03.4743166Z Deleting container: c4a812fdf59c_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T13:44:03.8670221Z Container spec TerminationMessagePolicy  path 
+2026-02-01T13:44:03.8732853Z Container is terminated. Total time elapsed: 5075 ms.
+2026-02-01T13:44:03.8741769Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T14:05:53.6292304Z Container start method called.
+2026-02-01T14:05:53.6296219Z Establishing network.
+2026-02-01T14:05:53.6297977Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T14:05:56.9216811Z Container is starting.
+2026-02-01T14:05:56.9221300Z Establishing user namespace if not established already.
+2026-02-01T14:05:56.9226158Z Establishing network if not established already.
+2026-02-01T14:05:56.9228269Z Mounting volumes.
+2026-02-01T14:05:56.9231258Z Nested mountpoint volatile/logs
+2026-02-01T14:05:56.9259441Z Nested mountpoint 
+2026-02-01T14:05:56.9362562Z Creating container.
+2026-02-01T14:05:56.9363838Z Creating pipes for streaming container io.
+2026-02-01T14:05:56.9365064Z Creating stdout named pipe at /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stdout_83d4b015b5274055ac2e985761b22e62.
+2026-02-01T14:05:56.9367184Z Successfully created stdout named pipe at: /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stdout_83d4b015b5274055ac2e985761b22e62.
+2026-02-01T14:05:56.9368650Z Opening named pipe /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stdout_83d4b015b5274055ac2e985761b22e62 for reading in non-blocking mode.
+2026-02-01T14:05:56.9370212Z Successfully opened named pipe: /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stdout_83d4b015b5274055ac2e985761b22e62.
+2026-02-01T14:05:56.9371686Z Successfully removed non-blocking flag from /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stdout_83d4b015b5274055ac2e985761b22e62.
+2026-02-01T14:05:56.9373013Z Creating stderr named pipe at /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stderr_081211c350f64069aef7fb449a625fe9.
+2026-02-01T14:05:56.9375215Z Successfully created stderr named pipe at: /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stderr_081211c350f64069aef7fb449a625fe9.
+2026-02-01T14:05:56.9376611Z Opening named pipe /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stderr_081211c350f64069aef7fb449a625fe9 for reading in non-blocking mode.
+2026-02-01T14:05:56.9378020Z Successfully opened named pipe: /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stderr_081211c350f64069aef7fb449a625fe9.
+2026-02-01T14:05:56.9379117Z Successfully removed non-blocking flag from /podr/container/pipe/6679ff675f7a_api-daj6dri4yf3k3z/stderr_081211c350f64069aef7fb449a625fe9.
+2026-02-01T14:05:56.9381302Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T14:05:57.2882874Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T14:05:57.2884481Z Setting value of PORT variable to 80
+2026-02-01T14:05:57.2886400Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T14:05:57.7888410Z Starting container: 6679ff675f7a_api-daj6dri4yf3k3z.
+2026-02-01T14:05:57.8210601Z Starting watchers and probes.
+2026-02-01T14:05:57.8403959Z Starting metrics collection.
+2026-02-01T14:05:57.8406173Z Container is running.
+2026-02-01T14:05:58.8874458Z Container start method finished after 5257 ms.
+2026-02-01T14:06:10.9647846Z Site startup probe succeeded after 12.066746 seconds.
+2026-02-01T14:06:11.1379526Z Site is running with deployment version: 66d08bdb6d30fc403cfb1e2238abd9f18be0baed1769952595673
+2026-02-01T14:06:11.1395521Z Site started.
+2026-02-01T14:06:31.1853675Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T14:06:31.2168510Z Stop and delete container. Retry count = 0
+2026-02-01T14:06:31.2170472Z Stopping container: cf2b4dd709e9_api-daj6dri4yf3k3z.
+2026-02-01T14:06:36.5486351Z Deleting container: cf2b4dd709e9_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T14:06:36.8488619Z Container spec TerminationMessagePolicy  path 
+2026-02-01T14:06:36.8490521Z Container is terminated. Total time elapsed: 5662 ms.
+2026-02-01T14:06:36.8510160Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T14:07:35.7432431Z Container start method called.
+2026-02-01T14:07:35.7583679Z Establishing network.
+2026-02-01T14:07:35.7809585Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T14:07:39.3234718Z Container is starting.
+2026-02-01T14:07:39.3250787Z Establishing user namespace if not established already.
+2026-02-01T14:07:39.3259415Z Establishing network if not established already.
+2026-02-01T14:07:39.3262040Z Mounting volumes.
+2026-02-01T14:07:39.3276804Z Nested mountpoint volatile/logs
+2026-02-01T14:07:39.3941394Z Nested mountpoint 
+2026-02-01T14:07:39.6506216Z Creating container.
+2026-02-01T14:07:39.6521191Z Creating pipes for streaming container io.
+2026-02-01T14:07:39.6613072Z Creating stdout named pipe at /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stdout_3897d34183f44522921bc2514bb504a2.
+2026-02-01T14:07:39.6615842Z Successfully created stdout named pipe at: /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stdout_3897d34183f44522921bc2514bb504a2.
+2026-02-01T14:07:39.6617191Z Opening named pipe /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stdout_3897d34183f44522921bc2514bb504a2 for reading in non-blocking mode.
+2026-02-01T14:07:39.6618497Z Successfully opened named pipe: /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stdout_3897d34183f44522921bc2514bb504a2.
+2026-02-01T14:07:39.6619582Z Successfully removed non-blocking flag from /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stdout_3897d34183f44522921bc2514bb504a2.
+2026-02-01T14:07:39.6620874Z Creating stderr named pipe at /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stderr_2f6a193e22694cfcb5ab032a9a07031a.
+2026-02-01T14:07:39.6622493Z Successfully created stderr named pipe at: /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stderr_2f6a193e22694cfcb5ab032a9a07031a.
+2026-02-01T14:07:39.6623501Z Opening named pipe /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stderr_2f6a193e22694cfcb5ab032a9a07031a for reading in non-blocking mode.
+2026-02-01T14:07:39.6670550Z Successfully opened named pipe: /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stderr_2f6a193e22694cfcb5ab032a9a07031a.
+2026-02-01T14:07:39.6679602Z Successfully removed non-blocking flag from /podr/container/pipe/006e68cd3e64_api-daj6dri4yf3k3z/stderr_2f6a193e22694cfcb5ab032a9a07031a.
+2026-02-01T14:07:39.6689366Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T14:07:40.2056184Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T14:07:40.2058347Z Setting value of PORT variable to 80
+2026-02-01T14:07:40.2240585Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T14:07:48.6012585Z Starting container: 006e68cd3e64_api-daj6dri4yf3k3z.
+2026-02-01T14:07:49.2623397Z Starting watchers and probes.
+2026-02-01T14:07:49.2711694Z Starting metrics collection.
+2026-02-01T14:07:49.2713299Z Container is running.
+2026-02-01T14:07:49.8092226Z Container start method finished after 14051 ms.
+2026-02-01T14:08:49.3373358Z Site startup probe succeeded after 59.5264004 seconds.
+2026-02-01T14:08:49.4351569Z Site is running with deployment version: 66d08bdb6d30fc403cfb1e2238abd9f18be0baed1769952595673
+2026-02-01T14:08:49.4357912Z Site started.
+2026-02-01T14:09:09.4998568Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T14:09:09.5382684Z Stop and delete container. Retry count = 0
+2026-02-01T14:09:09.5385469Z Stopping container: 6679ff675f7a_api-daj6dri4yf3k3z.
+2026-02-01T14:09:11.9808717Z Deleting container: 6679ff675f7a_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T14:09:12.5562040Z Container spec TerminationMessagePolicy  path 
+2026-02-01T14:09:12.5563668Z Container is terminated. Total time elapsed: 3055 ms.
+2026-02-01T14:09:12.5580555Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T14:28:29.5135651Z Container start method called.
+2026-02-01T14:28:29.5139436Z Establishing network.
+2026-02-01T14:28:29.5141358Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T14:29:41.5460001Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T14:29:41.5475185Z Container is starting.
+2026-02-01T14:29:41.5503297Z Establishing user namespace if not established already.
+2026-02-01T14:29:41.5512369Z Establishing network if not established already.
+2026-02-01T14:29:41.5530691Z Mounting volumes.
+2026-02-01T14:29:41.5538655Z Nested mountpoint volatile/logs
+2026-02-01T14:29:41.5576880Z Nested mountpoint 
+2026-02-01T14:29:41.5881175Z Creating container.
+2026-02-01T14:29:41.5902929Z Creating pipes for streaming container io.
+2026-02-01T14:29:41.5911749Z Creating stdout named pipe at /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stdout_241b5638ecd2435598b26958ef1e3d10.
+2026-02-01T14:29:41.5926536Z Successfully created stdout named pipe at: /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stdout_241b5638ecd2435598b26958ef1e3d10.
+2026-02-01T14:29:41.5947737Z Opening named pipe /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stdout_241b5638ecd2435598b26958ef1e3d10 for reading in non-blocking mode.
+2026-02-01T14:29:41.5978073Z Successfully opened named pipe: /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stdout_241b5638ecd2435598b26958ef1e3d10.
+2026-02-01T14:29:41.5979352Z Successfully removed non-blocking flag from /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stdout_241b5638ecd2435598b26958ef1e3d10.
+2026-02-01T14:29:41.5980563Z Creating stderr named pipe at /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stderr_89cdfa4ec9d84cf1bbad4fdf3eb24484.
+2026-02-01T14:29:41.6041961Z Successfully created stderr named pipe at: /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stderr_89cdfa4ec9d84cf1bbad4fdf3eb24484.
+2026-02-01T14:29:41.6045609Z Opening named pipe /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stderr_89cdfa4ec9d84cf1bbad4fdf3eb24484 for reading in non-blocking mode.
+2026-02-01T14:29:41.6068666Z Successfully opened named pipe: /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stderr_89cdfa4ec9d84cf1bbad4fdf3eb24484.
+2026-02-01T14:29:41.6069989Z Successfully removed non-blocking flag from /podr/container/pipe/0b09af218d58_api-daj6dri4yf3k3z/stderr_89cdfa4ec9d84cf1bbad4fdf3eb24484.
+2026-02-01T14:29:41.6071282Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T14:29:41.7154009Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T14:29:41.7180095Z Setting value of PORT variable to 80
+2026-02-01T14:29:41.7219909Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T14:29:42.3693287Z Starting container: 0b09af218d58_api-daj6dri4yf3k3z.
+2026-02-01T14:29:42.4124041Z Starting watchers and probes.
+2026-02-01T14:29:42.4135678Z Starting metrics collection.
+2026-02-01T14:29:42.4137931Z Container is running.
+2026-02-01T14:29:42.4252363Z Container start method finished after 72911 ms.
+2026-02-01T14:30:06.4473099Z Site startup probe succeeded after 24.0177793 seconds.
+2026-02-01T14:30:06.5545743Z Site is running with deployment version: 65ea74ada73d66f5a77f5a8649111972d934cb6c1769956050744
+2026-02-01T14:30:06.5548437Z Site started.
+2026-02-01T14:30:26.5745584Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T14:30:26.5833951Z Stop and delete container. Retry count = 0
+2026-02-01T14:30:26.5836150Z Stopping container: 006e68cd3e64_api-daj6dri4yf3k3z.
+2026-02-01T14:30:29.1189714Z Deleting container: 006e68cd3e64_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T14:30:29.2751156Z Container spec TerminationMessagePolicy  path 
+2026-02-01T14:30:29.2753395Z Container is terminated. Total time elapsed: 2700 ms.
+2026-02-01T14:30:29.2754658Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T14:38:30.2277410Z Container start method called.
+2026-02-01T14:38:30.2279170Z Establishing network.
+2026-02-01T14:38:30.2280302Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T14:39:11.2924694Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T14:39:11.2926351Z Container is starting.
+2026-02-01T14:39:11.2928069Z Establishing user namespace if not established already.
+2026-02-01T14:39:11.2929163Z Establishing network if not established already.
+2026-02-01T14:39:11.2930456Z Mounting volumes.
+2026-02-01T14:39:11.2931897Z Nested mountpoint volatile/logs
+2026-02-01T14:39:11.2980184Z Nested mountpoint 
+2026-02-01T14:39:11.3507098Z Creating container.
+2026-02-01T14:39:11.3508421Z Creating pipes for streaming container io.
+2026-02-01T14:39:11.3583857Z Creating stdout named pipe at /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stdout_a2154fd84ed9452294582bb76645690e.
+2026-02-01T14:39:11.3589325Z Successfully created stdout named pipe at: /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stdout_a2154fd84ed9452294582bb76645690e.
+2026-02-01T14:39:11.3590363Z Opening named pipe /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stdout_a2154fd84ed9452294582bb76645690e for reading in non-blocking mode.
+2026-02-01T14:39:11.3591405Z Successfully opened named pipe: /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stdout_a2154fd84ed9452294582bb76645690e.
+2026-02-01T14:39:11.3592384Z Successfully removed non-blocking flag from /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stdout_a2154fd84ed9452294582bb76645690e.
+2026-02-01T14:39:11.3593397Z Creating stderr named pipe at /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stderr_73540cf00a2e4aac855b84ade9478182.
+2026-02-01T14:39:11.3594936Z Successfully created stderr named pipe at: /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stderr_73540cf00a2e4aac855b84ade9478182.
+2026-02-01T14:39:11.3596015Z Opening named pipe /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stderr_73540cf00a2e4aac855b84ade9478182 for reading in non-blocking mode.
+2026-02-01T14:39:11.3597202Z Successfully opened named pipe: /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stderr_73540cf00a2e4aac855b84ade9478182.
+2026-02-01T14:39:11.3598210Z Successfully removed non-blocking flag from /podr/container/pipe/c3079f9de4b0_api-daj6dri4yf3k3z/stderr_73540cf00a2e4aac855b84ade9478182.
+2026-02-01T14:39:11.3599401Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T14:39:11.6474249Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T14:39:11.6499781Z Setting value of PORT variable to 80
+2026-02-01T14:39:11.6506047Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T14:39:12.7160046Z Starting container: c3079f9de4b0_api-daj6dri4yf3k3z.
+2026-02-01T14:39:12.7572658Z Starting watchers and probes.
+2026-02-01T14:39:12.7576051Z Starting metrics collection.
+2026-02-01T14:39:12.7577487Z Container is running.
+2026-02-01T14:39:12.7707860Z Container start method finished after 42542 ms.
+2026-02-01T14:39:22.8684246Z Site startup probe succeeded after 10.0956215 seconds.
+2026-02-01T14:39:23.0315934Z Site is running with deployment version: a56446d71f24a5f1a44623b27354b6a043633a291769956681112
+2026-02-01T14:39:23.0318260Z Site started.
+2026-02-01T14:39:43.0569747Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T14:39:43.0612208Z Stop and delete container. Retry count = 0
+2026-02-01T14:39:43.0613945Z Stopping container: 0b09af218d58_api-daj6dri4yf3k3z.
+2026-02-01T14:39:46.2626267Z Deleting container: 0b09af218d58_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T14:39:46.3630439Z Container spec TerminationMessagePolicy  path 
+2026-02-01T14:39:46.3632480Z Container is terminated. Total time elapsed: 3306 ms.
+2026-02-01T14:39:46.3635627Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T15:31:50.4878921Z Container start method called.
+2026-02-01T15:31:50.4897033Z Establishing network.
+2026-02-01T15:31:50.4899142Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T15:33:25.2483848Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T15:33:25.2484983Z Container is starting.
+2026-02-01T15:33:25.2545701Z Establishing user namespace if not established already.
+2026-02-01T15:33:25.2547381Z Establishing network if not established already.
+2026-02-01T15:33:25.2548906Z Mounting volumes.
+2026-02-01T15:33:25.2576465Z Nested mountpoint volatile/logs
+2026-02-01T15:33:25.2602458Z Nested mountpoint 
+2026-02-01T15:33:25.2835906Z Creating container.
+2026-02-01T15:33:25.2840826Z Creating pipes for streaming container io.
+2026-02-01T15:33:25.2851563Z Creating stdout named pipe at /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stdout_42d2082b345140b0b1888553b501318f.
+2026-02-01T15:33:25.2858956Z Successfully created stdout named pipe at: /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stdout_42d2082b345140b0b1888553b501318f.
+2026-02-01T15:33:25.2862240Z Opening named pipe /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stdout_42d2082b345140b0b1888553b501318f for reading in non-blocking mode.
+2026-02-01T15:33:25.2870097Z Successfully opened named pipe: /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stdout_42d2082b345140b0b1888553b501318f.
+2026-02-01T15:33:25.2874383Z Successfully removed non-blocking flag from /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stdout_42d2082b345140b0b1888553b501318f.
+2026-02-01T15:33:25.2878800Z Creating stderr named pipe at /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stderr_d04fb7c89d8f41d8bc2113273b2affc3.
+2026-02-01T15:33:25.2880739Z Successfully created stderr named pipe at: /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stderr_d04fb7c89d8f41d8bc2113273b2affc3.
+2026-02-01T15:33:25.2881934Z Opening named pipe /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stderr_d04fb7c89d8f41d8bc2113273b2affc3 for reading in non-blocking mode.
+2026-02-01T15:33:25.2883505Z Successfully opened named pipe: /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stderr_d04fb7c89d8f41d8bc2113273b2affc3.
+2026-02-01T15:33:25.2885160Z Successfully removed non-blocking flag from /podr/container/pipe/3d492ffed978_api-daj6dri4yf3k3z/stderr_d04fb7c89d8f41d8bc2113273b2affc3.
+2026-02-01T15:33:25.2888750Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T15:33:25.6738232Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T15:33:25.6740132Z Setting value of PORT variable to 80
+2026-02-01T15:33:25.6742611Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T15:33:26.2845450Z Starting container: 3d492ffed978_api-daj6dri4yf3k3z.
+2026-02-01T15:33:26.3207198Z Starting watchers and probes.
+2026-02-01T15:33:26.3214574Z Starting metrics collection.
+2026-02-01T15:33:26.3324533Z Container is running.
+2026-02-01T15:33:26.3740838Z Container start method finished after 95885 ms.
+2026-02-01T15:33:38.4599988Z Site startup probe succeeded after 12.0416594 seconds.
+2026-02-01T15:33:38.7917377Z Site is running with deployment version: b59bb602c239da037acea62932d6da3cb3950ed61769959894537
+2026-02-01T15:33:38.8093188Z Site started.
+2026-02-01T15:33:58.9436913Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T15:33:59.0297086Z Stop and delete container. Retry count = 0
+2026-02-01T15:33:59.0298910Z Stopping container: c3079f9de4b0_api-daj6dri4yf3k3z.
+2026-02-01T15:34:03.6120610Z Deleting container: c3079f9de4b0_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T15:34:03.7466241Z Container spec TerminationMessagePolicy  path 
+2026-02-01T15:34:03.7477294Z Container is terminated. Total time elapsed: 4803 ms.
+2026-02-01T15:34:03.7494753Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T15:49:28.8987913Z Container start method called.
+2026-02-01T15:49:28.8990107Z Establishing network.
+2026-02-01T15:49:28.8991768Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T15:55:24.4006811Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T15:55:24.4020272Z Container is starting.
+2026-02-01T15:55:24.4076318Z Establishing user namespace if not established already.
+2026-02-01T15:55:24.4078141Z Establishing network if not established already.
+2026-02-01T15:55:24.4088867Z Mounting volumes.
+2026-02-01T15:55:24.4124201Z Nested mountpoint volatile/logs
+2026-02-01T15:55:24.4294757Z Nested mountpoint 
+2026-02-01T15:55:24.4453536Z Creating container.
+2026-02-01T15:55:24.4471831Z Creating pipes for streaming container io.
+2026-02-01T15:55:24.4473283Z Creating stdout named pipe at /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stdout_24261f951e414c83b044616497e036c7.
+2026-02-01T15:55:24.4492822Z Successfully created stdout named pipe at: /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stdout_24261f951e414c83b044616497e036c7.
+2026-02-01T15:55:24.4505326Z Opening named pipe /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stdout_24261f951e414c83b044616497e036c7 for reading in non-blocking mode.
+2026-02-01T15:55:24.4510235Z Successfully opened named pipe: /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stdout_24261f951e414c83b044616497e036c7.
+2026-02-01T15:55:24.4519098Z Successfully removed non-blocking flag from /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stdout_24261f951e414c83b044616497e036c7.
+2026-02-01T15:55:24.4520904Z Creating stderr named pipe at /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stderr_2ef4523687504eb68e40a7c3d25e9e1c.
+2026-02-01T15:55:24.4522750Z Successfully created stderr named pipe at: /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stderr_2ef4523687504eb68e40a7c3d25e9e1c.
+2026-02-01T15:55:24.4523920Z Opening named pipe /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stderr_2ef4523687504eb68e40a7c3d25e9e1c for reading in non-blocking mode.
+2026-02-01T15:55:24.4525281Z Successfully opened named pipe: /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stderr_2ef4523687504eb68e40a7c3d25e9e1c.
+2026-02-01T15:55:24.4526463Z Successfully removed non-blocking flag from /podr/container/pipe/42eafa04e48a_api-daj6dri4yf3k3z/stderr_2ef4523687504eb68e40a7c3d25e9e1c.
+2026-02-01T15:55:24.4527607Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T15:55:24.4992777Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T15:55:24.4995377Z Setting value of PORT variable to 80
+2026-02-01T15:55:24.5026571Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T15:55:25.0358057Z Starting container: 42eafa04e48a_api-daj6dri4yf3k3z.
+2026-02-01T15:55:25.0588346Z Starting watchers and probes.
+2026-02-01T15:55:25.0760665Z Starting metrics collection.
+2026-02-01T15:55:25.0811208Z Container is running.
+2026-02-01T15:55:25.2796185Z Container start method finished after 356380 ms.
+2026-02-01T15:55:33.5441263Z Site startup probe succeeded after 8.09086 seconds.
+2026-02-01T15:55:33.6752020Z Site is running with deployment version: 7252beb7fe32eac8b72ece19c06e5547a65041601769960948495
+2026-02-01T15:55:33.6820355Z Site started.
+2026-02-01T15:55:54.1174861Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T15:55:54.1596387Z Stop and delete container. Retry count = 0
+2026-02-01T15:55:54.1600071Z Stopping container: 3d492ffed978_api-daj6dri4yf3k3z.
+2026-02-01T15:55:56.0258240Z Deleting container: 3d492ffed978_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T15:55:56.1374790Z Container spec TerminationMessagePolicy  path 
+2026-02-01T15:55:56.1404111Z Container is terminated. Total time elapsed: 2021 ms.
+2026-02-01T15:55:56.1414074Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T15:58:09.5790971Z Container start method called.
+2026-02-01T15:58:09.5843773Z Establishing network.
+2026-02-01T15:58:09.5924436Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T15:58:23.2897906Z Container is starting.
+2026-02-01T15:58:23.3529528Z Establishing user namespace if not established already.
+2026-02-01T15:58:23.3534500Z Establishing network if not established already.
+2026-02-01T15:58:23.3543059Z Mounting volumes.
+2026-02-01T15:58:23.3699139Z Nested mountpoint volatile/logs
+2026-02-01T15:58:23.3917846Z Nested mountpoint 
+2026-02-01T15:58:23.5731044Z Creating container.
+2026-02-01T15:58:23.5763250Z Creating pipes for streaming container io.
+2026-02-01T15:58:23.5765673Z Creating stdout named pipe at /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stdout_a0dee8bc466442ffb5fcdea51c6c7884.
+2026-02-01T15:58:23.5875412Z Successfully created stdout named pipe at: /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stdout_a0dee8bc466442ffb5fcdea51c6c7884.
+2026-02-01T15:58:23.7414650Z Opening named pipe /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stdout_a0dee8bc466442ffb5fcdea51c6c7884 for reading in non-blocking mode.
+2026-02-01T15:58:23.7552375Z Successfully opened named pipe: /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stdout_a0dee8bc466442ffb5fcdea51c6c7884.
+2026-02-01T15:58:23.7693448Z Successfully removed non-blocking flag from /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stdout_a0dee8bc466442ffb5fcdea51c6c7884.
+2026-02-01T15:58:23.7887698Z Creating stderr named pipe at /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stderr_6260a9aebe79420faa7dbe6e9c1ddd66.
+2026-02-01T15:58:23.7891618Z Successfully created stderr named pipe at: /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stderr_6260a9aebe79420faa7dbe6e9c1ddd66.
+2026-02-01T15:58:23.7937726Z Opening named pipe /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stderr_6260a9aebe79420faa7dbe6e9c1ddd66 for reading in non-blocking mode.
+2026-02-01T15:58:23.7941390Z Successfully opened named pipe: /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stderr_6260a9aebe79420faa7dbe6e9c1ddd66.
+2026-02-01T15:58:23.7970801Z Successfully removed non-blocking flag from /podr/container/pipe/132ce076b268_api-daj6dri4yf3k3z/stderr_6260a9aebe79420faa7dbe6e9c1ddd66.
+2026-02-01T15:58:23.8017912Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T15:58:24.1073747Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T15:58:24.1075614Z Setting value of PORT variable to 80
+2026-02-01T15:58:24.1477415Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T15:58:26.2943377Z Starting container: 132ce076b268_api-daj6dri4yf3k3z.
+2026-02-01T15:58:26.4794694Z Starting watchers and probes.
+2026-02-01T15:58:26.4804126Z Starting metrics collection.
+2026-02-01T15:58:26.4894681Z Container is running.
+2026-02-01T15:58:26.5679765Z Container start method finished after 16975 ms.
+2026-02-01T15:58:49.6275977Z Site startup probe succeeded after 23.0171384 seconds.
+2026-02-01T15:58:49.7701969Z Site is running with deployment version: 7252beb7fe32eac8b72ece19c06e5547a65041601769960948495
+2026-02-01T15:58:49.7711327Z Site started.
+2026-02-01T15:59:09.8075498Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T15:59:09.8148716Z Stop and delete container. Retry count = 0
+2026-02-01T15:59:09.8150147Z Stopping container: 42eafa04e48a_api-daj6dri4yf3k3z.
+2026-02-01T15:59:12.6453043Z Deleting container: 42eafa04e48a_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T15:59:12.8280492Z Container spec TerminationMessagePolicy  path 
+2026-02-01T15:59:12.8301724Z Container is terminated. Total time elapsed: 3020 ms.
+2026-02-01T15:59:12.8337612Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:03:09.2550607Z Container start method called.
+2026-02-01T16:03:09.2553600Z Establishing network.
+2026-02-01T16:03:09.2567846Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:03:56.6056774Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:03:56.6058845Z Container is starting.
+2026-02-01T16:03:56.6080949Z Establishing user namespace if not established already.
+2026-02-01T16:03:56.6082398Z Establishing network if not established already.
+2026-02-01T16:03:56.6084976Z Mounting volumes.
+2026-02-01T16:03:56.6107781Z Nested mountpoint volatile/logs
+2026-02-01T16:03:56.6166269Z Nested mountpoint 
+2026-02-01T16:03:56.7549934Z Creating container.
+2026-02-01T16:03:56.7551669Z Creating pipes for streaming container io.
+2026-02-01T16:03:56.7553004Z Creating stdout named pipe at /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stdout_bcb38fe029f2423a80ccbdf20de9a82d.
+2026-02-01T16:03:56.7781009Z Successfully created stdout named pipe at: /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stdout_bcb38fe029f2423a80ccbdf20de9a82d.
+2026-02-01T16:03:56.7782690Z Opening named pipe /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stdout_bcb38fe029f2423a80ccbdf20de9a82d for reading in non-blocking mode.
+2026-02-01T16:03:56.7785210Z Successfully opened named pipe: /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stdout_bcb38fe029f2423a80ccbdf20de9a82d.
+2026-02-01T16:03:56.7786776Z Successfully removed non-blocking flag from /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stdout_bcb38fe029f2423a80ccbdf20de9a82d.
+2026-02-01T16:03:56.7788266Z Creating stderr named pipe at /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stderr_0d4e633210874e07aeca240ac245e6fc.
+2026-02-01T16:03:56.7790367Z Successfully created stderr named pipe at: /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stderr_0d4e633210874e07aeca240ac245e6fc.
+2026-02-01T16:03:56.7791708Z Opening named pipe /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stderr_0d4e633210874e07aeca240ac245e6fc for reading in non-blocking mode.
+2026-02-01T16:03:56.7793358Z Successfully opened named pipe: /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stderr_0d4e633210874e07aeca240ac245e6fc.
+2026-02-01T16:03:56.7795087Z Successfully removed non-blocking flag from /podr/container/pipe/95fb1e534837_api-daj6dri4yf3k3z/stderr_0d4e633210874e07aeca240ac245e6fc.
+2026-02-01T16:03:56.7815267Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:03:57.0275880Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:03:57.0277527Z Setting value of PORT variable to 80
+2026-02-01T16:03:57.0291632Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:03:58.3876083Z Starting container: 95fb1e534837_api-daj6dri4yf3k3z.
+2026-02-01T16:03:58.4212434Z Starting watchers and probes.
+2026-02-01T16:03:58.4238352Z Starting metrics collection.
+2026-02-01T16:03:58.4241921Z Container is running.
+2026-02-01T16:03:59.1283851Z Container start method finished after 49873 ms.
+2026-02-01T16:04:08.1956355Z Site startup probe succeeded after 9.0180186 seconds.
+2026-02-01T16:04:08.3874735Z Site is running with deployment version: 340e64b7463cc8bd95c32c0954ace363242c79811769961745511
+2026-02-01T16:04:08.3921061Z Site started.
+2026-02-01T16:04:28.6205874Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:04:28.6240866Z Stop and delete container. Retry count = 0
+2026-02-01T16:04:28.6242342Z Stopping container: 132ce076b268_api-daj6dri4yf3k3z.
+2026-02-01T16:04:30.3382083Z Deleting container: 132ce076b268_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:04:30.4831359Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:04:30.4838308Z Container is terminated. Total time elapsed: 1862 ms.
+2026-02-01T16:04:30.4850785Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:21:15.2463936Z Container start method called.
+2026-02-01T16:21:15.2469999Z Establishing network.
+2026-02-01T16:21:15.2471435Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:21:42.9782712Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:21:42.9784821Z Container is starting.
+2026-02-01T16:21:42.9902826Z Establishing user namespace if not established already.
+2026-02-01T16:21:42.9923502Z Establishing network if not established already.
+2026-02-01T16:21:42.9927828Z Mounting volumes.
+2026-02-01T16:21:42.9937731Z Nested mountpoint volatile/logs
+2026-02-01T16:21:43.0021337Z Nested mountpoint 
+2026-02-01T16:21:43.0116969Z Creating container.
+2026-02-01T16:21:43.0123910Z Creating pipes for streaming container io.
+2026-02-01T16:21:43.0125209Z Creating stdout named pipe at /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stdout_cbb1324a6718453d80314fb0f0f72825.
+2026-02-01T16:21:43.0134912Z Successfully created stdout named pipe at: /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stdout_cbb1324a6718453d80314fb0f0f72825.
+2026-02-01T16:21:43.0136183Z Opening named pipe /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stdout_cbb1324a6718453d80314fb0f0f72825 for reading in non-blocking mode.
+2026-02-01T16:21:43.0137593Z Successfully opened named pipe: /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stdout_cbb1324a6718453d80314fb0f0f72825.
+2026-02-01T16:21:43.0138808Z Successfully removed non-blocking flag from /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stdout_cbb1324a6718453d80314fb0f0f72825.
+2026-02-01T16:21:43.0140014Z Creating stderr named pipe at /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stderr_ea59c49b2b064d989638567bed171cde.
+2026-02-01T16:21:43.0141739Z Successfully created stderr named pipe at: /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stderr_ea59c49b2b064d989638567bed171cde.
+2026-02-01T16:21:43.0182524Z Opening named pipe /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stderr_ea59c49b2b064d989638567bed171cde for reading in non-blocking mode.
+2026-02-01T16:21:43.0189441Z Successfully opened named pipe: /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stderr_ea59c49b2b064d989638567bed171cde.
+2026-02-01T16:21:43.0191036Z Successfully removed non-blocking flag from /podr/container/pipe/ab9e0888b127_api-daj6dri4yf3k3z/stderr_ea59c49b2b064d989638567bed171cde.
+2026-02-01T16:21:43.0212855Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:21:43.1493293Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:21:43.1495246Z Setting value of PORT variable to 80
+2026-02-01T16:21:43.1497567Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:21:44.0218288Z Starting container: ab9e0888b127_api-daj6dri4yf3k3z.
+2026-02-01T16:21:44.0838499Z Starting watchers and probes.
+2026-02-01T16:21:44.0928181Z Starting metrics collection.
+2026-02-01T16:21:44.0944734Z Container is running.
+2026-02-01T16:21:44.1190973Z Container start method finished after 28872 ms.
+2026-02-01T16:21:54.4213394Z Site startup probe succeeded after 10.2769543 seconds.
+2026-02-01T16:21:54.8671800Z Site is running with deployment version: 0a739f1c67a0fca0772bc3a85439180357723f6f1769962855160
+2026-02-01T16:21:54.8675869Z Site started.
+2026-02-01T16:22:15.2294850Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:22:17.4699584Z Stop and delete container. Retry count = 0
+2026-02-01T16:22:17.5264833Z Stopping container: 95fb1e534837_api-daj6dri4yf3k3z.
+2026-02-01T16:22:21.6354460Z Deleting container: 95fb1e534837_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:22:22.9879488Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:22:22.9883090Z Container is terminated. Total time elapsed: 7730 ms.
+2026-02-01T16:22:23.0645625Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:31:37.1755891Z Container start method called.
+2026-02-01T16:31:37.1758061Z Establishing network.
+2026-02-01T16:31:37.1774106Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:33:22.3720738Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:33:22.3722072Z Container is starting.
+2026-02-01T16:33:22.3724276Z Establishing user namespace if not established already.
+2026-02-01T16:33:22.3768705Z Establishing network if not established already.
+2026-02-01T16:33:22.3783371Z Mounting volumes.
+2026-02-01T16:33:22.3852167Z Nested mountpoint volatile/logs
+2026-02-01T16:33:22.4114076Z Nested mountpoint 
+2026-02-01T16:33:22.4659717Z Creating container.
+2026-02-01T16:33:22.4661731Z Creating pipes for streaming container io.
+2026-02-01T16:33:22.4663613Z Creating stdout named pipe at /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stdout_54dd76c09bcd456c989a13c26f0cc522.
+2026-02-01T16:33:22.4729676Z Successfully created stdout named pipe at: /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stdout_54dd76c09bcd456c989a13c26f0cc522.
+2026-02-01T16:33:22.4731805Z Opening named pipe /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stdout_54dd76c09bcd456c989a13c26f0cc522 for reading in non-blocking mode.
+2026-02-01T16:33:22.4865205Z Successfully opened named pipe: /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stdout_54dd76c09bcd456c989a13c26f0cc522.
+2026-02-01T16:33:22.4892454Z Successfully removed non-blocking flag from /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stdout_54dd76c09bcd456c989a13c26f0cc522.
+2026-02-01T16:33:22.5046655Z Creating stderr named pipe at /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stderr_b5babfa0dcb9431ea888dcf418978c4f.
+2026-02-01T16:33:22.5127894Z Successfully created stderr named pipe at: /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stderr_b5babfa0dcb9431ea888dcf418978c4f.
+2026-02-01T16:33:22.5131785Z Opening named pipe /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stderr_b5babfa0dcb9431ea888dcf418978c4f for reading in non-blocking mode.
+2026-02-01T16:33:22.5220334Z Successfully opened named pipe: /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stderr_b5babfa0dcb9431ea888dcf418978c4f.
+2026-02-01T16:33:22.5521871Z Successfully removed non-blocking flag from /podr/container/pipe/f45400040fcb_api-daj6dri4yf3k3z/stderr_b5babfa0dcb9431ea888dcf418978c4f.
+2026-02-01T16:33:22.5694804Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:33:22.9961801Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:33:22.9963730Z Setting value of PORT variable to 80
+2026-02-01T16:33:22.9965934Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:33:23.6024808Z Starting container: f45400040fcb_api-daj6dri4yf3k3z.
+2026-02-01T16:33:23.7694059Z Starting watchers and probes.
+2026-02-01T16:33:23.7700173Z Starting metrics collection.
+2026-02-01T16:33:23.7701864Z Container is running.
+2026-02-01T16:33:23.8060522Z Container start method finished after 106630 ms.
+2026-02-01T16:33:48.1437742Z Site startup probe succeeded after 24.316653 seconds.
+2026-02-01T16:33:48.3485453Z Site is running with deployment version: 5a42a1cd8c4f090885dbabbeb6c40f0620bdb61b1769963476631
+2026-02-01T16:33:48.3568129Z Site started.
+2026-02-01T16:34:08.4266500Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:34:08.4514672Z Stop and delete container. Retry count = 0
+2026-02-01T16:34:08.4516328Z Stopping container: ab9e0888b127_api-daj6dri4yf3k3z.
+2026-02-01T16:34:12.1366108Z Deleting container: ab9e0888b127_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:34:12.2779949Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:34:12.2781659Z Container is terminated. Total time elapsed: 3851 ms.
+2026-02-01T16:34:12.2793827Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:36:26.3026211Z Container start method called.
+2026-02-01T16:36:26.3032863Z Establishing network.
+2026-02-01T16:36:26.3041295Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:36:55.2330342Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:36:55.2347867Z Container is starting.
+2026-02-01T16:36:55.2386413Z Establishing user namespace if not established already.
+2026-02-01T16:36:55.2391812Z Establishing network if not established already.
+2026-02-01T16:36:55.2410189Z Mounting volumes.
+2026-02-01T16:36:55.2428443Z Nested mountpoint volatile/logs
+2026-02-01T16:36:55.2473140Z Nested mountpoint 
+2026-02-01T16:36:55.2789637Z Creating container.
+2026-02-01T16:36:55.2792257Z Creating pipes for streaming container io.
+2026-02-01T16:36:55.2793550Z Creating stdout named pipe at /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stdout_8237dd5694bd4c54934d67e2839419ca.
+2026-02-01T16:36:55.2855833Z Successfully created stdout named pipe at: /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stdout_8237dd5694bd4c54934d67e2839419ca.
+2026-02-01T16:36:55.2874834Z Opening named pipe /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stdout_8237dd5694bd4c54934d67e2839419ca for reading in non-blocking mode.
+2026-02-01T16:36:55.2878083Z Successfully opened named pipe: /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stdout_8237dd5694bd4c54934d67e2839419ca.
+2026-02-01T16:36:55.2879387Z Successfully removed non-blocking flag from /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stdout_8237dd5694bd4c54934d67e2839419ca.
+2026-02-01T16:36:55.2880678Z Creating stderr named pipe at /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stderr_22919feeffd247f1a8229d579277bab1.
+2026-02-01T16:36:55.2882403Z Successfully created stderr named pipe at: /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stderr_22919feeffd247f1a8229d579277bab1.
+2026-02-01T16:36:55.2883560Z Opening named pipe /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stderr_22919feeffd247f1a8229d579277bab1 for reading in non-blocking mode.
+2026-02-01T16:36:55.2884803Z Successfully opened named pipe: /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stderr_22919feeffd247f1a8229d579277bab1.
+2026-02-01T16:36:55.2885820Z Successfully removed non-blocking flag from /podr/container/pipe/e238250785b5_api-daj6dri4yf3k3z/stderr_22919feeffd247f1a8229d579277bab1.
+2026-02-01T16:36:55.2886965Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:36:55.3469282Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:36:55.3470992Z Setting value of PORT variable to 80
+2026-02-01T16:36:55.3472995Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:36:55.6142972Z Starting container: e238250785b5_api-daj6dri4yf3k3z.
+2026-02-01T16:36:55.6394077Z Starting watchers and probes.
+2026-02-01T16:36:55.6418879Z Starting metrics collection.
+2026-02-01T16:36:55.6428021Z Container is running.
+2026-02-01T16:36:55.6713400Z Container start method finished after 29368 ms.
+2026-02-01T16:37:06.6955404Z Site startup probe succeeded after 11.0139809 seconds.
+2026-02-01T16:37:06.8162530Z Site is running with deployment version: 889aa1843251a4a4f45e3ea7fc4118e11e00d5861769963772632
+2026-02-01T16:37:06.8176070Z Site started.
+2026-02-01T16:37:26.9831402Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:37:27.0401693Z Stop and delete container. Retry count = 0
+2026-02-01T16:37:27.0587389Z Stopping container: f45400040fcb_api-daj6dri4yf3k3z.
+2026-02-01T16:37:32.4032920Z Deleting container: f45400040fcb_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:37:32.6792297Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:37:32.6820698Z Container is terminated. Total time elapsed: 5696 ms.
+2026-02-01T16:37:32.6839898Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:46:12.1911726Z Container start method called.
+2026-02-01T16:46:12.2007714Z Establishing network.
+2026-02-01T16:46:12.2010184Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:46:42.4597628Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:46:42.4599470Z Container is starting.
+2026-02-01T16:46:42.4635531Z Establishing user namespace if not established already.
+2026-02-01T16:46:42.4642461Z Establishing network if not established already.
+2026-02-01T16:46:42.4645426Z Mounting volumes.
+2026-02-01T16:46:42.4647835Z Nested mountpoint volatile/logs
+2026-02-01T16:46:42.4687592Z Nested mountpoint 
+2026-02-01T16:46:42.5378417Z Creating container.
+2026-02-01T16:46:42.5394916Z Creating pipes for streaming container io.
+2026-02-01T16:46:42.5398748Z Creating stdout named pipe at /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stdout_a23ea7d3fece4f888f4ec6b10b9934a7.
+2026-02-01T16:46:42.5416824Z Successfully created stdout named pipe at: /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stdout_a23ea7d3fece4f888f4ec6b10b9934a7.
+2026-02-01T16:46:42.5418272Z Opening named pipe /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stdout_a23ea7d3fece4f888f4ec6b10b9934a7 for reading in non-blocking mode.
+2026-02-01T16:46:42.5420275Z Successfully opened named pipe: /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stdout_a23ea7d3fece4f888f4ec6b10b9934a7.
+2026-02-01T16:46:42.5421403Z Successfully removed non-blocking flag from /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stdout_a23ea7d3fece4f888f4ec6b10b9934a7.
+2026-02-01T16:46:42.5422857Z Creating stderr named pipe at /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stderr_d9ebf7292ba845be963405565b6cb1bc.
+2026-02-01T16:46:42.5452249Z Successfully created stderr named pipe at: /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stderr_d9ebf7292ba845be963405565b6cb1bc.
+2026-02-01T16:46:42.5473082Z Opening named pipe /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stderr_d9ebf7292ba845be963405565b6cb1bc for reading in non-blocking mode.
+2026-02-01T16:46:42.5477867Z Successfully opened named pipe: /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stderr_d9ebf7292ba845be963405565b6cb1bc.
+2026-02-01T16:46:42.5479189Z Successfully removed non-blocking flag from /podr/container/pipe/7a5f1f9b2006_api-daj6dri4yf3k3z/stderr_d9ebf7292ba845be963405565b6cb1bc.
+2026-02-01T16:46:42.5480343Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:46:42.7467954Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:46:42.7470439Z Setting value of PORT variable to 80
+2026-02-01T16:46:42.7472761Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:46:43.3530153Z Starting container: 7a5f1f9b2006_api-daj6dri4yf3k3z.
+2026-02-01T16:46:43.5186138Z Starting watchers and probes.
+2026-02-01T16:46:43.5190120Z Starting metrics collection.
+2026-02-01T16:46:43.5191846Z Container is running.
+2026-02-01T16:46:43.6051087Z Container start method finished after 31404 ms.
+2026-02-01T16:46:54.6708097Z Site startup probe succeeded after 11.0187887 seconds.
+2026-02-01T16:46:54.7616552Z Site is running with deployment version: 272862129a0e2e39637a08748c06daa686a10a011769964355809
+2026-02-01T16:46:54.7622716Z Site started.
+2026-02-01T16:47:14.8456953Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:47:15.0898316Z Stop and delete container. Retry count = 0
+2026-02-01T16:47:15.0977144Z Stopping container: e238250785b5_api-daj6dri4yf3k3z.
+2026-02-01T16:47:21.2253952Z Deleting container: e238250785b5_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:47:22.2878749Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:47:22.2881452Z Container is terminated. Total time elapsed: 7442 ms.
+2026-02-01T16:47:22.2886889Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T16:48:37.8440621Z Container start method called.
+2026-02-01T16:48:37.8442759Z Establishing network.
+2026-02-01T16:48:37.8444371Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T16:49:09.4209477Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T16:49:09.4210977Z Container is starting.
+2026-02-01T16:49:09.4277305Z Establishing user namespace if not established already.
+2026-02-01T16:49:09.4279142Z Establishing network if not established already.
+2026-02-01T16:49:09.4280602Z Mounting volumes.
+2026-02-01T16:49:09.4282754Z Nested mountpoint volatile/logs
+2026-02-01T16:49:09.4311593Z Nested mountpoint 
+2026-02-01T16:49:09.4555815Z Creating container.
+2026-02-01T16:49:09.4561189Z Creating pipes for streaming container io.
+2026-02-01T16:49:09.4563139Z Creating stdout named pipe at /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stdout_dd6aa11b946249c4b0ce4be31bf088b8.
+2026-02-01T16:49:09.4575900Z Successfully created stdout named pipe at: /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stdout_dd6aa11b946249c4b0ce4be31bf088b8.
+2026-02-01T16:49:09.4577769Z Opening named pipe /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stdout_dd6aa11b946249c4b0ce4be31bf088b8 for reading in non-blocking mode.
+2026-02-01T16:49:09.4580674Z Successfully opened named pipe: /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stdout_dd6aa11b946249c4b0ce4be31bf088b8.
+2026-02-01T16:49:09.4583248Z Successfully removed non-blocking flag from /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stdout_dd6aa11b946249c4b0ce4be31bf088b8.
+2026-02-01T16:49:09.4588147Z Creating stderr named pipe at /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stderr_315df733880347be8de22cc3536819ed.
+2026-02-01T16:49:09.4593064Z Successfully created stderr named pipe at: /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stderr_315df733880347be8de22cc3536819ed.
+2026-02-01T16:49:09.4597503Z Opening named pipe /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stderr_315df733880347be8de22cc3536819ed for reading in non-blocking mode.
+2026-02-01T16:49:09.4600419Z Successfully opened named pipe: /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stderr_315df733880347be8de22cc3536819ed.
+2026-02-01T16:49:09.4626278Z Successfully removed non-blocking flag from /podr/container/pipe/c70be88b3b9d_api-daj6dri4yf3k3z/stderr_315df733880347be8de22cc3536819ed.
+2026-02-01T16:49:09.4627584Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T16:49:09.5608371Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T16:49:09.5609715Z Setting value of PORT variable to 80
+2026-02-01T16:49:09.5613504Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T16:49:09.7887294Z Starting container: c70be88b3b9d_api-daj6dri4yf3k3z.
+2026-02-01T16:49:09.8086321Z Starting watchers and probes.
+2026-02-01T16:49:09.8103048Z Starting metrics collection.
+2026-02-01T16:49:09.8132186Z Container is running.
+2026-02-01T16:49:09.8588408Z Container start method finished after 32014 ms.
+2026-02-01T16:49:25.9880547Z Site startup probe succeeded after 16.1093278 seconds.
+2026-02-01T16:49:26.0823011Z Site is running with deployment version: 3079085815570c238fe174705ea34380158d169c1769964491082
+2026-02-01T16:49:26.0833331Z Site started.
+2026-02-01T16:49:46.0896962Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T16:49:46.0957781Z Stop and delete container. Retry count = 0
+2026-02-01T16:49:46.0962316Z Stopping container: 7a5f1f9b2006_api-daj6dri4yf3k3z.
+2026-02-01T16:49:48.0750033Z Deleting container: 7a5f1f9b2006_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T16:49:48.2349527Z Container spec TerminationMessagePolicy  path 
+2026-02-01T16:49:48.2356293Z Container is terminated. Total time elapsed: 2145 ms.
+2026-02-01T16:49:48.2358794Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T17:08:41.8717000Z Container start method called.
+2026-02-01T17:08:41.8718238Z Establishing network.
+2026-02-01T17:08:41.8719097Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T17:09:19.8812804Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T17:09:19.8821732Z Container is starting.
+2026-02-01T17:09:19.8851673Z Establishing user namespace if not established already.
+2026-02-01T17:09:19.8853212Z Establishing network if not established already.
+2026-02-01T17:09:19.8859978Z Mounting volumes.
+2026-02-01T17:09:19.8861834Z Nested mountpoint volatile/logs
+2026-02-01T17:09:19.9075575Z Nested mountpoint 
+2026-02-01T17:09:19.9615969Z Creating container.
+2026-02-01T17:09:19.9617920Z Creating pipes for streaming container io.
+2026-02-01T17:09:19.9619575Z Creating stdout named pipe at /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stdout_6c1b73a911e648039aef2c83f7da6eb2.
+2026-02-01T17:09:19.9630758Z Successfully created stdout named pipe at: /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stdout_6c1b73a911e648039aef2c83f7da6eb2.
+2026-02-01T17:09:19.9632136Z Opening named pipe /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stdout_6c1b73a911e648039aef2c83f7da6eb2 for reading in non-blocking mode.
+2026-02-01T17:09:19.9634596Z Successfully opened named pipe: /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stdout_6c1b73a911e648039aef2c83f7da6eb2.
+2026-02-01T17:09:19.9636690Z Successfully removed non-blocking flag from /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stdout_6c1b73a911e648039aef2c83f7da6eb2.
+2026-02-01T17:09:19.9638512Z Creating stderr named pipe at /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stderr_c4486c843e9c452080c3589577afe02a.
+2026-02-01T17:09:19.9641940Z Successfully created stderr named pipe at: /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stderr_c4486c843e9c452080c3589577afe02a.
+2026-02-01T17:09:19.9643290Z Opening named pipe /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stderr_c4486c843e9c452080c3589577afe02a for reading in non-blocking mode.
+2026-02-01T17:09:19.9644608Z Successfully opened named pipe: /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stderr_c4486c843e9c452080c3589577afe02a.
+2026-02-01T17:09:19.9645848Z Successfully removed non-blocking flag from /podr/container/pipe/3c2d3f717f1b_api-daj6dri4yf3k3z/stderr_c4486c843e9c452080c3589577afe02a.
+2026-02-01T17:09:19.9647086Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T17:09:20.1843718Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T17:09:20.1846211Z Setting value of PORT variable to 80
+2026-02-01T17:09:20.1849115Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T17:09:20.9091077Z Starting container: 3c2d3f717f1b_api-daj6dri4yf3k3z.
+2026-02-01T17:09:20.9368052Z Starting watchers and probes.
+2026-02-01T17:09:20.9375823Z Starting metrics collection.
+2026-02-01T17:09:20.9377629Z Container is running.
+2026-02-01T17:09:20.9727095Z Container start method finished after 39100 ms.
+2026-02-01T17:09:36.0402098Z Site startup probe succeeded after 15.039053 seconds.
+2026-02-01T17:09:36.2368908Z Site is running with deployment version: 4341fe75e0874332e6a27f46294885cb22a6ad0c1769965684122
+2026-02-01T17:09:36.2380087Z Site started.
+2026-02-01T17:09:56.2878018Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T17:09:56.3184962Z Stop and delete container. Retry count = 0
+2026-02-01T17:09:56.3186410Z Stopping container: c70be88b3b9d_api-daj6dri4yf3k3z.
+2026-02-01T17:09:58.4771682Z Deleting container: c70be88b3b9d_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T17:09:58.6463946Z Container spec TerminationMessagePolicy  path 
+2026-02-01T17:09:58.6466782Z Container is terminated. Total time elapsed: 2358 ms.
+2026-02-01T17:09:58.6491271Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T17:13:20.2157559Z Container start method called.
+2026-02-01T17:13:20.2162205Z Establishing network.
+2026-02-01T17:13:20.2163741Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T17:14:29.3705215Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T17:14:29.3709860Z Container is starting.
+2026-02-01T17:14:29.3800878Z Establishing user namespace if not established already.
+2026-02-01T17:14:29.3810884Z Establishing network if not established already.
+2026-02-01T17:14:29.3874974Z Mounting volumes.
+2026-02-01T17:14:29.3943063Z Nested mountpoint volatile/logs
+2026-02-01T17:14:29.4209007Z Nested mountpoint 
+2026-02-01T17:14:29.4472808Z Creating container.
+2026-02-01T17:14:29.4473947Z Creating pipes for streaming container io.
+2026-02-01T17:14:29.4476690Z Creating stdout named pipe at /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stdout_d463818d420845e58d4656356652954f.
+2026-02-01T17:14:29.4493543Z Successfully created stdout named pipe at: /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stdout_d463818d420845e58d4656356652954f.
+2026-02-01T17:14:29.4507083Z Opening named pipe /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stdout_d463818d420845e58d4656356652954f for reading in non-blocking mode.
+2026-02-01T17:14:29.4512831Z Successfully opened named pipe: /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stdout_d463818d420845e58d4656356652954f.
+2026-02-01T17:14:29.4517009Z Successfully removed non-blocking flag from /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stdout_d463818d420845e58d4656356652954f.
+2026-02-01T17:14:29.4518724Z Creating stderr named pipe at /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stderr_b68b1aba9a6e481db2f3559252e0862f.
+2026-02-01T17:14:29.4536589Z Successfully created stderr named pipe at: /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stderr_b68b1aba9a6e481db2f3559252e0862f.
+2026-02-01T17:14:29.4548408Z Opening named pipe /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stderr_b68b1aba9a6e481db2f3559252e0862f for reading in non-blocking mode.
+2026-02-01T17:14:29.4555980Z Successfully opened named pipe: /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stderr_b68b1aba9a6e481db2f3559252e0862f.
+2026-02-01T17:14:29.4557107Z Successfully removed non-blocking flag from /podr/container/pipe/73cfdcdbb810_api-daj6dri4yf3k3z/stderr_b68b1aba9a6e481db2f3559252e0862f.
+2026-02-01T17:14:29.4560600Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T17:14:29.5954664Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T17:14:29.5956070Z Setting value of PORT variable to 80
+2026-02-01T17:14:29.5967404Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T17:14:32.3134758Z Starting container: 73cfdcdbb810_api-daj6dri4yf3k3z.
+2026-02-01T17:14:32.6977160Z Starting watchers and probes.
+2026-02-01T17:14:32.7019672Z Starting metrics collection.
+2026-02-01T17:14:32.7028834Z Container is running.
+2026-02-01T17:14:32.7311029Z Container start method finished after 72514 ms.
+2026-02-01T17:14:49.8035507Z Site startup probe succeeded after 17.0333489 seconds.
+2026-02-01T17:14:49.9513543Z Site is running with deployment version: 8349446bc1ebc17aaaec265a8eb9353b1e8236db1769965950544
+2026-02-01T17:14:49.9548881Z Site started.
+2026-02-01T17:15:10.2436088Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T17:15:10.3154585Z Stop and delete container. Retry count = 0
+2026-02-01T17:15:10.3223112Z Stopping container: 3c2d3f717f1b_api-daj6dri4yf3k3z.
+2026-02-01T17:15:15.4588125Z Deleting container: 3c2d3f717f1b_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T17:15:15.6836994Z Container spec TerminationMessagePolicy  path 
+2026-02-01T17:15:15.6838724Z Container is terminated. Total time elapsed: 5437 ms.
+2026-02-01T17:15:15.6891324Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T17:18:26.6987590Z Container start method called.
+2026-02-01T17:18:26.7016322Z Establishing network.
+2026-02-01T17:18:26.7018198Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T17:19:17.0770968Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T17:19:17.0772663Z Container is starting.
+2026-02-01T17:19:17.0780895Z Establishing user namespace if not established already.
+2026-02-01T17:19:17.0782203Z Establishing network if not established already.
+2026-02-01T17:19:17.0783658Z Mounting volumes.
+2026-02-01T17:19:17.0795086Z Nested mountpoint volatile/logs
+2026-02-01T17:19:17.0902066Z Nested mountpoint 
+2026-02-01T17:19:17.1162143Z Creating container.
+2026-02-01T17:19:17.1164823Z Creating pipes for streaming container io.
+2026-02-01T17:19:17.1167447Z Creating stdout named pipe at /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stdout_b8a2f7c75dc8434681e5b8e5522e6482.
+2026-02-01T17:19:17.1210909Z Successfully created stdout named pipe at: /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stdout_b8a2f7c75dc8434681e5b8e5522e6482.
+2026-02-01T17:19:17.1234742Z Opening named pipe /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stdout_b8a2f7c75dc8434681e5b8e5522e6482 for reading in non-blocking mode.
+2026-02-01T17:19:17.1236680Z Successfully opened named pipe: /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stdout_b8a2f7c75dc8434681e5b8e5522e6482.
+2026-02-01T17:19:17.1239878Z Successfully removed non-blocking flag from /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stdout_b8a2f7c75dc8434681e5b8e5522e6482.
+2026-02-01T17:19:17.1241459Z Creating stderr named pipe at /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stderr_244a6085c0c54fb793990371a7becf06.
+2026-02-01T17:19:17.1245165Z Successfully created stderr named pipe at: /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stderr_244a6085c0c54fb793990371a7becf06.
+2026-02-01T17:19:17.1246691Z Opening named pipe /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stderr_244a6085c0c54fb793990371a7becf06 for reading in non-blocking mode.
+2026-02-01T17:19:17.1249317Z Successfully opened named pipe: /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stderr_244a6085c0c54fb793990371a7becf06.
+2026-02-01T17:19:17.1250896Z Successfully removed non-blocking flag from /podr/container/pipe/520d68fadac1_api-daj6dri4yf3k3z/stderr_244a6085c0c54fb793990371a7becf06.
+2026-02-01T17:19:17.1252431Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T17:19:17.2152804Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T17:19:17.2156330Z Setting value of PORT variable to 80
+2026-02-01T17:19:17.2162554Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T17:19:18.5155889Z Starting container: 520d68fadac1_api-daj6dri4yf3k3z.
+2026-02-01T17:19:18.5456710Z Starting watchers and probes.
+2026-02-01T17:19:18.8427080Z Starting metrics collection.
+2026-02-01T17:19:18.8451165Z Container is running.
+2026-02-01T17:19:19.0676776Z Container start method finished after 52368 ms.
+2026-02-01T17:19:36.1223561Z Site startup probe succeeded after 16.9785164 seconds.
+2026-02-01T17:19:36.2563665Z Site is running with deployment version: abe324aa32546788737aa6146fc2adcce3160fa21769966262315
+2026-02-01T17:19:36.2575733Z Site started.
+2026-02-01T17:19:56.2909072Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T17:19:56.3130308Z Stop and delete container. Retry count = 0
+2026-02-01T17:19:56.3131844Z Stopping container: 73cfdcdbb810_api-daj6dri4yf3k3z.
+2026-02-01T17:20:01.4369608Z Deleting container: 73cfdcdbb810_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T17:20:02.6607451Z Container spec TerminationMessagePolicy  path 
+2026-02-01T17:20:02.6610153Z Container is terminated. Total time elapsed: 6369 ms.
+2026-02-01T17:20:02.6646724Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T17:23:40.6736898Z Container start method called.
+2026-02-01T17:23:40.6739800Z Establishing network.
+2026-02-01T17:23:40.6742571Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T17:24:15.1149430Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T17:24:15.1151592Z Container is starting.
+2026-02-01T17:24:15.1297016Z Establishing user namespace if not established already.
+2026-02-01T17:24:15.1298447Z Establishing network if not established already.
+2026-02-01T17:24:15.1300726Z Mounting volumes.
+2026-02-01T17:24:15.1331086Z Nested mountpoint volatile/logs
+2026-02-01T17:24:15.1473446Z Nested mountpoint 
+2026-02-01T17:24:15.1553418Z Creating container.
+2026-02-01T17:24:15.1554987Z Creating pipes for streaming container io.
+2026-02-01T17:24:15.1556728Z Creating stdout named pipe at /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stdout_2f9f42bebdc54cc3a2f7dac0ed72c5dd.
+2026-02-01T17:24:15.1631949Z Successfully created stdout named pipe at: /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stdout_2f9f42bebdc54cc3a2f7dac0ed72c5dd.
+2026-02-01T17:24:15.1633354Z Opening named pipe /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stdout_2f9f42bebdc54cc3a2f7dac0ed72c5dd for reading in non-blocking mode.
+2026-02-01T17:24:15.1634764Z Successfully opened named pipe: /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stdout_2f9f42bebdc54cc3a2f7dac0ed72c5dd.
+2026-02-01T17:24:15.1635957Z Successfully removed non-blocking flag from /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stdout_2f9f42bebdc54cc3a2f7dac0ed72c5dd.
+2026-02-01T17:24:15.1637161Z Creating stderr named pipe at /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stderr_80ab5af13cf14a55b70737ce80045b55.
+2026-02-01T17:24:15.1638948Z Successfully created stderr named pipe at: /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stderr_80ab5af13cf14a55b70737ce80045b55.
+2026-02-01T17:24:15.1640321Z Opening named pipe /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stderr_80ab5af13cf14a55b70737ce80045b55 for reading in non-blocking mode.
+2026-02-01T17:24:15.1641665Z Successfully opened named pipe: /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stderr_80ab5af13cf14a55b70737ce80045b55.
+2026-02-01T17:24:15.1642705Z Successfully removed non-blocking flag from /podr/container/pipe/632a124f5c81_api-daj6dri4yf3k3z/stderr_80ab5af13cf14a55b70737ce80045b55.
+2026-02-01T17:24:15.1643899Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T17:24:15.2484412Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T17:24:15.2485905Z Setting value of PORT variable to 80
+2026-02-01T17:24:15.2487897Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T17:24:15.4870415Z Starting container: 632a124f5c81_api-daj6dri4yf3k3z.
+2026-02-01T17:24:15.5073870Z Starting watchers and probes.
+2026-02-01T17:24:15.5099427Z Starting metrics collection.
+2026-02-01T17:24:15.5119944Z Container is running.
+2026-02-01T17:24:15.5719893Z Container start method finished after 34897 ms.
+2026-02-01T17:24:36.1089670Z Site startup probe succeeded after 20.5136835 seconds.
+2026-02-01T17:24:36.6378745Z Site is running with deployment version: 3e34745497881040e1b1ef43a9381500579c12961769966582722
+2026-02-01T17:24:36.6380465Z Site started.
+2026-02-01T17:24:56.7028217Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T17:24:56.7223265Z Stop and delete container. Retry count = 0
+2026-02-01T17:24:56.7225414Z Stopping container: 520d68fadac1_api-daj6dri4yf3k3z.
+2026-02-01T17:24:58.6749250Z Deleting container: 520d68fadac1_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T17:24:58.7823484Z Container spec TerminationMessagePolicy  path 
+2026-02-01T17:24:58.7826177Z Container is terminated. Total time elapsed: 2079 ms.
+2026-02-01T17:24:58.7838888Z Site: api-daj6dri4yf3k3z stopped.
+2026-02-01T17:25:24.1093565Z Container start method called.
+2026-02-01T17:25:24.1095388Z Establishing network.
+2026-02-01T17:25:24.1096687Z Pulling image: crda672axowukix3.azurecr.io/da-api:main.
+2026-02-01T17:26:21.1334881Z Image crda672axowukix3.azurecr.io/da-api:main is pulled from registry crda672axowukix3.azurecr.io
+2026-02-01T17:26:21.1336564Z Container is starting.
+2026-02-01T17:26:21.1407981Z Establishing user namespace if not established already.
+2026-02-01T17:26:21.1413231Z Establishing network if not established already.
+2026-02-01T17:26:21.1414956Z Mounting volumes.
+2026-02-01T17:26:21.1419736Z Nested mountpoint volatile/logs
+2026-02-01T17:26:21.1543934Z Nested mountpoint 
+2026-02-01T17:26:21.1656898Z Creating container.
+2026-02-01T17:26:21.1658090Z Creating pipes for streaming container io.
+2026-02-01T17:26:21.1660574Z Creating stdout named pipe at /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stdout_afb45a17c7c94394ab5703e033def2f0.
+2026-02-01T17:26:21.1694361Z Successfully created stdout named pipe at: /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stdout_afb45a17c7c94394ab5703e033def2f0.
+2026-02-01T17:26:21.1714838Z Opening named pipe /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stdout_afb45a17c7c94394ab5703e033def2f0 for reading in non-blocking mode.
+2026-02-01T17:26:21.1720286Z Successfully opened named pipe: /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stdout_afb45a17c7c94394ab5703e033def2f0.
+2026-02-01T17:26:21.1729063Z Successfully removed non-blocking flag from /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stdout_afb45a17c7c94394ab5703e033def2f0.
+2026-02-01T17:26:21.1732806Z Creating stderr named pipe at /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stderr_46cb6cc872b2410281f0f9f4942d353f.
+2026-02-01T17:26:21.1740435Z Successfully created stderr named pipe at: /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stderr_46cb6cc872b2410281f0f9f4942d353f.
+2026-02-01T17:26:21.1747875Z Opening named pipe /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stderr_46cb6cc872b2410281f0f9f4942d353f for reading in non-blocking mode.
+2026-02-01T17:26:21.1759815Z Successfully opened named pipe: /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stderr_46cb6cc872b2410281f0f9f4942d353f.
+2026-02-01T17:26:21.1769778Z Successfully removed non-blocking flag from /podr/container/pipe/cce07a2468d6_api-daj6dri4yf3k3z/stderr_46cb6cc872b2410281f0f9f4942d353f.
+2026-02-01T17:26:21.1778106Z Overriding PORT environment variable with port exposed by container image.
+2026-02-01T17:26:21.2515966Z Container image exposes ports: ContainerExposedPort { Port = 80, Protocol = TCP }. Sanitized list of ports is: 80. Resolved main port to 80.
+2026-02-01T17:26:21.2517789Z Setting value of PORT variable to 80
+2026-02-01T17:26:21.2520240Z Creating container with image: crda672axowukix3.azurecr.io/da-api:main from registry: crda672axowukix3.azurecr.io and fully qualified image name: crda672axowukix3.azurecr.io/da-api:main
+2026-02-01T17:26:21.8941687Z Starting container: cce07a2468d6_api-daj6dri4yf3k3z.
+2026-02-01T17:26:21.9353582Z Starting watchers and probes.
+2026-02-01T17:26:21.9374517Z Starting metrics collection.
+2026-02-01T17:26:21.9376808Z Container is running.
+2026-02-01T17:26:21.9539042Z Container start method finished after 57844 ms.
+2026-02-01T17:26:30.9703793Z Site startup probe succeeded after 9.0123257 seconds.
+2026-02-01T17:26:31.1523641Z Site is running with deployment version: dde8dc1c73932f759837e83b080976c19a7202661769966712629
+2026-02-01T17:26:31.2209498Z Site started.
+2026-02-01T17:26:51.2348915Z Container is terminating. Grace period: 5 seconds.
+2026-02-01T17:26:51.2402195Z Stop and delete container. Retry count = 0
+2026-02-01T17:26:51.2407464Z Stopping container: 632a124f5c81_api-daj6dri4yf3k3z.
+2026-02-01T17:26:56.2780098Z Deleting container: 632a124f5c81_api-daj6dri4yf3k3z. Retry count = 0
+2026-02-01T17:26:56.4181454Z Container spec TerminationMessagePolicy  path 
+2026-02-01T17:26:56.4183329Z Container is terminated. Total time elapsed: 5183 ms.
+2026-02-01T17:26:56.4190223Z Site: api-daj6dri4yf3k3z stopped.

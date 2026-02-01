@@ -296,8 +296,10 @@ def create_specialist_agents(
         description="【優先】Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を直接分析・集計する専門家。数値データの質問にはこのエージェントを最優先で使用",
         instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
 
-## 重要：あなたは数値データ分析の最優先エージェントです
-売上、注文、顧客、製品に関する質問は、まずあなたがSQLクエリで回答してください。
+## 重要：迅速に回答
+- **1回のSQLクエリで回答を完成させる**
+- 結果が得られたら、すぐにChart.js JSONを含む最終回答を生成
+- 追加のクエリは不要（タイムアウト防止）
 
 ## 利用可能なテーブル（実際のスキーマ）
 
@@ -458,7 +460,7 @@ ORDER BY TotalSales DESC
 - OrderStatus = 'Completed' で完了した注文のみをフィルタ
 - グラフなしの場合は表形式または要約形式で報告
 - グラフ要求時は必ずChart.js JSON形式（Vega-Lite禁止）
-- ユーザーの意図を汲み取り、最適なクエリとグラフ形式を選択
+- **1回のクエリ実行後、すぐに最終回答を生成する（追加クエリ不要）**
 """,
         chat_client=chat_client,
         tools=[run_sql_query],
@@ -642,11 +644,11 @@ Vega-Lite形式は使用禁止です。
 ```
 
 ## 重要な注意
-- シンプルな質問は1つのエージェントで回答
+- **シンプルな質問は1回のエージェント呼び出しで完了させる**
 - 数値データの質問は必ずsql_agentを最初に使用
 - グラフ要求時はChart.js JSON形式（Vega-Lite禁止）
+- sql_agentが結果を返したら、それを最終回答として使用（再度呼び出し不要）
 - 日本語で回答
-- ユーザーの意図を汲み取り、最適な回答形式を選択
 """,
         chat_client=chat_client,
     )
@@ -704,13 +706,14 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
         manager_agent = create_manager_agent(chat_client)
 
         # Build the MagenticBuilder workflow
+        # Note: シンプルなクエリは1-2ラウンドで完了するため、max_round_count=4に制限
         workflow = (
             MagenticBuilder()
             .participants([sql_agent, web_agent, doc_agent])
             .with_manager(
                 agent=manager_agent,
-                max_round_count=10,  # 最大ラウンド数
-                max_stall_count=3,  # ストール検出閾値
+                max_round_count=4,  # タイムアウト防止のため制限（デフォルト10は長すぎる）
+                max_stall_count=2,  # 早期終了
             )
             .build()
         )
