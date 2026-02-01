@@ -73,12 +73,34 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
   // Handle assistant messages - string content (text, lists, tables, or stringified charts)
   if (message.role === "assistant" && typeof message.content === "string") {
-    // Try parsing as JSON to detect charts
+    // Extract Chart.js JSON from mixed text/JSON content
+    const extractChartFromText = (content: string): { textPart: string; chartData: any | null } => {
+      // Pattern to match Chart.js JSON object with type field
+      // Matches: { "type": "bar", "data": {...}, "options": {...} }
+      const chartJsonPattern = /\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"[\s\S]*?"data"\s*:\s*\{[\s\S]*?"datasets"\s*:\s*\[[\s\S]*?\]\s*\}[\s\S]*?\}/;
+
+      const match = content.match(chartJsonPattern);
+      if (match) {
+        const jsonStr = match[0];
+        const textPart = content.replace(jsonStr, '').trim();
+        try {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed && typeof parsed === 'object' && 'data' in parsed && 'type' in parsed) {
+            return { textPart, chartData: parsed };
+          }
+        } catch {
+          // JSON parse failed, return original content
+        }
+      }
+      return { textPart: content, chartData: null };
+    };
+
+    // Try parsing entire content as JSON first (pure JSON case)
     let parsedContent = null;
     try {
       parsedContent = JSON.parse(message.content);
     } catch {
-      // Not JSON - treat as plain text
+      // Not pure JSON - try to extract chart from mixed content
       parsedContent = null;
     }
 
@@ -119,6 +141,58 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           );
         }
       }
+    }
+
+    // SCENARIO 3: Mixed text + JSON content (e.g., "説明テキスト... { "type": "bar", ... }")
+    const { textPart, chartData: extractedChart } = extractChartFromText(message.content);
+
+    if (extractedChart) {
+      // Render both text and chart
+      const containsHTML = /<\/?[a-z][\s\S]*>/i.test(textPart);
+
+      return (
+        <div className="assistant-message">
+          {/* Text content above the chart */}
+          {textPart && (
+            containsHTML ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: textPart }}
+                className="html-content"
+              />
+            ) : (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, supersub]}
+                children={textPart}
+              />
+            )
+          )}
+
+          {/* Chart below the text */}
+          <div className="chart-section" style={{ marginTop: textPart ? '16px' : '0' }}>
+            <ChatChart chartContent={extractedChart} />
+          </div>
+
+          {/* Citations */}
+          {!generatingResponse && (
+            <Citations
+              answer={{
+                answer: textPart || message.content,
+                citations:
+                  message.role === "assistant"
+                    ? parseCitationFromMessage(message.citations)
+                    : [],
+              }}
+              index={index}
+            />
+          )}
+
+          <div className="answerDisclaimerContainer">
+            <span className="answerDisclaimer">
+              {t("message.aiDisclaimer")}
+            </span>
+          </div>
+        </div>
+      );
     }
 
     // Plain text message (most common case)
