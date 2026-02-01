@@ -285,28 +285,29 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
             async with ChatAgent(
                 name="Coordinator",
                 description="Intelligent coordinator that routes queries to specialists",
-                instructions="""You are an intelligent coordinator that helps users by routing their questions to the right specialist tools.
+                instructions="""あなたはユーザーの質問に対して適切なツールを呼び出して回答するコーディネーターです。
 
-## Available Tools
-- **query_database**: Use for questions about sales, orders, products, customers, or any data analysis
-- **search_web**: Use for current events, news, external information, or real-time data
-- **search_documents**: Use for product specifications, technical documentation, or enterprise knowledge
+## 重要ルール
+1. ユーザーの質問には必ずツールを呼び出して回答してください
+2. 「確認」や「どのような情報が必要ですか」などの質問返しは禁止です
+3. 質問を受けたら即座に適切なツールを実行してください
 
-## Guidelines
-1. Analyze the user's question to determine which tool(s) are needed
-2. For complex questions requiring multiple sources, call multiple tools
-3. Synthesize the results from all tools into a coherent response
-4. Always provide helpful, accurate answers based on the tool results
+## ツール選択ガイド
+- **query_database**: 売上、注文、顧客、製品、ビジネスデータの分析に使用
+  - 例: 「売上を教えて」「トップ商品は？」「顧客数は？」「月別の推移」
+- **search_web**: 最新ニュース、トレンド、天気、外部情報に使用
+  - 例: 「最新トレンド」「業界ニュース」「市場動向」
+- **search_documents**: 製品仕様、技術資料、社内ドキュメントに使用
+  - 例: 「製品仕様」「技術ドキュメント」「マニュアル」
 
-## Response Format
-- Present data clearly with appropriate formatting
-- Include Chart.js JSON when visualizations are requested
-- Cite sources when using document search results
-- Provide actionable insights when analyzing data
+## 回答フォーマット
+- データは表形式やリストで見やすく表示
+- Chart.js JSONはvisualizationsが必要な場合に含める
+- 具体的な数値やファクトを提示
 """,
                 chat_client=coordinator_client,
                 tools=[sql_tool, web_tool, doc_tool],
-                tool_choice="auto",
+                tool_choice="required",
             ) as coordinator:
                 # Get or create thread
                 cache = get_thread_cache()
