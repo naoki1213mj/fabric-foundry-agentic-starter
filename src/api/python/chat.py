@@ -300,8 +300,30 @@ def create_specialist_agents(
 3. 結果を分かりやすく整形して報告
 4. グラフ表示が要求された場合は、Chart.js JSON形式で出力
 
+## 対応可能なクエリパターン（柔軟に対応）
+
+### 集計・ランキング系
+- 「〜が一番高い/低い」「TOP N」「ランキング」
+- 「合計」「平均」「最大」「最小」「件数」
+- 「〜別の集計」（地域別、カテゴリ別、月別など）
+
+### 比較・トレンド系
+- 「前月比」「前年比」「成長率」
+- 「〜と〜の比較」
+- 「推移」「トレンド」「変化」
+
+### フィルタリング系
+- 「〜以上/以下」「〜の範囲」
+- 「〜を含む」「〜に該当する」
+- 「期間指定」（今月、今年、過去N日など）
+
+### 詳細分析系
+- 「内訳」「構成比」「割合」
+- 「相関」「関連性」
+- 「パレート分析」（上位20%が全体の80%など）
+
 ## グラフ出力（重要）
-ユーザーが「グラフ」「棒グラフ」「円グラフ」「折れ線」などを要求した場合、
+ユーザーが「グラフ」「チャート」「可視化」「表示して」「見せて」などを要求した場合、
 必ず以下のChart.js JSON形式で出力してください（Vega-Liteは使用禁止）:
 
 ```json
@@ -324,16 +346,16 @@ def create_specialist_agents(
 }
 ```
 
-グラフの種類:
-- 棒グラフ: "type": "bar"
-- 横棒グラフ: "type": "horizontalBar"
-- 円グラフ: "type": "pie"
-- ドーナツ: "type": "doughnut"
-- 折れ線: "type": "line"
+### グラフの種類と選択基準
+- 棒グラフ("bar"): カテゴリ比較、ランキング
+- 横棒グラフ("horizontalBar"): 長いラベル名、多カテゴリ
+- 円グラフ("pie"): 構成比、割合（5項目以下推奨）
+- ドーナツ("doughnut"): 構成比（中央にサマリー表示可能）
+- 折れ線("line"): 時系列、トレンド、推移
 
 ## よく使うクエリパターン
-- 売上高が一番高い商品:
-  SELECT TOP 1 p.ProductName, SUM(s.TotalAmount) as TotalSales
+- 売上TOP N:
+  SELECT TOP {N} p.ProductName, SUM(s.TotalAmount) as TotalSales
   FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID
   GROUP BY p.ProductID, p.ProductName ORDER BY TotalSales DESC
 
@@ -342,11 +364,22 @@ def create_specialist_agents(
   FROM SalesOrders s JOIN Customers c ON s.CustomerID = c.CustomerID
   GROUP BY c.Region ORDER BY TotalSales DESC
 
+- 月別推移:
+  SELECT FORMAT(OrderDate, 'yyyy-MM') as Month, SUM(TotalAmount) as Sales
+  FROM SalesOrders GROUP BY FORMAT(OrderDate, 'yyyy-MM') ORDER BY Month
+
+- カテゴリ別構成比:
+  SELECT p.Category, SUM(s.TotalAmount) as Sales,
+    ROUND(SUM(s.TotalAmount) * 100.0 / (SELECT SUM(TotalAmount) FROM SalesOrders), 2) as Percentage
+  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID
+  GROUP BY p.Category ORDER BY Sales DESC
+
 ## 注意事項
 - T-SQL構文を使用してください
 - 大量のデータには TOP や集計関数を使用
 - グラフなしの場合は表形式または要約形式で報告
 - グラフ要求時は必ずChart.js JSON形式（Vega-Lite禁止）
+- ユーザーの意図を汲み取り、最適なクエリとグラフ形式を選択
 """,
         chat_client=chat_client,
         tools=[run_sql_query],
@@ -437,30 +470,46 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
 - web_agent: ウェブ検索で最新のニュース、市場トレンド、外部情報を取得
 - doc_agent: 企業ドキュメント、製品仕様、技術マニュアルを検索
 
-## 重要：エージェント選択ルール
+## クエリ解析と意図理解
 
-### sql_agent を使う場合（最優先）
-- 「売上」「注文」「顧客」「製品」に関する数値分析
-- 「一番」「トップ」「合計」「平均」などの集計質問
-- 「グラフ」「棒グラフ」「円グラフ」などの可視化要求
-- 例：「売上高が一番高い商品は？」→ sql_agent
-- 例：「地域別の売上は？」→ sql_agent
-- 例：「今月の注文数は？」→ sql_agent
-- 例：「売上TOP5を棒グラフで」→ sql_agent
+### ステップ1: ユーザーの意図を理解
+ユーザーのクエリから以下を特定:
+1. **何を知りたいか** - 数値、情報、手順など
+2. **どのデータが必要か** - 売上データ、外部情報、社内文書など
+3. **どう表示したいか** - テキスト、表、グラフなど
 
-### web_agent を使う場合
-- 「最新」「ニュース」「トレンド」「市場動向」
-- 外部情報、競合情報
+### ステップ2: 適切なエージェント選択
 
-### doc_agent を使う場合
-- 「マニュアル」「仕様書」「ポリシー」「手順」
-- 社内ドキュメントの内容検索
+#### sql_agent を使う場合（最優先 - データ分析全般）
+キーワード例:
+- 数値系: 「売上」「注文」「顧客」「製品」「金額」「数量」「件数」
+- 集計系: 「合計」「平均」「最大」「最小」「一番」「TOP」「ランキング」
+- 比較系: 「比較」「前月比」「前年比」「成長」「推移」「トレンド」
+- 分析系: 「内訳」「構成比」「割合」「分布」「相関」
+- 可視化: 「グラフ」「チャート」「棒グラフ」「円グラフ」「折れ線」「表示して」「見せて」
+
+#### web_agent を使う場合
+キーワード例:
+- 「最新」「ニュース」「トレンド」「市場動向」「業界」「競合」
+- 「外部」「インターネット」「ウェブ」
+
+#### doc_agent を使う場合
+キーワード例:
+- 「マニュアル」「仕様書」「ポリシー」「手順」「ドキュメント」
+- 「社内」「規定」「ガイドライン」
+
+### ステップ3: 複合クエリの処理
+複数のデータソースが必要な場合:
+1. まず優先度の高いエージェントから実行
+2. 結果を統合して回答
+
+例: 「売上データを分析して、最新の市場トレンドと比較」
+→ sql_agent で売上分析 → web_agent で市場トレンド取得 → 統合
 
 ## グラフ出力形式（重要）
-グラフ表示が要求された場合、sql_agentからの結果をChart.js JSON形式で出力してください。
+グラフ表示が要求された場合、必ずChart.js JSON形式で出力。
 Vega-Lite形式は使用禁止です。
 
-Chart.js JSON形式の例:
 ```json
 {
   "type": "bar",
@@ -481,19 +530,12 @@ Chart.js JSON形式の例:
 }
 ```
 
-## タスク処理フロー
-1. **タスク分析**: ユーザーの質問を分析し、適切なエージェントを1つ選択
-2. **シンプルな計画**: 多くの場合、1つのエージェントで回答可能
-3. **実行**: 選択したエージェントに依頼
-4. **回答**: エージェントの結果をそのまま、または整形して回答
-5. **グラフ要求時**: 必ずChart.js JSON形式で出力
-
 ## 重要な注意
-- シンプルな質問は1つのエージェントで回答してください
-- doc_agentを過剰に使用しないでください
-- 数値データの質問は必ずsql_agentを使ってください
+- シンプルな質問は1つのエージェントで回答
+- 数値データの質問は必ずsql_agentを最初に使用
 - グラフ要求時はChart.js JSON形式（Vega-Lite禁止）
-- 日本語で回答してください
+- 日本語で回答
+- ユーザーの意図を汲み取り、最適な回答形式を選択
 """,
         chat_client=chat_client,
     )

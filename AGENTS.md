@@ -9,6 +9,21 @@
 このプロジェクトは以下の Solution Accelerator をベースにしています：
 https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator
 
+## 🚀 デプロイ方法（重要）
+
+**GitHub Actions で自動デプロイ**: `git push` するだけでAzure側に自動デプロイされます！
+
+```bash
+# 変更をコミット
+git add .
+git commit -m "fix: 修正内容"
+
+# プッシュ = 自動デプロイ（GitHub Actionsが実行される）
+git push
+```
+
+⚠️ **手動の `az webapp` コマンドは不要です！** pushすれば自動的にデプロイされます。
+
 ## 実装前チェック
 
 - [ ] 対象の `.instructions.md` を読んだ
@@ -18,7 +33,7 @@ https://github.com/microsoft/agentic-applications-for-unified-data-foundation-so
 
 ## 実装後チェック
 
-- [ ] `azd up` でデプロイ成功
+- [ ] `git push` でデプロイ開始（GitHub Actionsを確認）
 - [ ] API ヘルスチェック成功
 - [ ] Frontend 表示確認
 - [ ] DEMO_MODE=true で動作確認
