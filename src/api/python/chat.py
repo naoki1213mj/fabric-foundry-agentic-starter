@@ -10,9 +10,9 @@ Supports two modes:
 
 Architecture (MagenticBuilder - Magentic One Pattern):
 1. Manager Agent: タスク分解、進捗管理、最終回答合成
-2. SQL Specialist: Fabric SQLデータベースクエリ
-3. Web Specialist: ウェブ検索（最新情報）
-4. Doc Specialist: 企業ドキュメント検索
+2. SQL Specialist: Fabric SQLデータベースクエリ（売上、注文、顧客、製品分析）
+3. Web Specialist: ウェブ検索（最新情報、市場トレンド）
+4. Doc Specialist: 製品仕様書PDF検索（Azure AI Search）
 
 Complex Query Flow:
 User: "売上データを分析して、最新の市場トレンドと比較して"
@@ -745,8 +745,10 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
             elif isinstance(event, MagenticOrchestratorEvent):
                 # Magentic オーケストレーターイベント（計画、進捗など）
                 logger.info(f"Orchestrator event: {type(event).__name__}")
-                if hasattr(event, "plan"):
-                    logger.info(f"Plan created: {event.plan}")
+                # SDK version によって属性が異なる可能性があるため安全にアクセス
+                plan = getattr(event, "plan", None)
+                if plan:
+                    logger.info(f"Plan created: {plan}")
 
             elif isinstance(event, WorkflowOutputEvent):
                 # ワークフロー完了時の最終出力
@@ -835,18 +837,22 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             name="data_analyst",
             instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
 
-## 利用可能なテーブル
+## 利用可能なテーブル（実際のスキーマ）
 - orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
 - orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
-- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
-- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
-- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
+- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color, ProductCategoryID)
+- productcategory: カテゴリ (CategoryID, CategoryName, ParentCategoryId)
+- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId, CustomerRelationshipTypeId)
 - customerrelationshiptype: 顧客セグメント (CustomerRelationshipTypeId, CustomerRelationshipTypeName)
+- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
+- invoice: 請求書 (InvoiceId, CustomerId, OrderId, TotalAmount, InvoiceStatus)
+- payment: 支払い (PaymentId, InvoiceId, PaymentAmount, PaymentStatus, PaymentMethod)
 
 ## 主要なJOINパターン
 - 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
 - 顧客分析: orders JOIN customer ON CustomerId
 - 地域分析: customer JOIN location ON CustomerId
+- セグメント分析: customer JOIN customerrelationshiptype ON CustomerRelationshipTypeId
 
 ## タスク
 1. ユーザーの質問を分析
@@ -890,7 +896,7 @@ async def stream_chat_request(conversation_id: str, query: str):
     Handles streaming chat requests.
 
     Routes to:
-    - Multi-agent mode: Uses HandoffBuilder with specialist agents
+    - Multi-agent mode: Uses MagenticBuilder with Manager + Specialist agents
     - Single-agent mode: Direct ChatAgent with SQL tools
     """
 
