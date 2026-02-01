@@ -298,6 +298,38 @@ def create_specialist_agents(
 1. ユーザーの質問を分析し、適切なSQLクエリを作成
 2. run_sql_query ツールを使ってクエリを実行
 3. 結果を分かりやすく整形して報告
+4. グラフ表示が要求された場合は、Chart.js JSON形式で出力
+
+## グラフ出力（重要）
+ユーザーが「グラフ」「棒グラフ」「円グラフ」「折れ線」などを要求した場合、
+必ず以下のChart.js JSON形式で出力してください（Vega-Liteは使用禁止）:
+
+```json
+{
+  "type": "bar",
+  "data": {
+    "labels": ["ラベル1", "ラベル2", "ラベル3"],
+    "datasets": [{
+      "label": "データセット名",
+      "data": [100, 200, 300],
+      "backgroundColor": ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"]
+    }]
+  },
+  "options": {
+    "responsive": true,
+    "plugins": {
+      "title": { "display": true, "text": "グラフタイトル" }
+    }
+  }
+}
+```
+
+グラフの種類:
+- 棒グラフ: "type": "bar"
+- 横棒グラフ: "type": "horizontalBar"
+- 円グラフ: "type": "pie"
+- ドーナツ: "type": "doughnut"
+- 折れ線: "type": "line"
 
 ## よく使うクエリパターン
 - 売上高が一番高い商品:
@@ -313,7 +345,8 @@ def create_specialist_agents(
 ## 注意事項
 - T-SQL構文を使用してください
 - 大量のデータには TOP や集計関数を使用
-- 結果は表形式または要約形式で報告
+- グラフなしの場合は表形式または要約形式で報告
+- グラフ要求時は必ずChart.js JSON形式（Vega-Lite禁止）
 """,
         chat_client=chat_client,
         tools=[run_sql_query],
@@ -409,9 +442,11 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
 ### sql_agent を使う場合（最優先）
 - 「売上」「注文」「顧客」「製品」に関する数値分析
 - 「一番」「トップ」「合計」「平均」などの集計質問
+- 「グラフ」「棒グラフ」「円グラフ」などの可視化要求
 - 例：「売上高が一番高い商品は？」→ sql_agent
 - 例：「地域別の売上は？」→ sql_agent
 - 例：「今月の注文数は？」→ sql_agent
+- 例：「売上TOP5を棒グラフで」→ sql_agent
 
 ### web_agent を使う場合
 - 「最新」「ニュース」「トレンド」「市場動向」
@@ -421,16 +456,43 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
 - 「マニュアル」「仕様書」「ポリシー」「手順」
 - 社内ドキュメントの内容検索
 
+## グラフ出力形式（重要）
+グラフ表示が要求された場合、sql_agentからの結果をChart.js JSON形式で出力してください。
+Vega-Lite形式は使用禁止です。
+
+Chart.js JSON形式の例:
+```json
+{
+  "type": "bar",
+  "data": {
+    "labels": ["製品A", "製品B", "製品C"],
+    "datasets": [{
+      "label": "売上金額",
+      "data": [100000, 80000, 60000],
+      "backgroundColor": ["#4e79a7", "#f28e2c", "#e15759"]
+    }]
+  },
+  "options": {
+    "responsive": true,
+    "plugins": {
+      "title": { "display": true, "text": "売上TOP3" }
+    }
+  }
+}
+```
+
 ## タスク処理フロー
 1. **タスク分析**: ユーザーの質問を分析し、適切なエージェントを1つ選択
 2. **シンプルな計画**: 多くの場合、1つのエージェントで回答可能
 3. **実行**: 選択したエージェントに依頼
 4. **回答**: エージェントの結果をそのまま、または整形して回答
+5. **グラフ要求時**: 必ずChart.js JSON形式で出力
 
 ## 重要な注意
 - シンプルな質問は1つのエージェントで回答してください
 - doc_agentを過剰に使用しないでください
 - 数値データの質問は必ずsql_agentを使ってください
+- グラフ要求時はChart.js JSON形式（Vega-Lite禁止）
 - 日本語で回答してください
 """,
         chat_client=chat_client,
