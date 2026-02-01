@@ -382,8 +382,35 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
     try:
         credential = AzureCliCredential()
 
-        # Create chat client
-        chat_client = AzureOpenAIChatClient(credential=credential)
+        # Get Azure OpenAI configuration from environment variables
+        # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
+        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
+            "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+        )
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+        logger.info(
+            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}"
+        )
+
+        if not deployment_name:
+            raise ValueError(
+                "Azure OpenAI deployment name is required. "
+                "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+            )
+        if not endpoint:
+            raise ValueError(
+                "Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT"
+            )
+
+        # Create chat client with explicit configuration
+        chat_client = AzureOpenAIChatClient(
+            credential=credential,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_version=api_version,
+        )
 
         # Create specialist agents
         sql_agent, web_agent, doc_agent = create_specialist_agents(chat_client)
@@ -488,8 +515,35 @@ async def stream_single_agent_response(conversation_id: str, query: str):
     try:
         credential = AzureCliCredential()
 
-        # Create chat client
-        chat_client = AzureOpenAIChatClient(credential=credential)
+        # Get Azure OpenAI configuration from environment variables
+        # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
+        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
+            "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+        )
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+        logger.info(
+            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}"
+        )
+
+        if not deployment_name:
+            raise ValueError(
+                "Azure OpenAI deployment name is required. "
+                "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+            )
+        if not endpoint:
+            raise ValueError(
+                "Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT"
+            )
+
+        # Create chat client with explicit configuration
+        chat_client = AzureOpenAIChatClient(
+            credential=credential,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_version=api_version,
+        )
 
         # Create a single agent with SQL tool
         agent = chat_client.as_agent(
