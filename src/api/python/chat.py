@@ -217,6 +217,9 @@ async def search_documents(
 ) -> str:
     """Search enterprise documents, product specifications, and knowledge base.
 
+    IMPORTANT: For data analysis questions (sales, orders, customers, products),
+    use run_sql_query instead. This tool is for documentation lookup only.
+
     Use this tool for:
     - Product specifications and manuals
     - Technical documentation
@@ -227,7 +230,7 @@ async def search_documents(
         query: The search query string.
 
     Returns:
-        JSON string with document search results or error message.
+        JSON string with document search results (max 3 results, truncated).
     """
     try:
         logger.info(f"Document search requested: {query}")
@@ -242,6 +245,15 @@ async def search_documents(
                 ensure_ascii=False,
             )
         result = await kb_tool.search(query)
+
+        # Limit results to prevent token overflow
+        if isinstance(result, dict) and "results" in result:
+            result["results"] = result["results"][:3]  # Max 3 documents
+            # Truncate long content
+            for doc in result["results"]:
+                if "content" in doc and len(doc["content"]) > 1000:
+                    doc["content"] = doc["content"][:1000] + "...(truncated)"
+
         logger.info(f"Document search completed for query: {query}")
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:
@@ -271,8 +283,11 @@ def create_specialist_agents(
     # SQL specialist: Handles database queries
     sql_agent = ChatAgent(
         name="sql_agent",
-        description="Fabric SQLデータベースを使ってビジネスデータ（売上、注文、顧客、製品）を分析する専門家",
+        description="【優先】Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を直接分析・集計する専門家。数値データの質問にはこのエージェントを最優先で使用",
         instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
+
+## 重要：あなたは数値データ分析の最優先エージェントです
+売上、注文、顧客、製品に関する質問は、まずあなたがSQLクエリで回答してください。
 
 ## 利用可能なテーブル
 - SalesOrders: 売上注文データ (OrderID, CustomerID, ProductID, Quantity, TotalAmount, OrderDate)
@@ -283,6 +298,17 @@ def create_specialist_agents(
 1. ユーザーの質問を分析し、適切なSQLクエリを作成
 2. run_sql_query ツールを使ってクエリを実行
 3. 結果を分かりやすく整形して報告
+
+## よく使うクエリパターン
+- 売上高が一番高い商品: 
+  SELECT TOP 1 p.ProductName, SUM(s.TotalAmount) as TotalSales 
+  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID 
+  GROUP BY p.ProductID, p.ProductName ORDER BY TotalSales DESC
+
+- 地域別売上:
+  SELECT c.Region, SUM(s.TotalAmount) as TotalSales
+  FROM SalesOrders s JOIN Customers c ON s.CustomerID = c.CustomerID
+  GROUP BY c.Region ORDER BY TotalSales DESC
 
 ## 注意事項
 - T-SQL構文を使用してください
@@ -317,19 +343,33 @@ def create_specialist_agents(
     # Document specialist: Handles document searches
     doc_agent = ChatAgent(
         name="doc_agent",
-        description="企業ドキュメント、製品仕様書、技術マニュアル、社内ナレッジを検索する専門家",
+        description="企業ドキュメント、製品仕様書、技術マニュアル、社内ナレッジを検索する専門家。注意：売上・注文・製品データの分析にはsql_agentを使用してください",
         instructions="""あなたは企業ドキュメントから情報を検索する専門家です。
+
+## 重要：役割の明確化
+- 売上データ、注文データ、製品データの「分析」はsql_agentの担当です
+- あなたは「ドキュメント」「マニュアル」「仕様書」「ポリシー」の検索を担当します
 
 ## タスク
 1. リクエストに基づいて適切な検索クエリを作成
-2. search_documents ツールを使って情報を検索
+2. search_documents ツールを使って情報を検索（1回の呼び出しで十分）
 3. 結果を分かりやすくまとめて報告
 
-## 対応範囲
-- 製品仕様書とマニュアル
+## 対応範囲（これらの場合のみ検索）
+- 製品仕様書とマニュアルの内容
 - 技術ドキュメント
-- 社内ナレッジベース
+- 社内ナレッジベース記事
 - 会社ポリシーと手順書
+
+## 対応しない範囲（sql_agentに任せる）
+- 売上高の計算・集計
+- 注文データの分析
+- 顧客データの分析
+- 製品の売上ランキング
+
+## 注意
+- 検索は1回で十分です。同じ内容を複数回検索しないでください
+- 検索結果がない場合は「関連ドキュメントが見つかりませんでした」と報告
 """,
         chat_client=chat_client,
         tools=[search_documents],
@@ -360,28 +400,38 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
 チームを調整して複雑なタスクを効率的に完了させます。
 
 ## あなたのチーム
-- sql_agent: Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を分析
+- sql_agent:【最優先】Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を直接分析
 - web_agent: ウェブ検索で最新のニュース、市場トレンド、外部情報を取得
 - doc_agent: 企業ドキュメント、製品仕様、技術マニュアルを検索
 
+## 重要：エージェント選択ルール
+
+### sql_agent を使う場合（最優先）
+- 「売上」「注文」「顧客」「製品」に関する数値分析
+- 「一番」「トップ」「合計」「平均」などの集計質問
+- 例：「売上高が一番高い商品は？」→ sql_agent
+- 例：「地域別の売上は？」→ sql_agent
+- 例：「今月の注文数は？」→ sql_agent
+
+### web_agent を使う場合
+- 「最新」「ニュース」「トレンド」「市場動向」
+- 外部情報、競合情報
+
+### doc_agent を使う場合
+- 「マニュアル」「仕様書」「ポリシー」「手順」
+- 社内ドキュメントの内容検索
+
 ## タスク処理フロー
-1. **タスク分析**: ユーザーの質問を分析し、必要な情報源を特定
-2. **計画作成**: どのスペシャリストがどのサブタスクを担当するか決定
-3. **実行監視**: スペシャリストの進捗を監視
-4. **結果統合**: 全スペシャリストの結果を統合して最終回答を生成
+1. **タスク分析**: ユーザーの質問を分析し、適切なエージェントを1つ選択
+2. **シンプルな計画**: 多くの場合、1つのエージェントで回答可能
+3. **実行**: 選択したエージェントに依頼
+4. **回答**: エージェントの結果をそのまま、または整形して回答
 
-## 複合クエリの例
-「売上データを分析して、最新の市場トレンドと比較して」
-→ Plan:
-  1. sql_agent: 売上データの分析（傾向、トップ製品、地域別など）
-  2. web_agent: 最新の市場トレンドと業界動向を検索
-  3. マネージャー: 両方の結果を統合して比較分析を作成
-
-## 回答形式
-- 各スペシャリストからの情報を明確に整理
-- データは表形式で見やすく表示
-- 最終的な洞察と推奨事項を含める
-- 日本語で回答
+## 重要な注意
+- シンプルな質問は1つのエージェントで回答してください
+- doc_agentを過剰に使用しないでください
+- 数値データの質問は必ずsql_agentを使ってください
+- 日本語で回答してください
 """,
         chat_client=chat_client,
     )
