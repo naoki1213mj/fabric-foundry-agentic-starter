@@ -1,0 +1,330 @@
+2026-01-16T00:01:05.2541517Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-01-16T00:01:05.2553972Z Request method: 'POST'
+2026-01-16T00:01:05.2554151Z Request headers:
+2026-01-16T00:01:05.2554225Z     'Content-Type': 'application/json'
+2026-01-16T00:01:05.2554319Z     'Content-Length': '1360'
+2026-01-16T00:01:05.2554398Z     'Accept': 'application/json'
+2026-01-16T00:01:05.2554490Z     'x-ms-client-request-id': '73dae898-f26e-11f0-ac2b-8a2addf96257'
+2026-01-16T00:01:05.2554554Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-01-16T00:01:05.2554602Z A body is sent with the request
+2026-01-16T00:01:05.9070435Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-01-16T00:01:05.9071106Z Response headers:
+2026-01-16T00:01:05.9071187Z     'Transfer-Encoding': 'chunked'
+2026-01-16T00:01:05.9071298Z     'Content-Type': 'application/json; charset=utf-8'
+2026-01-16T00:01:05.9071344Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-01-16T00:01:05.9071384Z     'Strict-Transport-Security': 'REDACTED'
+2026-01-16T00:01:05.9071424Z     'X-Content-Type-Options': 'REDACTED'
+2026-01-16T00:01:05.9071469Z     'Date': 'Fri, 16 Jan 2026 00:01:04 GMT'
+2026-01-16T00:01:06.7559533Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:01:06.9366630Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:01:06.9389682Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:01:07.0567639Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:01:07.0615410Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.0666985Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.0685879Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.0720278Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.0747640Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:01:07.1467968Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:01:07.1484365Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:01:07.1511112Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:01:07.1547606Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.1596809Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.1606496Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.1636093Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:01:07.1651651Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:01:07.1763871Z INFO:     Started server process [1]
+2026-01-16T00:01:07.1770966Z INFO:     Waiting for application startup.
+2026-01-16T00:01:07.1774289Z INFO:     Application startup complete.
+2026-01-16T00:01:07.1781377Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-16T00:01:07.2253769Z INFO:     169.254.130.1:23609 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-16T00:01:07.4201634Z INFO:     169.254.130.1:23619 - "GET / HTTP/1.1" 200 OK
+2026-01-16T00:01:07.4461058Z INFO:     169.254.130.1:23619 - "GET / HTTP/1.1" 200 OK
+2026-01-16T00:04:54.2136331Z INFO:     169.254.130.1:63781 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:04:54.4896038Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:04:54.4900196Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:04:54.4901923Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:04:59.2211931Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:04:59.2424254Z INFO:     169.254.130.1:63781 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:10:41.5401162Z INFO:     169.254.130.1:32967 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:10:41.8102663Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:10:41.8107634Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:10:41.8107768Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:10:43.7166059Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:10:43.7224522Z INFO:     169.254.130.1:32967 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:17:23.3421037Z INFO:     169.254.130.1:63735 - "GET /health HTTP/1.1" 200 OK
+2026-01-16T00:21:20.8324048Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-01-16T00:21:20.8325927Z Request method: 'POST'
+2026-01-16T00:21:20.8326024Z Request headers:
+2026-01-16T00:21:20.8326065Z     'Content-Type': 'application/json'
+2026-01-16T00:21:20.8326103Z     'Content-Length': '1360'
+2026-01-16T00:21:20.8326169Z     'Accept': 'application/json'
+2026-01-16T00:21:20.8326231Z     'x-ms-client-request-id': '48657112-f271-11f0-92d7-52d203ba1a3d'
+2026-01-16T00:21:20.8326332Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-01-16T00:21:20.8326375Z A body is sent with the request
+2026-01-16T00:21:21.4741957Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-01-16T00:21:21.4742786Z Response headers:
+2026-01-16T00:21:21.4742922Z     'Transfer-Encoding': 'chunked'
+2026-01-16T00:21:21.4742966Z     'Content-Type': 'application/json; charset=utf-8'
+2026-01-16T00:21:21.4743001Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-01-16T00:21:21.4743037Z     'Strict-Transport-Security': 'REDACTED'
+2026-01-16T00:21:21.4743068Z     'X-Content-Type-Options': 'REDACTED'
+2026-01-16T00:21:21.4743102Z     'Date': 'Fri, 16 Jan 2026 00:21:20 GMT'
+2026-01-16T00:21:22.2894935Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:21:22.4798566Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:21:22.4828430Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:21:22.5991687Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:21:22.6041309Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.6107373Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.6107705Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.6187180Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.6205481Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:21:22.6716455Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:21:22.6732335Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:21:22.6751139Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:21:22.6887214Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.6957742Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.7007839Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.7008171Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:21:22.7011668Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:21:22.7149172Z INFO:     Started server process [1]
+2026-01-16T00:21:22.7155724Z INFO:     Waiting for application startup.
+2026-01-16T00:21:22.7162884Z INFO:     Application startup complete.
+2026-01-16T00:21:22.7191033Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-16T00:21:23.6864360Z INFO:     169.254.130.1:20941 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-16T00:21:35.3878539Z INFO:     169.254.130.1:32343 - "GET /health HTTP/1.1" 200 OK
+2026-01-16T00:21:44.0803395Z INFO:     Shutting down
+2026-01-16T00:21:44.1808100Z INFO:     Waiting for application shutdown.
+2026-01-16T00:21:44.1814727Z INFO:     Application shutdown complete.
+2026-01-16T00:21:44.1825161Z INFO:     Finished server process [1]
+2026-01-16T00:25:25.8628125Z INFO:     169.254.130.1:28361 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:25:26.1803624Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:25:26.1815755Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:25:26.1816015Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:25:30.4346970Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:25:30.4453812Z INFO:     169.254.130.1:28361 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:25:54.5594399Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:25:54.5599636Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:25:54.5599764Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:25:55.8550960Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:25:55.8574153Z INFO:     169.254.130.1:44221 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:26:00.7289436Z INFO:     169.254.130.1:44221 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:26:01.1301428Z INFO:     169.254.130.1:44221 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:26:01.1500347Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:26:03.0574997Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:03.0575245Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:03.0575271Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:03.0575294Z INFO:chat:Multi-agent mode: Using Orchestrator Agent 'OrchestratorAgent-daj6dri4yf3k3z'
+2026-01-16T00:26:03.0575318Z INFO:chat:  Available agents: SQL='SqlAgent-daj6dri4yf3k3z', Web='WebAgent-daj6dri4yf3k3z'
+2026-01-16T00:26:05.0531704Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/conversations?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:26:08.5437544Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:26:14.9965404Z INFO:     169.254.130.1:44221 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:26:15.3291170Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:15.3291440Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:16.5600547Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:16.5679425Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:26:21.8837298Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:26:22.0316555Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:22.0318539Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.3189886Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.3220200Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.3222731Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.3224486Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4232932Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4237653Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4237796Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4280949Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4281118Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4281156Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4474732Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4475296Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4475344Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4563822Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4576442Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4579069Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4611171Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4612653Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4614726Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4727392Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4730612Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4733743Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4808210Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:26:23.4810942Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:26:23.4814064Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:26:23.4850973Z INFO:     169.254.130.1:44221 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:28:00.4603353Z INFO:     169.254.130.1:15979 - "GET /health HTTP/1.1" 200 OK
+2026-01-16T00:28:12.2943411Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:28:12.2943779Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:28:12.2943825Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:28:15.0619215Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:28:15.1291445Z INFO:     169.254.130.1:38817 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:28:23.2145925Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-01-16T00:28:23.2159165Z Request method: 'POST'
+2026-01-16T00:28:23.2159326Z Request headers:
+2026-01-16T00:28:23.2159368Z     'Content-Type': 'application/json'
+2026-01-16T00:28:23.2159428Z     'Content-Length': '1360'
+2026-01-16T00:28:23.2159464Z     'Accept': 'application/json'
+2026-01-16T00:28:23.2159513Z     'x-ms-client-request-id': '4427c90a-f272-11f0-91b9-9e155a70cf54'
+2026-01-16T00:28:23.2159554Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-01-16T00:28:23.2159593Z A body is sent with the request
+2026-01-16T00:28:23.8063864Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-01-16T00:28:23.8064588Z Response headers:
+2026-01-16T00:28:23.8064656Z     'Transfer-Encoding': 'chunked'
+2026-01-16T00:28:23.8064706Z     'Content-Type': 'application/json; charset=utf-8'
+2026-01-16T00:28:23.8064747Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-01-16T00:28:23.8064790Z     'Strict-Transport-Security': 'REDACTED'
+2026-01-16T00:28:23.8064829Z     'X-Content-Type-Options': 'REDACTED'
+2026-01-16T00:28:23.8064885Z     'Date': 'Fri, 16 Jan 2026 00:28:23 GMT'
+2026-01-16T00:28:24.5506872Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:28:24.7045738Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:28:24.7063232Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:28:24.8113888Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:28:24.8160269Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8205008Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8213112Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8235174Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8246642Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:28:24.8596758Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-01-16T00:28:24.8612334Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-01-16T00:28:24.8627468Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-01-16T00:28:24.8672241Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8715748Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8723841Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8745092Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-01-16T00:28:24.8756737Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-01-16T00:28:24.8849563Z INFO:     Started server process [1]
+2026-01-16T00:28:24.8851843Z INFO:     Waiting for application startup.
+2026-01-16T00:28:24.8854496Z INFO:     Application startup complete.
+2026-01-16T00:28:24.8861778Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-01-16T00:28:25.1132257Z INFO:     169.254.130.1:12699 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-01-16T00:28:45.2785664Z INFO:     Shutting down
+2026-01-16T00:28:45.3836613Z INFO:     Waiting for application shutdown.
+2026-01-16T00:28:45.3840187Z INFO:     Application shutdown complete.
+2026-01-16T00:28:45.3840279Z INFO:     Finished server process [1]
+2026-01-16T00:28:46.3486534Z ERROR:asyncio:Unclosed client session
+2026-01-16T00:28:46.3486900Z client_session: <aiohttp.client.ClientSession object at 0x748c6cc8ec50>
+2026-01-16T00:29:12.5128226Z INFO:     169.254.130.1:60361 - "GET /health HTTP/1.1" 200 OK
+2026-01-16T00:29:25.4718489Z INFO:     169.254.130.1:63095 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:29:25.7916745Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:29:25.7920724Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:25.7923369Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:29.6141575Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:29.6169406Z INFO:     169.254.130.1:63095 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T00:29:33.4359376Z INFO:     169.254.130.1:63095 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:29:33.7911416Z INFO:     169.254.130.1:63095 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:29:33.7995593Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:29:33.8006815Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:33.8010172Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:35.0635795Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:35.0642090Z INFO:chat:Multi-agent mode: Using Orchestrator Agent 'OrchestratorAgent-daj6dri4yf3k3z'
+2026-01-16T00:29:35.0662229Z INFO:chat:  Available agents: SQL='SqlAgent-daj6dri4yf3k3z', Web='WebAgent-daj6dri4yf3k3z'
+2026-01-16T00:29:36.1123946Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/conversations?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:29:38.9708100Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:29:45.3647860Z INFO:     169.254.130.1:63095 - "OPTIONS /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:29:45.6457744Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:45.6458348Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:45.6458402Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:45.6504215Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:29:50.4974868Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:29:50.6341049Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:50.6349922Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.8941205Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.8988167Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.8988459Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.8992649Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9126671Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9132348Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9132545Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9155001Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9157499Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9158414Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9257907Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9268400Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9268606Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9343301Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9347825Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9352926Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9382185Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9384721Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9388426Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9487805Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9490203Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9493757Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9573267Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:51.9575715Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:51.9578773Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:51.9603943Z INFO:     169.254.130.1:63095 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:29:56.0005346Z INFO:     169.254.130.1:63095 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:29:56.0008336Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:29:56.0015041Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:29:56.0020512Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:29:58.1345133Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:29:58.1349324Z INFO:chat:Multi-agent mode: Using Orchestrator Agent 'OrchestratorAgent-daj6dri4yf3k3z'
+2026-01-16T00:29:58.1352180Z INFO:chat:  Available agents: SQL='SqlAgent-daj6dri4yf3k3z', Web='WebAgent-daj6dri4yf3k3z'
+2026-01-16T00:30:00.9190053Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:30:04.5512554Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.5516413Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.5516542Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.5561937Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.5566110Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.5573216Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.5647624Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.5648584Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.5648642Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.5835041Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.5841788Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.5841988Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.5965826Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.5969082Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.5975529Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.5998660Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.6000749Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.6002454Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.6136511Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.6140313Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.6144186Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.6266730Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:30:04.6268751Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:30:04.6272578Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:30:04.6311503Z INFO:     169.254.130.1:63095 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:31:03.1478583Z INFO:     169.254.130.1:50649 - "POST /api/chat HTTP/1.1" 200 OK
+2026-01-16T00:31:03.1481790Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-01-16T00:31:03.1489635Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:03.1489895Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:05.3917468Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:05.3922432Z INFO:chat:Multi-agent mode: Using Orchestrator Agent 'OrchestratorAgent-daj6dri4yf3k3z'
+2026-01-16T00:31:05.3922712Z INFO:chat:  Available agents: SQL='SqlAgent-daj6dri4yf3k3z', Web='WebAgent-daj6dri4yf3k3z'
+2026-01-16T00:31:08.0615409Z INFO:httpx:HTTP Request: POST https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z/openai/responses?api-version=2025-11-15-preview "HTTP/1.1 200 OK"
+2026-01-16T00:31:11.8344277Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8346996Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8350919Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8380285Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8382470Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8386099Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8487369Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8490224Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8497475Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8634839Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8637156Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8642714Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8737665Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8740756Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8744389Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8778763Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8784541Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8784660Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8881727Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8891660Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8891772Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.8961483Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:31:11.8961795Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:31:11.8961841Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:31:11.9000546Z INFO:     169.254.130.1:50649 - "POST /historyfab/update HTTP/1.1" 200 OK
+2026-01-16T00:35:56.5093638Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-01-16T00:35:56.5094939Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-01-16T00:35:56.5100381Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-01-16T00:35:59.1792928Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-01-16T00:35:59.1840886Z INFO:     169.254.130.1:43267 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-01-16T01:56:48.2642322Z INFO:     Shutting down
+2026-01-16T01:56:48.3721688Z INFO:     Waiting for application shutdown.
+2026-01-16T01:56:48.3933923Z INFO:     Application shutdown complete.
+2026-01-16T01:56:48.4029097Z INFO:     Finished server process [1]

@@ -332,10 +332,18 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
                 # 2. Call appropriate tool(s)
                 # 3. Synthesize results
                 messages = [ChatMessage(role=Role.USER, content=query)]
+                logger.info(f"Starting coordinator run_stream with query: {query[:100]}...")
 
+                update_count = 0
                 async for update in coordinator.run_stream(messages, thread=thread):
+                    update_count += 1
+                    # Log all update attributes for debugging
+                    logger.info(f"Update #{update_count}: type={type(update).__name__}, text={bool(update.text)}, attrs={[a for a in dir(update) if not a.startswith('_')]}")
                     if update.text:
+                        logger.info(f"Yielding text (len={len(update.text)}): {update.text[:200]}...")
                         yield update.text
+                
+                logger.info(f"Coordinator stream completed. Total updates: {update_count}")
 
     except ServiceResponseException as e:
         logger.error("Service error in multi-agent: %s", e)

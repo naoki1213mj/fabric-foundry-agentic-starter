@@ -1,0 +1,143 @@
+2026-02-01T12:35:29.3131167Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-02-01T12:35:29.3149606Z Request method: 'POST'
+2026-02-01T12:35:29.3150219Z Request headers:
+2026-02-01T12:35:29.3150322Z     'Content-Type': 'application/json'
+2026-02-01T12:35:29.3150402Z     'Content-Length': '1360'
+2026-02-01T12:35:29.3150495Z     'Accept': 'application/json'
+2026-02-01T12:35:29.3150600Z     'x-ms-client-request-id': '7df207a4-ff6a-11f0-b1bb-e2c2f2b82ddf'
+2026-02-01T12:35:29.3150679Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-02-01T12:35:29.3150739Z A body is sent with the request
+2026-02-01T12:35:30.0569709Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-02-01T12:35:30.0570406Z Response headers:
+2026-02-01T12:35:30.0570497Z     'Transfer-Encoding': 'chunked'
+2026-02-01T12:35:30.0570639Z     'Content-Type': 'application/json; charset=utf-8'
+2026-02-01T12:35:30.0570701Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-02-01T12:35:30.0570761Z     'Strict-Transport-Security': 'REDACTED'
+2026-02-01T12:35:30.0570818Z     'X-Content-Type-Options': 'REDACTED'
+2026-02-01T12:35:30.0570873Z     'Date': 'Sun, 01 Feb 2026 12:35:29 GMT'
+2026-02-01T12:35:30.6854003Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:35:30.8116513Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T12:35:30.8136899Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T12:35:30.9068351Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T12:35:30.9105742Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9115414Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9157616Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9234143Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9258050Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:35:30.9712024Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T12:35:30.9738669Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T12:35:30.9781413Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T12:35:30.9811097Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9820657Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9881768Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9939657Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:35:30.9959314Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:35:31.0122264Z INFO:     Started server process [1]
+2026-02-01T12:35:31.0122799Z INFO:     Waiting for application startup.
+2026-02-01T12:35:31.0127306Z INFO:     Application startup complete.
+2026-02-01T12:35:31.0133567Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-02-01T12:35:31.9069285Z INFO:     169.254.129.1:15001 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-02-01T12:35:32.5257836Z INFO:     169.254.129.1:15013 - "GET / HTTP/1.1" 200 OK
+2026-02-01T12:35:32.5258198Z INFO:     169.254.129.1:15021 - "GET /health HTTP/1.1" 200 OK
+2026-02-01T12:35:32.6010857Z INFO:     169.254.129.1:15013 - "GET / HTTP/1.1" 200 OK
+2026-02-01T12:59:55.4449800Z INFO:azure.core.pipeline.policies.http_logging_policy:Request URL: 'https://westus-0.in.applicationinsights.azure.com//v2.1/track'
+2026-02-01T12:59:55.4480250Z Request method: 'POST'
+2026-02-01T12:59:55.4481000Z Request headers:
+2026-02-01T12:59:55.4481054Z     'Content-Type': 'application/json'
+2026-02-01T12:59:55.4481099Z     'Content-Length': '1358'
+2026-02-01T12:59:55.4481149Z     'Accept': 'application/json'
+2026-02-01T12:59:55.4481222Z     'x-ms-client-request-id': 'e7d3d870-ff6d-11f0-a0b8-7e3a73ff0597'
+2026-02-01T12:59:55.4481265Z     'User-Agent': 'azsdk-python-azuremonitorclient/unknown Python/3.11.14 (Linux-6.6.104.2-4.azl3-x86_64-with)'
+2026-02-01T12:59:55.4481303Z A body is sent with the request
+2026-02-01T12:59:56.1530238Z INFO:azure.core.pipeline.policies.http_logging_policy:Response status: 200
+2026-02-01T12:59:56.1530788Z Response headers:
+2026-02-01T12:59:56.1530852Z     'Transfer-Encoding': 'chunked'
+2026-02-01T12:59:56.1531137Z     'Content-Type': 'application/json; charset=utf-8'
+2026-02-01T12:59:56.1531200Z     'Server': 'Microsoft-HTTPAPI/2.0'
+2026-02-01T12:59:56.1531404Z     'Strict-Transport-Security': 'REDACTED'
+2026-02-01T12:59:56.1531450Z     'X-Content-Type-Options': 'REDACTED'
+2026-02-01T12:59:56.1531490Z     'Date': 'Sun, 01 Feb 2026 12:59:55 GMT'
+2026-02-01T12:59:57.2013707Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:59:57.5762560Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T12:59:57.5789077Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T12:59:57.5812626Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T12:59:57.5883527Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.5885847Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.5919423Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.6031566Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.6037291Z INFO:root:Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:59:57.6767208Z WARNING:opentelemetry.trace:Overriding of current TracerProvider is not allowed
+2026-02-01T12:59:57.6793048Z WARNING:opentelemetry._logs._internal:Overriding of current LoggerProvider is not allowed
+2026-02-01T12:59:57.6829482Z WARNING:opentelemetry.metrics._internal:Overriding of current MeterProvider is not allowed
+2026-02-01T12:59:57.6873124Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.6887080Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.7016589Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.7145838Z WARNING:opentelemetry.instrumentation.instrumentor:Attempting to instrument while already instrumented
+2026-02-01T12:59:57.7176408Z INFO:root:Historyfab API: Application Insights configured with the provided Instrumentation Key
+2026-02-01T12:59:57.7444591Z INFO:     Started server process [1]
+2026-02-01T12:59:57.7450256Z INFO:     Waiting for application startup.
+2026-02-01T12:59:57.7547440Z INFO:     Application startup complete.
+2026-02-01T12:59:57.7658448Z INFO:     Uvicorn running on http://0.0.0.0:80 (Press CTRL+C to quit)
+2026-02-01T12:59:58.7375970Z INFO:     169.254.129.1:52079 - "GET /robots933456.txt HTTP/1.1" 404 Not Found
+2026-02-01T13:00:19.1839151Z INFO:     Shutting down
+2026-02-01T13:00:19.2815673Z INFO:     Waiting for application shutdown.
+2026-02-01T13:00:19.2889812Z INFO:     Application shutdown complete.
+2026-02-01T13:00:19.2897946Z INFO:     Finished server process [1]
+2026-02-01T13:00:49.4610572Z INFO:     169.254.129.1:39795 - "GET /health HTTP/1.1" 200 OK
+2026-02-01T13:09:01.2073704Z INFO:     169.254.129.1:14605 - "OPTIONS /historyfab/list?offset=0&limit=25 HTTP/1.1" 200 OK
+2026-02-01T13:09:01.5107737Z INFO:history_sql:Historyfab list-API: user_id: None, offset: 0, limit: 25
+2026-02-01T13:09:01.5110507Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T13:09:01.5118320Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T13:09:16.8078812Z ERROR:root:FABRIC-SQL: Driver 18 connection failed with error: ('HYT00', '[HYT00] [Microsoft][ODBC Driver 18 for SQL Server]Login timeout expired (0) (SQLDriverConnect)')
+2026-02-01T13:09:16.8079215Z INFO:root:FABRIC-SQL: Attempting fallback connection with Driver 17...
+2026-02-01T13:09:16.8986559Z INFO:root:FABRIC-SQL:Failed to connect Fabric SQL Database: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-02-01T13:09:16.9054097Z ERROR:root:Error executing SQL query: 'NoneType' object has no attribute 'cursor'
+2026-02-01T13:09:16.9556310Z ERROR:history_sql:Error in get_conversation
+2026-02-01T13:09:16.9557102Z Traceback (most recent call last):
+2026-02-01T13:09:16.9557145Z   File "/app/history_sql.py", line 342, in get_conversations
+2026-02-01T13:09:16.9557175Z     result = await run_query_params(query, params)
+2026-02-01T13:09:16.9557203Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-01T13:09:16.9557272Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-02-01T13:09:16.9557305Z     conn.close()
+2026-02-01T13:09:16.9557337Z     ^^^^^^^^^^
+2026-02-01T13:09:16.9557368Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-02-01T13:09:16.9575962Z ERROR:history_sql:Exception in /historyfab/list: 'NoneType' object has no attribute 'close'
+2026-02-01T13:09:16.9576133Z Traceback (most recent call last):
+2026-02-01T13:09:16.9576170Z   File "/app/history_sql.py", line 952, in list_conversations
+2026-02-01T13:09:16.9576201Z     conversations = await get_conversations(user_id, offset=offset, limit=limit)
+2026-02-01T13:09:16.9576231Z                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-01T13:09:16.9576260Z   File "/app/history_sql.py", line 342, in get_conversations
+2026-02-01T13:09:16.9576311Z     result = await run_query_params(query, params)
+2026-02-01T13:09:16.9576342Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-02-01T13:09:16.9576374Z   File "/app/history_sql.py", line 235, in run_query_params
+2026-02-01T13:09:16.9576404Z     conn.close()
+2026-02-01T13:09:16.9576435Z     ^^^^^^^^^^
+2026-02-01T13:09:16.9576479Z AttributeError: 'NoneType' object has no attribute 'close'
+2026-02-01T13:09:16.9595269Z INFO:     169.254.129.1:14605 - "GET /historyfab/list?offset=0&limit=25 HTTP/1.1" 500 Internal Server Error
+2026-02-01T13:09:16.9639059Z INFO:     169.254.129.1:19941 - "OPTIONS /api/chat HTTP/1.1" 200 OK
+2026-02-01T13:09:17.4033344Z INFO:chat:Using multi-agent mode with agent-as-tool pattern
+2026-02-01T13:09:17.4036022Z INFO:     169.254.129.1:19941 - "POST /api/chat HTTP/1.1" 200 OK
+2026-02-01T13:09:17.4306549Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-02-01T13:09:17.4348378Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T13:09:17.4386069Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T13:09:22.6467164Z ERROR:root:FABRIC-SQL: Driver 18 connection failed with error: ('HY000', "[HY000] [Microsoft][ODBC Driver 18 for SQL Server][SQL Server]Database 'retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44' on server 'l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com' is not currently available.  Please retry the connection later.  If the problem persists, contact customer support, and provide them the session tracing ID of '{5735B278-6276-4698-A5E9-3B23CA13D4DB}'. (40613) (SQLDriverConnect)")
+2026-02-01T13:09:22.6468550Z INFO:root:FABRIC-SQL: Attempting fallback connection with Driver 17...
+2026-02-01T13:09:22.6479422Z INFO:root:FABRIC-SQL:Failed to connect Fabric SQL Database: ('01000', "[01000] [unixODBC][Driver Manager]Can't open lib 'ODBC Driver 17 for SQL Server' : file not found (0) (SQLDriverConnect)")
+2026-02-01T13:09:22.6617316Z ERROR:chat:Error in multi-agent response: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
+2026-02-01T13:09:22.6620845Z ERROR:chat:Unexpected error: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
+2026-02-01T13:09:35.2025393Z INFO:     169.254.129.1:19245 - "POST /api/chat HTTP/1.1" 200 OK
+2026-02-01T13:09:35.2026265Z INFO:chat:Using multi-agent mode with agent-as-tool pattern
+2026-02-01T13:09:35.2032340Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-02-01T13:09:35.2039709Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T13:09:35.2042748Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T13:09:41.2941786Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-02-01T13:09:41.2942150Z ERROR:chat:Error in multi-agent response: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
+2026-02-01T13:09:41.2954961Z ERROR:chat:Unexpected error: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
+2026-02-01T13:09:49.0884645Z INFO:chat:Using multi-agent mode with agent-as-tool pattern
+2026-02-01T13:09:49.0885393Z INFO:     169.254.129.1:63681 - "POST /api/chat HTTP/1.1" 200 OK
+2026-02-01T13:09:49.0892880Z INFO:azure.identity.aio._credentials.managed_identity:ManagedIdentityCredential will use App Service managed identity
+2026-02-01T13:09:49.0897835Z INFO:root:FABRIC-SQL: Attempting connection with Driver 18...
+2026-02-01T13:09:49.0900288Z INFO:root:FABRIC-SQL: Connection string (masked): SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com;DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+2026-02-01T13:09:49.3008887Z INFO:root:FABRIC-SQL: Connection successful with Driver 18
+2026-02-01T13:09:49.3050165Z ERROR:chat:Error in multi-agent response: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
+2026-02-01T13:09:49.3050861Z ERROR:chat:Unexpected error: BaseAgent.as_tool() got an unexpected keyword argument 'argument_description'
