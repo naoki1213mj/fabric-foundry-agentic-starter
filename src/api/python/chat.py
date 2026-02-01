@@ -300,9 +300,9 @@ def create_specialist_agents(
 3. 結果を分かりやすく整形して報告
 
 ## よく使うクエリパターン
-- 売上高が一番高い商品: 
-  SELECT TOP 1 p.ProductName, SUM(s.TotalAmount) as TotalSales 
-  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID 
+- 売上高が一番高い商品:
+  SELECT TOP 1 p.ProductName, SUM(s.TotalAmount) as TotalSales
+  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID
   GROUP BY p.ProductID, p.ProductName ORDER BY TotalSales DESC
 
 - 地域別売上:
