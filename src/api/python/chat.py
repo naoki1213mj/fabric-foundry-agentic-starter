@@ -40,6 +40,9 @@ from agent_framework import (
 )
 from agent_framework.azure import AzureOpenAIChatClient
 
+# Import existing tool handlers
+from agents.web_agent import WebAgentHandler
+
 # Azure SDK - Use sync credential for SDK compatibility
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
@@ -47,6 +50,7 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from knowledge_base_tool import KnowledgeBaseTool
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
 
@@ -60,6 +64,27 @@ router = APIRouter()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize tool handlers (singletons)
+_web_agent_handler: WebAgentHandler | None = None
+_knowledge_base_tool: KnowledgeBaseTool | None = None
+
+
+def get_web_agent_handler() -> WebAgentHandler:
+    """Get or create WebAgentHandler singleton."""
+    global _web_agent_handler
+    if _web_agent_handler is None:
+        _web_agent_handler = WebAgentHandler()
+    return _web_agent_handler
+
+
+def get_knowledge_base_tool() -> KnowledgeBaseTool | None:
+    """Get or create KnowledgeBaseTool singleton."""
+    global _knowledge_base_tool
+    if _knowledge_base_tool is None:
+        _knowledge_base_tool = KnowledgeBaseTool.create_from_env()
+    return _knowledge_base_tool
+
 
 # Check if the Application Insights Instrumentation Key is set in the environment variables
 instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
@@ -178,16 +203,11 @@ async def search_web(
         JSON string with search results or error message.
     """
     try:
-        # TODO: Implement actual web search via Bing Search API or Azure AI Search
         logger.info(f"Web search requested: {query}")
-        return json.dumps(
-            {
-                "message": "Web search functionality is being configured.",
-                "query": query,
-                "results": [],
-            },
-            ensure_ascii=False,
-        )
+        web_agent = get_web_agent_handler()
+        result = await web_agent.bing_grounding(query)
+        logger.info(f"Web search completed for query: {query}")
+        return result  # Already JSON string
     except Exception as e:
         logger.error(f"Error in web search: {e}")
         return json.dumps({"error": str(e)}, ensure_ascii=False)
@@ -212,16 +232,20 @@ async def search_documents(
         JSON string with document search results or error message.
     """
     try:
-        # TODO: Implement actual document search via Azure AI Search
         logger.info(f"Document search requested: {query}")
-        return json.dumps(
-            {
-                "message": "Document search functionality is being configured.",
-                "query": query,
-                "results": [],
-            },
-            ensure_ascii=False,
-        )
+        kb_tool = get_knowledge_base_tool()
+        if kb_tool is None:
+            return json.dumps(
+                {
+                    "message": "Document search is not configured. AI_SEARCH_* environment variables are missing.",
+                    "query": query,
+                    "results": [],
+                },
+                ensure_ascii=False,
+            )
+        result = await kb_tool.search(query)
+        logger.info(f"Document search completed for query: {query}")
+        return json.dumps(result, ensure_ascii=False)
     except Exception as e:
         logger.error(f"Error in document search: {e}")
         return json.dumps({"error": str(e)}, ensure_ascii=False)
@@ -478,7 +502,11 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
 
             elif isinstance(event, WorkflowStatusEvent):
                 # SDK 1.0.0b260130: WorkflowRunState enum values may differ
-                state_name = str(event.state.name) if hasattr(event.state, "name") else str(event.state)
+                state_name = (
+                    str(event.state.name)
+                    if hasattr(event.state, "name")
+                    else str(event.state)
+                )
                 logger.info(f"Workflow status: {state_name}")
 
             elif isinstance(event, GroupChatRequestSentEvent):
