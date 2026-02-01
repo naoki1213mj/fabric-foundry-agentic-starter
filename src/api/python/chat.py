@@ -3,31 +3,48 @@ Chat API module for handling chat interactions and responses.
 
 Supports two modes:
 - Single Agent Mode (default): Uses a single ChatAgent for all queries
-- Multi Agent Mode (MULTI_AGENT_MODE=true): Uses Agent Framework's native multi-agent capabilities
-  - Coordinator with agent-as-tool pattern
-  - Automatic tool selection and parallel execution
-  - Built-in result synthesis
+- Multi Agent Mode (MULTI_AGENT_MODE=true): Uses MagenticBuilder for multi-agent orchestration
+  - Manager Agent decomposes complex queries into subtasks
+  - Specialist Agents execute subtasks in parallel when possible
+  - Manager synthesizes final answer from all specialist responses
+
+Architecture (MagenticBuilder - Magentic One Pattern):
+1. Manager Agent: タスク分解、進捗管理、最終回答合成
+2. SQL Specialist: Fabric SQLデータベースクエリ
+3. Web Specialist: ウェブ検索（最新情報）
+4. Doc Specialist: 企業ドキュメント検索
+
+Complex Query Flow:
+User: "売上データを分析して、最新の市場トレンドと比較して"
+→ Manager: Plan = [1. sql_agent: 売上分析, 2. web_agent: 市場トレンド取得]
+→ Specialists: 並列実行
+→ Manager: 結果を統合して最終回答生成
 """
 
-import asyncio
 import json
 import logging
 import os
 import re
+from typing import Annotated
 
-from agent_framework import ChatAgent, ChatMessage, Role
-from agent_framework.azure import AzureAIClient
-from agent_framework.exceptions import ServiceResponseException
-
-# Azure Auth
-from auth.azure_credential_utils import get_azure_credential_async
+from agent_framework import (
+    AgentRunUpdateEvent,
+    ChatAgent,
+    GroupChatRequestSentEvent,
+    MagenticBuilder,
+    MagenticOrchestratorEvent,
+    RequestInfoEvent,
+    WorkflowOutputEvent,
+    WorkflowRunState,
+    WorkflowStatusEvent,
+    tool,
+)
+from agent_framework.azure import AzureOpenAIChatClient
 
 # Azure SDK
-from azure.ai.agents.models import TruncationObject
-from azure.ai.projects.aio import AIProjectClient
+from azure.identity.aio import AzureCliCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
-from cachetools import TTLCache
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -36,20 +53,8 @@ from opentelemetry.trace import Status, StatusCode
 
 load_dotenv()
 
-# Constants
-HOST_NAME = "Agentic Applications for Unified Data Foundation"
-HOST_INSTRUCTIONS = "Answer questions about Sales, Products and Orders data."
-
 # Multi-Agent Configuration
 MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
-
-# Agent Names from environment
-AGENT_NAME_ORCHESTRATOR = os.getenv("AGENT_NAME_ORCHESTRATOR")
-AGENT_NAME_SQL = os.getenv("AGENT_NAME_SQL")
-AGENT_NAME_WEB = os.getenv("AGENT_NAME_WEB")
-AGENT_NAME_DOC = os.getenv("AGENT_NAME_DOC")
-AGENT_NAME_CHAT = os.getenv("AGENT_NAME_CHAT")  # Legacy single-agent mode
-
 
 router = APIRouter()
 
@@ -79,63 +84,6 @@ logging.getLogger("azure.monitor.opentelemetry.exporter.export._base").setLevel(
 )
 
 
-class ExpCache(TTLCache):
-    """Extended TTLCache that deletes Azure AI agent threads when items expire."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def expire(self, time=None):
-        items = super().expire(time)
-        for key, thread_conversation_id in items:
-            try:
-                asyncio.create_task(self._delete_thread_async(thread_conversation_id))
-                logger.info("Scheduled thread deletion: %s", thread_conversation_id)
-            except Exception as e:
-                logger.error(
-                    "Failed to schedule thread deletion for key %s: %s", key, e
-                )
-        return items
-
-    def popitem(self):
-        key, thread_conversation_id = super().popitem()
-        try:
-            asyncio.create_task(self._delete_thread_async(thread_conversation_id))
-            logger.info(
-                "Scheduled thread deletion (LRU evict): %s", thread_conversation_id
-            )
-        except Exception as e:
-            logger.error(
-                "Failed to schedule thread deletion for key %s (LRU evict): %s", key, e
-            )
-        return key, thread_conversation_id
-
-    async def _delete_thread_async(self, thread_conversation_id: str):
-        credential = None
-        endpoint = os.getenv("AZURE_AI_AGENT_ENDPOINT")
-        if not endpoint:
-            logger.warning("AZURE_AI_AGENT_ENDPOINT not configured")
-            return
-        try:
-            if thread_conversation_id:
-                credential = await get_azure_credential_async()
-                async with AIProjectClient(
-                    endpoint=endpoint, credential=credential
-                ) as project_client:
-                    openai_client = project_client.get_openai_client()
-                    await openai_client.conversations.delete(
-                        conversation_id=thread_conversation_id
-                    )
-                    logger.info(
-                        "Thread deleted successfully: %s", thread_conversation_id
-                    )
-        except Exception as e:
-            logger.error("Failed to delete thread %s: %s", thread_conversation_id, e)
-        finally:
-            if credential is not None:
-                await credential.close()
-
-
 def track_event_if_configured(event_name: str, event_data: dict):
     """Track event to Application Insights if configured."""
     instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
@@ -143,341 +91,453 @@ def track_event_if_configured(event_name: str, event_data: dict):
         track_event(event_name, event_data)
 
 
-# Global thread cache
-thread_cache = None
+# ============================================================================
+# Tool Functions with @tool decorator
+# These tools are used by agents in the HandoffBuilder workflow
+# ============================================================================
+
+# Global database connection for tools
+_db_connection = None
 
 
-def get_thread_cache():
-    """Get or create the global thread cache."""
-    global thread_cache
-    if thread_cache is None:
-        thread_cache = ExpCache(maxsize=1000, ttl=3600.0)
-    return thread_cache
+async def get_db_connection():
+    """Get or create database connection for tools."""
+    global _db_connection
+    if _db_connection is None:
+        from history_sql import get_fabric_db_connection
+
+        _db_connection = await get_fabric_db_connection()
+    return _db_connection
 
 
-async def create_specialist_agent(
-    project_client: AIProjectClient,
-    agent_type: str,
-    model_deployment_name: str,
-    tools: list | None = None,
-) -> ChatAgent:
-    """
-    Create a specialist agent instance.
+@tool(approval_mode="never_require")
+async def run_sql_query(
+    sql_query: Annotated[str, "The SQL query to execute against the Fabric database"],
+) -> str:
+    """Execute a SQL query against the Fabric SQL database and return results as JSON.
+
+    Use this tool to query sales, orders, products, customers, and business data.
+    The database contains tables like: SalesOrders, Products, Customers, etc.
 
     Args:
-        project_client: Azure AI Project client
-        agent_type: Type of agent ('sql', 'web', 'doc')
-        model_deployment_name: Model deployment name
-        tools: Optional list of tools for the agent
+        sql_query: The SQL query to execute. Use T-SQL syntax.
 
     Returns:
-        Configured ChatAgent instance
+        JSON string with query results or error message.
     """
-    agent_names = {
-        "sql": AGENT_NAME_SQL,
-        "web": AGENT_NAME_WEB,
-        "doc": AGENT_NAME_DOC,
-    }
+    from datetime import date, datetime
+    from decimal import Decimal
 
-    agent_name = agent_names.get(agent_type)
-    if not agent_name:
-        raise ValueError(f"Unknown agent type: {agent_type}")
+    try:
+        conn = await get_db_connection()
+        if not conn:
+            return json.dumps(
+                {"error": "Database connection not available"}, ensure_ascii=False
+            )
 
-    chat_client = AzureAIClient(
-        project_client=project_client,
-        agent_name=agent_name,
-        model_deployment_name=model_deployment_name,
-        use_latest_version=True,
+        cursor = conn.cursor()
+        cursor.execute(sql_query)
+        columns = [desc[0] for desc in cursor.description]
+        result = []
+
+        for row in cursor.fetchall():
+            row_dict = {}
+            for col_name, value in zip(columns, row):
+                if isinstance(value, (datetime, date)):
+                    row_dict[col_name] = value.isoformat()
+                elif isinstance(value, Decimal):
+                    row_dict[col_name] = float(value)
+                else:
+                    row_dict[col_name] = value
+            result.append(row_dict)
+
+        cursor.close()
+        logger.info(f"SQL query executed successfully, returned {len(result)} rows")
+        return json.dumps(result, ensure_ascii=False)
+
+    except Exception as e:
+        logger.error(f"Error executing SQL query: {e}")
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+
+
+@tool(approval_mode="never_require")
+async def search_web(
+    query: Annotated[str, "The search query for web information"],
+) -> str:
+    """Search the web for real-time information, news, and current events.
+
+    Use this tool for:
+    - Latest news and trends
+    - Current market information
+    - Weather updates
+    - External data not in the database
+
+    Args:
+        query: The search query string.
+
+    Returns:
+        JSON string with search results or error message.
+    """
+    try:
+        # TODO: Implement actual web search via Bing Search API or Azure AI Search
+        logger.info(f"Web search requested: {query}")
+        return json.dumps(
+            {
+                "message": "Web search functionality is being configured.",
+                "query": query,
+                "results": [],
+            },
+            ensure_ascii=False,
+        )
+    except Exception as e:
+        logger.error(f"Error in web search: {e}")
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+
+
+@tool(approval_mode="never_require")
+async def search_documents(
+    query: Annotated[str, "The search query for enterprise documents"],
+) -> str:
+    """Search enterprise documents, product specifications, and knowledge base.
+
+    Use this tool for:
+    - Product specifications and manuals
+    - Technical documentation
+    - Internal knowledge base articles
+    - Company policies and procedures
+
+    Args:
+        query: The search query string.
+
+    Returns:
+        JSON string with document search results or error message.
+    """
+    try:
+        # TODO: Implement actual document search via Azure AI Search
+        logger.info(f"Document search requested: {query}")
+        return json.dumps(
+            {
+                "message": "Document search functionality is being configured.",
+                "query": query,
+                "results": [],
+            },
+            ensure_ascii=False,
+        )
+    except Exception as e:
+        logger.error(f"Error in document search: {e}")
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
+
+
+# ============================================================================
+# Multi-Agent Workflow using MagenticBuilder (Magentic One Pattern)
+# ============================================================================
+
+
+def create_specialist_agents(
+    chat_client: AzureOpenAIChatClient,
+) -> tuple[ChatAgent, ChatAgent, ChatAgent]:
+    """Create specialist agents for MagenticBuilder workflow.
+
+    MagenticBuilder の Manager が各スペシャリストを動的に選択・調整するため、
+    トリアージエージェントは不要。Manager がその役割を担う。
+
+    Args:
+        chat_client: The AzureOpenAIChatClient to use for creating agents.
+
+    Returns:
+        Tuple of (sql_agent, web_agent, doc_agent)
+    """
+    # SQL specialist: Handles database queries
+    sql_agent = ChatAgent(
+        name="sql_agent",
+        description="Fabric SQLデータベースを使ってビジネスデータ（売上、注文、顧客、製品）を分析する専門家",
+        instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
+
+## 利用可能なテーブル
+- SalesOrders: 売上注文データ (OrderID, CustomerID, ProductID, Quantity, TotalAmount, OrderDate)
+- Products: 製品データ (ProductID, ProductName, Category, Price)
+- Customers: 顧客データ (CustomerID, CustomerName, Region, Segment)
+
+## タスク
+1. ユーザーの質問を分析し、適切なSQLクエリを作成
+2. run_sql_query ツールを使ってクエリを実行
+3. 結果を分かりやすく整形して報告
+
+## 注意事項
+- T-SQL構文を使用してください
+- 大量のデータには TOP や集計関数を使用
+- 結果は表形式または要約形式で報告
+""",
+        chat_client=chat_client,
+        tools=[run_sql_query],
     )
 
-    descriptions = {
-        "sql": "Executes SQL queries and generates Chart.js visualizations",
-        "web": "Searches the web for real-time information",
-        "doc": "Searches enterprise documents and specifications",
-    }
+    # Web specialist: Handles web searches
+    web_agent = ChatAgent(
+        name="web_agent",
+        description="ウェブ検索で最新のニュース、市場トレンド、外部情報を取得する専門家",
+        instructions="""あなたはウェブ検索を使って最新情報を取得する専門家です。
 
-    return ChatAgent(
-        name=f"{agent_type.capitalize()}Agent",
-        description=descriptions.get(agent_type, ""),
+## タスク
+1. リクエストに基づいて適切な検索クエリを作成
+2. search_web ツールを使って情報を検索
+3. 結果を分かりやすくまとめて報告
+
+## 対応範囲
+- 最新ニュースとトレンド
+- 市場動向と業界情報
+- 競合分析
+- その他の外部情報
+""",
         chat_client=chat_client,
-        tools=tools or [],
-        tool_choice="auto" if tools else "none",
+        tools=[search_web],
+    )
+
+    # Document specialist: Handles document searches
+    doc_agent = ChatAgent(
+        name="doc_agent",
+        description="企業ドキュメント、製品仕様書、技術マニュアル、社内ナレッジを検索する専門家",
+        instructions="""あなたは企業ドキュメントから情報を検索する専門家です。
+
+## タスク
+1. リクエストに基づいて適切な検索クエリを作成
+2. search_documents ツールを使って情報を検索
+3. 結果を分かりやすくまとめて報告
+
+## 対応範囲
+- 製品仕様書とマニュアル
+- 技術ドキュメント
+- 社内ナレッジベース
+- 会社ポリシーと手順書
+""",
+        chat_client=chat_client,
+        tools=[search_documents],
+    )
+
+    return sql_agent, web_agent, doc_agent
+
+
+def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
+    """Create the manager agent for MagenticBuilder orchestration.
+
+    Manager Agent の役割:
+    1. 複雑なクエリをサブタスクに分解（Plan）
+    2. 各スペシャリストへのタスク割り当て
+    3. 進捗の監視と必要に応じた再計画
+    4. 全スペシャリストの結果を統合して最終回答を生成
+
+    Args:
+        chat_client: The AzureOpenAIChatClient to use.
+
+    Returns:
+        Manager ChatAgent
+    """
+    return ChatAgent(
+        name="MagenticManager",
+        description="チームを調整して複雑なタスクを効率的に完了させるオーケストレーター",
+        instructions="""あなたはMagentic Oneのマネージャーエージェントです。
+チームを調整して複雑なタスクを効率的に完了させます。
+
+## あなたのチーム
+- sql_agent: Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を分析
+- web_agent: ウェブ検索で最新のニュース、市場トレンド、外部情報を取得
+- doc_agent: 企業ドキュメント、製品仕様、技術マニュアルを検索
+
+## タスク処理フロー
+1. **タスク分析**: ユーザーの質問を分析し、必要な情報源を特定
+2. **計画作成**: どのスペシャリストがどのサブタスクを担当するか決定
+3. **実行監視**: スペシャリストの進捗を監視
+4. **結果統合**: 全スペシャリストの結果を統合して最終回答を生成
+
+## 複合クエリの例
+「売上データを分析して、最新の市場トレンドと比較して」
+→ Plan:
+  1. sql_agent: 売上データの分析（傾向、トップ製品、地域別など）
+  2. web_agent: 最新の市場トレンドと業界動向を検索
+  3. マネージャー: 両方の結果を統合して比較分析を作成
+
+## 回答形式
+- 各スペシャリストからの情報を明確に整理
+- データは表形式で見やすく表示
+- 最終的な洞察と推奨事項を含める
+- 日本語で回答
+""",
+        chat_client=chat_client,
     )
 
 
 async def stream_multi_agent_response(conversation_id: str, query: str):
     """
-    Stream response using Agent Framework's agent-as-tool pattern.
+    Stream response using MagenticBuilder pattern for true multi-agent collaboration.
 
-    This leverages:
-    - agent.as_tool() to convert agents into callable tools
-    - Automatic tool selection by the coordinator
-    - Built-in parallel execution when multiple tools are called
+    MagenticBuilder (Magentic One Pattern):
+    - Manager Agent がタスクを分解し、計画を作成
+    - 複数のスペシャリストが並列または順次実行
+    - Manager が結果を統合して最終回答を生成
+
+    これにより、複合的なクエリ（例：「売上データを分析して、最新トレンドと比較」）に対応可能。
     """
-    from history_sql import SqlQueryTool, get_fabric_db_connection
-
     credential = None
-    custom_tool = None
-    kb_tool = None
-
-    endpoint = os.getenv("AZURE_AI_AGENT_ENDPOINT")
-    if not endpoint:
-        raise ValueError("AZURE_AI_AGENT_ENDPOINT not configured")
 
     try:
-        credential = await get_azure_credential_async()
+        credential = AzureCliCredential()
 
-        async with AIProjectClient(
-            endpoint=endpoint, credential=credential
-        ) as project_client:
-            model_deployment_name = os.getenv(
-                "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
-            ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
+        # Create chat client
+        chat_client = AzureOpenAIChatClient(credential=credential)
 
-            if not model_deployment_name:
-                raise ValueError("Model deployment name not configured")
+        # Create specialist agents
+        sql_agent, web_agent, doc_agent = create_specialist_agents(chat_client)
 
-            # Set up SQL tools
-            sql_tools = []
-            db_connection = await get_fabric_db_connection()
-            if db_connection:
-                custom_tool = SqlQueryTool.create_with_connection(db_connection)
-                sql_tools = [custom_tool.run_sql_query]
+        # Create manager agent
+        manager_agent = create_manager_agent(chat_client)
 
-            # Create specialist agents
-            sql_agent = await create_specialist_agent(
-                project_client, "sql", model_deployment_name, sql_tools
+        # Build the MagenticBuilder workflow
+        workflow = (
+            MagenticBuilder()
+            .participants([sql_agent, web_agent, doc_agent])
+            .with_manager(
+                agent=manager_agent,
+                max_round_count=10,  # 最大ラウンド数
+                max_stall_count=3,  # ストール検出閾値
             )
-            web_agent = await create_specialist_agent(
-                project_client, "web", model_deployment_name
-            )
+            .build()
+        )
 
-            # For doc agent, we'll handle RAG inline
-            doc_agent = await create_specialist_agent(
-                project_client, "doc", model_deployment_name
-            )
+        logger.info(f"Starting MagenticBuilder workflow with query: {query[:100]}...")
+        logger.info("Workflow configured with Manager + 3 Specialists (SQL, Web, Doc)")
 
-            # Convert agents to tools using agent.as_tool()
-            # This is the key Agent Framework pattern!
-            sql_tool = sql_agent.as_tool(
-                name="query_database",
-                description="Query the database for sales, orders, products, customers, and business data. Can generate Chart.js visualizations. Input: Natural language query about database information.",
-            )
+        last_message_id: str | None = None
+        accumulated_text = ""
 
-            web_tool = web_agent.as_tool(
-                name="search_web",
-                description="Search the web for real-time information, news, current events, weather, and external data not in the database. Input: Search query for web information.",
-            )
+        # Stream the workflow execution
+        async for event in workflow.run_stream(query):
+            if isinstance(event, AgentRunUpdateEvent):
+                # ストリーミング更新 - エージェントからのテキスト出力
+                update = event.data
+                message_id = getattr(update, "message_id", None)
 
-            doc_tool = doc_agent.as_tool(
-                name="search_documents",
-                description="Search enterprise documents, product specifications, technical documentation, and internal knowledge base. Input: Search query for document information.",
-            )
+                # 新しいメッセージの場合、区切りを追加
+                if message_id and message_id != last_message_id:
+                    if last_message_id is not None and accumulated_text:
+                        logger.info(f"Agent {event.executor_id} completed response")
+                    last_message_id = message_id
 
-            # Create coordinator agent with specialist agents as tools
-            coordinator_client = AzureAIClient(
-                project_client=project_client,
-                agent_name=AGENT_NAME_ORCHESTRATOR,
-                model_deployment_name=model_deployment_name,
-                use_latest_version=True,
-            )
+                # テキストを出力
+                if hasattr(update, "text") and update.text:
+                    accumulated_text += update.text
+                    yield update.text
+                elif isinstance(update, str):
+                    accumulated_text += update
+                    yield update
 
-            async with ChatAgent(
-                name="Coordinator",
-                description="Intelligent coordinator that routes queries to specialists",
-                instructions="""あなたはユーザーの質問に対して適切なツールを呼び出して回答するコーディネーターです。
+            elif isinstance(event, MagenticOrchestratorEvent):
+                # Magentic オーケストレーターイベント（計画、進捗など）
+                logger.info(f"Orchestrator event: {type(event).__name__}")
+                if hasattr(event, "plan"):
+                    logger.info(f"Plan created: {event.plan}")
 
-## 重要ルール
-1. ユーザーの質問には必ずツールを呼び出して回答してください
-2. 「確認」や「どのような情報が必要ですか」などの質問返しは禁止です
-3. 質問を受けたら即座に適切なツールを実行してください
+            elif isinstance(event, WorkflowOutputEvent):
+                # ワークフロー完了時の最終出力
+                if event.data:
+                    output_messages = event.data
+                    if isinstance(output_messages, list):
+                        for msg in output_messages:
+                            if hasattr(msg, "text") and msg.text:
+                                # 最終回答が既に蓄積されたテキストと異なる場合のみ出力
+                                if msg.text not in accumulated_text:
+                                    yield msg.text
+                    elif isinstance(output_messages, str):
+                        if output_messages not in accumulated_text:
+                            yield output_messages
+                logger.info("MagenticBuilder workflow completed")
 
-## ツール選択ガイド
-- **query_database**: 売上、注文、顧客、製品、ビジネスデータの分析に使用
-  - 例: 「売上を教えて」「トップ商品は？」「顧客数は？」「月別の推移」
-- **search_web**: 最新ニュース、トレンド、天気、外部情報に使用
-  - 例: 「最新トレンド」「業界ニュース」「市場動向」
-- **search_documents**: 製品仕様、技術資料、社内ドキュメントに使用
-  - 例: 「製品仕様」「技術ドキュメント」「マニュアル」
+            elif isinstance(event, WorkflowStatusEvent):
+                if event.state == WorkflowRunState.COMPLETED:
+                    logger.info("Workflow status: COMPLETED")
+                elif event.state == WorkflowRunState.PAUSED:
+                    logger.info("Workflow status: PAUSED")
 
-## 回答フォーマット
-- データは表形式やリストで見やすく表示
-- Chart.js JSONはvisualizationsが必要な場合に含める
-- 具体的な数値やファクトを提示
-""",
-                chat_client=coordinator_client,
-                tools=[sql_tool, web_tool, doc_tool],
-                tool_choice="required",
-            ) as coordinator:
-                # Get or create thread
-                cache = get_thread_cache()
-                thread_conversation_id = cache.get(conversation_id, None)
+            elif isinstance(event, GroupChatRequestSentEvent):
+                # グループチャットリクエスト（Manager → Specialist）
+                logger.info(f"Request sent to: {getattr(event, 'target', 'unknown')}")
 
-                if thread_conversation_id:
-                    thread = coordinator.get_new_thread(
-                        service_thread_id=thread_conversation_id
-                    )
-                else:
-                    openai_client = project_client.get_openai_client()
-                    conversation = await openai_client.conversations.create()
-                    thread_conversation_id = conversation.id
-                    thread = coordinator.get_new_thread(
-                        service_thread_id=thread_conversation_id
-                    )
-                    cache[conversation_id] = thread_conversation_id
+            elif isinstance(event, RequestInfoEvent):
+                logger.info(f"Request info event: {event}")
 
-                # Stream response from coordinator
-                # The coordinator will automatically:
-                # 1. Analyze the query
-                # 2. Call appropriate tool(s)
-                # 3. Synthesize results
-                messages = [ChatMessage(role=Role.USER, content=query)]
-                logger.info(
-                    f"Starting coordinator run_stream with query: {query[:100]}..."
-                )
-
-                update_count = 0
-                async for update in coordinator.run_stream(messages, thread=thread):
-                    update_count += 1
-                    # Log all update attributes for debugging
-                    logger.info(
-                        f"Update #{update_count}: type={type(update).__name__}, text={bool(update.text)}, role={getattr(update, 'role', 'N/A')}, author={getattr(update, 'author_name', 'N/A')}"
-                    )
-
-                    # Log contents for tool call inspection
-                    if hasattr(update, "contents") and update.contents:
-                        for i, content in enumerate(update.contents):
-                            content_type = type(content).__name__
-                            logger.info(
-                                f"  Content[{i}]: type={content_type}, attrs={[a for a in dir(content) if not a.startswith('_')]}"
-                            )
-                            # Log tool call details if present
-                            if hasattr(content, "tool_calls"):
-                                logger.info(f"    Tool calls: {content.tool_calls}")
-                            if hasattr(content, "name"):
-                                logger.info(f"    Name: {content.name}")
-                            if hasattr(content, "arguments"):
-                                logger.info(f"    Arguments: {content.arguments}")
-                            if hasattr(content, "output"):
-                                output_str = (
-                                    str(content.output)[:200]
-                                    if content.output
-                                    else None
-                                )
-                                logger.info(f"    Output: {output_str}")
-
-                    if update.text:
-                        logger.info(
-                            f"Yielding text (len={len(update.text)}): {update.text[:200]}..."
-                        )
-                        yield update.text
-
-                logger.info(
-                    f"Coordinator stream completed. Total updates: {update_count}"
-                )
-
-    except ServiceResponseException as e:
-        logger.error("Service error in multi-agent: %s", e)
-        raise
     except Exception as e:
-        logger.error("Error in multi-agent response: %s", e)
+        logger.error(f"Error in MagenticBuilder workflow: {e}", exc_info=True)
         raise
     finally:
-        if custom_tool:
-            custom_tool.close_connection()
-        if kb_tool:
-            await kb_tool.close()
+        global _db_connection
+        if _db_connection:
+            try:
+                _db_connection.close()
+            except Exception:
+                pass
+            _db_connection = None
         if credential:
             await credential.close()
 
 
 async def stream_single_agent_response(conversation_id: str, query: str):
     """
-    Stream response using single agent mode (legacy behavior).
+    Stream response using single agent mode with AzureOpenAIChatClient.
     """
-    from history_sql import SqlQueryTool, get_fabric_db_connection
-
     credential = None
-    custom_tool = None
-
-    endpoint = os.getenv("AZURE_AI_AGENT_ENDPOINT")
-    if not endpoint:
-        raise ValueError("AZURE_AI_AGENT_ENDPOINT not configured")
 
     try:
-        credential = await get_azure_credential_async()
+        credential = AzureCliCredential()
 
-        async with AIProjectClient(
-            endpoint=endpoint, credential=credential
-        ) as project_client:
-            cache = get_thread_cache()
-            thread_conversation_id = cache.get(conversation_id, None)
-            truncation_strategy = TruncationObject(
-                type="last_messages", last_messages=4
-            )
+        # Create chat client
+        chat_client = AzureOpenAIChatClient(credential=credential)
 
-            db_connection = await get_fabric_db_connection()
-            if not db_connection:
-                logger.error("Failed to establish database connection")
-                raise Exception("Database connection failed")
+        # Create a single agent with SQL tool
+        agent = chat_client.as_agent(
+            name="data_analyst",
+            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
 
-            custom_tool = SqlQueryTool.create_with_connection(db_connection)
-            my_tools = [custom_tool.run_sql_query]
+## 利用可能なテーブル
+- SalesOrders: 売上注文データ
+- Products: 製品データ
+- Customers: 顧客データ
 
-            agent_name = AGENT_NAME_CHAT
-            logger.info(f"Single agent mode: Using Chat Agent '{agent_name}'")
+## タスク
+1. ユーザーの質問を分析
+2. 必要に応じてrun_sql_queryツールでデータを取得
+3. 結果を分かりやすく整形して回答
 
-            model_deployment_name = os.getenv(
-                "AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME"
-            ) or os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME")
+## 回答形式
+- データは表形式で見やすく表示
+- Chart.js JSONはグラフが適切な場合に含める
+""",
+            tools=[run_sql_query],
+        )
 
-            if not model_deployment_name:
-                raise ValueError("Model deployment name not configured")
+        logger.info(f"Single agent mode: processing query: {query[:100]}...")
 
-            chat_client = AzureAIClient(
-                project_client=project_client,
-                agent_name=agent_name,
-                model_deployment_name=model_deployment_name,
-                use_latest_version=True,
-            )
+        # Stream the agent response
+        async for chunk in agent.run_stream(query):
+            if chunk and chunk.text:
+                yield chunk.text
 
-            async with ChatAgent(
-                chat_client=chat_client,
-                tools=my_tools,
-                tool_choice="auto",
-            ) as chat_agent:
-                if thread_conversation_id:
-                    thread = chat_agent.get_new_thread(
-                        service_thread_id=thread_conversation_id
-                    )
-                else:
-                    openai_client = project_client.get_openai_client()
-                    conversation = await openai_client.conversations.create()
-                    thread_conversation_id = conversation.id
-                    thread = chat_agent.get_new_thread(
-                        service_thread_id=thread_conversation_id
-                    )
-                    cache[conversation_id] = thread_conversation_id
-
-                async for chunk in chat_agent.run_stream(
-                    messages=query,
-                    thread=thread,
-                    truncation_strategy=truncation_strategy,
-                ):
-                    if chunk is not None and chunk.text:
-                        yield chunk.text
-
-    except ServiceResponseException as e:
-        logger.error("Service error: %s", e)
-        raise
     except Exception as e:
-        logger.error("Error in single agent response: %s", e)
+        logger.error(f"Error in single agent response: {e}", exc_info=True)
         raise
     finally:
-        if custom_tool:
-            custom_tool.close_connection()
+        global _db_connection
+        if _db_connection:
+            try:
+                _db_connection.close()
+            except Exception:
+                pass
+            _db_connection = None
         if credential:
             await credential.close()
+
+
+# ============================================================================
+# Chat API Endpoint
+# ============================================================================
 
 
 async def stream_chat_request(conversation_id: str, query: str):
@@ -485,7 +545,7 @@ async def stream_chat_request(conversation_id: str, query: str):
     Handles streaming chat requests.
 
     Routes to:
-    - Multi-agent mode: Uses agent-as-tool pattern with coordinator
+    - Multi-agent mode: Uses HandoffBuilder with specialist agents
     - Single-agent mode: Direct ChatAgent with SQL tools
     """
 
@@ -494,8 +554,8 @@ async def stream_chat_request(conversation_id: str, query: str):
             assistant_content = ""
 
             # Choose streaming function based on mode
-            if MULTI_AGENT_MODE and AGENT_NAME_ORCHESTRATOR:
-                logger.info("Using multi-agent mode with agent-as-tool pattern")
+            if MULTI_AGENT_MODE:
+                logger.info("Using multi-agent mode with HandoffBuilder")
                 stream_func = stream_multi_agent_response
             else:
                 logger.info("Using single-agent mode")
@@ -503,20 +563,21 @@ async def stream_chat_request(conversation_id: str, query: str):
 
             # Stream and accumulate response
             async for chunk in stream_func(conversation_id, query):
-                assistant_content += str(chunk)
-                response = {
-                    "choices": [
-                        {
-                            "messages": [
-                                {
-                                    "role": "assistant",
-                                    "content": assistant_content,
-                                }
-                            ]
-                        }
-                    ]
-                }
-                yield json.dumps(response, ensure_ascii=False) + "\n\n"
+                if chunk:
+                    assistant_content += str(chunk)
+                    response = {
+                        "choices": [
+                            {
+                                "messages": [
+                                    {
+                                        "role": "assistant",
+                                        "content": assistant_content,
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                    yield json.dumps(response, ensure_ascii=False) + "\n\n"
 
             # Fallback if no response
             if not assistant_content:
@@ -527,7 +588,7 @@ async def stream_chat_request(conversation_id: str, query: str):
                             "messages": [
                                 {
                                     "role": "assistant",
-                                    "content": "I cannot answer this question with the current data. Please rephrase or add more details.",
+                                    "content": "申し訳ございませんが、この質問にはお答えできません。質問を変えてお試しください。",
                                 }
                             ]
                         }
@@ -535,12 +596,12 @@ async def stream_chat_request(conversation_id: str, query: str):
                 }
                 yield json.dumps(response, ensure_ascii=False) + "\n\n"
 
-        except ServiceResponseException as e:
+        except Exception as e:
             error_message = str(e)
-            if "Rate limit is exceeded" in error_message:
+            if "Rate limit" in error_message:
                 match = re.search(r"Try again in (\d+) seconds.", error_message)
                 retry_after = match.group(1) if match else "sometime"
-                logger.error("Rate limit error: %s", error_message)
+                logger.error(f"Rate limit error: {error_message}")
                 yield (
                     json.dumps(
                         {
@@ -550,18 +611,13 @@ async def stream_chat_request(conversation_id: str, query: str):
                     + "\n\n"
                 )
             else:
-                logger.error("ServiceResponseException: %s", error_message)
+                logger.error(f"Unexpected error: {e}", exc_info=True)
                 yield (
-                    json.dumps({"error": "An error occurred. Please try again later."})
+                    json.dumps(
+                        {"error": "An error occurred while processing the request."}
+                    )
                     + "\n\n"
                 )
-
-        except Exception as e:
-            logger.error("Unexpected error: %s", e)
-            yield (
-                json.dumps({"error": "An error occurred while processing the request."})
-                + "\n\n"
-            )
 
     return generate()
 
@@ -589,7 +645,7 @@ async def conversation(request: Request):
         return StreamingResponse(result, media_type="application/json-lines")
 
     except Exception as ex:
-        logger.exception("Error in conversation endpoint: %s", str(ex))
+        logger.exception(f"Error in conversation endpoint: {str(ex)}")
         span = trace.get_current_span()
         if span is not None:
             span.record_exception(ex)

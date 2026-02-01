@@ -13,8 +13,12 @@ aiohttp==3.13.3
 
 # Azure Services (with prerelease dependencies)
 # Note: These packages require --pre flag or prerelease versions
-agent-framework-azure-ai==1.0.0b260114
-agent-framework-core==1.0.0b260114
+# Updated to 1.0.0b260130 (latest as of 2026-01-30)
+# Breaking changes from b260114:
+#   - b260128: @ai_function renamed to @tool (already using @tool)
+#   - b260128: MagenticBuilder factory pattern added
+agent-framework-azure-ai==1.0.0b260130
+agent-framework-core==1.0.0b260130
 azure-identity==1.26.0b1
 azure-ai-agents==1.2.0b5
 azure-ai-projects==2.0.0b3
