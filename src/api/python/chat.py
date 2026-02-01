@@ -332,18 +332,49 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
                 # 2. Call appropriate tool(s)
                 # 3. Synthesize results
                 messages = [ChatMessage(role=Role.USER, content=query)]
-                logger.info(f"Starting coordinator run_stream with query: {query[:100]}...")
+                logger.info(
+                    f"Starting coordinator run_stream with query: {query[:100]}..."
+                )
 
                 update_count = 0
                 async for update in coordinator.run_stream(messages, thread=thread):
                     update_count += 1
                     # Log all update attributes for debugging
-                    logger.info(f"Update #{update_count}: type={type(update).__name__}, text={bool(update.text)}, attrs={[a for a in dir(update) if not a.startswith('_')]}")
+                    logger.info(
+                        f"Update #{update_count}: type={type(update).__name__}, text={bool(update.text)}, role={getattr(update, 'role', 'N/A')}, author={getattr(update, 'author_name', 'N/A')}"
+                    )
+
+                    # Log contents for tool call inspection
+                    if hasattr(update, "contents") and update.contents:
+                        for i, content in enumerate(update.contents):
+                            content_type = type(content).__name__
+                            logger.info(
+                                f"  Content[{i}]: type={content_type}, attrs={[a for a in dir(content) if not a.startswith('_')]}"
+                            )
+                            # Log tool call details if present
+                            if hasattr(content, "tool_calls"):
+                                logger.info(f"    Tool calls: {content.tool_calls}")
+                            if hasattr(content, "name"):
+                                logger.info(f"    Name: {content.name}")
+                            if hasattr(content, "arguments"):
+                                logger.info(f"    Arguments: {content.arguments}")
+                            if hasattr(content, "output"):
+                                output_str = (
+                                    str(content.output)[:200]
+                                    if content.output
+                                    else None
+                                )
+                                logger.info(f"    Output: {output_str}")
+
                     if update.text:
-                        logger.info(f"Yielding text (len={len(update.text)}): {update.text[:200]}...")
+                        logger.info(
+                            f"Yielding text (len={len(update.text)}): {update.text[:200]}..."
+                        )
                         yield update.text
-                
-                logger.info(f"Coordinator stream completed. Total updates: {update_count}")
+
+                logger.info(
+                    f"Coordinator stream completed. Total updates: {update_count}"
+                )
 
     except ServiceResponseException as e:
         logger.error("Service error in multi-agent: %s", e)
