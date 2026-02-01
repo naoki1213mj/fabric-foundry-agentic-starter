@@ -261,20 +261,17 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
             # This is the key Agent Framework pattern!
             sql_tool = sql_agent.as_tool(
                 name="query_database",
-                description="Query the database for sales, orders, products, customers, and business data. Can generate Chart.js visualizations.",
-                argument_description="Natural language query about database information",
+                description="Query the database for sales, orders, products, customers, and business data. Can generate Chart.js visualizations. Input: Natural language query about database information.",
             )
 
             web_tool = web_agent.as_tool(
                 name="search_web",
-                description="Search the web for real-time information, news, current events, weather, and external data not in the database.",
-                argument_description="Search query for web information",
+                description="Search the web for real-time information, news, current events, weather, and external data not in the database. Input: Search query for web information.",
             )
 
             doc_tool = doc_agent.as_tool(
                 name="search_documents",
-                description="Search enterprise documents, product specifications, technical documentation, and internal knowledge base.",
-                argument_description="Search query for document information",
+                description="Search enterprise documents, product specifications, technical documentation, and internal knowledge base. Input: Search query for document information.",
             )
 
             # Create coordinator agent with specialist agents as tools

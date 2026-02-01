@@ -192,20 +192,17 @@ class MultiAgentOrchestrator:
         # Convert specialist agents to tools for the orchestrator
         sql_tool = self.sql_agent.as_tool(
             name="query_database",
-            description="Query the database for sales, orders, products, and customer data. Returns data and optional Chart.js visualizations.",
-            argument_description="The natural language query about database information",
+            description="Query the database for sales, orders, products, and customer data. Returns data and optional Chart.js visualizations. Input: Natural language query about database information.",
         )
 
         web_tool = self.web_agent.as_tool(
             name="search_web",
-            description="Search the web for real-time information, news, current events, and external data.",
-            argument_description="The search query for web information",
+            description="Search the web for real-time information, news, current events, and external data. Input: Search query for web information.",
         )
 
         doc_tool = self.doc_agent.as_tool(
             name="search_documents",
-            description="Search enterprise documents, product specifications, and technical documentation.",
-            argument_description="The search query for document information",
+            description="Search enterprise documents, product specifications, and technical documentation. Input: Search query for document information.",
         )
 
         # Create coordinator with agent tools
