@@ -139,7 +139,17 @@ async def run_sql_query(
     """Execute a SQL query against the Fabric SQL database and return results as JSON.
 
     Use this tool to query sales, orders, products, customers, and business data.
-    The database contains tables like: SalesOrders, Products, Customers, etc.
+
+    Available tables:
+    - orders: Order headers (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
+    - orderline: Order details (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
+    - product: Products (ProductID, ProductName, CategoryName, ListPrice, BrandName)
+    - customer: Customers (CustomerId, FirstName, LastName, CustomerTypeId)
+    - location: Customer locations (LocationId, CustomerId, Region, City)
+    - productcategory: Product categories (CategoryID, CategoryName)
+    - customerrelationshiptype: Customer segments (CustomerRelationshipTypeId, CustomerRelationshipTypeName)
+    - invoice: Invoices (InvoiceId, CustomerId, OrderId, TotalAmount)
+    - payment: Payments (PaymentId, InvoiceId, PaymentAmount, PaymentStatus)
 
     Args:
         sql_query: The SQL query to execute. Use T-SQL syntax.
@@ -289,10 +299,39 @@ def create_specialist_agents(
 ## 重要：あなたは数値データ分析の最優先エージェントです
 売上、注文、顧客、製品に関する質問は、まずあなたがSQLクエリで回答してください。
 
-## 利用可能なテーブル
-- SalesOrders: 売上注文データ (OrderID, CustomerID, ProductID, Quantity, TotalAmount, OrderDate)
-- Products: 製品データ (ProductID, ProductName, Category, Price)
-- Customers: 顧客データ (CustomerID, CustomerName, Region, Segment)
+## 利用可能なテーブル（実際のスキーマ）
+
+### 主要テーブル
+- **orders**: 注文ヘッダー
+  - OrderId, SalesChannelId, OrderNumber, CustomerId, CustomerAccountId
+  - OrderDate, OrderStatus (Completed/Pending/Cancelled), SubTotal, TaxAmount, OrderTotal
+  - PaymentMethod (MC/VISA/PayPal/Discover), IsoCurrencyCode, CreatedBy
+
+- **orderline**: 注文明細（売上詳細）
+  - OrderId, OrderLineNumber, ProductId, Quantity, UnitPrice, LineTotal, DiscountAmount, TaxAmount
+
+- **product**: 製品マスタ
+  - ProductID, ProductName, ProductDescription, BrandName, Color, ProductModel
+  - ProductCategoryID, CategoryName, ListPrice, StandardCost, Weight, ProductStatus
+
+- **productcategory**: 製品カテゴリ
+  - CategoryID, ParentCategoryId, CategoryName, CategoryDescription, BrandName
+
+- **customer**: 顧客マスタ
+  - CustomerId, CustomerTypeId (Individual/Business/Government)
+  - CustomerRelationshipTypeId, FirstName, LastName, Gender, PrimaryEmail, IsActive
+
+- **customerrelationshiptype**: 顧客セグメント
+  - CustomerRelationshipTypeId, CustomerRelationshipTypeName (VIP/Premium/Standard/SMB/Partner等)
+
+- **location**: 顧客所在地
+  - LocationId, CustomerId, AddressLine1, City, StateId, ZipCode, CountryId, Region, Latitude, Longitude
+
+- **invoice**: 請求書
+  - InvoiceId, InvoiceNumber, CustomerId, OrderId, InvoiceDate, DueDate, TotalAmount, InvoiceStatus
+
+- **payment**: 支払い
+  - PaymentId, PaymentNumber, InvoiceId, OrderId, PaymentDate, PaymentAmount, PaymentStatus, PaymentMethod
 
 ## タスク
 1. ユーザーの質問を分析し、適切なSQLクエリを作成
@@ -300,27 +339,87 @@ def create_specialist_agents(
 3. 結果を分かりやすく整形して報告
 4. グラフ表示が要求された場合は、Chart.js JSON形式で出力
 
-## 対応可能なクエリパターン（柔軟に対応）
+## 重要なJOINパターン
 
-### 集計・ランキング系
-- 「〜が一番高い/低い」「TOP N」「ランキング」
-- 「合計」「平均」「最大」「最小」「件数」
-- 「〜別の集計」（地域別、カテゴリ別、月別など）
+### 売上分析（orders + orderline + product）
+```sql
+SELECT p.ProductName, SUM(ol.LineTotal) as TotalSales
+FROM orders o
+JOIN orderline ol ON o.OrderId = ol.OrderId
+JOIN product p ON ol.ProductId = p.ProductID
+WHERE o.OrderStatus = 'Completed'
+GROUP BY p.ProductName
+```
 
-### 比較・トレンド系
-- 「前月比」「前年比」「成長率」
-- 「〜と〜の比較」
-- 「推移」「トレンド」「変化」
+### 顧客別売上（orders + customer）
+```sql
+SELECT c.FirstName + ' ' + c.LastName as CustomerName, SUM(o.OrderTotal) as TotalSpent
+FROM orders o
+JOIN customer c ON o.CustomerId = c.CustomerId
+GROUP BY c.CustomerId, c.FirstName, c.LastName
+```
 
-### フィルタリング系
-- 「〜以上/以下」「〜の範囲」
-- 「〜を含む」「〜に該当する」
-- 「期間指定」（今月、今年、過去N日など）
+### 地域別売上（orders + customer + location）
+```sql
+SELECT l.Region, SUM(o.OrderTotal) as TotalSales
+FROM orders o
+JOIN customer c ON o.CustomerId = c.CustomerId
+JOIN location l ON c.CustomerId = l.CustomerId
+GROUP BY l.Region
+```
 
-### 詳細分析系
-- 「内訳」「構成比」「割合」
-- 「相関」「関連性」
-- 「パレート分析」（上位20%が全体の80%など）
+## よく使うクエリパターン
+
+### 売上TOP N製品
+```sql
+SELECT TOP {N} p.ProductName, SUM(ol.LineTotal) as TotalSales
+FROM orders o
+JOIN orderline ol ON o.OrderId = ol.OrderId
+JOIN product p ON ol.ProductId = p.ProductID
+WHERE o.OrderStatus = 'Completed'
+GROUP BY p.ProductID, p.ProductName
+ORDER BY TotalSales DESC
+```
+
+### カテゴリ別売上
+```sql
+SELECT p.CategoryName, SUM(ol.LineTotal) as TotalSales
+FROM orders o
+JOIN orderline ol ON o.OrderId = ol.OrderId
+JOIN product p ON ol.ProductId = p.ProductID
+WHERE o.OrderStatus = 'Completed'
+GROUP BY p.CategoryName
+ORDER BY TotalSales DESC
+```
+
+### 月別売上推移
+```sql
+SELECT FORMAT(o.OrderDate, 'yyyy-MM') as Month, SUM(o.OrderTotal) as Sales
+FROM orders o
+WHERE o.OrderStatus = 'Completed'
+GROUP BY FORMAT(o.OrderDate, 'yyyy-MM')
+ORDER BY Month
+```
+
+### 支払い方法別売上
+```sql
+SELECT o.PaymentMethod, SUM(o.OrderTotal) as TotalSales, COUNT(*) as OrderCount
+FROM orders o
+WHERE o.OrderStatus = 'Completed'
+GROUP BY o.PaymentMethod
+ORDER BY TotalSales DESC
+```
+
+### 顧客セグメント別売上
+```sql
+SELECT crt.CustomerRelationshipTypeName as Segment, SUM(o.OrderTotal) as TotalSales
+FROM orders o
+JOIN customer c ON o.CustomerId = c.CustomerId
+JOIN customerrelationshiptype crt ON c.CustomerRelationshipTypeId = crt.CustomerRelationshipTypeId
+WHERE o.OrderStatus = 'Completed'
+GROUP BY crt.CustomerRelationshipTypeName
+ORDER BY TotalSales DESC
+```
 
 ## グラフ出力（重要）
 ユーザーが「グラフ」「チャート」「可視化」「表示して」「見せて」などを要求した場合、
@@ -353,30 +452,10 @@ def create_specialist_agents(
 - ドーナツ("doughnut"): 構成比（中央にサマリー表示可能）
 - 折れ線("line"): 時系列、トレンド、推移
 
-## よく使うクエリパターン
-- 売上TOP N:
-  SELECT TOP {N} p.ProductName, SUM(s.TotalAmount) as TotalSales
-  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID
-  GROUP BY p.ProductID, p.ProductName ORDER BY TotalSales DESC
-
-- 地域別売上:
-  SELECT c.Region, SUM(s.TotalAmount) as TotalSales
-  FROM SalesOrders s JOIN Customers c ON s.CustomerID = c.CustomerID
-  GROUP BY c.Region ORDER BY TotalSales DESC
-
-- 月別推移:
-  SELECT FORMAT(OrderDate, 'yyyy-MM') as Month, SUM(TotalAmount) as Sales
-  FROM SalesOrders GROUP BY FORMAT(OrderDate, 'yyyy-MM') ORDER BY Month
-
-- カテゴリ別構成比:
-  SELECT p.Category, SUM(s.TotalAmount) as Sales,
-    ROUND(SUM(s.TotalAmount) * 100.0 / (SELECT SUM(TotalAmount) FROM SalesOrders), 2) as Percentage
-  FROM SalesOrders s JOIN Products p ON s.ProductID = p.ProductID
-  GROUP BY p.Category ORDER BY Sales DESC
-
 ## 注意事項
 - T-SQL構文を使用してください
 - 大量のデータには TOP や集計関数を使用
+- OrderStatus = 'Completed' で完了した注文のみをフィルタ
 - グラフなしの場合は表形式または要約形式で報告
 - グラフ要求時は必ずChart.js JSON形式（Vega-Lite禁止）
 - ユーザーの意図を汲み取り、最適なクエリとグラフ形式を選択
@@ -725,9 +804,17 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
 
 ## 利用可能なテーブル
-- SalesOrders: 売上注文データ
-- Products: 製品データ
-- Customers: 顧客データ
+- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
+- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
+- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
+- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
+- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
+- customerrelationshiptype: 顧客セグメント (CustomerRelationshipTypeId, CustomerRelationshipTypeName)
+
+## 主要なJOINパターン
+- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
+- 顧客分析: orders JOIN customer ON CustomerId
+- 地域分析: customer JOIN location ON CustomerId
 
 ## タスク
 1. ユーザーの質問を分析
@@ -736,7 +823,7 @@ async def stream_single_agent_response(conversation_id: str, query: str):
 
 ## 回答形式
 - データは表形式で見やすく表示
-- Chart.js JSONはグラフが適切な場合に含める
+- Chart.js JSONはグラフが適切な場合に含める（Vega-Lite禁止）
 """,
             tools=[run_sql_query],
         )
