@@ -1,17 +1,16 @@
 """
 Multi-Agent Module
 
-This module provides the agent implementations and orchestration
-for the multi-agent chat system using Microsoft Agent Framework.
+This module provides the agent tool handlers for the multi-agent chat system
+using Microsoft Agent Framework.
+
+Note: The main orchestration logic is in chat.py using MagenticBuilder.
 """
 
-from .orchestrator import MultiAgentOrchestrator, create_orchestrator
 from .sql_agent import SqlAgentHandler
 from .web_agent import WebAgentHandler
 
 __all__ = [
-    "create_orchestrator",
-    "MultiAgentOrchestrator",
     "SqlAgentHandler",
     "WebAgentHandler",
 ]

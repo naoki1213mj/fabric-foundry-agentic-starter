@@ -14,7 +14,11 @@
 /myenv
 scriptenv/
 __pycache__/
-/venv1/# ログファイル
+/venv1/
+
+# ログファイル・調査用フォルダ
+# 調査時は .debug_logs/ フォルダを使用してください
+.debug_logs/
 api_logs/
 api_logs.zip
 api_logs_extracted/
@@ -29,6 +33,19 @@ debug_logs/
 debug_logs.zip
 v27_logs/
 v27_logs.zip
+current_logs/
+current_logs.zip
+error_logs/
+error_logs.zip
+error_logs2/
+error_logs2.zip
+latest_error_logs/
+latest_error_logs.zip
+new_error_logs/
+new_error_logs.zip
+restart_logs/
+restart_logs.zip
+chat_test_logs/
 
 # ACRビルド用一時フォルダ
 src/App/acr-build/

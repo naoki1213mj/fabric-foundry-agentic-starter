@@ -40,10 +40,8 @@ from agent_framework import (
 )
 from agent_framework.azure import AzureOpenAIChatClient
 
-# Import existing tool handlers
+# Local imports - tool handlers
 from agents.web_agent import WebAgentHandler
-
-# Azure SDK - Use sync credential for SDK compatibility
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
