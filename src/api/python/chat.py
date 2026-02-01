@@ -35,7 +35,6 @@ from agent_framework import (
     MagenticOrchestratorEvent,
     RequestInfoEvent,
     WorkflowOutputEvent,
-    WorkflowRunState,
     WorkflowStatusEvent,
     tool,
 )
@@ -478,10 +477,9 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
                 logger.info("MagenticBuilder workflow completed")
 
             elif isinstance(event, WorkflowStatusEvent):
-                if event.state == WorkflowRunState.COMPLETED:
-                    logger.info("Workflow status: COMPLETED")
-                elif event.state == WorkflowRunState.PAUSED:
-                    logger.info("Workflow status: PAUSED")
+                # SDK 1.0.0b260130: WorkflowRunState enum values may differ
+                state_name = str(event.state.name) if hasattr(event.state, "name") else str(event.state)
+                logger.info(f"Workflow status: {state_name}")
 
             elif isinstance(event, GroupChatRequestSentEvent):
                 # グループチャットリクエスト（Manager → Specialist）
