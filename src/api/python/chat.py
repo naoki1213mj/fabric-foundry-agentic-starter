@@ -56,6 +56,7 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
 from knowledge_base_tool import KnowledgeBaseTool
@@ -1675,29 +1676,43 @@ async def stream_chat_request(
                 stream_func = multi_tool_wrapper
 
             # Stream and accumulate response
+            # Note: Send incremental chunks for smooth UI rendering
             async for chunk in stream_func(conversation_id, query):
                 if chunk:
-                    assistant_content += str(chunk)
-                    # Include web citations in the response for UI display (Bing terms of use)
-                    citations_json = (
-                        json.dumps(_current_web_citations)
-                        if _current_web_citations
-                        else None
-                    )
+                    chunk_str = str(chunk)
+                    assistant_content += chunk_str
+                    # Send only the incremental chunk (not the full accumulated content)
+                    # This prevents UI flickering/re-rendering on each chunk
                     response = {
                         "choices": [
                             {
                                 "messages": [
                                     {
                                         "role": "assistant",
-                                        "content": assistant_content,
-                                        "citations": citations_json,
+                                        "content": chunk_str,  # Incremental only
                                     }
                                 ]
                             }
                         ]
                     }
                     yield json.dumps(response, ensure_ascii=False) + "\n\n"
+
+            # Send final message with citations (Bing terms of use compliance)
+            if _current_web_citations:
+                citations_response = {
+                    "choices": [
+                        {
+                            "messages": [
+                                {
+                                    "role": "assistant",
+                                    "content": "",  # No additional content
+                                    "citations": json.dumps(_current_web_citations),
+                                }
+                            ]
+                        }
+                    ]
+                }
+                yield json.dumps(citations_response, ensure_ascii=False) + "\n\n"
 
             # Fallback if no response
             if not assistant_content:

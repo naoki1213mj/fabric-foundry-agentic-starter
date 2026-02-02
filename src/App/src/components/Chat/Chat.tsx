@@ -41,7 +41,6 @@ import {
     isMalformedChartJSON,
     parseChartContent,
 } from "../../utils/jsonUtils";
-import { extractAnswerAndCitations } from "../../utils/messageUtils";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import "./Chat.css";
 
@@ -430,18 +429,23 @@ const Chat: React.FC<ChatProps> = ({
                   runningText += textValue;
                 } else if (typeof parsed === "object" && !hasError) {
                   const responseContent = parsed?.choices?.[0]?.messages?.[0]?.content;
+                  const responseCitations = parsed?.choices?.[0]?.messages?.[0]?.citations;
 
                   if (responseContent) {
-                    const { answerText, citationString } = extractAnswerAndCitations(responseContent);
-                    // Backend sends accumulated content, so we use it directly
+                    // Backend sends incremental chunks, so we accumulate them
                     // Create a new object to ensure Redux detects the change
-                    streamMessage.content = answerText || "";
+                    streamMessage.content = (streamMessage.content || "") + responseContent;
                     streamMessage.role = parsed?.choices?.[0]?.messages?.[0]?.role || ASSISTANT;
-                    streamMessage.citations = citationString;
 
                     // Dispatch with a new object reference to trigger re-render
                     dispatch(updateMessageById({ ...streamMessage }));
                     scrollChatToBottom();
+                  }
+
+                  // Handle citations sent separately at end of stream (Bing terms compliance)
+                  if (responseCitations) {
+                    streamMessage.citations = responseCitations;
+                    dispatch(updateMessageById({ ...streamMessage }));
                   }
                 }
               } catch (e) {
