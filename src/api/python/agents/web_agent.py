@@ -6,6 +6,15 @@ Uses the Foundry Agent Service with create_version() and responses API.
 
 Best Practice Reference:
 - https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-tools
+
+Pattern follows official Microsoft sample:
+- Create AIProjectClient with DefaultAzureCredential
+- Get openai_client from project_client.get_openai_client()
+- Use `with project_client:` context manager
+- Create agent with agents.create_version()
+- Send query with openai_client.responses.create()
+- Extract citations from response.output items
+- Clean up with agents.delete_version()
 """
 
 import json
@@ -42,25 +51,12 @@ class WebAgentHandler:
         self.model_deployment = os.getenv(
             "AZURE_AI_MODEL_DEPLOYMENT_NAME", "gpt-4o-mini"
         )
-        self._project_client = None
-        self._credential = None
-
-    def _get_project_client(self) -> Optional[AIProjectClient]:
-        """Get or create the AIProjectClient."""
-        if self._project_client is None:
-            if not self.foundry_endpoint:
-                return None
-            self._credential = DefaultAzureCredential()
-            self._project_client = AIProjectClient(
-                endpoint=self.foundry_endpoint, credential=self._credential
-            )
-        return self._project_client
 
     async def bing_grounding(self, query: str) -> str:
         """
         Search the web using Bing Grounding via Foundry Agent Service (New API).
 
-        Uses the recommended pattern:
+        Uses the recommended pattern from Microsoft official documentation:
         - agents.create_version() for agent creation
         - openai_client.responses.create() for responses
 
@@ -89,15 +85,18 @@ class WebAgentHandler:
             )
 
         try:
-            project_client = self._get_project_client()
-            if not project_client:
-                raise ValueError("Failed to create AIProjectClient")
-
             logger.info(
                 f"Performing Bing Grounding search via Foundry (New API): {query[:100]}..."
             )
 
-            # Get OpenAI client for responses API
+            # Create fresh client for each request (best practice to avoid transport issues)
+            # Following official pattern from Microsoft docs
+            project_client = AIProjectClient(
+                endpoint=self.foundry_endpoint,
+                credential=DefaultAzureCredential(),
+            )
+
+            # Get OpenAI client BEFORE entering context manager
             openai_client = project_client.get_openai_client()
 
             # Create Bing Grounding tool with New API
@@ -114,6 +113,7 @@ class WebAgentHandler:
                 )
             )
 
+            # Use context manager for proper resource management
             with project_client:
                 # Create agent version with New API (create_version)
                 agent = project_client.agents.create_version(
@@ -144,39 +144,65 @@ class WebAgentHandler:
                         },
                     )
 
-                    # Extract answer and citations
-                    answer_text = response.output_text if response.output_text else ""
-                    citations = []
+                    # Extract answer text safely
+                    answer_text = ""
+                    if hasattr(response, "output_text") and response.output_text:
+                        answer_text = response.output_text
 
-                    # Extract URL citations from output items
+                    # Extract URL citations from output items with proper null checks
+                    citations = []
                     if hasattr(response, "output") and response.output:
                         for item in response.output:
-                            if hasattr(item, "content"):
-                                for content in item.content:
-                                    if hasattr(content, "annotations"):
-                                        for annotation in content.annotations:
-                                            if annotation.type == "url_citation":
-                                                citations.append(
-                                                    {
-                                                        "url": annotation.url,
-                                                        "title": getattr(
-                                                            annotation, "title", ""
-                                                        ),
-                                                    }
-                                                )
+                            # Check if item has content attribute and it's not None
+                            if not hasattr(item, "content") or item.content is None:
+                                continue
+
+                            for content in item.content:
+                                # Check if content has annotations and it's not None
+                                if (
+                                    not hasattr(content, "annotations")
+                                    or content.annotations is None
+                                ):
+                                    continue
+
+                                for annotation in content.annotations:
+                                    if (
+                                        hasattr(annotation, "type")
+                                        and annotation.type == "url_citation"
+                                    ):
+                                        citations.append(
+                                            {
+                                                "url": getattr(annotation, "url", ""),
+                                                "title": getattr(
+                                                    annotation, "title", ""
+                                                ),
+                                            }
+                                        )
+
+                    logger.info(
+                        f"Bing Grounding response received. "
+                        f"Answer length: {len(answer_text)}, Citations: {len(citations)}"
+                    )
 
                 finally:
                     # Clean up the agent version
-                    project_client.agents.delete_version(
-                        agent_name=agent.name, agent_version=agent.version
-                    )
-                    logger.info(
-                        f"Deleted Bing search agent: {agent.name} v{agent.version}"
-                    )
+                    try:
+                        project_client.agents.delete_version(
+                            agent_name=agent.name, agent_version=agent.version
+                        )
+                        logger.info(
+                            f"Deleted Bing search agent: {agent.name} v{agent.version}"
+                        )
+                    except Exception as cleanup_error:
+                        logger.warning(
+                            f"Failed to delete agent (non-critical): {cleanup_error}"
+                        )
 
+            # Return results
             if answer_text:
                 logger.info(
-                    f"Bing Grounding completed. Found {len(citations)} citations."
+                    f"Bing Grounding completed successfully. "
+                    f"Found {len(citations)} citations."
                 )
                 return json.dumps(
                     {
