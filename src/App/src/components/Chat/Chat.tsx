@@ -2,6 +2,8 @@ import { DefaultButton, Spinner, SpinnerSize } from "@fluentui/react";
 import {
     Body1,
     Button,
+    Dropdown,
+    Option,
     Subtitle2,
     Textarea,
 } from "@fluentui/react-components";
@@ -28,20 +30,9 @@ import {
     updateMessageById,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
-
-// Throttle utility for scroll during streaming
-const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
-  let lastCall = 0;
-  return (...args: Parameters<T>) => {
-    const now = Date.now();
-    if (now - lastCall >= delay) {
-      lastCall = now;
-      fn(...args);
-    }
-  };
-};
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
+    type AgentMode,
     type ChartDataResponse,
     type ChatMessage,
     type Conversation,
@@ -55,6 +46,18 @@ import {
 } from "../../utils/jsonUtils";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import "./Chat.css";
+
+// Throttle utility for scroll during streaming
+const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
+  let lastCall = 0;
+  return (...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  };
+};
 
 type ChatProps = {
   onHandlePanelStates: (name: string) => void;
@@ -79,8 +82,17 @@ const Chat: React.FC<ChatProps> = ({
   const { isFetchingConvMessages, isHistoryUpdateAPIPending } = useAppSelector((state) => state.chatHistory);
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
   const [isChartLoading, setIsChartLoading] = useState(false)
+  const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
+
+  // Agent mode options
+  const agentModeOptions: { value: AgentMode; label: string; description: string }[] = [
+    { value: "sql_only", label: "SQL Only", description: "高速・SQLクエリのみ" },
+    { value: "multi_tool", label: "Multi Tool (推奨)", description: "全ツール使用・バランス型" },
+    { value: "handoff", label: "Handoff", description: "専門家エージェント委譲" },
+    { value: "magentic", label: "Magentic", description: "複雑な計画・マネージャー型" },
+  ];
 
   // Memoized computed values
   const currentConversationId = useMemo(() =>
@@ -276,7 +288,8 @@ const Chat: React.FC<ChatProps> = ({
 
     const request: ConversationRequest = {
       id: conversationId,
-      query: question
+      query: question,
+      agentMode: agentMode
     };
 
     let updatedMessages: ChatMessage[] = [];
@@ -367,7 +380,8 @@ const Chat: React.FC<ChatProps> = ({
   ) => {
     if (generatingResponse || !question.trim()) return;
 
-    const isChatReq = isChartQuery(userMessage) ? "graph" : "Text";
+    const isChart = isChartQuery(userMessage);
+    const isChatReq = isChart ? "graph" : "Text";
     const newMessage: ChatMessage = {
       id: generateUUIDv4(),
       role: USER,
@@ -376,6 +390,10 @@ const Chat: React.FC<ChatProps> = ({
     };
 
     dispatch(setGeneratingResponse(true));
+    // Set chart loading state for graph queries to show loading indicator
+    if (isChart) {
+      setIsChartLoading(true);
+    }
 
     dispatch(addMessages([newMessage]));
 
@@ -388,7 +406,8 @@ const Chat: React.FC<ChatProps> = ({
 
     const request: ConversationRequest = {
       id: conversationId,
-      query: userMessage
+      query: userMessage,
+      agentMode: agentMode
     };
 
     const streamMessage: ChatMessage = {
@@ -562,6 +581,7 @@ const Chat: React.FC<ChatProps> = ({
     } finally {
       dispatch(setGeneratingResponse(false));
       dispatch(setStreamingFlag(false));
+      setIsChartLoading(false);
       abortController.abort();
     }
   };
@@ -669,6 +689,25 @@ const Chat: React.FC<ChatProps> = ({
         <div data-testid="streamendref-id" ref={chatMessageStreamEnd} />
       </div>
       <div className="chat-footer">
+        <div className="agent-mode-selector">
+          <Dropdown
+            placeholder="Agent Mode"
+            value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
+            selectedOptions={[agentMode]}
+            onOptionSelect={(_, data) => setAgentMode(data.optionValue as AgentMode)}
+            disabled={isInputDisabled}
+            style={{ minWidth: "160px" }}
+          >
+            {agentModeOptions.map((option) => (
+              <Option key={option.value} value={option.value} text={option.label}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontWeight: 500 }}>{option.label}</span>
+                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                </div>
+              </Option>
+            ))}
+          </Dropdown>
+        </div>
         <Button
           className="btn-create-conv"
           shape="circular"

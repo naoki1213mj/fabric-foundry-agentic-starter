@@ -1621,7 +1621,10 @@ def select_agent_mode(query: str) -> str:
 
 
 async def stream_chat_request(
-    conversation_id: str, query: str, user_id: str = "anonymous"
+    conversation_id: str,
+    query: str,
+    user_id: str = "anonymous",
+    agent_mode: str | None = None,
 ):
     """
     Handles streaming chat requests with dynamic mode selection.
@@ -1641,9 +1644,18 @@ async def stream_chat_request(
         try:
             assistant_content = ""
 
-            # Select best mode for this query
-            mode = select_agent_mode(query)
-            logger.info(f"Selected mode '{mode}' for query: {query[:50]}...")
+            # Use request agent_mode if provided, otherwise auto-select
+            if agent_mode and agent_mode in [
+                "sql_only",
+                "multi_tool",
+                "handoff",
+                "magentic",
+            ]:
+                mode = agent_mode
+                logger.info(f"Using requested mode '{mode}' for query: {query[:50]}...")
+            else:
+                mode = select_agent_mode(query)
+                logger.info(f"Auto-selected mode '{mode}' for query: {query[:50]}...")
 
             # Choose stream function based on mode
             if mode == "sql_only":
@@ -1757,6 +1769,9 @@ async def conversation(request: Request):
         request_json = await request.json()
         conversation_id = request_json.get("conversation_id")
         query = request_json.get("query")
+        agent_mode = request_json.get(
+            "agent_mode"
+        )  # Optional: sql_only, multi_tool, handoff, magentic
 
         if not query:
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
@@ -1766,9 +1781,14 @@ async def conversation(request: Request):
                 content={"error": "Conversation ID is required"}, status_code=400
             )
 
-        result = await stream_chat_request(conversation_id, query, user_id)
+        result = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
-            "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query}
+            "ChatStreamSuccess",
+            {
+                "conversation_id": conversation_id,
+                "query": query,
+                "agent_mode": agent_mode,
+            },
         )
         return StreamingResponse(result, media_type="application/json-lines")
 

@@ -193,7 +193,7 @@
 
 .initial-msg > span:nth-of-type(3) {
   color: var(--colorNeutralForeground4);
- 
+
 }
 
 .typing-indicator {
@@ -247,6 +247,15 @@
 .chat-footer {
   display: flex;
   align-items: center;
+  gap: 8px;
+}
+
+.agent-mode-selector {
+  flex-shrink: 0;
+}
+
+.agent-mode-selector .fui-Dropdown {
+  min-width: 160px;
 }
 
 /* HTML Content Styles */
@@ -299,7 +308,7 @@
   .html-content table {
     font-size: 12px;
   }
-  
+
   .html-content table th,
   .html-content table td {
     padding: 8px 6px;

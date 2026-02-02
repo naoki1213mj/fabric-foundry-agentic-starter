@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 
 export type FilterObject = {
   key: string;
@@ -37,9 +36,12 @@ export type ChatMessage = {
   citations?: string
 };
 
+export type AgentMode = "sql_only" | "multi_tool" | "handoff" | "magentic";
+
 export type ConversationRequest = {
   id?: string;
   query: string;
+  agentMode?: AgentMode;
 };
 
 export type AskResponse = {
