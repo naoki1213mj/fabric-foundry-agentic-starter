@@ -56,7 +56,8 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-from history import get_conversation_messages
+# Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
+from history_sql import get_conversation_messages
 from knowledge_base_tool import KnowledgeBaseTool
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
@@ -1635,7 +1636,7 @@ async def stream_chat_request(
         global _current_web_citations
         # Clear any previous citations at the start of each request
         _current_web_citations = []
-        
+
         try:
             assistant_content = ""
 
@@ -1678,7 +1679,11 @@ async def stream_chat_request(
                 if chunk:
                     assistant_content += str(chunk)
                     # Include web citations in the response for UI display (Bing terms of use)
-                    citations_json = json.dumps(_current_web_citations) if _current_web_citations else None
+                    citations_json = (
+                        json.dumps(_current_web_citations)
+                        if _current_web_citations
+                        else None
+                    )
                     response = {
                         "choices": [
                             {
