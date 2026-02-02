@@ -1051,18 +1051,26 @@ async def stream_single_agent_response(
             api_version=api_version,
         )
 
+        # Initialize tool handlers (ensure singletons are created)
+        web_handler = get_web_agent_handler()
+        kb_tool = get_knowledge_base_tool()
+
         # Collect all available tools
         all_tools = [run_sql_query]  # Always available
 
         # Add web search if configured
-        if _web_agent_handler:
+        if web_handler:
             all_tools.append(search_web)
             logger.info("Web search tool enabled")
 
         # Add document search if configured
-        if _knowledge_base_tool:
+        if kb_tool:
             all_tools.append(search_documents)
             logger.info("Document search tool enabled")
+        else:
+            logger.warning(
+                "Document search tool NOT available - AI_SEARCH_* env vars may be missing"
+            )
 
         logger.info(f"Available tools: {len(all_tools)} tools configured")
 
@@ -1305,6 +1313,13 @@ async def stream_handoff_response(
         except Exception as e:
             logger.warning(f"Handoff: Could not load history: {e}")
 
+        # Initialize tool handlers (ensure singletons are created)
+        web_handler = get_web_agent_handler()
+        kb_tool = get_knowledge_base_tool()
+        logger.info(
+            f"Handoff mode: web_handler={web_handler is not None}, kb_tool={kb_tool is not None}"
+        )
+
         credential = DefaultAzureCredential()
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
@@ -1394,7 +1409,7 @@ async def stream_handoff_response(
 2. 結果を分かりやすくまとめる
 3. **完全な回答を提供**（これが最終回答です）
 """,
-            tools=[search_web] if _web_agent_handler else [],
+            tools=[search_web] if web_handler else [],
         )
 
         # Document search specialist
@@ -1409,14 +1424,14 @@ async def stream_handoff_response(
 2. 結果を分かりやすくまとめる
 3. **完全な回答を提供**（これが最終回答です）
 """,
-            tools=[search_documents] if _knowledge_base_tool else [],
+            tools=[search_documents] if kb_tool else [],
         )
 
         # Collect active agents
         participants = [triage_agent, sql_agent]
-        if _web_agent_handler:
+        if web_handler:
             participants.append(web_agent)
-        if _knowledge_base_tool:
+        if kb_tool:
             participants.append(doc_agent)
 
         logger.info(f"Handoff workflow with {len(participants)} agents")
@@ -1429,9 +1444,9 @@ async def stream_handoff_response(
 
         # Configure handoff routes: triage can handoff to all specialists
         specialist_agents = [sql_agent]
-        if _web_agent_handler:
+        if web_handler:
             specialist_agents.append(web_agent)
-        if _knowledge_base_tool:
+        if kb_tool:
             specialist_agents.append(doc_agent)
 
         builder = builder.add_handoff(triage_agent, specialist_agents)
