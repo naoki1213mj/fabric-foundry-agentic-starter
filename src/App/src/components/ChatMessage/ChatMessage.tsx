@@ -73,12 +73,44 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
   // Handle assistant messages - string content (text, lists, tables, or stringified charts)
   if (message.role === "assistant" && typeof message.content === "string") {
-    // Extract Chart.js JSON(s) from mixed text/JSON content using bracket counting
+    // Extract Chart.js JSON(s) from mixed text/JSON content
     const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
       const charts: any[] = [];
       let textPart = content;
 
-      // Find all potential JSON starting points: { "type": "bar|pie|line|..."
+      // STEP 1: First try to extract from Markdown code blocks (```json ... ```)
+      const codeBlockPattern = /```json\s*([\s\S]*?)```/g;
+      let codeBlockMatch;
+      const codeBlockPositions: { start: number; end: number; json: any }[] = [];
+
+      while ((codeBlockMatch = codeBlockPattern.exec(content)) !== null) {
+        const jsonStr = codeBlockMatch[1].trim();
+        try {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed && parsed.data && parsed.type && parsed.data.datasets) {
+            codeBlockPositions.push({
+              start: codeBlockMatch.index,
+              end: codeBlockMatch.index + codeBlockMatch[0].length,
+              json: parsed
+            });
+          }
+        } catch {
+          // Invalid JSON in code block, skip
+        }
+      }
+
+      // If found in code blocks, use those
+      if (codeBlockPositions.length > 0) {
+        for (let i = codeBlockPositions.length - 1; i >= 0; i--) {
+          const pos = codeBlockPositions[i];
+          charts.unshift(pos.json);
+          textPart = textPart.substring(0, pos.start) + textPart.substring(pos.end);
+        }
+        textPart = textPart.replace(/\n{3,}/g, '\n\n').trim();
+        return { textPart, charts };
+      }
+
+      // STEP 2: Fallback - Find raw JSON using bracket counting
       const chartTypePattern = /\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/g;
       const jsonPositions: { start: number; end: number; json: any }[] = [];
 
