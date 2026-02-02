@@ -314,7 +314,8 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        throw new Error('Failed to send message');
+        const errMsg = result.error?.message || 'Failed to send message';
+        throw new Error(errMsg);
       }
       const response = result.payload;
 
@@ -440,7 +441,8 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        throw new Error('Failed to send message');
+        const errMsg = result.error?.message || 'Failed to send message';
+        throw new Error(errMsg);
       }
       const response = result.payload;
 
