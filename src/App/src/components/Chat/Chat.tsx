@@ -163,15 +163,32 @@ const Chat: React.FC<ChatProps> = ({
 }, []);
 
   const isChartQuery = useCallback((query: string) => {
-    const chartKeywords = ["chart", "graph", "visualize", "plot"];
+    const chartKeywords = [
+      "chart",
+      "graph",
+      "visualize",
+      "plot",
+      "グラフ",
+      "チャート",
+      "可視化",
+      "図",
+      "棒グラフ",
+      "円グラフ",
+      "折れ線",
+      "折れ線グラフ",
+    ];
 
     // Convert to lowercase for case-insensitive matching
     const lowerCaseQuery = query.toLowerCase();
 
     // Use word boundary regex to match whole words only
-    return chartKeywords.some(keyword =>
-      new RegExp(`\\b${keyword}\\b`).test(lowerCaseQuery)
-    );
+    return chartKeywords.some((keyword) => {
+      // 英語は単語境界、日本語は部分一致
+      if (/^[a-z]+$/i.test(keyword)) {
+        return new RegExp(`\\b${keyword}\\b`).test(lowerCaseQuery);
+      }
+      return lowerCaseQuery.includes(keyword);
+    });
   }, []);
 
   useEffect(() => {

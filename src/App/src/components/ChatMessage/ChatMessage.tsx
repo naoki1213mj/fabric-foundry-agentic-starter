@@ -73,6 +73,24 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
   // Handle assistant messages - string content (text, lists, tables, or stringified charts)
   if (message.role === "assistant" && typeof message.content === "string") {
+    const isStreaming = generatingResponse && isLastAssistantMessage;
+    const looksLikeChartJson = /```json|"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i.test(
+      message.content
+    );
+
+    // Avoid rendering partial chart JSON during streaming to prevent flicker
+    if (isStreaming && looksLikeChartJson) {
+      return (
+        <div className="assistant-message">
+          <div className="typing-indicator">
+            <span className="generating-text">{t("chat.generatingChart")}</span>
+            <span className="dot"></span>
+            <span className="dot"></span>
+            <span className="dot"></span>
+          </div>
+        </div>
+      );
+    }
     // Extract Chart.js JSON(s) from mixed text/JSON content
     const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
       const charts: any[] = [];
