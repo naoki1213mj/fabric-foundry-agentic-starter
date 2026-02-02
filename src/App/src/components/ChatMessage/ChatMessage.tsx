@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,6 +6,19 @@ import supersub from "remark-supersub";
 import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
 import ChatChart from "../ChatChart/ChatChart";
 import Citations from "../Citations/Citations";
+
+// Helper to create a stable signature for chart data
+const getChartSignature = (chart: any): string => {
+  try {
+    const type = chart?.type || chart?.chartType || '';
+    const labels = chart?.data?.labels?.join(',') || '';
+    const firstDataset = chart?.data?.datasets?.[0];
+    const data = firstDataset?.data?.join(',') || '';
+    return `${type}|${labels}|${data}`;
+  } catch {
+    return JSON.stringify(chart);
+  }
+};
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -100,7 +113,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           return false;
         }
       }
-      
+
       // Check for complete raw JSON
       const rawJsonMatch = content.match(/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
       if (rawJsonMatch && rawJsonMatch.index !== undefined) {
@@ -137,7 +150,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       if (rawJsonMatch && rawJsonMatch.index !== undefined) {
         const beforeJson = textPart.substring(0, rawJsonMatch.index);
         const afterJsonStart = textPart.substring(rawJsonMatch.index);
-        
+
         let braceCount = 0;
         let jsonEndIndex = afterJsonStart.length;
         for (let i = 0; i < afterJsonStart.length; i++) {
@@ -361,7 +374,13 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     }
 
     // SCENARIO 3: Mixed text + JSON content (e.g., "説明テキスト... { "type": "bar", ... }")
-    const { textPart, charts: extractedCharts } = extractChartsFromText(message.content);
+    // Memoize chart extraction to prevent recalculation on every render
+    // At this point, message.content is guaranteed to be string (checked at line 72)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { textPart, charts: extractedCharts } = useMemo(
+      () => extractChartsFromText(message.content as string),
+      [message.content]
+    );
 
     if (extractedCharts.length > 0) {
       // Render text + multiple charts
@@ -385,15 +404,19 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           )}
 
           {/* Render all extracted charts */}
-          {extractedCharts.map((chartData, chartIndex) => (
-            <div
-              key={chartIndex}
-              className="chart-section"
-              style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
-            >
-              <ChatChart chartContent={chartData} />
-            </div>
-          ))}
+          {extractedCharts.map((chartData, chartIndex) => {
+            // Use stable key based on chart content to prevent flickering
+            const chartKey = `chart-${getChartSignature(chartData)}`;
+            return (
+              <div
+                key={chartKey}
+                className="chart-section"
+                style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
+              >
+                <ChatChart chartContent={chartData} />
+              </div>
+            );
+          })}
 
           {/* Citations */}
           {!generatingResponse && (

@@ -1,10 +1,9 @@
-import React, { useEffect, useRef } from "react";
 import {
-  Chart as ChartJS,
-  type ChartTypeRegistry,
-  registerables,
+    Chart as ChartJS,
+    type ChartTypeRegistry,
+    registerables,
 } from "chart.js";
-import { hideDataSetsLabelConfig } from "../../configs/Utils";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 
 const chartTypes = {
   barChart: "bar",
@@ -34,29 +33,59 @@ const isValidChartConfig = (content: ChartProps["chartContent"]): boolean => {
   return true;
 };
 
-const ChatChart: React.FC<ChartProps> = ({ chartContent }) => {
+// Create a stable signature for chart data to use as dependency
+const getChartDataSignature = (chartContent: ChartProps["chartContent"]): string => {
+  try {
+    const type = chartContent?.type || '';
+    const labels = chartContent?.data?.labels?.join(',') || '';
+    const datasets = chartContent?.data?.datasets?.map((ds: any) =>
+      ds?.data?.join(',') || ''
+    ).join('|') || '';
+    return `${type}:${labels}:${datasets}`;
+  } catch {
+    return JSON.stringify(chartContent);
+  }
+};
+
+const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<ChartJS | null>(null);
   const validChart = isValidChartConfig(chartContent);
 
-useEffect(() => {
-  if (validChart && chartRef.current && chartContent.data && chartContent?.type) {
-    ChartJS.register(...registerables);
+  // Memoize the chart data signature to prevent unnecessary re-renders
+  const chartSignature = useMemo(() => getChartDataSignature(chartContent), [chartContent]);
 
-    const chartConfigData = {
-      type:
+useEffect(() => {
+  // Skip if chart data hasn't actually changed
+  if (!validChart || !chartRef.current || !chartContent.data || !chartContent?.type) {
+    return;
+  }
+
+  // Destroy existing chart before creating new one
+  if (chartInstanceRef.current) {
+    chartInstanceRef.current.destroy();
+    chartInstanceRef.current = null;
+  }
+
+  ChartJS.register(...registerables);
+
+  const chartConfigData = {
+    type:
+      chartContent.type === "horizontalBar"
+        ? chartTypes.barChart
+        : (chartContent.type as keyof ChartTypeRegistry),
+    data: { ...chartContent.data },
+    options: {
+      ...chartContent?.options,
+      responsive: false,
+      // Disable animations to prevent flickering during streaming
+      animation: false,
+      indexAxis:
         chartContent.type === "horizontalBar"
-          ? chartTypes.barChart
-          : (chartContent.type as keyof ChartTypeRegistry),
-      data: { ...chartContent.data },
-      options: {
-        ...chartContent?.options,
-        responsive: false,
-        indexAxis:
-          chartContent.type === "horizontalBar"
-            ? "y"
-            : chartContent?.options?.indexAxis,
-      },
-    };
+          ? "y"
+          : chartContent?.options?.indexAxis,
+    },
+  };
 
     // Restore tooltip callback if it’s missing or a string placeholder
     const tooltipCallbacks =
@@ -81,6 +110,7 @@ useEffect(() => {
     }
 
     const myChart = new ChartJS(chartRef.current, chartConfigData);
+    chartInstanceRef.current = myChart;
 
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
@@ -102,12 +132,13 @@ useEffect(() => {
       ) {
         resizeObserver.unobserve(chartRef?.current?.parentElement);
       }
-      if (myChart.destroy) {
-        myChart.destroy();
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
       }
     };
-  }
-}, [chartContent.data, chartContent?.options, chartContent?.type, validChart]);
+  // Use chartSignature as dependency - chart only re-creates when actual data changes
+}, [chartSignature, validChart]);
 
   return (
     <div style={{ maxHeight: 350 }}>
@@ -123,6 +154,8 @@ useEffect(() => {
       )}
     </div>
   );
-};
+});
+
+ChatChart.displayName = 'ChatChart';
 
 export default ChatChart;
