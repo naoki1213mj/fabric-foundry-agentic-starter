@@ -158,6 +158,7 @@ export type ParsedChunk = {
         {
           content: string;
           role: string;
+          citations?: string;
         }
       ];
       history_metadata: object;
