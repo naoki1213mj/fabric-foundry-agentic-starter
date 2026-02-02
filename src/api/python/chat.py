@@ -49,6 +49,7 @@ from agent_framework.azure import AzureOpenAIChatClient
 
 # Local imports - tool handlers
 from agents.web_agent import WebAgentHandler
+from auth.auth_utils import get_authenticated_user_details
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -983,13 +984,41 @@ async def stream_multi_agent_response(
             _db_connection = None
 
 
-async def stream_single_agent_response(conversation_id: str, query: str):
+async def stream_single_agent_response(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Stream response using single agent mode with AzureOpenAIChatClient.
     This is the PRIMARY mode - a single intelligent agent with multiple tools.
     The LLM automatically selects which tools to use based on the query.
     """
     try:
+        # Load conversation history for multi-turn support
+        history_messages = []
+        try:
+            import asyncio
+
+            messages = await asyncio.wait_for(
+                get_conversation_messages(user_id, conversation_id), timeout=3.0
+            )
+            if messages:
+                # Last 6 messages for context
+                recent_messages = messages[-6:] if len(messages) > 6 else messages
+                for msg in recent_messages:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if isinstance(content, str) and content:
+                        history_messages.append({"role": role, "content": content})
+                logger.info(
+                    f"Loaded {len(history_messages)} messages from conversation history"
+                )
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Conversation history fetch timed out, continuing without history"
+            )
+        except Exception as e:
+            logger.warning(f"Could not load conversation history: {e}")
+
         # Use sync credential - SDK requires synchronous token acquisition
         credential = DefaultAzureCredential()
 
@@ -1089,10 +1118,25 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             tools=all_tools,
         )
 
+        # Build the full prompt with conversation history for multi-turn support
+        if history_messages:
+            # Format history as context for the agent
+            history_context = "\n".join(
+                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
+            )
+            full_query = f"""## 会話履歴（参考にしてください）
+{history_context}
+
+## 現在の質問
+{query}"""
+            logger.info(f"Including {len(history_messages)} messages in context")
+        else:
+            full_query = query
+
         logger.info(f"Unified agent processing query: {query[:100]}...")
 
         # Stream the agent response
-        async for chunk in agent.run_stream(query):
+        async for chunk in agent.run_stream(full_query):
             if chunk and chunk.text:
                 yield chunk.text
 
@@ -1109,12 +1153,37 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             _db_connection = None
 
 
-async def stream_sql_only_response(conversation_id: str, query: str):
+async def stream_sql_only_response(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Stream response using single agent mode with SQL tool only.
     This is the FASTEST mode - optimized for simple SQL queries.
     """
     try:
+        # Load conversation history for multi-turn support
+        history_messages = []
+        try:
+            import asyncio
+
+            messages = await asyncio.wait_for(
+                get_conversation_messages(user_id, conversation_id), timeout=3.0
+            )
+            if messages:
+                recent_messages = messages[-6:] if len(messages) > 6 else messages
+                for msg in recent_messages:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if isinstance(content, str) and content:
+                        history_messages.append({"role": role, "content": content})
+                logger.info(
+                    f"SQL-only: Loaded {len(history_messages)} messages from history"
+                )
+        except asyncio.TimeoutError:
+            logger.warning("SQL-only: History fetch timed out")
+        except Exception as e:
+            logger.warning(f"SQL-only: Could not load history: {e}")
+
         credential = DefaultAzureCredential()
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
@@ -1157,9 +1226,25 @@ async def stream_sql_only_response(conversation_id: str, query: str):
             tools=[run_sql_query],
         )
 
+        # Build the full prompt with conversation history for multi-turn support
+        if history_messages:
+            history_context = "\n".join(
+                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
+            )
+            full_query = f"""## 会話履歴（参考にしてください）
+{history_context}
+
+## 現在の質問
+{query}"""
+            logger.info(
+                f"SQL-only: Including {len(history_messages)} messages in context"
+            )
+        else:
+            full_query = query
+
         logger.info(f"SQL-only agent processing query: {query[:100]}...")
 
-        async for chunk in agent.run_stream(query):
+        async for chunk in agent.run_stream(full_query):
             if chunk and chunk.text:
                 yield chunk.text
 
@@ -1176,7 +1261,9 @@ async def stream_sql_only_response(conversation_id: str, query: str):
             _db_connection = None
 
 
-async def stream_handoff_response(conversation_id: str, query: str):
+async def stream_handoff_response(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Stream response using HandoffBuilder for expert delegation pattern.
 
@@ -1195,6 +1282,29 @@ async def stream_handoff_response(conversation_id: str, query: str):
     Topology: User → Triage → Specialist → Response
     """
     try:
+        # Load conversation history for multi-turn support
+        history_messages = []
+        try:
+            import asyncio
+
+            messages = await asyncio.wait_for(
+                get_conversation_messages(user_id, conversation_id), timeout=3.0
+            )
+            if messages:
+                recent_messages = messages[-6:] if len(messages) > 6 else messages
+                for msg in recent_messages:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if isinstance(content, str) and content:
+                        history_messages.append({"role": role, "content": content})
+                logger.info(
+                    f"Handoff: Loaded {len(history_messages)} messages from history"
+                )
+        except asyncio.TimeoutError:
+            logger.warning("Handoff: History fetch timed out")
+        except Exception as e:
+            logger.warning(f"Handoff: Could not load history: {e}")
+
         credential = DefaultAzureCredential()
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
@@ -1345,11 +1455,27 @@ async def stream_handoff_response(conversation_id: str, query: str):
 
         workflow = builder.build()
 
+        # Build the full prompt with conversation history for multi-turn support
+        if history_messages:
+            history_context = "\n".join(
+                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
+            )
+            full_query = f"""## 会話履歴（参考にしてください）
+{history_context}
+
+## 現在の質問
+{query}"""
+            logger.info(
+                f"Handoff: Including {len(history_messages)} messages in context"
+            )
+        else:
+            full_query = query
+
         logger.info(f"Handoff workflow processing query: {query[:100]}...")
 
         # Stream the workflow response
         streamed_content = ""
-        async for event in workflow.run_stream(query):
+        async for event in workflow.run_stream(full_query):
             if isinstance(event, AgentRunUpdateEvent):
                 # Stream agent responses in real-time
                 if event.data:
@@ -1408,7 +1534,7 @@ AGENT_MODE = os.getenv("AGENT_MODE", "multi_tool").lower()
 def select_agent_mode(query: str) -> str:
     """
     Select the best agent mode based on query complexity.
-    
+
     Design Principles:
     - multi_tool is the DEFAULT and RECOMMENDED for most queries
     - multi_tool handles result integration (single agent calls multiple tools)
@@ -1427,12 +1553,26 @@ def select_agent_mode(query: str) -> str:
     query_lower = query.lower()
 
     # Simple greetings → sql_only (fastest, no tools needed)
-    greeting_patterns = ["こんにちは", "ありがとう", "hello", "hi", "よろしく", "はじめまして"]
+    greeting_patterns = [
+        "こんにちは",
+        "ありがとう",
+        "hello",
+        "hi",
+        "よろしく",
+        "はじめまして",
+    ]
     if any(p in query_lower for p in greeting_patterns):
         return "sql_only"
 
     # Simple SQL-only patterns → sql_only
-    sql_only_patterns = ["売上top", "売上ランキング", "一覧", "何件", "総数", "合計金額"]
+    sql_only_patterns = [
+        "売上top",
+        "売上ランキング",
+        "一覧",
+        "何件",
+        "総数",
+        "合計金額",
+    ]
     if any(p in query_lower for p in sql_only_patterns) and not any(
         p in query_lower for p in ["仕様", "スペック", "トレンド", "最新"]
     ):
@@ -1447,7 +1587,9 @@ def select_agent_mode(query: str) -> str:
     return "multi_tool"
 
 
-async def stream_chat_request(conversation_id: str, query: str):
+async def stream_chat_request(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Handles streaming chat requests with dynamic mode selection.
 
@@ -1468,18 +1610,33 @@ async def stream_chat_request(conversation_id: str, query: str):
 
             # Choose stream function based on mode
             if mode == "sql_only":
-                stream_func = stream_sql_only_response
+
+                async def sql_wrapper(cid: str, q: str):
+                    async for chunk in stream_sql_only_response(cid, q, user_id):
+                        yield chunk
+
+                stream_func = sql_wrapper
             elif mode == "handoff":
-                stream_func = stream_handoff_response
+
+                async def handoff_wrapper(cid: str, q: str):
+                    async for chunk in stream_handoff_response(cid, q, user_id):
+                        yield chunk
+
+                stream_func = handoff_wrapper
             elif mode == "magentic":
                 # Magentic requires user_id parameter
                 async def magentic_wrapper(cid: str, q: str):
-                    async for chunk in stream_multi_agent_response(cid, q, "anonymous"):
+                    async for chunk in stream_multi_agent_response(cid, q, user_id):
                         yield chunk
 
                 stream_func = magentic_wrapper
             else:  # multi_tool (default)
-                stream_func = stream_single_agent_response
+
+                async def multi_tool_wrapper(cid: str, q: str):
+                    async for chunk in stream_single_agent_response(cid, q, user_id):
+                        yield chunk
+
+                stream_func = multi_tool_wrapper
 
             # Stream and accumulate response
             async for chunk in stream_func(conversation_id, query):
@@ -1546,6 +1703,12 @@ async def stream_chat_request(conversation_id: str, query: str):
 async def conversation(request: Request):
     """Handle chat requests - streaming text or chart generation based on query keywords."""
     try:
+        # Get authenticated user for conversation history
+        authenticated_user = get_authenticated_user_details(
+            request_headers=request.headers
+        )
+        user_id = authenticated_user.get("user_principal_id", "anonymous")
+
         request_json = await request.json()
         conversation_id = request_json.get("conversation_id")
         query = request_json.get("query")
@@ -1558,7 +1721,7 @@ async def conversation(request: Request):
                 content={"error": "Conversation ID is required"}, status_code=400
             )
 
-        result = await stream_chat_request(conversation_id, query)
+        result = await stream_chat_request(conversation_id, query, user_id)
         track_event_if_configured(
             "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query}
         )
