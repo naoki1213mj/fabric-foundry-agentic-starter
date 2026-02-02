@@ -1,24 +1,29 @@
 """
 Chat API module for handling chat interactions and responses.
 
-Supports two modes:
-- Single Agent Mode (default): Uses a single ChatAgent for all queries
-- Multi Agent Mode (MULTI_AGENT_MODE=true): Uses MagenticBuilder for multi-agent orchestration
-  - Manager Agent decomposes complex queries into subtasks
-  - Specialist Agents execute subtasks in parallel when possible
-  - Manager synthesizes final answer from all specialist responses
+Supports multiple agent modes (AGENT_MODE environment variable):
 
-Architecture (MagenticBuilder - Magentic One Pattern):
-1. Manager Agent: タスク分解、進捗管理、最終回答合成
-2. SQL Specialist: Fabric SQLデータベースクエリ（売上、注文、顧客、製品分析）
-3. Web Specialist: ウェブ検索（最新情報、市場トレンド）
-4. Doc Specialist: 製品仕様書PDF検索（Azure AI Search）
+1. sql_only: Fastest - single agent with SQL tool only
+   - Best for: Simple SQL queries like "売上TOP3"
 
-Complex Query Flow:
-User: "売上データを分析して、最新の市場トレンドと比較して"
-→ Manager: Plan = [1. sql_agent: 売上分析, 2. web_agent: 市場トレンド取得]
-→ Specialists: 並列実行
-→ Manager: 結果を統合して最終回答生成
+2. multi_tool (DEFAULT, RECOMMENDED): Single agent with all tools
+   - Best for: Most queries - LLM decides which tools to use
+   - Handles complex queries by calling multiple tools sequentially
+   - Example: "売上データと製品仕様を比較" → SQL + Doc tools
+
+3. handoff: Multi-agent with HandoffBuilder
+   - Best for: Expert delegation pattern
+   - Triage → Specialist → Final response (no integration)
+   - Note: Does NOT integrate results from multiple specialists
+
+4. magentic: Multi-agent with MagenticBuilder (legacy, slowest)
+   - Best for: Complex planning with result integration
+   - Manager plans → Specialists execute → Manager integrates
+
+Architecture Decision:
+- For result integration from multiple sources → Use multi_tool (single agent calls multiple tools)
+- For expert delegation → Use handoff
+- For complex planning → Use magentic (slow but powerful)
 """
 
 import json
@@ -31,6 +36,7 @@ from agent_framework import (
     AgentRunUpdateEvent,
     ChatAgent,
     GroupChatRequestSentEvent,
+    HandoffAgentUserRequest,
     HandoffBuilder,
     MagenticBuilder,
     MagenticOrchestratorEvent,
@@ -1032,15 +1038,23 @@ async def stream_single_agent_response(conversation_id: str, query: str):
         logger.info(f"Available tools: {len(all_tools)} tools configured")
 
         # Create a single intelligent agent with ALL tools
+        # This is the RECOMMENDED mode for most queries because:
+        # 1. Single LLM call handles tool selection
+        # 2. Can call multiple tools and INTEGRATE results
+        # 3. Fast and flexible
         agent = chat_client.as_agent(
             name="unified_assistant",
             instructions="""あなたは統合アシスタントです。ユーザーの質問に最適なツールを選んで回答します。
+
+## 重要：結果の統合
+複数のツールを使う場合は、**全ての結果を統合して1つの回答**を作成してください。
 
 ## 利用可能なツール
 
 ### 1. run_sql_query - ビジネスデータ分析（最重要）
 売上、注文、顧客、製品の数値データを取得・分析
 - テーブル: orders, orderline, product, customer, location, invoice, payment
+- 主要JOIN: orders JOIN orderline ON OrderId JOIN product ON ProductId
 - 用途: 「売上TOP3」「月別推移」「顧客分析」「グラフ表示」等
 
 ### 2. search_web - Web検索（利用可能な場合）
@@ -1059,13 +1073,18 @@ async def stream_single_agent_response(conversation_id: str, query: str):
 - location: LocationId, CustomerId, Region, City, StateId
 
 ## 回答ルール
-1. **ツール不要な質問**（挨拶、概念説明）はツールを使わず直接回答
-2. **データが必要**ならrun_sql_queryを使用
-3. **最新情報**が必要ならsearch_webを使用
-4. **製品仕様**が必要ならsearch_documentsを使用
-5. **複合質問**は必要なツールを順番に呼び出し、結果を統合
-6. 日本語で分かりやすく回答
-7. グラフはChart.js JSON形式（Vega-Lite禁止）
+1. **ツール不要な質問**（挨拶、概念説明）→ ツールを使わず直接回答
+2. **単一ソース** → 適切なツールを1回使用
+3. **複合質問**（例：「売上と製品仕様を比較」）→ 複数ツールを順次呼び出し、**結果を統合**
+4. **結果の統合**は必ず行う - 各ツールの結果を論理的に組み合わせて回答
+5. 日本語で分かりやすく回答
+6. グラフはChart.js JSON形式（Vega-Lite禁止）
+
+## 複合質問の例
+「Mountain-100の売上と仕様を教えて」
+→ Step 1: run_sql_query で売上データ取得
+→ Step 2: search_documents で製品仕様取得
+→ Step 3: 両方の結果を統合して回答
 """,
             tools=all_tools,
         )
@@ -1159,15 +1178,21 @@ async def stream_sql_only_response(conversation_id: str, query: str):
 
 async def stream_handoff_response(conversation_id: str, query: str):
     """
-    Stream response using HandoffBuilder for multi-agent collaboration.
+    Stream response using HandoffBuilder for expert delegation pattern.
 
-    This is FASTER than MagenticBuilder because:
-    - No central planner overhead
-    - Direct agent-to-agent handoffs
-    - Triage routes to specialists immediately
+    HandoffBuilder Design:
+    - Triage agent analyzes query and hands off to the RIGHT specialist
+    - Specialist provides the FINAL answer (no integration step)
+    - Fast because: no central planner, direct handoffs
 
-    Topology:
-    User → Triage → (SQL Agent | Web Agent | Doc Agent) → Response
+    Use Case:
+    - "売上TOP3" → Triage → SQL Agent → Final SQL-based answer
+    - "最新のトレンド" → Triage → Web Agent → Final web-based answer
+
+    NOT for:
+    - Queries needing multiple sources combined → Use multi_tool mode instead
+
+    Topology: User → Triage → Specialist → Response
     """
     try:
         credential = DefaultAzureCredential()
@@ -1187,61 +1212,92 @@ async def stream_handoff_response(conversation_id: str, query: str):
             api_version=api_version,
         )
 
-        # Create triage agent
+        # Create triage agent - routes to the RIGHT specialist
         triage_agent = chat_client.as_agent(
             name="triage_agent",
-            description="ユーザーの質問を分析し、適切な専門エージェントにルーティングする",
-            instructions="""あなたは質問を分析し、適切な専門エージェントにハンドオフするトリアージエージェントです。
+            description="ユーザーの質問を分析し、最適な専門エージェントにハンドオフする",
+            instructions="""あなたは質問を分析し、最適な専門エージェントにハンドオフするトリアージエージェントです。
 
-## ルーティングルール
-1. **sql_agent**: 売上、注文、顧客、製品などのビジネスデータ分析
-   - 例: 「売上TOP3」「月別推移」「顧客分析」
-2. **web_agent**: 最新ニュース、市場トレンド、外部情報
-   - 例: 「2026年のトレンド」「最新の〜」
-3. **doc_agent**: 製品仕様書、マニュアル、技術ドキュメント
-   - 例: 「Mountain-100のスペック」「製品の機能」
+## 重要：1つの専門エージェントを選んでハンドオフ
 
-## 複合質問の場合
-最も重要なデータソースのエージェントから開始してください。
+### sql_agent にハンドオフ
+- 売上、注文、顧客、製品のデータ分析
+- 数値データ、集計、ランキング、グラフ
+- 例: 「売上TOP3」「月別推移」「顧客分析」
 
-## 挨拶・概念説明の場合
-ハンドオフせず、直接回答してください。
+### web_agent にハンドオフ
+- 最新ニュース、市場トレンド、外部情報
+- リアルタイム情報、ウェブ検索が必要な質問
+- 例: 「2026年のトレンド」「最新の〜」
+
+### doc_agent にハンドオフ
+- 製品仕様書、マニュアル、技術ドキュメント
+- 製品の機能、スペック、特徴
+- 例: 「Mountain-100のスペック」「製品の機能」
+
+## ハンドオフしない場合
+- 挨拶、概念説明、一般的な質問
+- この場合は直接回答してください
+
+## 複数ソースが必要な場合
+最も重要なソースの専門エージェントにハンドオフしてください。
+（注：複数ソースの統合が必要な場合は multi_tool モードが推奨です）
 """,
         )
 
-        # Create SQL specialist
+        # SQL specialist - comprehensive instructions for final answer
         sql_agent = chat_client.as_agent(
             name="sql_agent",
-            description="Fabric SQLデータベースでビジネスデータを分析する専門家",
-            instructions="""Fabric SQLデータベースを使ってビジネスデータを分析します。
+            description="Fabric SQLデータベースでビジネスデータを分析し、完全な回答を提供する専門家",
+            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
+ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
 
-## テーブル
-- orders, orderline, product, customer, location
+## 利用可能なテーブル
+- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
+- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
+- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
+- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
+- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
+
+## 主要なJOINパターン
+- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
+- 顧客分析: orders JOIN customer ON CustomerId
 
 ## タスク
 1. run_sql_queryツールでデータ取得
-2. 結果を整形して回答
-3. グラフはChart.js JSON形式
+2. 結果を人間が読みやすい形式（Markdown）に整形
+3. グラフが適切な場合はChart.js JSON形式で追加
+4. **完全な回答を提供**（これが最終回答です）
 """,
             tools=[run_sql_query],
         )
 
-        # Create web search specialist
+        # Web search specialist
         web_agent = chat_client.as_agent(
             name="web_agent",
-            description="Web検索で最新情報を取得する専門家",
-            instructions="""Web検索で最新情報、ニュース、トレンドを取得します。
-search_webツールを使って情報を収集し、分かりやすくまとめてください。
+            description="Web検索で最新情報を取得し、完全な回答を提供する専門家",
+            instructions="""あなたはWeb検索で最新情報、ニュース、トレンドを取得する専門家です。
+ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
+
+## タスク
+1. search_webツールで情報を収集
+2. 結果を分かりやすくまとめる
+3. **完全な回答を提供**（これが最終回答です）
 """,
             tools=[search_web] if _web_agent_handler else [],
         )
 
-        # Create document search specialist
+        # Document search specialist
         doc_agent = chat_client.as_agent(
             name="doc_agent",
-            description="製品仕様書やドキュメントを検索する専門家",
-            instructions="""製品仕様書やドキュメントを検索します。
-search_documentsツールを使って情報を取得し、分かりやすくまとめてください。
+            description="製品仕様書やドキュメントを検索し、完全な回答を提供する専門家",
+            instructions="""あなたは製品仕様書やドキュメントを検索する専門家です。
+ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
+
+## タスク
+1. search_documentsツールで情報を取得
+2. 結果を分かりやすくまとめる
+3. **完全な回答を提供**（これが最終回答です）
 """,
             tools=[search_documents] if _knowledge_base_tool else [],
         )
@@ -1255,40 +1311,72 @@ search_documentsツールを使って情報を取得し、分かりやすくま�
 
         logger.info(f"Handoff workflow with {len(participants)} agents")
 
-        # Build handoff workflow with autonomous mode
-        workflow = (
-            HandoffBuilder(
-                name="data_analysis_handoff",
-                participants=participants,
+        # Build handoff workflow
+        builder = HandoffBuilder(
+            name="data_analysis_handoff",
+            participants=participants,
+        ).with_start_agent(triage_agent)
+
+        # Configure handoff routes: triage can handoff to all specialists
+        specialist_agents = [sql_agent]
+        if _web_agent_handler:
+            specialist_agents.append(web_agent)
+        if _knowledge_base_tool:
+            specialist_agents.append(doc_agent)
+
+        builder = builder.add_handoff(triage_agent, specialist_agents)
+
+        # Specialists can handoff back to triage if needed
+        for specialist in specialist_agents:
+            builder = builder.add_handoff(specialist, [triage_agent])
+
+        # Enable autonomous mode for all agents
+        builder = builder.with_autonomous_mode()
+
+        # Terminate when a specialist has responded
+        builder = builder.with_termination_condition(
+            lambda msgs: len(msgs) >= 2
+            and any(
+                hasattr(m, "author_name")
+                and m.author_name in ["sql_agent", "web_agent", "doc_agent"]
+                for m in msgs
             )
-            .with_start_agent(triage_agent)
-            .with_autonomous_mode()  # Auto-continue without user input
-            .with_termination_condition(
-                # Terminate after specialist responds
-                lambda msgs: len(msgs) >= 3
-                and any(
-                    m.author_name in ["sql_agent", "web_agent", "doc_agent"]
-                    for m in msgs[-2:]
-                )
-            )
-            .build()
         )
+
+        workflow = builder.build()
 
         logger.info(f"Handoff workflow processing query: {query[:100]}...")
 
         # Stream the workflow response
+        streamed_content = ""
         async for event in workflow.run_stream(query):
             if isinstance(event, AgentRunUpdateEvent):
+                # Stream agent responses in real-time
                 if event.data:
-                    yield str(event.data)
+                    text = str(event.data)
+                    if text and text not in streamed_content:
+                        streamed_content += text
+                        yield text
+            elif isinstance(event, RequestInfoEvent):
+                # Handle user input requests (shouldn't happen with autonomous mode)
+                if isinstance(event.data, HandoffAgentUserRequest):
+                    logger.info(f"Handoff request from {event.source_executor_id}")
             elif isinstance(event, WorkflowOutputEvent):
-                # Final output
+                # Final output - extract the specialist's response
                 if event.data:
                     messages = event.data
-                    if messages and len(messages) > 0:
-                        last_msg = messages[-1]
-                        if hasattr(last_msg, "text") and last_msg.text:
-                            yield last_msg.text
+                    # Find the last specialist message
+                    for msg in reversed(messages):
+                        if hasattr(msg, "author_name") and msg.author_name in [
+                            "sql_agent",
+                            "web_agent",
+                            "doc_agent",
+                        ]:
+                            if hasattr(msg, "text") and msg.text:
+                                # Only yield if not already streamed
+                                if msg.text not in streamed_content:
+                                    yield msg.text
+                            break
 
     except Exception as e:
         logger.error(f"Error in Handoff workflow: {e}", exc_info=True)
@@ -1310,9 +1398,10 @@ search_documentsツールを使って情報を取得し、分かりやすくま�
 # Agent Mode Configuration
 # AGENT_MODE options:
 #   - "sql_only": Fastest - single agent with SQL tool only
-#   - "multi_tool": Default - single agent with all tools (SQL, Web, Doc)
-#   - "handoff": Multi-agent with HandoffBuilder (faster than Magentic)
-#   - "magentic": Multi-agent with MagenticBuilder (slowest, most capable)
+#   - "multi_tool": Default, RECOMMENDED - single agent with all tools (SQL, Web, Doc)
+#                   Best for: most queries, including complex multi-source queries
+#   - "handoff": Multi-agent with HandoffBuilder (expert delegation, no result integration)
+#   - "magentic": Multi-agent with MagenticBuilder (slowest, complex planning)
 AGENT_MODE = os.getenv("AGENT_MODE", "multi_tool").lower()
 
 
@@ -1320,30 +1409,41 @@ def select_agent_mode(query: str) -> str:
     """
     Select the best agent mode based on query complexity.
     
+    Design Principles:
+    - multi_tool is the DEFAULT and RECOMMENDED for most queries
+    - multi_tool handles result integration (single agent calls multiple tools)
+    - handoff is for expert delegation (no result integration)
+    - sql_only is for simple SQL-only queries
+    - magentic is legacy (slow but powerful planning)
+
     Returns:
         "sql_only" | "multi_tool" | "handoff" | "magentic"
     """
-    # If explicitly configured, use that mode
+    # If explicitly configured to a specific mode, use that
     if AGENT_MODE in ["sql_only", "handoff", "magentic"]:
         return AGENT_MODE
-    
+
     # Auto-select based on query (default: multi_tool)
     query_lower = query.lower()
-    
-    # Simple greetings → sql_only (fastest)
-    simple_patterns = ["こんにちは", "ありがとう", "hello", "hi", "よろしく"]
-    if any(p in query_lower for p in simple_patterns):
+
+    # Simple greetings → sql_only (fastest, no tools needed)
+    greeting_patterns = ["こんにちは", "ありがとう", "hello", "hi", "よろしく", "はじめまして"]
+    if any(p in query_lower for p in greeting_patterns):
         return "sql_only"
-    
-    # Complex multi-source queries → handoff
-    complex_patterns = [
-        "仕様と売上", "売上と仕様", "市場と売上", "トレンドと", 
-        "と比較", "比較して", "複数の", "総合的に"
-    ]
-    if any(p in query_lower for p in complex_patterns):
-        return "handoff"
-    
-    # Default: multi_tool (single agent with all tools)
+
+    # Simple SQL-only patterns → sql_only
+    sql_only_patterns = ["売上top", "売上ランキング", "一覧", "何件", "総数", "合計金額"]
+    if any(p in query_lower for p in sql_only_patterns) and not any(
+        p in query_lower for p in ["仕様", "スペック", "トレンド", "最新"]
+    ):
+        return "sql_only"
+
+    # Everything else → multi_tool (handles single and multi-source queries)
+    # multi_tool can:
+    # - Use SQL only if needed
+    # - Use Web only if needed
+    # - Use Doc only if needed
+    # - Use MULTIPLE tools and INTEGRATE results
     return "multi_tool"
 
 
@@ -1376,6 +1476,7 @@ async def stream_chat_request(conversation_id: str, query: str):
                 async def magentic_wrapper(cid: str, q: str):
                     async for chunk in stream_multi_agent_response(cid, q, "anonymous"):
                         yield chunk
+
                 stream_func = magentic_wrapper
             else:  # multi_tool (default)
                 stream_func = stream_single_agent_response
