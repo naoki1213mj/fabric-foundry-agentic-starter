@@ -432,20 +432,19 @@ const Chat: React.FC<ChatProps> = ({
                   const responseCitations = parsed?.choices?.[0]?.messages?.[0]?.citations;
 
                   if (responseContent) {
-                    // Backend sends incremental chunks, so we accumulate them
+                    // Backend sends accumulated content, so we use it directly
                     // Create a new object to ensure Redux detects the change
-                    streamMessage.content = (streamMessage.content || "") + responseContent;
+                    streamMessage.content = responseContent;
                     streamMessage.role = parsed?.choices?.[0]?.messages?.[0]?.role || ASSISTANT;
+
+                    // Handle citations (Bing terms compliance)
+                    if (responseCitations) {
+                      streamMessage.citations = responseCitations;
+                    }
 
                     // Dispatch with a new object reference to trigger re-render
                     dispatch(updateMessageById({ ...streamMessage }));
                     scrollChatToBottom();
-                  }
-
-                  // Handle citations sent separately at end of stream (Bing terms compliance)
-                  if (responseCitations) {
-                    streamMessage.citations = responseCitations;
-                    dispatch(updateMessageById({ ...streamMessage }));
                   }
                 }
               } catch (e) {

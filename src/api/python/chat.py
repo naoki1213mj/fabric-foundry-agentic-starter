@@ -1676,43 +1676,30 @@ async def stream_chat_request(
                 stream_func = multi_tool_wrapper
 
             # Stream and accumulate response
-            # Note: Send incremental chunks for smooth UI rendering
             async for chunk in stream_func(conversation_id, query):
                 if chunk:
                     chunk_str = str(chunk)
                     assistant_content += chunk_str
-                    # Send only the incremental chunk (not the full accumulated content)
-                    # This prevents UI flickering/re-rendering on each chunk
+                    # Include web citations in the response for UI display (Bing terms of use)
+                    citations_json = (
+                        json.dumps(_current_web_citations)
+                        if _current_web_citations
+                        else None
+                    )
                     response = {
                         "choices": [
                             {
                                 "messages": [
                                     {
                                         "role": "assistant",
-                                        "content": chunk_str,  # Incremental only
+                                        "content": assistant_content,
+                                        "citations": citations_json,
                                     }
                                 ]
                             }
                         ]
                     }
                     yield json.dumps(response, ensure_ascii=False) + "\n\n"
-
-            # Send final message with citations (Bing terms of use compliance)
-            if _current_web_citations:
-                citations_response = {
-                    "choices": [
-                        {
-                            "messages": [
-                                {
-                                    "role": "assistant",
-                                    "content": "",  # No additional content
-                                    "citations": json.dumps(_current_web_citations),
-                                }
-                            ]
-                        }
-                    ]
-                }
-                yield json.dumps(citations_response, ensure_ascii=False) + "\n\n"
 
             # Fallback if no response
             if not assistant_content:
