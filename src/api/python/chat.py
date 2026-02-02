@@ -76,6 +76,9 @@ logger = logging.getLogger(__name__)
 _web_agent_handler: WebAgentHandler | None = None
 _knowledge_base_tool: KnowledgeBaseTool | None = None
 
+# Global storage for web citations (per-request, thread-local would be better but this works for demo)
+_current_web_citations: list = []
+
 
 def get_web_agent_handler() -> WebAgentHandler:
     """Get or create WebAgentHandler singleton."""
@@ -219,10 +222,23 @@ async def search_web(
     Returns:
         JSON string with search results or error message.
     """
+    global _current_web_citations
     try:
         logger.info(f"Web search requested: {query}")
         web_agent = get_web_agent_handler()
         result = await web_agent.bing_grounding(query)
+
+        # Extract and store citations for UI display (Bing terms of use compliance)
+        try:
+            result_data = json.loads(result)
+            if "citations" in result_data and result_data["citations"]:
+                _current_web_citations.extend(result_data["citations"])
+                logger.info(
+                    f"Stored {len(result_data['citations'])} web citations for UI display"
+                )
+        except json.JSONDecodeError:
+            pass
+
         logger.info(f"Web search completed for query: {query}")
         return result  # Already JSON string
     except Exception as e:
@@ -1616,6 +1632,10 @@ async def stream_chat_request(
     """
 
     async def generate():
+        global _current_web_citations
+        # Clear any previous citations at the start of each request
+        _current_web_citations = []
+        
         try:
             assistant_content = ""
 
@@ -1657,6 +1677,8 @@ async def stream_chat_request(
             async for chunk in stream_func(conversation_id, query):
                 if chunk:
                     assistant_content += str(chunk)
+                    # Include web citations in the response for UI display (Bing terms of use)
+                    citations_json = json.dumps(_current_web_citations) if _current_web_citations else None
                     response = {
                         "choices": [
                             {
@@ -1664,6 +1686,7 @@ async def stream_chat_request(
                                     {
                                         "role": "assistant",
                                         "content": assistant_content,
+                                        "citations": citations_json,
                                     }
                                 ]
                             }

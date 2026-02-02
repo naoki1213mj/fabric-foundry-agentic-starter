@@ -47,10 +47,8 @@ class WebAgentHandler:
         self.api_key = api_key or os.getenv("BING_SEARCH_API_KEY")
         self.foundry_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT")
         self.bing_connection_id = os.getenv("BING_PROJECT_CONNECTION_ID")
-        # Use gpt-4o-mini for web search agent (lighter weight, faster)
-        self.model_deployment = os.getenv(
-            "AZURE_AI_MODEL_DEPLOYMENT_NAME", "gpt-4o-mini"
-        )
+        # Use gpt-5 for web search agent (best quality)
+        self.model_deployment = os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME", "gpt-5")
 
     async def bing_grounding(self, query: str) -> str:
         """
@@ -204,10 +202,29 @@ class WebAgentHandler:
                     f"Bing Grounding completed successfully. "
                     f"Found {len(citations)} citations."
                 )
+                # Format citations for UI display (Bing terms of use compliance)
+                # Each citation must have url and title for proper display
+                formatted_citations = []
+                for i, cit in enumerate(citations):
+                    formatted_citations.append(
+                        {
+                            "id": f"web-{i + 1}",
+                            "title": cit.get("title") or f"Web Source {i + 1}",
+                            "url": cit.get("url", ""),
+                            "filepath": cit.get(
+                                "url", ""
+                            ),  # UI uses filepath for display
+                            "content": "",  # No content for web citations
+                            "metadata": None,
+                            "chunk_id": None,
+                            "reindex_id": None,
+                        }
+                    )
+
                 return json.dumps(
                     {
                         "answer": answer_text,
-                        "citations": citations,
+                        "citations": formatted_citations,
                         "source": "bing_grounding_foundry_new_api",
                     },
                     ensure_ascii=False,
