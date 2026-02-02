@@ -641,96 +641,27 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     return ChatAgent(
         name="MagenticManager",
         description="チームを調整して複雑なタスクを効率的に完了させるオーケストレーター",
-        instructions="""あなたはMagentic Oneのマネージャーエージェントです。
-チームを調整して複雑なタスクを効率的に完了させます。
+        instructions="""あなたはチームを調整するマネージャーです。**迅速に**タスクを完了させます。
 
-## あなたのチーム
-- sql_agent:【最優先】Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を直接分析
-- web_agent: ウェブ検索で最新のニュース、市場トレンド、外部情報を取得
-- doc_agent: 製品仕様書PDFから技術スペック・機能情報を検索（対象：バックパック、自転車、ヘルメット、テント、キャンプ用品等）
-- 一般知識: あなた自身のLLM知識で概念説明、用語解説、一般的な助言が可能
+## チーム（各エージェントは1回だけ呼び出す）
+- sql_agent: 売上/注文/顧客/製品データをSQLで取得・分析
+- web_agent: 最新ニュース/市場トレンドを検索
+- doc_agent: 製品仕様書PDF（Mountain-100, Alpine Explorer等）を検索
 
-## クエリ解析と意図理解
+## クイック判断フロー
 
-### ステップ1: ユーザーの意図を理解
-ユーザーのクエリから以下を特定:
-1. **何を知りたいか** - 数値、情報、手順、概念説明など
-2. **どのデータが必要か** - 売上データ、外部情報、社内文書、一般知識など
-3. **どう表示したいか** - テキスト、表、グラフなど
+**数値データ（売上、件数、比較、グラフ）** → sql_agent
+**最新情報（ニュース、市場、2026年）** → web_agent
+**製品仕様（スペック、機能、素材）** → doc_agent
+**概念説明（〜とは、方法）** → あなた自身が回答
 
-### ステップ2: 適切なエージェント選択
+## 処理ルール（重要）
+1. **1ラウンドで完了**: 必要なエージェントを同時に呼び出し、結果を統合
+2. **グラフ重複禁止**: sql_agentがグラフを返したら追加しない
+3. **日本語で簡潔に回答**
 
-#### sql_agent を使う場合（最優先 - データ分析全般）
-キーワード例:
-- 数値系: 「売上」「注文」「顧客」「製品」「金額」「数量」「件数」
-- 集計系: 「合計」「平均」「最大」「最小」「一番」「TOP」「ランキング」
-- 比較系: 「比較」「前月比」「前年比」「成長」「推移」「トレンド」
-- 分析系: 「内訳」「構成比」「割合」「分布」「相関」
-- 可視化: 「グラフ」「チャート」「棒グラフ」「円グラフ」「折れ線」「表示して」「見せて」
-
-#### web_agent を使う場合
-キーワード例:
-- 「最新」「ニュース」「トレンド」「市場動向」「業界」「競合」
-- 「外部」「インターネット」「ウェブ」「2025年」「2026年」（最新情報）
-
-#### doc_agent を使う場合
-キーワード例:
-- 「仕様」「スペック」「機能」「素材」「重量」「サイズ」「容量」
-- 製品名: 「Mountain-100」「Sport-100 Helmet」「Alpine Explorer」
-- カテゴリ: 「バックパック」「テント」「ヘルメット」「コーヒーメーカー」「ウォーターボトル」
-
-#### 一般知識（あなた自身）を使う場合
-キーワード例:
-- 「とは」「意味」「説明」「定義」「どうやって」「方法」
-- 概念説明: 「KPIとは」「ROIの計算方法」「RFM分析の解説」
-- ビジネス用語、技術用語の解説
-- 一般的なベストプラクティスやアドバイス
-
-### ステップ3: 複合クエリの処理（重要）
-複数のデータソースが必要な場合:
-
-**パターン1: データ + 説明**
-例: 「売上TOP5を分析して、傾向を説明して」
-→ sql_agent で売上取得 → あなたの知識で傾向分析・説明を追加
-
-**パターン2: データ + 外部情報**
-例: 「自社売上を市場動向と比較」
-→ sql_agent で売上取得 → web_agent で市場情報取得 → 統合
-
-**パターン3: 製品情報 + データ**
-例: 「Mountain-100の仕様と売上を教えて」
-→ doc_agent で仕様取得 → sql_agent で売上取得 → 統合
-
-**パターン4: 概念説明 + 実データ**
-例: 「RFM分析とは何か、顧客データに適用して」
-→ あなたの知識でRFM説明 → sql_agent で顧客分析 → 統合
-
-### ステップ4: 回答の統合
-複数エージェントの結果を統合する場合:
-1. 各エージェントの結果を論理的に整理
-2. ユーザーの質問に直接答える形式で構成
-3. データと説明を組み合わせて分かりやすく提示
-
-## グラフ出力ルール（重要：重複禁止）
-
-### sql_agentがグラフ（```json）を含む回答を返した場合
-→ **そのまま使用。追加のグラフを生成しない**
-
-### sql_agentがグラフなしの回答を返し、ユーザーがグラフを要求している場合
-→ あなたがChart.js JSONを1つだけ追加
-
-### 絶対禁止
-- 同じグラフを2回出力
-- sql_agentのグラフに加えて別のグラフを追加
-
-## 重要な注意
-- **シンプルな質問は1回のエージェント呼び出しで完了させる**
-- **複合質問は必要なエージェントを順番に呼び出し、結果を統合**
-- 数値データの質問は必ずsql_agentを最初に使用
-- 概念説明や一般知識はあなた自身の知識で回答可能
-- グラフ要求時はChart.js JSON形式（Vega-Lite禁止）
-- **sql_agentの回答にグラフがあれば、それをそのまま使う（追加グラフ禁止）**
-- 日本語で回答
+例: 「Alpine Explorerの仕様と売上」
+→ doc_agent（仕様）+ sql_agent（売上）を呼び出し → 結果を統合して回答
 """,
         chat_client=chat_client,
     )
@@ -754,10 +685,10 @@ async def stream_multi_agent_response(
         history_messages = []
         try:
             import asyncio
+
             # Set a short timeout (3 seconds) to avoid blocking
             messages = await asyncio.wait_for(
-                get_conversation_messages(user_id, conversation_id),
-                timeout=3.0
+                get_conversation_messages(user_id, conversation_id), timeout=3.0
             )
             if messages:
                 # Convert to format suitable for agent (last N messages for context)
@@ -772,7 +703,9 @@ async def stream_multi_agent_response(
                     f"Loaded {len(history_messages)} messages from conversation history"
                 )
         except asyncio.TimeoutError:
-            logger.warning("Conversation history fetch timed out, continuing without history")
+            logger.warning(
+                "Conversation history fetch timed out, continuing without history"
+            )
         except Exception as e:
             logger.warning(f"Could not load conversation history: {e}")
             # Continue without history
@@ -817,14 +750,15 @@ async def stream_multi_agent_response(
         manager_agent = create_manager_agent(chat_client)
 
         # Build the MagenticBuilder workflow
-        # Note: シンプルなクエリは1-2ラウンドで完了するため、max_round_count=4に制限
+        # Note: App Serviceのタイムアウト（230秒）を超えないよう制限
+        # 複雑なクエリでも1-2ラウンドで完了するよう設計
         workflow = (
             MagenticBuilder()
             .participants([sql_agent, web_agent, doc_agent])
             .with_manager(
                 agent=manager_agent,
-                max_round_count=4,  # タイムアウト防止のため制限（デフォルト10は長すぎる）
-                max_stall_count=2,  # 早期終了
+                max_round_count=2,  # 504タイムアウト防止: 2ラウンド以内で完了
+                max_stall_count=1,  # 停滞したら即終了
             )
             .build()
         )
