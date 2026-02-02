@@ -196,7 +196,8 @@ export async function callConversationApi(
   try {
     const response = await httpClient.post(endpoint, {
       conversation_id: options.id,
-      query: options.query
+      query: options.query,
+      user_id: getUserId() || "anonymous"
     }, {
       signal: abortSignal
     });

@@ -168,7 +168,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     const deduplicateCharts = (charts: any[]): any[] => {
       const seen = new Set<string>();
       const unique: any[] = [];
-      
+
       for (const chart of charts) {
         // Create a signature based on chart type and data labels/values
         let signature = '';
@@ -181,13 +181,13 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
         } catch {
           signature = JSON.stringify(chart);
         }
-        
+
         if (!seen.has(signature)) {
           seen.add(signature);
           unique.push(chart);
         }
       }
-      
+
       return unique;
     };
 

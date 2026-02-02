@@ -48,6 +48,7 @@ from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from history import get_conversation_messages
 from knowledge_base_tool import KnowledgeBaseTool
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
@@ -735,7 +736,9 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     )
 
 
-async def stream_multi_agent_response(conversation_id: str, query: str):
+async def stream_multi_agent_response(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Stream response using MagenticBuilder pattern for true multi-agent collaboration.
 
@@ -747,6 +750,26 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
     これにより、複合的なクエリ（例：「売上データを分析して、最新トレンドと比較」）に対応可能。
     """
     try:
+        # Get conversation history for multi-turn support
+        history_messages = []
+        try:
+            messages = await get_conversation_messages(user_id, conversation_id)
+            if messages:
+                # Convert to format suitable for agent (last N messages for context)
+                # Limit to last 10 messages to avoid token limits
+                recent_messages = messages[-10:] if len(messages) > 10 else messages
+                for msg in recent_messages:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if isinstance(content, str) and content:
+                        history_messages.append({"role": role, "content": content})
+                logger.info(
+                    f"Loaded {len(history_messages)} messages from conversation history"
+                )
+        except Exception as e:
+            logger.warning(f"Could not load conversation history: {e}")
+            # Continue without history
+
         # Use sync credential - SDK requires synchronous token acquisition
         credential = DefaultAzureCredential()
 
@@ -802,11 +825,26 @@ async def stream_multi_agent_response(conversation_id: str, query: str):
         logger.info(f"Starting MagenticBuilder workflow with query: {query[:100]}...")
         logger.info("Workflow configured with Manager + 3 Specialists (SQL, Web, Doc)")
 
+        # Build the full prompt with conversation history
+        if history_messages:
+            # Format history as context for the agent
+            history_context = "\n".join(
+                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
+            )
+            full_query = f"""## 会話履歴（参考にしてください）
+{history_context}
+
+## 現在の質問
+{query}"""
+            logger.info(f"Including {len(history_messages)} messages in context")
+        else:
+            full_query = query
+
         last_message_id: str | None = None
         accumulated_text = ""
 
         # Stream the workflow execution
-        async for event in workflow.run_stream(query):
+        async for event in workflow.run_stream(full_query):
             if isinstance(event, AgentRunUpdateEvent):
                 # ストリーミング更新 - エージェントからのテキスト出力
                 update = event.data
@@ -975,7 +1013,9 @@ async def stream_single_agent_response(conversation_id: str, query: str):
 # ============================================================================
 
 
-async def stream_chat_request(conversation_id: str, query: str):
+async def stream_chat_request(
+    conversation_id: str, query: str, user_id: str = "anonymous"
+):
     """
     Handles streaming chat requests.
 
@@ -991,7 +1031,10 @@ async def stream_chat_request(conversation_id: str, query: str):
             # Choose streaming function based on mode
             if MULTI_AGENT_MODE:
                 logger.info("Using multi-agent mode with HandoffBuilder")
-                stream_func = stream_multi_agent_response
+                # Pass user_id for conversation history retrieval
+                stream_func = lambda cid, q: stream_multi_agent_response(
+                    cid, q, user_id
+                )
             else:
                 logger.info("Using single-agent mode")
                 stream_func = stream_single_agent_response
@@ -1064,6 +1107,8 @@ async def conversation(request: Request):
         request_json = await request.json()
         conversation_id = request_json.get("conversation_id")
         query = request_json.get("query")
+        # Get user_id from request or use anonymous
+        user_id = request_json.get("user_id", "anonymous")
 
         if not query:
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
@@ -1073,7 +1118,7 @@ async def conversation(request: Request):
                 content={"error": "Conversation ID is required"}, status_code=400
             )
 
-        result = await stream_chat_request(conversation_id, query)
+        result = await stream_chat_request(conversation_id, query, user_id)
         track_event_if_configured(
             "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query}
         )
