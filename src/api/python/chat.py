@@ -641,61 +641,88 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     return ChatAgent(
         name="MagenticManager",
         description="チームを調整して複雑なタスクを効率的に完了させるオーケストレーター",
-        instructions="""あなたはスペシャリストチームを調整するマネージャーです。ユーザーの質問を分析し、適切なエージェントに振り分けて、結果を統合して回答します。
+        instructions="""あなたはMagentic Oneのマネージャーエージェントです。
+チームを調整して複雑なタスクを効率的に完了させます。
 
-## チームメンバー
-| エージェント | 担当領域 | 具体例 |
-|-------------|---------|-------|
-| sql_agent | データベース分析 | 売上、注文、顧客、製品の数値データ・集計・比較・グラフ |
-| web_agent | Web検索 | 最新ニュース、市場トレンド、競合情報、2026年の話題 |
-| doc_agent | 製品仕様書 | Mountain-100, Alpine Explorer等のスペック、機能、素材 |
-| あなた | 一般知識 | 概念説明、用語解説、ベストプラクティス、アドバイス |
+## あなたのチーム
+| エージェント | 役割 | 対象データ |
+|-------------|------|----------|
+| sql_agent | 【最優先】ビジネスデータ分析 | 売上、注文、顧客、製品（Fabric SQLデータベース） |
+| web_agent | 外部情報検索 | 最新ニュース、市場トレンド、業界動向 |
+| doc_agent | 製品仕様書検索 | バックパック、自転車、ヘルメット、テント等のPDF |
+| あなた自身 | 一般知識 | 概念説明、用語解説、ベストプラクティス |
 
-## 入力パターン別の対応
+## クエリ解析フロー
 
-### パターン1: 数値・データ分析
-「売上TOP3」「月別推移」「顧客別比較」「グラフで表示」
-→ **sql_agent** に依頼
+### ステップ1: ユーザーの意図を理解
+1. **何を知りたいか** - 数値、情報、手順、概念説明など
+2. **どのデータが必要か** - 売上データ、外部情報、社内文書、一般知識など
+3. **どう表示したいか** - テキスト、表、グラフなど
 
-### パターン2: 最新情報・外部トレンド
-「最新のアウトドア市場は」「2026年のトレンド」「競合他社の動向」
-→ **web_agent** に依頼
+### ステップ2: 適切なエージェント選択
 
-### パターン3: 製品仕様・技術情報
-「Mountain-100のスペック」「Alpine Explorerの耐久性」「製品の素材は」
-→ **doc_agent** に依頼
+#### sql_agent を使う場合（データ分析全般 - 最優先）
+- 数値系: 「売上」「注文」「顧客」「製品」「金額」「数量」「件数」
+- 集計系: 「合計」「平均」「最大」「最小」「一番」「TOP」「ランキング」
+- 比較系: 「比較」「前月比」「前年比」「成長」「推移」「トレンド」
+- 分析系: 「内訳」「構成比」「割合」「分布」
+- 可視化: 「グラフ」「チャート」「棒グラフ」「円グラフ」「折れ線」「表示して」
 
-### パターン4: 概念・一般知識
-「〜とは何ですか」「〜の方法」「〜のベストプラクティス」
-→ **あなた自身が回答**（エージェント不要）
+#### web_agent を使う場合
+- 「最新」「ニュース」「トレンド」「市場動向」「業界」「競合」
+- 「外部」「インターネット」「2025年」「2026年」（最新情報）
 
-### パターン5: 複合クエリ
-「Alpine Explorerの仕様と売上」
-→ **doc_agent + sql_agent** を同時に呼び出し、結果を統合
+#### doc_agent を使う場合
+- 「仕様」「スペック」「機能」「素材」「重量」「サイズ」「容量」
+- 製品名: 「Mountain-100」「Sport-100 Helmet」「Alpine Explorer」
+- カテゴリ: 「バックパック」「テント」「ヘルメット」「コーヒーメーカー」
 
-「売上TOP3と市場トレンド」
-→ **sql_agent + web_agent** を同時に呼び出し、結果を統合
+#### あなた自身の知識を使う場合（エージェント不要）
+- 「とは」「意味」「説明」「定義」「どうやって」「方法」
+- 概念説明: 「KPIとは」「ROIの計算方法」「RFM分析とは」
+- 一般的なベストプラクティスやアドバイス
+- 挨拶: 「こんにちは」「ありがとう」
 
-### パターン6: 曖昧な質問
-「おすすめは？」「どうすればいい？」
-→ 文脈から推測。データが必要なら sql_agent、製品情報なら doc_agent、一般的なら自分で回答
+### ステップ3: 複合クエリの処理
 
-### パターン7: 挨拶・雑談
-「こんにちは」「ありがとう」
-→ **エージェント不要**、あなたが直接応答
+**パターン1: データ + 説明**
+例: 「売上TOP5を分析して傾向を説明」
+→ sql_agent で売上取得 → あなたの知識で傾向分析を追加
+
+**パターン2: データ + 外部情報**
+例: 「自社売上を市場動向と比較」
+→ sql_agent で売上取得 → web_agent で市場情報取得 → 統合
+
+**パターン3: 製品情報 + データ**
+例: 「Mountain-100の仕様と売上を教えて」
+→ doc_agent で仕様取得 → sql_agent で売上取得 → 統合
+
+**パターン4: 概念説明 + 実データ**
+例: 「RFM分析とは何か、顧客データに適用」
+→ あなたの知識でRFM説明 → sql_agent で顧客分析 → 統合
+
+### ステップ4: 回答の統合
+1. 各エージェントの結果を論理的に整理
+2. ユーザーの質問に直接答える形式で構成
+3. データと説明を組み合わせて分かりやすく提示
+
+## グラフ出力ルール（重複禁止）
+
+- sql_agentがグラフ（```json）を含む回答を返した場合 → **そのまま使用。追加のグラフを生成しない**
+- sql_agentがグラフなしでユーザーがグラフを要求 → あなたがChart.js JSONを1つだけ追加
+- **絶対禁止**: 同じグラフを2回出力、sql_agentのグラフに加えて別のグラフを追加
 
 ## 処理ルール
-1. **効率優先**: 必要なエージェントのみ呼び出す（不要なら呼ばない）
-2. **1ラウンド完結**: 可能な限り1回のラウンドで完了
-3. **グラフ重複禁止**: sql_agentがグラフ/チャートを返した場合、追加のグラフは作成しない
-4. **日本語で回答**: 自然な日本語で分かりやすく
-5. **結果統合**: 複数エージェントの結果は論理的に統合して1つの回答に
+1. **効率優先**: 必要なエージェントのみ呼び出す
+2. **1ラウンド完結**: 可能な限り1回で完了
+3. **日本語で回答**: 自然で分かりやすく
+4. **結果統合**: 複数エージェントの結果は論理的に統合
 
 ## 出力フォーマット
 - Markdown形式で構造化
-- 重要な数値は強調
-- 長い場合は見出しで区切る
-- グラフデータはsql_agentの出力をそのまま使用
+- 重要な数値は**強調**
+- 長い回答は見出しで区切る
+- グラフはChart.js JSON形式（Vega-Lite禁止）
 """,
         chat_client=chat_client,
     )
@@ -824,38 +851,41 @@ async def stream_multi_agent_response(
         # Stream the workflow execution
         # 戦略: Specialistの出力は蓄積のみ、Managerの最終応答のみをリアルタイムストリーム
         # これにより応答サイズを削減しつつ、ユーザーにはストリーミング体験を提供
-        
+
         async for event in workflow.run_stream(full_query):
             if isinstance(event, AgentRunUpdateEvent):
                 update = event.data
                 message_id = getattr(update, "message_id", None)
                 executor_id = str(getattr(event, "executor_id", "unknown"))
                 text_chunk = ""
-                
+
                 if hasattr(update, "text") and update.text:
                     text_chunk = update.text
                 elif isinstance(update, str):
                     text_chunk = update
-                
+
                 if not text_chunk:
                     continue
-                
+
                 # executor_idでエージェントを識別
                 # MagenticManager または Manager を含む場合はManager
-                is_manager = "manager" in executor_id.lower() or "magentic" in executor_id.lower()
-                
+                is_manager = (
+                    "manager" in executor_id.lower()
+                    or "magentic" in executor_id.lower()
+                )
+
                 # 新しいメッセージの場合
                 if message_id and message_id != last_message_id:
                     if last_executor_id:
                         logger.info(f"Agent {last_executor_id} completed response")
                     last_message_id = message_id
                     last_executor_id = executor_id
-                    
+
                     # Managerの新しいメッセージが始まった
                     if is_manager:
                         is_manager_streaming = True
                         logger.info(f"Manager streaming started: {executor_id}")
-                
+
                 if is_manager:
                     # Managerの出力はリアルタイムでストリーム
                     manager_output += text_chunk
@@ -884,15 +914,21 @@ async def stream_multi_agent_response(
                                 final_text = msg.text
                     elif isinstance(output_messages, str):
                         final_text = output_messages
-                    
+
                     # まだストリームされていない部分があればyield
                     if final_text and final_text != manager_output:
-                        remaining = final_text[len(manager_output):] if final_text.startswith(manager_output) else final_text
+                        remaining = (
+                            final_text[len(manager_output) :]
+                            if final_text.startswith(manager_output)
+                            else final_text
+                        )
                         if remaining:
-                            logger.info(f"Yielding remaining final output: {len(remaining)} chars")
+                            logger.info(
+                                f"Yielding remaining final output: {len(remaining)} chars"
+                            )
                             yield remaining
                             manager_output = final_text
-                
+
                 logger.info("MagenticBuilder workflow completed")
 
             elif isinstance(event, WorkflowStatusEvent):
@@ -908,16 +944,22 @@ async def stream_multi_agent_response(
 
             elif isinstance(event, RequestInfoEvent):
                 logger.info(f"Request info event: {event}")
-        
+
         # ログにSpecialist出力のサマリーを記録
         for agent_id, output in specialist_outputs.items():
             logger.info(f"Specialist {agent_id} output: {len(output)} chars")
-        
+
         # ストリーミングが全くなかった場合のフォールバック
         if not manager_output:
-            logger.warning("No manager output streamed, using accumulated specialist outputs")
+            logger.warning(
+                "No manager output streamed, using accumulated specialist outputs"
+            )
             # Specialistの出力を結合して返す
-            combined = "\n\n".join(f"### {agent_id}\n{output}" for agent_id, output in specialist_outputs.items() if output)
+            combined = "\n\n".join(
+                f"### {agent_id}\n{output}"
+                for agent_id, output in specialist_outputs.items()
+                if output
+            )
             if combined:
                 yield combined
 
