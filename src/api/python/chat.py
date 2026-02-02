@@ -1073,6 +1073,56 @@ async def stream_single_agent_response(conversation_id: str, query: str):
 # ============================================================================
 
 
+def requires_multi_agent(query: str) -> bool:
+    """
+    クエリの複雑さを判定し、マルチエージェントが必要かどうかを返す。
+    
+    マルチエージェントが必要なケース:
+    - 複数のデータソースが必要（売上+仕様、データ+市場トレンド等）
+    - 明示的に複合分析を要求
+    
+    シングルエージェントで十分なケース:
+    - 単純な売上・注文クエリ
+    - 挨拶・雑談
+    - 概念説明のみ
+    """
+    query_lower = query.lower()
+    
+    # 複合クエリのキーワード（マルチエージェント必要）
+    multi_agent_keywords = [
+        # 複数ソース要求
+        "仕様と売上", "売上と仕様", "スペックと売上", "売上とスペック",
+        "市場と売上", "売上と市場", "トレンドと売上", "売上とトレンド",
+        "比較して", "と比較", "合わせて", "併せて",
+        # 外部情報+内部データ
+        "最新の", "2026年", "2025年", "ニュース", "市場動向",
+        # 製品仕様検索
+        "仕様", "スペック", "素材", "機能", "特徴は",
+    ]
+    
+    # シングルエージェントで十分なキーワード
+    single_agent_keywords = [
+        # 挨拶・雑談
+        "こんにちは", "ありがとう", "よろしく", "hello", "hi",
+        # 単純なデータクエリ
+        "売上top", "売上ランキング", "一覧", "リスト",
+        "何件", "いくつ", "総数", "合計",
+    ]
+    
+    # 挨拶や単純クエリは即座にシングルエージェント
+    for kw in single_agent_keywords:
+        if kw in query_lower:
+            return False
+    
+    # 複合キーワードが含まれていればマルチエージェント
+    for kw in multi_agent_keywords:
+        if kw in query_lower:
+            return True
+    
+    # デフォルトはシングルエージェント（高速）
+    return False
+
+
 async def stream_chat_request(
     conversation_id: str, query: str, user_id: str = "anonymous"
 ):
@@ -1088,15 +1138,16 @@ async def stream_chat_request(
         try:
             assistant_content = ""
 
-            # Choose streaming function based on mode
-            if MULTI_AGENT_MODE:
-                logger.info("Using multi-agent mode with HandoffBuilder")
-                # Pass user_id for conversation history retrieval
+            # クエリの複雑さに応じてモードを動的に選択
+            use_multi_agent = MULTI_AGENT_MODE and requires_multi_agent(query)
+            
+            if use_multi_agent:
+                logger.info(f"Using multi-agent mode for complex query: {query[:50]}...")
                 stream_func = lambda cid, q: stream_multi_agent_response(
                     cid, q, user_id
                 )
             else:
-                logger.info("Using single-agent mode")
+                logger.info(f"Using single-agent mode for query: {query[:50]}...")
                 stream_func = stream_single_agent_response
 
             # Stream and accumulate response
