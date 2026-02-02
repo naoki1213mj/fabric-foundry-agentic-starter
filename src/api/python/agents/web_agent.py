@@ -42,13 +42,17 @@ class WebAgentHandler:
         """
         try:
             if not self.api_key:
-                # Fallback: Return a message indicating Bing is not configured
+                # Fallback: Return a message that guides the LLM to use its knowledge
                 logger.warning("Bing Search API key not configured")
                 return json.dumps(
                     {
-                        "answer": f"Web search for '{query}' is not available. Bing Search API is not configured.",
+                        "answer": f"[Web検索APIが未設定です] '{query}'についての情報は、私の学習データに基づいて回答します。\n\n"
+                                  f"注: 以下は私の知識（2024年までの情報）に基づく回答です。",
                         "citations": [],
-                    }
+                        "fallback": True,
+                        "note": "Bing Search API is not configured. Please use LLM knowledge to answer."
+                    },
+                    ensure_ascii=False
                 )
 
             headers = {
@@ -72,11 +76,18 @@ class WebAgentHandler:
                         logger.error(
                             f"Bing Search API error: {response.status} - {error_text}"
                         )
+                        # Return a helpful fallback message that guides the LLM
+                        # to use its own knowledge
                         return json.dumps(
                             {
-                                "answer": f"Web search failed with status {response.status}",
+                                "answer": f"[Web検索は現在利用できません (status={response.status})] '{query}'についての情報は、私の学習データに基づいて回答します。\n\n"
+                                          f"注: 以下は私の知識（2024年までの情報）に基づく回答です。最新の市場動向については、参考情報として扱ってください。\n\n"
+                                          f"検索クエリ: {query}",
                                 "citations": [],
-                            }
+                                "fallback": True,
+                                "note": "Bing Search API returned an error. Please use LLM knowledge to answer."
+                            },
+                            ensure_ascii=False
                         )
 
                     data = await response.json()
@@ -104,7 +115,14 @@ class WebAgentHandler:
         except Exception as e:
             logger.error(f"Bing search error: {e}")
             return json.dumps(
-                {"answer": f"Web search failed: {str(e)}", "citations": []}
+                {
+                    "answer": f"[Web検索エラー] '{query}'についての情報は、私の学習データに基づいて回答します。\n\n"
+                              f"エラー詳細: {str(e)}",
+                    "citations": [],
+                    "fallback": True,
+                    "note": f"Web search failed with error: {str(e)}. Please use LLM knowledge to answer."
+                },
+                ensure_ascii=False
             )
 
     def get_tools(self) -> List[callable]:
