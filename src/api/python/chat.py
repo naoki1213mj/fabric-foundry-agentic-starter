@@ -31,6 +31,7 @@ from agent_framework import (
     AgentRunUpdateEvent,
     ChatAgent,
     GroupChatRequestSentEvent,
+    HandoffBuilder,
     MagenticBuilder,
     MagenticOrchestratorEvent,
     RequestInfoEvent,
@@ -1089,30 +1090,298 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             _db_connection = None
 
 
+async def stream_sql_only_response(conversation_id: str, query: str):
+    """
+    Stream response using single agent mode with SQL tool only.
+    This is the FASTEST mode - optimized for simple SQL queries.
+    """
+    try:
+        credential = DefaultAzureCredential()
+        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
+            "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+        )
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+        if not deployment_name or not endpoint:
+            raise ValueError("Azure OpenAI configuration missing")
+
+        chat_client = AzureOpenAIChatClient(
+            credential=credential,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_version=api_version,
+        )
+
+        # SQL-only agent - fastest mode
+        agent = chat_client.as_agent(
+            name="sql_analyst",
+            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
+
+## 利用可能なテーブル
+- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
+- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
+- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
+- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
+- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
+
+## 主要なJOINパターン
+- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
+- 顧客分析: orders JOIN customer ON CustomerId
+
+## タスク
+1. ユーザーの質問を分析
+2. 必要に応じてrun_sql_queryツールでデータを取得
+3. 結果を分かりやすく整形して回答
+4. グラフはChart.js JSON形式（Vega-Lite禁止）
+""",
+            tools=[run_sql_query],
+        )
+
+        logger.info(f"SQL-only agent processing query: {query[:100]}...")
+
+        async for chunk in agent.run_stream(query):
+            if chunk and chunk.text:
+                yield chunk.text
+
+    except Exception as e:
+        logger.error(f"Error in SQL-only response: {e}", exc_info=True)
+        raise
+    finally:
+        global _db_connection
+        if _db_connection:
+            try:
+                _db_connection.close()
+            except Exception:
+                pass
+            _db_connection = None
+
+
+async def stream_handoff_response(conversation_id: str, query: str):
+    """
+    Stream response using HandoffBuilder for multi-agent collaboration.
+
+    This is FASTER than MagenticBuilder because:
+    - No central planner overhead
+    - Direct agent-to-agent handoffs
+    - Triage routes to specialists immediately
+
+    Topology:
+    User → Triage → (SQL Agent | Web Agent | Doc Agent) → Response
+    """
+    try:
+        credential = DefaultAzureCredential()
+        deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
+            "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+        )
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+        if not deployment_name or not endpoint:
+            raise ValueError("Azure OpenAI configuration missing")
+
+        chat_client = AzureOpenAIChatClient(
+            credential=credential,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_version=api_version,
+        )
+
+        # Create triage agent
+        triage_agent = chat_client.as_agent(
+            name="triage_agent",
+            description="ユーザーの質問を分析し、適切な専門エージェントにルーティングする",
+            instructions="""あなたは質問を分析し、適切な専門エージェントにハンドオフするトリアージエージェントです。
+
+## ルーティングルール
+1. **sql_agent**: 売上、注文、顧客、製品などのビジネスデータ分析
+   - 例: 「売上TOP3」「月別推移」「顧客分析」
+2. **web_agent**: 最新ニュース、市場トレンド、外部情報
+   - 例: 「2026年のトレンド」「最新の〜」
+3. **doc_agent**: 製品仕様書、マニュアル、技術ドキュメント
+   - 例: 「Mountain-100のスペック」「製品の機能」
+
+## 複合質問の場合
+最も重要なデータソースのエージェントから開始してください。
+
+## 挨拶・概念説明の場合
+ハンドオフせず、直接回答してください。
+""",
+        )
+
+        # Create SQL specialist
+        sql_agent = chat_client.as_agent(
+            name="sql_agent",
+            description="Fabric SQLデータベースでビジネスデータを分析する専門家",
+            instructions="""Fabric SQLデータベースを使ってビジネスデータを分析します。
+
+## テーブル
+- orders, orderline, product, customer, location
+
+## タスク
+1. run_sql_queryツールでデータ取得
+2. 結果を整形して回答
+3. グラフはChart.js JSON形式
+""",
+            tools=[run_sql_query],
+        )
+
+        # Create web search specialist
+        web_agent = chat_client.as_agent(
+            name="web_agent",
+            description="Web検索で最新情報を取得する専門家",
+            instructions="""Web検索で最新情報、ニュース、トレンドを取得します。
+search_webツールを使って情報を収集し、分かりやすくまとめてください。
+""",
+            tools=[search_web] if _web_agent_handler else [],
+        )
+
+        # Create document search specialist
+        doc_agent = chat_client.as_agent(
+            name="doc_agent",
+            description="製品仕様書やドキュメントを検索する専門家",
+            instructions="""製品仕様書やドキュメントを検索します。
+search_documentsツールを使って情報を取得し、分かりやすくまとめてください。
+""",
+            tools=[search_documents] if _knowledge_base_tool else [],
+        )
+
+        # Collect active agents
+        participants = [triage_agent, sql_agent]
+        if _web_agent_handler:
+            participants.append(web_agent)
+        if _knowledge_base_tool:
+            participants.append(doc_agent)
+
+        logger.info(f"Handoff workflow with {len(participants)} agents")
+
+        # Build handoff workflow with autonomous mode
+        workflow = (
+            HandoffBuilder(
+                name="data_analysis_handoff",
+                participants=participants,
+            )
+            .with_start_agent(triage_agent)
+            .with_autonomous_mode()  # Auto-continue without user input
+            .with_termination_condition(
+                # Terminate after specialist responds
+                lambda msgs: len(msgs) >= 3
+                and any(
+                    m.author_name in ["sql_agent", "web_agent", "doc_agent"]
+                    for m in msgs[-2:]
+                )
+            )
+            .build()
+        )
+
+        logger.info(f"Handoff workflow processing query: {query[:100]}...")
+
+        # Stream the workflow response
+        async for event in workflow.run_stream(query):
+            if isinstance(event, AgentRunUpdateEvent):
+                if event.data:
+                    yield str(event.data)
+            elif isinstance(event, WorkflowOutputEvent):
+                # Final output
+                if event.data:
+                    messages = event.data
+                    if messages and len(messages) > 0:
+                        last_msg = messages[-1]
+                        if hasattr(last_msg, "text") and last_msg.text:
+                            yield last_msg.text
+
+    except Exception as e:
+        logger.error(f"Error in Handoff workflow: {e}", exc_info=True)
+        raise
+    finally:
+        global _db_connection
+        if _db_connection:
+            try:
+                _db_connection.close()
+            except Exception:
+                pass
+            _db_connection = None
+
+
 # ============================================================================
 # Chat API Endpoint
 # ============================================================================
 
+# Agent Mode Configuration
+# AGENT_MODE options:
+#   - "sql_only": Fastest - single agent with SQL tool only
+#   - "multi_tool": Default - single agent with all tools (SQL, Web, Doc)
+#   - "handoff": Multi-agent with HandoffBuilder (faster than Magentic)
+#   - "magentic": Multi-agent with MagenticBuilder (slowest, most capable)
+AGENT_MODE = os.getenv("AGENT_MODE", "multi_tool").lower()
+
+
+def select_agent_mode(query: str) -> str:
+    """
+    Select the best agent mode based on query complexity.
+    
+    Returns:
+        "sql_only" | "multi_tool" | "handoff" | "magentic"
+    """
+    # If explicitly configured, use that mode
+    if AGENT_MODE in ["sql_only", "handoff", "magentic"]:
+        return AGENT_MODE
+    
+    # Auto-select based on query (default: multi_tool)
+    query_lower = query.lower()
+    
+    # Simple greetings → sql_only (fastest)
+    simple_patterns = ["こんにちは", "ありがとう", "hello", "hi", "よろしく"]
+    if any(p in query_lower for p in simple_patterns):
+        return "sql_only"
+    
+    # Complex multi-source queries → handoff
+    complex_patterns = [
+        "仕様と売上", "売上と仕様", "市場と売上", "トレンドと", 
+        "と比較", "比較して", "複数の", "総合的に"
+    ]
+    if any(p in query_lower for p in complex_patterns):
+        return "handoff"
+    
+    # Default: multi_tool (single agent with all tools)
+    return "multi_tool"
+
 
 async def stream_chat_request(conversation_id: str, query: str):
     """
-    Handles streaming chat requests.
+    Handles streaming chat requests with dynamic mode selection.
 
-    Uses unified single-agent mode with all tools (SQL, Web, Doc).
-    The LLM automatically selects which tools to use based on the query.
-    This is much faster than MagenticBuilder while maintaining all capabilities.
+    Modes:
+    - sql_only: Fastest, SQL queries only
+    - multi_tool: Single agent with all tools (default)
+    - handoff: Multi-agent with HandoffBuilder
+    - magentic: Multi-agent with MagenticBuilder (legacy)
     """
 
     async def generate():
         try:
             assistant_content = ""
 
-            # Always use unified single-agent with all tools
-            # The LLM intelligently selects which tools to use
-            logger.info(f"Processing query with unified agent: {query[:50]}...")
+            # Select best mode for this query
+            mode = select_agent_mode(query)
+            logger.info(f"Selected mode '{mode}' for query: {query[:50]}...")
+
+            # Choose stream function based on mode
+            if mode == "sql_only":
+                stream_func = stream_sql_only_response
+            elif mode == "handoff":
+                stream_func = stream_handoff_response
+            elif mode == "magentic":
+                # Magentic requires user_id parameter
+                async def magentic_wrapper(cid: str, q: str):
+                    async for chunk in stream_multi_agent_response(cid, q, "anonymous"):
+                        yield chunk
+                stream_func = magentic_wrapper
+            else:  # multi_tool (default)
+                stream_func = stream_single_agent_response
 
             # Stream and accumulate response
-            async for chunk in stream_single_agent_response(conversation_id, query):
+            async for chunk in stream_func(conversation_id, query):
                 if chunk:
                     assistant_content += str(chunk)
                     response = {
