@@ -107,7 +107,9 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           textPart = textPart.substring(0, pos.start) + textPart.substring(pos.end);
         }
         textPart = textPart.replace(/\n{3,}/g, '\n\n').trim();
-        return { textPart, charts };
+        // Deduplicate charts based on data content
+        const uniqueCharts = deduplicateCharts(charts);
+        return { textPart, charts: uniqueCharts };
       }
 
       // STEP 2: Fallback - Find raw JSON using bracket counting
@@ -157,7 +159,36 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       textPart = textPart.replace(/Chart\.js（[^）]*）[^\n]*/g, '').trim();
       textPart = textPart.replace(/\n{3,}/g, '\n\n'); // Reduce multiple newlines
 
-      return { textPart, charts };
+      // Deduplicate charts based on data content
+      const uniqueCharts = deduplicateCharts(charts);
+      return { textPart, charts: uniqueCharts };
+    };
+
+    // Helper function to deduplicate charts based on their data
+    const deduplicateCharts = (charts: any[]): any[] => {
+      const seen = new Set<string>();
+      const unique: any[] = [];
+      
+      for (const chart of charts) {
+        // Create a signature based on chart type and data labels/values
+        let signature = '';
+        try {
+          const type = chart.type || chart.chartType || '';
+          const labels = chart.data?.labels?.join(',') || '';
+          const firstDataset = chart.data?.datasets?.[0];
+          const data = firstDataset?.data?.join(',') || '';
+          signature = `${type}|${labels}|${data}`;
+        } catch {
+          signature = JSON.stringify(chart);
+        }
+        
+        if (!seen.has(signature)) {
+          seen.add(signature);
+          unique.push(chart);
+        }
+      }
+      
+      return unique;
     };
 
     // Try parsing entire content as JSON first (pure JSON case)
