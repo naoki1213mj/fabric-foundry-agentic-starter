@@ -1,20 +1,16 @@
+import { getApiBaseUrl } from "../config";
 import {
-  historyListResponse,
-  historyReadResponse,
+    historyListResponse,
+    historyReadResponse,
 } from "../configs/StaticData";
 import {
-  AppConfig,
-  ChartConfigItem,
-  ChatMessage,
-  Conversation,
-  ConversationRequest,
-  CosmosDBHealth,
-  CosmosDBStatus,
+    ChatMessage,
+    Conversation,
+    ConversationRequest
 } from "../types/AppTypes";
+import { createErrorResponse, getUserId, setUserId } from "../utils/apiUtils";
 import { ApiErrorHandler } from "../utils/errorHandler";
-import { getApiBaseUrl } from "../config";
 import { httpClient } from "../utils/httpClient";
-import { getUserId, setUserId, createErrorResponse } from "../utils/apiUtils";
 
 const baseURL = getApiBaseUrl(); // base API URL
 
@@ -62,12 +58,12 @@ export async function getUserInfo(): Promise<UserInfo[]> {
 
 export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
   const endpoint = `/historyfab/read`;
-  
+
   try {
     const response = await httpClient.get(endpoint, {
       params: { id: convId }
     });
-    
+
     if (!response.ok) {
       // Return fallback data (maintaining current behavior)
       return historyReadResponse.messages.map((msg: any) => ({
@@ -100,7 +96,7 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
       });
     }
     return messages;
-    
+
   } catch (error) {
     return [];
   }
@@ -111,7 +107,7 @@ export const historyList = async (
   limit = 25
 ): Promise<Conversation[] | null> => {
   const endpoint = `/historyfab/list`;
-  
+
   try {
     const response = await httpClient.get(endpoint, {
       params: { offset, limit }
@@ -122,16 +118,16 @@ export const historyList = async (
     }
 
     const payload = await response.json();
-    
+
     if (!Array.isArray(payload)) {
       // Log as general error
       ApiErrorHandler.handleGeneralError(
-        new Error("Invalid response format: expected array"), 
+        new Error("Invalid response format: expected array"),
         endpoint
       );
       return null;
     }
-    
+
     const conversations: Conversation[] = payload.map((conv: any) => {
       const conversation: Conversation = {
         // Use conversationId as fallback if id is not available
@@ -144,11 +140,11 @@ export const historyList = async (
       return conversation;
     });
     return conversations;
-    
+
   } catch (error) {
     // Use new error handling system with fallback data
     ApiErrorHandler.handleNetworkError(error, endpoint);
-    
+
     // Return fallback data (maintaining current behavior)
     const conversations: Conversation[] = historyListResponse.map(
       (conv: any) => {
@@ -172,15 +168,15 @@ export const historyUpdate = async (
   convId: string
 ): Promise<Response> => {
   const endpoint = `/historyfab/update`;
-  
+
   try {
     const response = await httpClient.post(endpoint, {
       conversation_id: convId,
       messages: newMessages,
     });
-    
+
     return response;
-    
+
   } catch (error) {
     // Return error response (maintaining current behavior)
     return createErrorResponse(500, 'Failed to update history');
@@ -192,7 +188,7 @@ export async function callConversationApi(
   abortSignal: AbortSignal
 ): Promise<Response> {
   const endpoint = `/api/chat`;
-  
+
   try {
     const response = await httpClient.post(endpoint, {
       conversation_id: options.id,
@@ -205,7 +201,7 @@ export async function callConversationApi(
     if (!response.ok) {
       // Handle error with new system but still throw (maintaining current behavior)
       const errorInfo = await ApiErrorHandler.handleApiError(response, endpoint);
-      
+
       try {
         const errorData = await response.json();
         throw new Error(JSON.stringify(errorData.error));
@@ -215,7 +211,7 @@ export async function callConversationApi(
     }
 
     return response;
-    
+
   } catch (error: any) {
     // Log network errors
     if (error.name !== 'AbortError') {
@@ -230,15 +226,15 @@ export const historyRename = async (
   title: string
 ): Promise<Response> => {
   const endpoint = `/historyfab/rename`;
-  
+
   try {
     const response = await httpClient.post(endpoint, {
       conversation_id: convId,
       title: title,
     });
-    
+
     return response;
-    
+
   } catch (error) {
     // Return error response (maintaining current behavior)
     return createErrorResponse(500, 'Failed to rename conversation');
@@ -247,14 +243,14 @@ export const historyRename = async (
 
 export const historyDelete = async (convId: string): Promise<Response> => {
   const endpoint = `/historyfab/delete`;
-  
+
   try {
     const response = await httpClient.delete(endpoint, {
       params: { id: convId }
     });
-    
+
     return response;
-    
+
   } catch (error) {
     // Return error response (maintaining current behavior)
     return createErrorResponse(500, 'Failed to delete conversation');
@@ -263,14 +259,14 @@ export const historyDelete = async (convId: string): Promise<Response> => {
 
 export const historyDeleteAll = async (): Promise<Response> => {
   const endpoint = `/historyfab/delete_all`;
-  
+
   try {
     const response = await httpClient.delete(endpoint, {
       body: JSON.stringify({})
     });
-    
+
     return response;
-    
+
   } catch (error) {
     // Return error response (maintaining current behavior)
     return createErrorResponse(500, 'Failed to delete all conversations');
@@ -279,19 +275,19 @@ export const historyDeleteAll = async (): Promise<Response> => {
 
 export const fetchCitationContent = async (body: any) => {
   const endpoint = `/api/fetch-azure-search-content`;
-  
+
   try {
     const response = await httpClient.post(endpoint, body);
-    
+
     if (!response.ok) {
       // Handle error with new system and throw (maintaining current behavior)
       const errorInfo = await ApiErrorHandler.handleApiError(response, endpoint);
       throw new Error(errorInfo.message);
     }
-    
+
     const data = await response.json();
     return data;
-    
+
   } catch (error: any) {
     // Use new error handling system
     if (error.message && !error.message.includes('Failed to fetch')) {

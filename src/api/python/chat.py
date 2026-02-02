@@ -750,14 +750,19 @@ async def stream_multi_agent_response(
     これにより、複合的なクエリ（例：「売上データを分析して、最新トレンドと比較」）に対応可能。
     """
     try:
-        # Get conversation history for multi-turn support
+        # Get conversation history for multi-turn support (with timeout)
         history_messages = []
         try:
-            messages = await get_conversation_messages(user_id, conversation_id)
+            import asyncio
+            # Set a short timeout (3 seconds) to avoid blocking
+            messages = await asyncio.wait_for(
+                get_conversation_messages(user_id, conversation_id),
+                timeout=3.0
+            )
             if messages:
                 # Convert to format suitable for agent (last N messages for context)
-                # Limit to last 10 messages to avoid token limits
-                recent_messages = messages[-10:] if len(messages) > 10 else messages
+                # Limit to last 6 messages to reduce token usage
+                recent_messages = messages[-6:] if len(messages) > 6 else messages
                 for msg in recent_messages:
                     role = msg.get("role", "user")
                     content = msg.get("content", "")
@@ -766,6 +771,8 @@ async def stream_multi_agent_response(
                 logger.info(
                     f"Loaded {len(history_messages)} messages from conversation history"
                 )
+        except asyncio.TimeoutError:
+            logger.warning("Conversation history fetch timed out, continuing without history")
         except Exception as e:
             logger.warning(f"Could not load conversation history: {e}")
             # Continue without history
