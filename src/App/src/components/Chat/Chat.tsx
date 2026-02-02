@@ -28,6 +28,18 @@ import {
     updateMessageById,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
+
+// Throttle utility for scroll during streaming
+const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
+  let lastCall = 0;
+  return (...args: Parameters<T>) => {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn(...args);
+    }
+  };
+};
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
     type ChartDataResponse,
@@ -179,6 +191,17 @@ const Chat: React.FC<ChatProps> = ({
       }, 100);
     }
   }, []);
+
+  // Throttled version for streaming - only scroll every 500ms to prevent flickering
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const throttledScrollChatToBottom = useMemo(
+    () => throttle(() => {
+      if (chatMessageStreamEnd.current) {
+        chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
+      }
+    }, 500),
+    []
+  );
 
   useEffect(() => {
     scrollChatToBottom();
@@ -444,7 +467,8 @@ const Chat: React.FC<ChatProps> = ({
 
                     // Dispatch with a new object reference to trigger re-render
                     dispatch(updateMessageById({ ...streamMessage }));
-                    scrollChatToBottom();
+                    // Use throttled scroll during streaming to prevent flickering
+                    throttledScrollChatToBottom();
                   }
                 }
               } catch (e) {
