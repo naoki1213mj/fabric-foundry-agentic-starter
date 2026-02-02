@@ -73,26 +73,59 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
 
   // Handle assistant messages - string content (text, lists, tables, or stringified charts)
   if (message.role === "assistant" && typeof message.content === "string") {
-    // Extract Chart.js JSON from mixed text/JSON content
-    const extractChartFromText = (content: string): { textPart: string; chartData: any | null } => {
-      // Pattern to match Chart.js JSON object with type field
-      // Matches: { "type": "bar", "data": {...}, "options": {...} }
-      const chartJsonPattern = /\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"[\s\S]*?"data"\s*:\s*\{[\s\S]*?"datasets"\s*:\s*\[[\s\S]*?\]\s*\}[\s\S]*?\}/;
+    // Extract Chart.js JSON(s) from mixed text/JSON content using bracket counting
+    const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
+      const charts: any[] = [];
+      let textPart = content;
 
-      const match = content.match(chartJsonPattern);
-      if (match) {
-        const jsonStr = match[0];
-        const textPart = content.replace(jsonStr, '').trim();
-        try {
-          const parsed = JSON.parse(jsonStr);
-          if (parsed && typeof parsed === 'object' && 'data' in parsed && 'type' in parsed) {
-            return { textPart, chartData: parsed };
+      // Find all potential JSON starting points: { "type": "bar|pie|line|..."
+      const chartTypePattern = /\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/g;
+      const jsonPositions: { start: number; end: number; json: any }[] = [];
+
+      let match;
+      while ((match = chartTypePattern.exec(content)) !== null) {
+        const startIndex = match.index;
+
+        // Find the matching closing brace using bracket counting
+        let braceCount = 0;
+        let endIndex = -1;
+
+        for (let i = startIndex; i < content.length; i++) {
+          if (content[i] === '{') braceCount++;
+          else if (content[i] === '}') {
+            braceCount--;
+            if (braceCount === 0) {
+              endIndex = i;
+              break;
+            }
           }
-        } catch {
-          // JSON parse failed, return original content
+        }
+
+        if (endIndex !== -1) {
+          const jsonStr = content.substring(startIndex, endIndex + 1);
+          try {
+            const parsed = JSON.parse(jsonStr);
+            if (parsed && parsed.data && parsed.type && parsed.data.datasets) {
+              jsonPositions.push({ start: startIndex, end: endIndex + 1, json: parsed });
+            }
+          } catch {
+            // Invalid JSON, skip
+          }
         }
       }
-      return { textPart: content, chartData: null };
+
+      // Remove JSON from text (in reverse order to maintain indices)
+      for (let i = jsonPositions.length - 1; i >= 0; i--) {
+        const pos = jsonPositions[i];
+        charts.unshift(pos.json); // Add to beginning to maintain order
+        textPart = textPart.substring(0, pos.start) + textPart.substring(pos.end);
+      }
+
+      // Clean up extra whitespace and "Chart.js（...）" labels
+      textPart = textPart.replace(/Chart\.js（[^）]*）[^\n]*/g, '').trim();
+      textPart = textPart.replace(/\n{3,}/g, '\n\n'); // Reduce multiple newlines
+
+      return { textPart, charts };
     };
 
     // Try parsing entire content as JSON first (pure JSON case)
@@ -144,15 +177,15 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     }
 
     // SCENARIO 3: Mixed text + JSON content (e.g., "説明テキスト... { "type": "bar", ... }")
-    const { textPart, chartData: extractedChart } = extractChartFromText(message.content);
+    const { textPart, charts: extractedCharts } = extractChartsFromText(message.content);
 
-    if (extractedChart) {
-      // Render both text and chart
+    if (extractedCharts.length > 0) {
+      // Render text + multiple charts
       const containsHTML = /<\/?[a-z][\s\S]*>/i.test(textPart);
 
       return (
         <div className="assistant-message">
-          {/* Text content above the chart */}
+          {/* Text content above the charts */}
           {textPart && (
             containsHTML ? (
               <div
@@ -167,10 +200,16 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
             )
           )}
 
-          {/* Chart below the text */}
-          <div className="chart-section" style={{ marginTop: textPart ? '16px' : '0' }}>
-            <ChatChart chartContent={extractedChart} />
-          </div>
+          {/* Render all extracted charts */}
+          {extractedCharts.map((chartData, chartIndex) => (
+            <div
+              key={chartIndex}
+              className="chart-section"
+              style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
+            >
+              <ChatChart chartContent={chartData} />
+            </div>
+          ))}
 
           {/* Citations */}
           {!generatingResponse && (
