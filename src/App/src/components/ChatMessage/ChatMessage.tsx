@@ -180,6 +180,20 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       const availableText = extractTextExcludingChart(message.content);
       const containsHTML = availableText ? /<\/?[a-z][\s\S]*>/i.test(availableText) : false;
 
+      // If no text available yet (chart JSON came first), show normal loading
+      // This prevents showing "グラフ生成中" when we're just starting to receive data
+      if (!availableText || availableText.length < 10) {
+        return (
+          <div className="assistant-message">
+            <div className="typing-indicator">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="assistant-message">
           {availableText && (
