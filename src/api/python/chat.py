@@ -709,31 +709,18 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
 1. 各エージェントの結果を論理的に整理
 2. ユーザーの質問に直接答える形式で構成
 3. データと説明を組み合わせて分かりやすく提示
-4. グラフが要求されていれば最後にChart.js JSONを追加
 
-## グラフ出力形式（重要）
-グラフ表示が要求された場合、回答の最後に```jsonコードブロックでChart.js JSONを出力。
-Vega-Lite形式は使用禁止です。
+## グラフ出力ルール（重要：重複禁止）
 
-```json
-{
-  "type": "bar",
-  "data": {
-    "labels": ["製品A", "製品B", "製品C"],
-    "datasets": [{
-      "label": "売上金額",
-      "data": [100000, 80000, 60000],
-      "backgroundColor": ["#4e79a7", "#f28e2c", "#e15759"]
-    }]
-  },
-  "options": {
-    "responsive": true,
-    "plugins": {
-      "title": { "display": true, "text": "売上TOP3" }
-    }
-  }
-}
-```
+### sql_agentがグラフ（```json）を含む回答を返した場合
+→ **そのまま使用。追加のグラフを生成しない**
+
+### sql_agentがグラフなしの回答を返し、ユーザーがグラフを要求している場合
+→ あなたがChart.js JSONを1つだけ追加
+
+### 絶対禁止
+- 同じグラフを2回出力
+- sql_agentのグラフに加えて別のグラフを追加
 
 ## 重要な注意
 - **シンプルな質問は1回のエージェント呼び出しで完了させる**
@@ -741,6 +728,7 @@ Vega-Lite形式は使用禁止です。
 - 数値データの質問は必ずsql_agentを最初に使用
 - 概念説明や一般知識はあなた自身の知識で回答可能
 - グラフ要求時はChart.js JSON形式（Vega-Lite禁止）
+- **sql_agentの回答にグラフがあれば、それをそのまま使う（追加グラフ禁止）**
 - 日本語で回答
 """,
         chat_client=chat_client,
