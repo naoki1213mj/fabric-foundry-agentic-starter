@@ -79,55 +79,97 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     const chartJsonPattern = /```json|"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i;
     const looksLikeChartJson = chartJsonPattern.test(message.content);
 
-    // Extract text before the chart JSON for streaming preview
-    const extractTextBeforeChart = (content: string): string => {
-      // Find where the chart JSON starts
-      const codeBlockStart = content.indexOf('```json');
-      const rawJsonMatch = content.match(/"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
-
-      let chartStartIndex = -1;
-
-      if (codeBlockStart !== -1) {
-        chartStartIndex = codeBlockStart;
-      } else if (rawJsonMatch && rawJsonMatch.index !== undefined) {
-        // Find the opening brace before "type"
-        const beforeType = content.substring(0, rawJsonMatch.index);
-        const lastBrace = beforeType.lastIndexOf('{');
-        if (lastBrace !== -1) {
-          chartStartIndex = lastBrace;
+    // Check if chart JSON is complete (has matching closing braces/backticks)
+    const isChartJsonComplete = (content: string): boolean => {
+      // Check for complete markdown code block
+      const codeBlockMatch = content.match(/```json\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        try {
+          JSON.parse(codeBlockMatch[1].trim());
+          return true;
+        } catch {
+          return false;
         }
       }
 
-      if (chartStartIndex > 0) {
-        return content.substring(0, chartStartIndex).trim();
+      // Check for raw JSON completeness using brace counting
+      const rawJsonMatch = content.match(/"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
+      if (rawJsonMatch && rawJsonMatch.index !== undefined) {
+        const beforeType = content.substring(0, rawJsonMatch.index);
+        const lastBrace = beforeType.lastIndexOf('{');
+        if (lastBrace !== -1) {
+          let braceCount = 0;
+          for (let i = lastBrace; i < content.length; i++) {
+            if (content[i] === '{') braceCount++;
+            else if (content[i] === '}') braceCount--;
+            if (braceCount === 0) return true; // Complete JSON found
+          }
+        }
       }
-      return '';
+      return false;
     };
 
-    // During streaming with chart JSON: show text + "generating chart" indicator
-    if (isStreaming && looksLikeChartJson) {
-      const textBeforeChart = extractTextBeforeChart(message.content);
-      const containsHTML = textBeforeChart ? /<\/?[a-z][\s\S]*>/i.test(textBeforeChart) : false;
+    // Extract text parts (before and after chart JSON) for streaming preview
+    const extractTextWithoutIncompleteChart = (content: string): string => {
+      // If chart JSON is complete, we don't need this - use normal flow
+      if (isChartJsonComplete(content)) return '';
+
+      // Remove incomplete chart JSON patterns to show remaining text
+      let textPart = content;
+
+      // Remove incomplete ```json blocks
+      const incompleteCodeBlock = /```json[\s\S]*$/;
+      textPart = textPart.replace(incompleteCodeBlock, '');
+
+      // Remove incomplete raw JSON (find start of { "type": ... without closing })
+      const rawJsonStart = textPart.match(/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
+      if (rawJsonStart && rawJsonStart.index !== undefined) {
+        const beforeJson = textPart.substring(0, rawJsonStart.index);
+        const afterJsonStart = textPart.substring(rawJsonStart.index);
+        // Check if this JSON is incomplete
+        let braceCount = 0;
+        let jsonEndIndex = -1;
+        for (let i = 0; i < afterJsonStart.length; i++) {
+          if (afterJsonStart[i] === '{') braceCount++;
+          else if (afterJsonStart[i] === '}') braceCount--;
+          if (braceCount === 0 && i > 0) {
+            jsonEndIndex = i;
+            break;
+          }
+        }
+        if (jsonEndIndex === -1) {
+          // Incomplete JSON - remove it
+          textPart = beforeJson.trim();
+        }
+      }
+
+      return textPart.trim();
+    };
+
+    // During streaming with incomplete chart JSON: show available text + "generating chart" indicator
+    if (isStreaming && looksLikeChartJson && !isChartJsonComplete(message.content)) {
+      const availableText = extractTextWithoutIncompleteChart(message.content);
+      const containsHTML = availableText ? /<\/?[a-z][\s\S]*>/i.test(availableText) : false;
 
       return (
         <div className="assistant-message">
-          {/* Show text content that came before the chart */}
-          {textBeforeChart && (
+          {/* Show text content (before and after chart, excluding incomplete JSON) */}
+          {availableText && (
             containsHTML ? (
               <div
-                dangerouslySetInnerHTML={{ __html: textBeforeChart }}
+                dangerouslySetInnerHTML={{ __html: availableText }}
                 className="html-content"
               />
             ) : (
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, supersub]}
-                children={textBeforeChart}
+                children={availableText}
               />
             )
           )}
 
           {/* Show "generating chart" indicator */}
-          <div className="chart-generating-indicator" style={{ marginTop: textBeforeChart ? '16px' : '0' }}>
+          <div className="chart-generating-indicator" style={{ marginTop: availableText ? '16px' : '0' }}>
             <div className="typing-indicator">
               <span className="generating-text">{t("chat.generatingChart")}</span>
               <span className="dot"></span>
