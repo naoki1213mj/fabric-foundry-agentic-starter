@@ -74,23 +74,71 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
   // Handle assistant messages - string content (text, lists, tables, or stringified charts)
   if (message.role === "assistant" && typeof message.content === "string") {
     const isStreaming = generatingResponse && isLastAssistantMessage;
-    const looksLikeChartJson = /```json|"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i.test(
-      message.content
-    );
 
-    // Avoid rendering partial chart JSON during streaming to prevent flicker
+    // Check if content contains chart JSON pattern
+    const chartJsonPattern = /```json|"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i;
+    const looksLikeChartJson = chartJsonPattern.test(message.content);
+
+    // Extract text before the chart JSON for streaming preview
+    const extractTextBeforeChart = (content: string): string => {
+      // Find where the chart JSON starts
+      const codeBlockStart = content.indexOf('```json');
+      const rawJsonMatch = content.match(/"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
+
+      let chartStartIndex = -1;
+
+      if (codeBlockStart !== -1) {
+        chartStartIndex = codeBlockStart;
+      } else if (rawJsonMatch && rawJsonMatch.index !== undefined) {
+        // Find the opening brace before "type"
+        const beforeType = content.substring(0, rawJsonMatch.index);
+        const lastBrace = beforeType.lastIndexOf('{');
+        if (lastBrace !== -1) {
+          chartStartIndex = lastBrace;
+        }
+      }
+
+      if (chartStartIndex > 0) {
+        return content.substring(0, chartStartIndex).trim();
+      }
+      return '';
+    };
+
+    // During streaming with chart JSON: show text + "generating chart" indicator
     if (isStreaming && looksLikeChartJson) {
+      const textBeforeChart = extractTextBeforeChart(message.content);
+      const containsHTML = textBeforeChart ? /<\/?[a-z][\s\S]*>/i.test(textBeforeChart) : false;
+
       return (
         <div className="assistant-message">
-          <div className="typing-indicator">
-            <span className="generating-text">{t("chat.generatingChart")}</span>
-            <span className="dot"></span>
-            <span className="dot"></span>
-            <span className="dot"></span>
+          {/* Show text content that came before the chart */}
+          {textBeforeChart && (
+            containsHTML ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: textBeforeChart }}
+                className="html-content"
+              />
+            ) : (
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, supersub]}
+                children={textBeforeChart}
+              />
+            )
+          )}
+
+          {/* Show "generating chart" indicator */}
+          <div className="chart-generating-indicator" style={{ marginTop: textBeforeChart ? '16px' : '0' }}>
+            <div className="typing-indicator">
+              <span className="generating-text">{t("chat.generatingChart")}</span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
           </div>
         </div>
       );
     }
+
     // Extract Chart.js JSON(s) from mixed text/JSON content
     const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
       const charts: any[] = [];
