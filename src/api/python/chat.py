@@ -785,25 +785,31 @@ async def stream_multi_agent_response(
         accumulated_text = ""
 
         # Stream the workflow execution
+        # 最終回答のみを返す（中間出力は蓄積してログのみ）
+        # これにより応答サイズを大幅に削減し、タイムアウトを防止
+        final_answer = ""
+
         async for event in workflow.run_stream(full_query):
             if isinstance(event, AgentRunUpdateEvent):
                 # ストリーミング更新 - エージェントからのテキスト出力
                 update = event.data
                 message_id = getattr(update, "message_id", None)
+                executor_id = getattr(event, "executor_id", "unknown")
 
                 # 新しいメッセージの場合、区切りを追加
                 if message_id and message_id != last_message_id:
                     if last_message_id is not None and accumulated_text:
-                        logger.info(f"Agent {event.executor_id} completed response")
+                        logger.info(f"Agent {executor_id} completed response")
                     last_message_id = message_id
 
-                # テキストを出力
+                # テキストを蓄積（yieldは最後のみ）
                 if hasattr(update, "text") and update.text:
                     accumulated_text += update.text
-                    yield update.text
+                    # Managerの最終応答として蓄積
+                    final_answer += update.text
                 elif isinstance(update, str):
                     accumulated_text += update
-                    yield update
+                    final_answer += update
 
             elif isinstance(event, MagenticOrchestratorEvent):
                 # Magentic オーケストレーターイベント（計画、進捗など）
@@ -815,17 +821,20 @@ async def stream_multi_agent_response(
 
             elif isinstance(event, WorkflowOutputEvent):
                 # ワークフロー完了時の最終出力
+                logger.info("WorkflowOutputEvent received - extracting final answer")
                 if event.data:
                     output_messages = event.data
                     if isinstance(output_messages, list):
                         for msg in output_messages:
                             if hasattr(msg, "text") and msg.text:
-                                # 最終回答が既に蓄積されたテキストと異なる場合のみ出力
-                                if msg.text not in accumulated_text:
-                                    yield msg.text
+                                # 最終回答として使用（既存の蓄積を上書き）
+                                final_answer = msg.text
+                                logger.info(
+                                    f"Final answer from WorkflowOutputEvent: {len(final_answer)} chars"
+                                )
                     elif isinstance(output_messages, str):
-                        if output_messages not in accumulated_text:
-                            yield output_messages
+                        final_answer = output_messages
+                        logger.info(f"Final answer (string): {len(final_answer)} chars")
                 logger.info("MagenticBuilder workflow completed")
 
             elif isinstance(event, WorkflowStatusEvent):
@@ -843,6 +852,13 @@ async def stream_multi_agent_response(
 
             elif isinstance(event, RequestInfoEvent):
                 logger.info(f"Request info event: {event}")
+
+        # ワークフロー完了後、最終回答のみをyield
+        if final_answer:
+            logger.info(f"Yielding final answer: {len(final_answer)} chars")
+            yield final_answer
+        else:
+            logger.warning("No final answer accumulated")
 
     except Exception as e:
         logger.error(f"Error in MagenticBuilder workflow: {e}", exc_info=True)
