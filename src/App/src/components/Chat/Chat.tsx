@@ -314,8 +314,7 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        const errMsg = result.error?.message || 'Failed to send message';
-        throw new Error(errMsg);
+        throw new Error('Failed to send message');
       }
       const response = result.payload;
 
@@ -441,8 +440,7 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        const errMsg = result.error?.message || 'Failed to send message';
-        throw new Error(errMsg);
+        throw new Error('Failed to send message');
       }
       const response = result.payload;
 
@@ -486,8 +484,6 @@ const Chat: React.FC<ChatProps> = ({
                 if (parsed?.error && !hasError) {
                   hasError = true;
                   runningText = parsed?.error;
-                } else if (isChartQuery(userMessage) && !hasError) {
-                  runningText += textValue;
                 } else if (typeof parsed === "object" && !hasError) {
                   const responseContent = parsed?.choices?.[0]?.messages?.[0]?.content;
                   const responseCitations = parsed?.choices?.[0]?.messages?.[0]?.citations;
@@ -507,6 +503,8 @@ const Chat: React.FC<ChatProps> = ({
                     dispatch(updateMessageById({ ...streamMessage }));
                     // Use throttled scroll during streaming to prevent flickering
                     throttledScrollChatToBottom();
+                    // Keep latest content for fallback parsing if needed
+                    runningText = responseContent;
                   }
                 }
               } catch (e) {
@@ -528,52 +526,55 @@ const Chat: React.FC<ChatProps> = ({
           const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
           updatedMessages = [newMessage, errorMessage];
         } else if (isChartQuery(userMessage)) {
-          try {
-            const splitRunningText = runningText.split("}{");
-            const parsedChartResponse = JSON.parse("{" + splitRunningText[splitRunningText.length - 1]);
+          if (streamMessage.content) {
+            updatedMessages = [newMessage, streamMessage];
+          } else {
+            // Fallback: attempt to parse chart-only responses
+            try {
+              const splitRunningText = runningText.split("}{");
+              const parsedChartResponse = JSON.parse("{" + splitRunningText[splitRunningText.length - 1]);
 
-            const rawChartContent = parsedChartResponse?.choices[0]?.messages[0]?.content;
+              const rawChartContent = parsedChartResponse?.choices[0]?.messages[0]?.content;
 
-            // **OPTIMIZED: Use helper function for parsing**
-            let chartResponse = typeof rawChartContent === "string"
-              ? parseChartContent(rawChartContent)
-              : rawChartContent || "Chart can't be generated, please try again.";
+              // **OPTIMIZED: Use helper function for parsing**
+              let chartResponse = typeof rawChartContent === "string"
+                ? parseChartContent(rawChartContent)
+                : rawChartContent || "Chart can't be generated, please try again.";
 
-            chartResponse = extractChartData(chartResponse);
+              chartResponse = extractChartData(chartResponse);
 
-            // Validate and create chart message
-            if ((chartResponse?.type || chartResponse?.chartType) && chartResponse?.data) {
-              // Valid chart data
-              const chartMessage = createAndDispatchMessage(
-                ASSISTANT,
-                chartResponse as unknown as ChartDataResponse
-              );
-              updatedMessages = [newMessage, chartMessage];
-            } else if (parsedChartResponse?.error || parsedChartResponse?.choices[0]?.messages[0]?.content) {
-              let content = parsedChartResponse?.choices[0]?.messages[0]?.content;
-              let displayContent = content;
+              // Validate and create chart message
+              if ((chartResponse?.type || chartResponse?.chartType) && chartResponse?.data) {
+                const chartMessage = createAndDispatchMessage(
+                  ASSISTANT,
+                  chartResponse as unknown as ChartDataResponse
+                );
+                updatedMessages = [newMessage, chartMessage];
+              } else if (parsedChartResponse?.error || parsedChartResponse?.choices[0]?.messages[0]?.content) {
+                let content = parsedChartResponse?.choices[0]?.messages[0]?.content;
+                let displayContent = content;
 
-              try {
-                const parsed = typeof content === "string" ? JSON.parse(content) : content;
-                if (parsed && typeof parsed === "object" && "answer" in parsed) {
-                  displayContent = parsed.answer;
+                try {
+                  const parsed = typeof content === "string" ? JSON.parse(content) : content;
+                  if (parsed && typeof parsed === "object" && "answer" in parsed) {
+                    displayContent = parsed.answer;
+                  }
+                } catch {
+                  displayContent = content;
                 }
-              } catch {
-                displayContent = content;
+
+                let errorMsg = parsedChartResponse?.error || displayContent;
+
+                if (isMalformedChartJSON(errorMsg, !!parsedChartResponse?.error)) {
+                  errorMsg = "Chart can not be generated, please try again later";
+                }
+
+                const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
+                updatedMessages = [newMessage, errorMessage];
               }
-
-              let errorMsg = parsedChartResponse?.error || displayContent;
-
-              // **OPTIMIZED: Use helper function for validation**
-              if (isMalformedChartJSON(errorMsg, !!parsedChartResponse?.error)) {
-                errorMsg = "Chart can not be generated, please try again later";
-              }
-
-              const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
-              updatedMessages = [newMessage, errorMessage];
+            } catch {
+              // Error parsing chart response
             }
-          } catch {
-            // Error parsing chart response
           }
         } else if (!isChartResponseReceived) {
           updatedMessages = [newMessage, streamMessage];

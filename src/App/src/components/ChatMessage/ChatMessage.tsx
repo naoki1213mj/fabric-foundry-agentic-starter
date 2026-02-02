@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,19 +6,6 @@ import supersub from "remark-supersub";
 import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
 import ChatChart from "../ChatChart/ChatChart";
 import Citations from "../Citations/Citations";
-
-// Helper to create a stable signature for chart data
-const getChartSignature = (chart: any): string => {
-  try {
-    const type = chart?.type || chart?.chartType || '';
-    const labels = chart?.data?.labels?.join(',') || '';
-    const firstDataset = chart?.data?.datasets?.[0];
-    const data = firstDataset?.data?.join(',') || '';
-    return `${type}|${labels}|${data}`;
-  } catch {
-    return JSON.stringify(chart);
-  }
-};
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -88,114 +75,54 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
   if (message.role === "assistant" && typeof message.content === "string") {
     const isStreaming = generatingResponse && isLastAssistantMessage;
 
-    // More precise chart JSON detection - must have both "type" and "data" with "datasets"
-    const hasChartJsonPattern = (content: string): boolean => {
-      // Check for markdown code block with chart JSON
-      if (/```json[\s\S]*?"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"[\s\S]*?"data"[\s\S]*?"datasets"/i.test(content)) {
-        return true;
-      }
-      // Check for raw chart JSON object
-      if (/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"[\s\S]*?"data"\s*:\s*\{[\s\S]*?"datasets"/i.test(content)) {
-        return true;
-      }
-      return false;
-    };
+    // Check if content contains chart JSON pattern
+    const chartJsonPattern = /```json|"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i;
+    const looksLikeChartJson = chartJsonPattern.test(message.content);
 
-    // Check if chart JSON is complete
-    const isChartJsonComplete = (content: string): boolean => {
-      // Check for complete markdown code block
-      const codeBlockMatch = content.match(/```json\s*([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        try {
-          const parsed = JSON.parse(codeBlockMatch[1].trim());
-          return parsed && parsed.type && parsed.data && parsed.data.datasets;
-        } catch {
-          return false;
-        }
-      }
+    // Check if chart JSON is complete (has matching closing braces/backticks)
+    // During streaming with chart JSON: show available text + "generating chart" indicator
+    // Keep showing indicator until streaming is complete to prevent flickering
+    if (isStreaming && looksLikeChartJson) {
+      // Extract text excluding the chart JSON (complete or incomplete)
+      const extractTextExcludingChart = (content: string): string => {
+        let textPart = content;
 
-      // Check for complete raw JSON
-      const rawJsonMatch = content.match(/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
-      if (rawJsonMatch && rawJsonMatch.index !== undefined) {
-        let braceCount = 0;
-        for (let i = rawJsonMatch.index; i < content.length; i++) {
-          if (content[i] === '{') braceCount++;
-          else if (content[i] === '}') {
-            braceCount--;
-            if (braceCount === 0) {
-              // Try to parse the JSON
-              try {
-                const jsonStr = content.substring(rawJsonMatch.index, i + 1);
-                const parsed = JSON.parse(jsonStr);
-                return parsed && parsed.type && parsed.data && parsed.data.datasets;
-              } catch {
-                return false;
+        // Remove ```json ... ``` blocks (complete or incomplete)
+        textPart = textPart.replace(/```json[\s\S]*?(```|$)/g, '');
+
+        // Remove raw JSON objects with chart type
+        const rawJsonStart = textPart.match(/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
+        if (rawJsonStart && rawJsonStart.index !== undefined) {
+          const beforeJson = textPart.substring(0, rawJsonStart.index);
+          const afterJsonStart = textPart.substring(rawJsonStart.index);
+          // Find where JSON ends (or end of string if incomplete)
+          let braceCount = 0;
+          let jsonEndIndex = afterJsonStart.length; // default to end if incomplete
+          for (let i = 0; i < afterJsonStart.length; i++) {
+            if (afterJsonStart[i] === '{') braceCount++;
+            else if (afterJsonStart[i] === '}') {
+              braceCount--;
+              if (braceCount === 0) {
+                jsonEndIndex = i + 1;
+                break;
               }
             }
           }
+          const afterJson = afterJsonStart.substring(jsonEndIndex);
+          textPart = (beforeJson + afterJson).trim();
         }
-      }
-      return false;
-    };
 
-    // Extract text excluding chart JSON
-    const extractTextExcludingChart = (content: string): string => {
-      let textPart = content;
+        // Clean up extra whitespace
+        textPart = textPart.replace(/\n{3,}/g, '\n\n').trim();
+        return textPart;
+      };
 
-      // Remove ```json ... ``` blocks (complete or incomplete)
-      textPart = textPart.replace(/```json[\s\S]*?(```|$)/g, '');
-
-      // Remove raw JSON objects with chart type pattern
-      const rawJsonMatch = textPart.match(/\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/i);
-      if (rawJsonMatch && rawJsonMatch.index !== undefined) {
-        const beforeJson = textPart.substring(0, rawJsonMatch.index);
-        const afterJsonStart = textPart.substring(rawJsonMatch.index);
-
-        let braceCount = 0;
-        let jsonEndIndex = afterJsonStart.length;
-        for (let i = 0; i < afterJsonStart.length; i++) {
-          if (afterJsonStart[i] === '{') braceCount++;
-          else if (afterJsonStart[i] === '}') {
-            braceCount--;
-            if (braceCount === 0) {
-              jsonEndIndex = i + 1;
-              break;
-            }
-          }
-        }
-        const afterJson = afterJsonStart.substring(jsonEndIndex);
-        textPart = (beforeJson + afterJson).trim();
-      }
-
-      // Clean up
-      textPart = textPart.replace(/\n{3,}/g, '\n\n').trim();
-      return textPart;
-    };
-
-    const looksLikeChartJson = hasChartJsonPattern(message.content);
-    const chartIsComplete = looksLikeChartJson && isChartJsonComplete(message.content);
-
-    // During streaming: show text + "generating chart" indicator if chart is detected but incomplete
-    if (isStreaming && looksLikeChartJson && !chartIsComplete) {
       const availableText = extractTextExcludingChart(message.content);
       const containsHTML = availableText ? /<\/?[a-z][\s\S]*>/i.test(availableText) : false;
 
-      // If no text available yet (chart JSON came first), show normal loading
-      // This prevents showing "グラフ生成中" when we're just starting to receive data
-      if (!availableText || availableText.length < 10) {
-        return (
-          <div className="assistant-message">
-            <div className="typing-indicator">
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </div>
-          </div>
-        );
-      }
-
       return (
         <div className="assistant-message">
+          {/* Show text content (before and after chart, excluding JSON) */}
           {availableText && (
             containsHTML ? (
               <div
@@ -209,6 +136,8 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
               />
             )
           )}
+
+          {/* Show "generating chart" indicator */}
           <div className="chart-generating-indicator" style={{ marginTop: availableText ? '16px' : '0' }}>
             <div className="typing-indicator">
               <span className="generating-text">{t("chat.generatingChart")}</span>
@@ -388,13 +317,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     }
 
     // SCENARIO 3: Mixed text + JSON content (e.g., "説明テキスト... { "type": "bar", ... }")
-    // Memoize chart extraction to prevent recalculation on every render
-    // At this point, message.content is guaranteed to be string (checked at line 72)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { textPart, charts: extractedCharts } = useMemo(
-      () => extractChartsFromText(message.content as string),
-      [message.content]
-    );
+    const { textPart, charts: extractedCharts } = extractChartsFromText(message.content);
 
     if (extractedCharts.length > 0) {
       // Render text + multiple charts
@@ -418,19 +341,15 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
           )}
 
           {/* Render all extracted charts */}
-          {extractedCharts.map((chartData, chartIndex) => {
-            // Use stable key based on chart content to prevent flickering
-            const chartKey = `chart-${getChartSignature(chartData)}`;
-            return (
-              <div
-                key={chartKey}
-                className="chart-section"
-                style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
-              >
-                <ChatChart chartContent={chartData} />
-              </div>
-            );
-          })}
+          {extractedCharts.map((chartData, chartIndex) => (
+            <div
+              key={chartIndex}
+              className="chart-section"
+              style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
+            >
+              <ChatChart chartContent={chartData} />
+            </div>
+          ))}
 
           {/* Citations */}
           {!generatingResponse && (

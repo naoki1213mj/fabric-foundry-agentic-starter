@@ -1135,12 +1135,6 @@ async def stream_single_agent_response(
 5. 日本語で分かりやすく回答
 6. グラフはChart.js JSON形式（Vega-Lite禁止）
 
-## グラフ出力の重要ルール
-- **グラフを出力する場合は、必ずテキストによる説明も含めること**
-- 回答構成: ①テキストによる分析・説明 → ②グラフJSON（```json...```）
-- グラフだけを出力してはいけない。必ず前後にテキスト説明を付ける
-- 例: 「〇〇の売上比較です。Mountain-100が最も高く...」+ グラフJSON
-
 ## 複合質問の例
 「Mountain-100の売上と仕様を教えて」
 → Step 1: run_sql_query で売上データ取得
@@ -1254,11 +1248,6 @@ async def stream_sql_only_response(
 2. 必要に応じてrun_sql_queryツールでデータを取得
 3. 結果を分かりやすく整形して回答
 4. グラフはChart.js JSON形式（Vega-Lite禁止）
-
-## グラフ出力の重要ルール
-- **グラフを出力する場合は、必ずテキストによる説明も含めること**
-- 回答構成: ①テキストによる分析・説明 → ②グラフJSON（```json...```）
-- グラフだけを出力してはいけない。必ず前後にテキスト説明を付ける
 """,
             tools=[run_sql_query],
         )
@@ -1422,11 +1411,6 @@ async def stream_handoff_response(
 2. 結果を人間が読みやすい形式（Markdown）に整形
 3. グラフが適切な場合はChart.js JSON形式で追加
 4. **完全な回答を提供**（これが最終回答です）
-
-## グラフ出力の重要ルール
-- **グラフを出力する場合は、必ずテキストによる説明も含めること**
-- 回答構成: ①テキストによる分析・説明 → ②グラフJSON（```json...```）
-- グラフだけを出力してはいけない。必ず前後にテキスト説明を付ける
 """,
             tools=[run_sql_query],
         )
@@ -1637,10 +1621,7 @@ def select_agent_mode(query: str) -> str:
 
 
 async def stream_chat_request(
-    conversation_id: str,
-    query: str,
-    user_id: str = "anonymous",
-    agent_mode: str | None = None,
+    conversation_id: str, query: str, user_id: str = "anonymous", agent_mode: str | None = None
 ):
     """
     Handles streaming chat requests with dynamic mode selection.
@@ -1661,12 +1642,7 @@ async def stream_chat_request(
             assistant_content = ""
 
             # Use request agent_mode if provided, otherwise auto-select
-            if agent_mode and agent_mode in [
-                "sql_only",
-                "multi_tool",
-                "handoff",
-                "magentic",
-            ]:
+            if agent_mode and agent_mode in ["sql_only", "multi_tool", "handoff", "magentic"]:
                 mode = agent_mode
                 logger.info(f"Using requested mode '{mode}' for query: {query[:50]}...")
             else:
@@ -1785,9 +1761,15 @@ async def conversation(request: Request):
         request_json = await request.json()
         conversation_id = request_json.get("conversation_id")
         query = request_json.get("query")
-        agent_mode = request_json.get(
-            "agent_mode"
-        )  # Optional: sql_only, multi_tool, handoff, magentic
+
+        if not query:
+            return JSONResponse(content={"error": "Query is required"}, status_code=400)
+
+        if not conversation_id:
+            return JSONResponse(
+                content={"error": "Conversation ID is required"}, status_code=400
+            )
+        agent_mode = request_json.get("agent_mode")  # Optional: sql_only, multi_tool, handoff, magentic
 
         if not query:
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
@@ -1799,20 +1781,7 @@ async def conversation(request: Request):
 
         result = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
-            "ChatStreamSuccess",
-            {
-                "conversation_id": conversation_id,
-                "query": query,
-                "agent_mode": agent_mode,
-            },
-        )
-        return StreamingResponse(result, media_type="application/json-lines")
-
-    except Exception as ex:
-        logger.exception(f"Error in conversation endpoint: {str(ex)}")
-        span = trace.get_current_span()
-        if span is not None:
-            span.record_exception(ex)
+            "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query, "agent_mode": agent_mode
             span.set_status(Status(StatusCode.ERROR, str(ex)))
         return JSONResponse(
             content={
