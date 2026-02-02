@@ -641,27 +641,61 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     return ChatAgent(
         name="MagenticManager",
         description="チームを調整して複雑なタスクを効率的に完了させるオーケストレーター",
-        instructions="""あなたはチームを調整するマネージャーです。**迅速に**タスクを完了させます。
+        instructions="""あなたはスペシャリストチームを調整するマネージャーです。ユーザーの質問を分析し、適切なエージェントに振り分けて、結果を統合して回答します。
 
-## チーム（各エージェントは1回だけ呼び出す）
-- sql_agent: 売上/注文/顧客/製品データをSQLで取得・分析
-- web_agent: 最新ニュース/市場トレンドを検索
-- doc_agent: 製品仕様書PDF（Mountain-100, Alpine Explorer等）を検索
+## チームメンバー
+| エージェント | 担当領域 | 具体例 |
+|-------------|---------|-------|
+| sql_agent | データベース分析 | 売上、注文、顧客、製品の数値データ・集計・比較・グラフ |
+| web_agent | Web検索 | 最新ニュース、市場トレンド、競合情報、2026年の話題 |
+| doc_agent | 製品仕様書 | Mountain-100, Alpine Explorer等のスペック、機能、素材 |
+| あなた | 一般知識 | 概念説明、用語解説、ベストプラクティス、アドバイス |
 
-## クイック判断フロー
+## 入力パターン別の対応
 
-**数値データ（売上、件数、比較、グラフ）** → sql_agent
-**最新情報（ニュース、市場、2026年）** → web_agent
-**製品仕様（スペック、機能、素材）** → doc_agent
-**概念説明（〜とは、方法）** → あなた自身が回答
+### パターン1: 数値・データ分析
+「売上TOP3」「月別推移」「顧客別比較」「グラフで表示」
+→ **sql_agent** に依頼
 
-## 処理ルール（重要）
-1. **1ラウンドで完了**: 必要なエージェントを同時に呼び出し、結果を統合
-2. **グラフ重複禁止**: sql_agentがグラフを返したら追加しない
-3. **日本語で簡潔に回答**
+### パターン2: 最新情報・外部トレンド
+「最新のアウトドア市場は」「2026年のトレンド」「競合他社の動向」
+→ **web_agent** に依頼
 
-例: 「Alpine Explorerの仕様と売上」
-→ doc_agent（仕様）+ sql_agent（売上）を呼び出し → 結果を統合して回答
+### パターン3: 製品仕様・技術情報
+「Mountain-100のスペック」「Alpine Explorerの耐久性」「製品の素材は」
+→ **doc_agent** に依頼
+
+### パターン4: 概念・一般知識
+「〜とは何ですか」「〜の方法」「〜のベストプラクティス」
+→ **あなた自身が回答**（エージェント不要）
+
+### パターン5: 複合クエリ
+「Alpine Explorerの仕様と売上」
+→ **doc_agent + sql_agent** を同時に呼び出し、結果を統合
+
+「売上TOP3と市場トレンド」
+→ **sql_agent + web_agent** を同時に呼び出し、結果を統合
+
+### パターン6: 曖昧な質問
+「おすすめは？」「どうすればいい？」
+→ 文脈から推測。データが必要なら sql_agent、製品情報なら doc_agent、一般的なら自分で回答
+
+### パターン7: 挨拶・雑談
+「こんにちは」「ありがとう」
+→ **エージェント不要**、あなたが直接応答
+
+## 処理ルール
+1. **効率優先**: 必要なエージェントのみ呼び出す（不要なら呼ばない）
+2. **1ラウンド完結**: 可能な限り1回のラウンドで完了
+3. **グラフ重複禁止**: sql_agentがグラフ/チャートを返した場合、追加のグラフは作成しない
+4. **日本語で回答**: 自然な日本語で分かりやすく
+5. **結果統合**: 複数エージェントの結果は論理的に統合して1つの回答に
+
+## 出力フォーマット
+- Markdown形式で構造化
+- 重要な数値は強調
+- 長い場合は見出しで区切る
+- グラフデータはsql_agentの出力をそのまま使用
 """,
         chat_client=chat_client,
     )
@@ -782,63 +816,86 @@ async def stream_multi_agent_response(
             full_query = query
 
         last_message_id: str | None = None
-        accumulated_text = ""
+        last_executor_id: str | None = None
+        specialist_outputs: dict[str, str] = {}  # Specialist別の出力を蓄積
+        manager_output = ""  # Managerの最終出力
+        is_manager_streaming = False  # Managerがストリーミング中かどうか
 
         # Stream the workflow execution
-        # 最終回答のみを返す（中間出力は蓄積してログのみ）
-        # これにより応答サイズを大幅に削減し、タイムアウトを防止
-        final_answer = ""
-
+        # 戦略: Specialistの出力は蓄積のみ、Managerの最終応答のみをリアルタイムストリーム
+        # これにより応答サイズを削減しつつ、ユーザーにはストリーミング体験を提供
+        
         async for event in workflow.run_stream(full_query):
             if isinstance(event, AgentRunUpdateEvent):
-                # ストリーミング更新 - エージェントからのテキスト出力
                 update = event.data
                 message_id = getattr(update, "message_id", None)
-                executor_id = getattr(event, "executor_id", "unknown")
-
-                # 新しいメッセージの場合、区切りを追加
-                if message_id and message_id != last_message_id:
-                    if last_message_id is not None and accumulated_text:
-                        logger.info(f"Agent {executor_id} completed response")
-                    last_message_id = message_id
-
-                # テキストを蓄積（yieldは最後のみ）
+                executor_id = str(getattr(event, "executor_id", "unknown"))
+                text_chunk = ""
+                
                 if hasattr(update, "text") and update.text:
-                    accumulated_text += update.text
-                    # Managerの最終応答として蓄積
-                    final_answer += update.text
+                    text_chunk = update.text
                 elif isinstance(update, str):
-                    accumulated_text += update
-                    final_answer += update
+                    text_chunk = update
+                
+                if not text_chunk:
+                    continue
+                
+                # executor_idでエージェントを識別
+                # MagenticManager または Manager を含む場合はManager
+                is_manager = "manager" in executor_id.lower() or "magentic" in executor_id.lower()
+                
+                # 新しいメッセージの場合
+                if message_id and message_id != last_message_id:
+                    if last_executor_id:
+                        logger.info(f"Agent {last_executor_id} completed response")
+                    last_message_id = message_id
+                    last_executor_id = executor_id
+                    
+                    # Managerの新しいメッセージが始まった
+                    if is_manager:
+                        is_manager_streaming = True
+                        logger.info(f"Manager streaming started: {executor_id}")
+                
+                if is_manager:
+                    # Managerの出力はリアルタイムでストリーム
+                    manager_output += text_chunk
+                    yield text_chunk
+                else:
+                    # Specialistの出力は蓄積のみ（ログに記録）
+                    if executor_id not in specialist_outputs:
+                        specialist_outputs[executor_id] = ""
+                    specialist_outputs[executor_id] += text_chunk
 
             elif isinstance(event, MagenticOrchestratorEvent):
-                # Magentic オーケストレーターイベント（計画、進捗など）
                 logger.info(f"Orchestrator event: {type(event).__name__}")
-                # SDK version によって属性が異なる可能性があるため安全にアクセス
                 plan = getattr(event, "plan", None)
                 if plan:
                     logger.info(f"Plan created: {plan}")
 
             elif isinstance(event, WorkflowOutputEvent):
                 # ワークフロー完了時の最終出力
-                logger.info("WorkflowOutputEvent received - extracting final answer")
+                logger.info("WorkflowOutputEvent received")
                 if event.data:
                     output_messages = event.data
+                    final_text = ""
                     if isinstance(output_messages, list):
                         for msg in output_messages:
                             if hasattr(msg, "text") and msg.text:
-                                # 最終回答として使用（既存の蓄積を上書き）
-                                final_answer = msg.text
-                                logger.info(
-                                    f"Final answer from WorkflowOutputEvent: {len(final_answer)} chars"
-                                )
+                                final_text = msg.text
                     elif isinstance(output_messages, str):
-                        final_answer = output_messages
-                        logger.info(f"Final answer (string): {len(final_answer)} chars")
+                        final_text = output_messages
+                    
+                    # まだストリームされていない部分があればyield
+                    if final_text and final_text != manager_output:
+                        remaining = final_text[len(manager_output):] if final_text.startswith(manager_output) else final_text
+                        if remaining:
+                            logger.info(f"Yielding remaining final output: {len(remaining)} chars")
+                            yield remaining
+                            manager_output = final_text
+                
                 logger.info("MagenticBuilder workflow completed")
 
             elif isinstance(event, WorkflowStatusEvent):
-                # SDK 1.0.0b260130: WorkflowRunState enum values may differ
                 state_name = (
                     str(event.state.name)
                     if hasattr(event.state, "name")
@@ -847,18 +904,22 @@ async def stream_multi_agent_response(
                 logger.info(f"Workflow status: {state_name}")
 
             elif isinstance(event, GroupChatRequestSentEvent):
-                # グループチャットリクエスト（Manager → Specialist）
                 logger.info(f"Request sent to: {getattr(event, 'target', 'unknown')}")
 
             elif isinstance(event, RequestInfoEvent):
                 logger.info(f"Request info event: {event}")
-
-        # ワークフロー完了後、最終回答のみをyield
-        if final_answer:
-            logger.info(f"Yielding final answer: {len(final_answer)} chars")
-            yield final_answer
-        else:
-            logger.warning("No final answer accumulated")
+        
+        # ログにSpecialist出力のサマリーを記録
+        for agent_id, output in specialist_outputs.items():
+            logger.info(f"Specialist {agent_id} output: {len(output)} chars")
+        
+        # ストリーミングが全くなかった場合のフォールバック
+        if not manager_output:
+            logger.warning("No manager output streamed, using accumulated specialist outputs")
+            # Specialistの出力を結合して返す
+            combined = "\n\n".join(f"### {agent_id}\n{output}" for agent_id, output in specialist_outputs.items() if output)
+            if combined:
+                yield combined
 
     except Exception as e:
         logger.error(f"Error in MagenticBuilder workflow: {e}", exc_info=True)
