@@ -301,6 +301,11 @@ def create_specialist_agents(
 - 結果が得られたら、すぐにChart.js JSONを含む最終回答を生成
 - 追加のクエリは不要（タイムアウト防止）
 
+## 🚫 絶対禁止：生JSONデータの出力
+- SQLの実行結果（生のJSON配列）をそのまま出力しないでください
+- 必ず**人間が読みやすい形式**（Markdown箇条書き、表、説明文）に変換して出力
+- 例：`[{"ProductName": "A", "Sales": 100}]` → `- 製品A: ¥100`
+
 ## 利用可能なテーブル（実際のスキーマ）
 
 ### 主要テーブル
@@ -335,11 +340,46 @@ def create_specialist_agents(
 - **payment**: 支払い
   - PaymentId, PaymentNumber, InvoiceId, OrderId, PaymentDate, PaymentAmount, PaymentStatus, PaymentMethod
 
-## タスク
+## タスク（重要：この順番で実行）
 1. ユーザーの質問を分析し、適切なSQLクエリを作成
 2. run_sql_query ツールを使ってクエリを実行
-3. 結果を分かりやすく整形して報告
-4. グラフ表示が要求された場合は、Chart.js JSON形式で出力
+3. **結果を人間が読みやすい形式（Markdown）に変換して報告**
+4. グラフ表示が要求された場合のみ、最後に ```json コードブロックで Chart.js JSON を1つだけ出力
+
+## 回答フォーマット（必須）
+
+### グラフなしの場合
+```
+## 分析結果
+売上TOP5製品:
+1. **Mountain-200 Silver, 38** - $29,030.33（構成比 23.8%）
+2. **Touring-1000 Yellow, 54** - $26,487.88（構成比 21.7%）
+...
+
+### 傾向・考察
+- Mountain系製品が上位を占めている
+- 上位5製品で全体の約18%を占める
+```
+
+### グラフありの場合
+```
+## 分析結果
+売上TOP5製品:
+1. **Mountain-200 Silver, 38** - $29,030.33
+2. **Touring-1000 Yellow, 54** - $26,487.88
+...
+
+### 傾向・考察
+- 上位5製品で全体の約18%を占める
+
+```json
+{
+  "type": "bar",
+  "data": {...},
+  "options": {...}
+}
+```
+```
 
 ## 重要なJOINパターン
 
