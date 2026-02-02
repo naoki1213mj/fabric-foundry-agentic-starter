@@ -979,13 +979,14 @@ async def stream_multi_agent_response(
 async def stream_single_agent_response(conversation_id: str, query: str):
     """
     Stream response using single agent mode with AzureOpenAIChatClient.
+    This is the PRIMARY mode - a single intelligent agent with multiple tools.
+    The LLM automatically selects which tools to use based on the query.
     """
     try:
         # Use sync credential - SDK requires synchronous token acquisition
         credential = DefaultAzureCredential()
 
         # Get Azure OpenAI configuration from environment variables
-        # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
@@ -1014,41 +1015,61 @@ async def stream_single_agent_response(conversation_id: str, query: str):
             api_version=api_version,
         )
 
-        # Create a single agent with SQL tool
+        # Collect all available tools
+        all_tools = [run_sql_query]  # Always available
+
+        # Add web search if configured
+        if _web_agent_handler:
+            all_tools.append(search_web)
+            logger.info("Web search tool enabled")
+
+        # Add document search if configured
+        if _knowledge_base_tool:
+            all_tools.append(search_documents)
+            logger.info("Document search tool enabled")
+
+        logger.info(f"Available tools: {len(all_tools)} tools configured")
+
+        # Create a single intelligent agent with ALL tools
         agent = chat_client.as_agent(
-            name="data_analyst",
-            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
+            name="unified_assistant",
+            instructions="""あなたは統合アシスタントです。ユーザーの質問に最適なツールを選んで回答します。
 
-## 利用可能なテーブル（実際のスキーマ）
-- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
-- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
-- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color, ProductCategoryID)
-- productcategory: カテゴリ (CategoryID, CategoryName, ParentCategoryId)
-- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId, CustomerRelationshipTypeId)
-- customerrelationshiptype: 顧客セグメント (CustomerRelationshipTypeId, CustomerRelationshipTypeName)
-- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
-- invoice: 請求書 (InvoiceId, CustomerId, OrderId, TotalAmount, InvoiceStatus)
-- payment: 支払い (PaymentId, InvoiceId, PaymentAmount, PaymentStatus, PaymentMethod)
+## 利用可能なツール
 
-## 主要なJOINパターン
-- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
-- 顧客分析: orders JOIN customer ON CustomerId
-- 地域分析: customer JOIN location ON CustomerId
-- セグメント分析: customer JOIN customerrelationshiptype ON CustomerRelationshipTypeId
+### 1. run_sql_query - ビジネスデータ分析（最重要）
+売上、注文、顧客、製品の数値データを取得・分析
+- テーブル: orders, orderline, product, customer, location, invoice, payment
+- 用途: 「売上TOP3」「月別推移」「顧客分析」「グラフ表示」等
 
-## タスク
-1. ユーザーの質問を分析
-2. 必要に応じてrun_sql_queryツールでデータを取得
-3. 結果を分かりやすく整形して回答
+### 2. search_web - Web検索（利用可能な場合）
+最新ニュース、市場トレンド、競合情報、外部情報
+- 用途: 「最新の〜」「2026年のトレンド」「市場動向」等
 
-## 回答形式
-- データは表形式で見やすく表示
-- Chart.js JSONはグラフが適切な場合に含める（Vega-Lite禁止）
+### 3. search_documents - 製品仕様書検索（利用可能な場合）
+製品PDF（バックパック、自転車、テント等）から仕様・スペックを検索
+- 用途: 「Mountain-100のスペック」「Alpine Explorerの機能」等
+
+## SQLスキーマ
+- orders: OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod
+- orderline: OrderId, ProductId, Quantity, UnitPrice, LineTotal
+- product: ProductID, ProductName, CategoryName, ListPrice, BrandName, Color
+- customer: CustomerId, FirstName, LastName, CustomerTypeId
+- location: LocationId, CustomerId, Region, City, StateId
+
+## 回答ルール
+1. **ツール不要な質問**（挨拶、概念説明）はツールを使わず直接回答
+2. **データが必要**ならrun_sql_queryを使用
+3. **最新情報**が必要ならsearch_webを使用
+4. **製品仕様**が必要ならsearch_documentsを使用
+5. **複合質問**は必要なツールを順番に呼び出し、結果を統合
+6. 日本語で分かりやすく回答
+7. グラフはChart.js JSON形式（Vega-Lite禁止）
 """,
-            tools=[run_sql_query],
+            tools=all_tools,
         )
 
-        logger.info(f"Single agent mode: processing query: {query[:100]}...")
+        logger.info(f"Unified agent processing query: {query[:100]}...")
 
         # Stream the agent response
         async for chunk in agent.run_stream(query):
@@ -1073,85 +1094,25 @@ async def stream_single_agent_response(conversation_id: str, query: str):
 # ============================================================================
 
 
-def requires_multi_agent(query: str) -> bool:
-    """
-    クエリの複雑さを判定し、マルチエージェントが必要かどうかを返す。
-    
-    マルチエージェントが必要なケース:
-    - 複数のデータソースが必要（売上+仕様、データ+市場トレンド等）
-    - 明示的に複合分析を要求
-    
-    シングルエージェントで十分なケース:
-    - 単純な売上・注文クエリ
-    - 挨拶・雑談
-    - 概念説明のみ
-    """
-    query_lower = query.lower()
-    
-    # 複合クエリのキーワード（マルチエージェント必要）
-    multi_agent_keywords = [
-        # 複数ソース要求
-        "仕様と売上", "売上と仕様", "スペックと売上", "売上とスペック",
-        "市場と売上", "売上と市場", "トレンドと売上", "売上とトレンド",
-        "比較して", "と比較", "合わせて", "併せて",
-        # 外部情報+内部データ
-        "最新の", "2026年", "2025年", "ニュース", "市場動向",
-        # 製品仕様検索
-        "仕様", "スペック", "素材", "機能", "特徴は",
-    ]
-    
-    # シングルエージェントで十分なキーワード
-    single_agent_keywords = [
-        # 挨拶・雑談
-        "こんにちは", "ありがとう", "よろしく", "hello", "hi",
-        # 単純なデータクエリ
-        "売上top", "売上ランキング", "一覧", "リスト",
-        "何件", "いくつ", "総数", "合計",
-    ]
-    
-    # 挨拶や単純クエリは即座にシングルエージェント
-    for kw in single_agent_keywords:
-        if kw in query_lower:
-            return False
-    
-    # 複合キーワードが含まれていればマルチエージェント
-    for kw in multi_agent_keywords:
-        if kw in query_lower:
-            return True
-    
-    # デフォルトはシングルエージェント（高速）
-    return False
-
-
-async def stream_chat_request(
-    conversation_id: str, query: str, user_id: str = "anonymous"
-):
+async def stream_chat_request(conversation_id: str, query: str):
     """
     Handles streaming chat requests.
 
-    Routes to:
-    - Multi-agent mode: Uses MagenticBuilder with Manager + Specialist agents
-    - Single-agent mode: Direct ChatAgent with SQL tools
+    Uses unified single-agent mode with all tools (SQL, Web, Doc).
+    The LLM automatically selects which tools to use based on the query.
+    This is much faster than MagenticBuilder while maintaining all capabilities.
     """
 
     async def generate():
         try:
             assistant_content = ""
 
-            # クエリの複雑さに応じてモードを動的に選択
-            use_multi_agent = MULTI_AGENT_MODE and requires_multi_agent(query)
-            
-            if use_multi_agent:
-                logger.info(f"Using multi-agent mode for complex query: {query[:50]}...")
-                stream_func = lambda cid, q: stream_multi_agent_response(
-                    cid, q, user_id
-                )
-            else:
-                logger.info(f"Using single-agent mode for query: {query[:50]}...")
-                stream_func = stream_single_agent_response
+            # Always use unified single-agent with all tools
+            # The LLM intelligently selects which tools to use
+            logger.info(f"Processing query with unified agent: {query[:50]}...")
 
             # Stream and accumulate response
-            async for chunk in stream_func(conversation_id, query):
+            async for chunk in stream_single_agent_response(conversation_id, query):
                 if chunk:
                     assistant_content += str(chunk)
                     response = {
@@ -1218,8 +1179,6 @@ async def conversation(request: Request):
         request_json = await request.json()
         conversation_id = request_json.get("conversation_id")
         query = request_json.get("query")
-        # Get user_id from request or use anonymous
-        user_id = request_json.get("user_id", "anonymous")
 
         if not query:
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
@@ -1229,7 +1188,7 @@ async def conversation(request: Request):
                 content={"error": "Conversation ID is required"}, status_code=400
             )
 
-        result = await stream_chat_request(conversation_id, query, user_id)
+        result = await stream_chat_request(conversation_id, query)
         track_event_if_configured(
             "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query}
         )
