@@ -201,7 +201,7 @@ async def run_query_params(sql_query, params: tuple[Any, ...] = ()):
         result = []
         for row in cursor.fetchall():
             row_dict = {}
-            for col_name, value in zip(columns, row):
+            for col_name, value in zip(columns, row, strict=False):
                 if isinstance(value, (datetime, date)):
                     row_dict[col_name] = value.isoformat()
                 elif isinstance(value, Decimal):
@@ -250,12 +250,12 @@ class SqlQueryTool(BaseModel):
 
     def close_connection(self):
         """Close and remove the cached connection."""
+        import contextlib
+
         conn = _connection_cache.pop(self.connection_id, None)
         if conn:
-            try:
+            with contextlib.suppress(Exception):
                 conn.close()
-            except Exception:
-                pass
 
     async def run_sql_query(self, sql_query: str) -> str:
         """Execute parameterized SQL query and return results as JSON string."""
@@ -273,7 +273,7 @@ class SqlQueryTool(BaseModel):
             result = []
             for row in cursor.fetchall():
                 row_dict = {}
-                for col_name, value in zip(columns, row):
+                for col_name, value in zip(columns, row, strict=False):
                     if isinstance(value, (datetime, date)):
                         row_dict[col_name] = value.isoformat()
                     elif isinstance(value, Decimal):

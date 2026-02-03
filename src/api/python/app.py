@@ -14,16 +14,16 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.10.0"
-BUILD_DATE = "2026-01-16"
-BUILD_INFO = "Environment config sync and uv integration"
-
 from chat import router as chat_router
 from history import router as history_router
 from history_sql import router as history_sql_router
 
 load_dotenv()
+
+# Application version - updated for CI/CD pipeline validation
+APP_VERSION = "2.10.0"
+BUILD_DATE = "2026-01-16"
+BUILD_INFO = "Environment config sync and uv integration"
 
 
 def build_app() -> FastAPI:

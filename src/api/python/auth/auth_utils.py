@@ -15,7 +15,7 @@ def get_authenticated_user_details(request_headers):
         raw_user_object = sample_user.sample_user
     else:
         # if it is, get the user details from the EasyAuth headers
-        raw_user_object = {k: v for k, v in request_headers.items()}
+        raw_user_object = dict(request_headers.items())
 
     user_object["user_principal_id"] = raw_user_object.get("x-ms-client-principal-id")
     user_object["user_name"] = raw_user_object.get("x-ms-client-principal-name")

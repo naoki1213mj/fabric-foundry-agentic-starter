@@ -195,7 +195,7 @@ async def run_sql_query(
 
         for row in cursor.fetchall():
             row_dict = {}
-            for col_name, value in zip(columns, row):
+            for col_name, value in zip(columns, row, strict=False):
                 if isinstance(value, (datetime, date)):
                     row_dict[col_name] = value.isoformat()
                 elif isinstance(value, Decimal):
@@ -490,7 +490,6 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         last_executor_id: str | None = None
         specialist_outputs: dict[str, str] = {}  # Specialist別の出力を蓄積
         manager_output = ""  # Managerの最終出力
-        is_manager_streaming = False  # Managerがストリーミング中かどうか
 
         # Stream the workflow execution
         # 戦略: Specialistの出力は蓄積のみ、Managerの最終応答のみをリアルタイムストリーム
@@ -524,7 +523,6 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
 
                     # Managerの新しいメッセージが始まった
                     if is_manager:
-                        is_manager_streaming = True
                         logger.info(f"Manager streaming started: {executor_id}")
 
                 if is_manager:
@@ -604,10 +602,10 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
     finally:
         global _db_connection
         if _db_connection:
-            try:
+            import contextlib
+
+            with contextlib.suppress(Exception):
                 _db_connection.close()
-            except Exception:
-                pass
             _db_connection = None
 
 
@@ -739,10 +737,10 @@ async def stream_single_agent_response(
     finally:
         global _db_connection
         if _db_connection:
-            try:
+            import contextlib
+
+            with contextlib.suppress(Exception):
                 _db_connection.close()
-            except Exception:
-                pass
             _db_connection = None
 
 
@@ -824,10 +822,10 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
     finally:
         global _db_connection
         if _db_connection:
-            try:
+            import contextlib
+
+            with contextlib.suppress(Exception):
                 _db_connection.close()
-            except Exception:
-                pass
             _db_connection = None
 
 
@@ -1003,22 +1001,19 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
                 # Handle user input requests (shouldn't happen with autonomous mode)
                 if isinstance(event.data, HandoffAgentUserRequest):
                     logger.info(f"Handoff request from {event.source_executor_id}")
-            elif isinstance(event, WorkflowOutputEvent):
+            elif isinstance(event, WorkflowOutputEvent) and event.data:
                 # Final output - extract the specialist's response
-                if event.data:
-                    messages = event.data
-                    # Find the last specialist message
-                    for msg in reversed(messages):
-                        if hasattr(msg, "author_name") and msg.author_name in [
-                            "sql_agent",
-                            "web_agent",
-                            "doc_agent",
-                        ]:
-                            if hasattr(msg, "text") and msg.text:
-                                # Only yield if not already streamed
-                                if msg.text not in streamed_content:
-                                    yield msg.text
-                            break
+                messages = event.data
+                # Find the last specialist message
+                for msg in reversed(messages):
+                    if hasattr(msg, "author_name") and msg.author_name in [
+                        "sql_agent",
+                        "web_agent",
+                        "doc_agent",
+                    ]:
+                        if hasattr(msg, "text") and msg.text and msg.text not in streamed_content:
+                            yield msg.text
+                        break
 
     except Exception as e:
         logger.error(f"Error in Handoff workflow: {e}", exc_info=True)
@@ -1026,10 +1021,10 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
     finally:
         global _db_connection
         if _db_connection:
-            try:
+            import contextlib
+
+            with contextlib.suppress(Exception):
                 _db_connection.close()
-            except Exception:
-                pass
             _db_connection = None
 
 
