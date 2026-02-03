@@ -1,0 +1,21 @@
+# Test requirements for Python API
+# Install with: uv pip install -r requirements-test.txt
+
+# Core testing framework
+pytest>=8.0.0
+pytest-asyncio>=0.24.0
+pytest-cov>=6.0.0
+
+# HTTP testing
+httpx>=0.28.0
+pytest-httpx>=0.35.0
+
+# Mocking
+pytest-mock>=3.14.0
+respx>=0.22.0
+
+# FastAPI testing
+starlette[full]>=0.45.0
+
+# Code quality (also used in CI)
+ruff>=0.8.0

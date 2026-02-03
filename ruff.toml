@@ -1,0 +1,46 @@
+# Ruff Configuration for Project Root
+# This file applies to the entire repository
+
+line-length = 100
+target-version = "py311"
+
+# Exclude directories
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules",
+    ".azure",
+    "infra/scripts/__pycache__",
+]
+
+[lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+    "B904",   # raise without from inside except
+    "E402",   # module level import not at top of file (needed for some Azure SDK patterns)
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["B", "C4"]  # Relax rules for tests
+"infra/scripts/*" = ["E", "W"]  # Legacy scripts
+
+[lint.isort]
+known-first-party = ["agents", "auth", "prompts"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

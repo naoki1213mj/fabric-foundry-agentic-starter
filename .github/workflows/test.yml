@@ -1,0 +1,206 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Test and Lint
+
+# ============================================
+# Trigger Conditions
+# ============================================
+# This workflow runs on:
+# - All PRs to main branch (code quality check before merge)
+# - Push to main branch (validate deployed code)
+# - Manual trigger for debugging
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/api/python/**'
+      - 'src/App/**'
+      - 'tests/**'
+      - 'ruff.toml'
+      - 'pyproject.toml'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/api/python/**'
+      - 'src/App/**'
+      - 'tests/**'
+      - 'ruff.toml'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
+
+jobs:
+  # ============================================
+  # Python Lint (Ruff)
+  # ============================================
+  python-lint:
+    name: Python Lint (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff linter
+        run: |
+          echo "🔍 Running Ruff linter..."
+          ruff check src/api/python --output-format=github
+        continue-on-error: false
+
+      - name: Run Ruff formatter check
+        run: |
+          echo "🎨 Checking code formatting..."
+          ruff format src/api/python --check --diff
+        continue-on-error: true  # Warning only for now
+
+  # ============================================
+  # Python Unit Tests
+  # ============================================
+  python-tests:
+    name: Python Unit Tests
+    runs-on: ubuntu-latest
+    needs: python-lint
+    defaults:
+      run:
+        working-directory: src/api/python
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements.txt
+          uv pip install --system -r requirements-test.txt
+
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running unit tests..."
+          pytest tests/ \
+            -v \
+            --tb=short \
+            --junitxml=test-results.xml \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            -m "not slow"
+        env:
+          # Mock environment variables for tests
+          AZURE_AI_AGENT_ENDPOINT: "https://test.openai.azure.com/"
+          AZURE_OPENAI_ENDPOINT: "https://test.openai.azure.com/"
+          AZURE_OPENAI_API_KEY: "test-key"
+          FABRIC_SQL_CONNECTION_STRING: "Driver={ODBC Driver 18 for SQL Server};Server=test;Database=test;"
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ""
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-test-results
+          path: src/api/python/test-results.xml
+          retention-days: 7
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-coverage
+          path: src/api/python/coverage.xml
+          retention-days: 7
+
+      - name: Post coverage comment on PR
+        if: github.event_name == 'pull_request'
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MINIMUM_GREEN: 60
+          MINIMUM_ORANGE: 40
+        continue-on-error: true
+
+  # ============================================
+  # Frontend Lint (ESLint + TypeScript)
+  # ============================================
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/App
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: src/App/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: |
+          echo "🔍 Running ESLint..."
+          npm run lint 2>&1 || echo "::warning::ESLint found issues"
+        continue-on-error: true  # Warning only - don't block PR
+
+      - name: Run TypeScript check
+        run: |
+          echo "📝 Checking TypeScript..."
+          npm run build 2>&1 || echo "::warning::TypeScript build issues found"
+        continue-on-error: true
+
+  # ============================================
+  # PR Status Summary
+  # ============================================
+  status-check:
+    name: Status Check
+    runs-on: ubuntu-latest
+    needs: [python-lint, python-tests, frontend-lint]
+    if: always()
+    steps:
+      - name: Check job results
+        run: |
+          echo "📊 Test Results Summary"
+          echo "========================"
+          echo "Python Lint: ${{ needs.python-lint.result }}"
+          echo "Python Tests: ${{ needs.python-tests.result }}"
+          echo "Frontend Lint: ${{ needs.frontend-lint.result }}"
+          echo ""
+
+          if [ "${{ needs.python-lint.result }}" == "failure" ]; then
+            echo "❌ Python lint failed - please fix lint errors"
+            exit 1
+          fi
+
+          if [ "${{ needs.python-tests.result }}" == "failure" ]; then
+            echo "❌ Python tests failed - please fix failing tests"
+            exit 1
+          fi
+
+          echo "✅ All required checks passed!"
