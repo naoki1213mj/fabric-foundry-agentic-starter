@@ -13,4 +13,3 @@
         2.  Provide Description of Workspace (optional)
         3.  Click Apply
     5.  Retrieve Workspace ID from URL for future steps. Refer to documentation additional assistance ([here](https://learn.microsoft.com/en-us/fabric/admin/portal-workspace#identify-your-workspace-id))
-

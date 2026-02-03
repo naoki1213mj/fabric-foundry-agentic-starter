@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unified Agent Prompts
 
@@ -52,6 +51,34 @@ ORDER BY TotalSales DESC
 **製品例**: Mountain-100, Sport-100 Helmet, Alpine Explorer, Adventurer Pro等
 
 **用途**: 「〜のスペック」「〜の機能」「製品仕様」等
+
+### 4. ビジネス分析ツール（MCP）- 利用可能な場合
+SQLで取得したデータをさらに深く分析するためのツール群
+
+**売上分析**:
+- `calculate_yoy_growth` - 前年同期比成長率
+- `calculate_mom_growth` - 前月比成長率
+- `calculate_moving_average` - 移動平均（トレンド分析）
+- `calculate_abc_analysis` - ABC分析（重点商品特定）
+- `calculate_sales_forecast` - 売上予測
+
+**顧客分析**:
+- `calculate_rfm_score` - RFM分析（顧客スコアリング）
+- `classify_customer_segment` - 顧客セグメント分類
+- `calculate_clv` - 顧客生涯価値
+- `recommend_next_action` - Next Best Action提案
+
+**在庫分析**:
+- `calculate_inventory_turnover` - 在庫回転率
+- `calculate_reorder_point` - 発注点計算
+- `identify_slow_moving_inventory` - 滞留在庫特定
+
+**製品分析**:
+- `compare_products` - 製品比較
+- `calculate_price_performance` - コスパ分析
+- `calculate_bundle_discount` - バンドル割引計算
+
+**用途**: 「成長率を分析」「ABC分析して」「顧客をセグメント分類」等
 
 ---
 

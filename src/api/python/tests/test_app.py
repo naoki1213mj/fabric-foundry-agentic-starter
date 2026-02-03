@@ -23,10 +23,7 @@ class TestAppConfiguration:
         app = build_app()
 
         assert isinstance(app, FastAPI)
-        assert (
-            app.title
-            == "Agentic Applications for Unified Data Foundation Solution Accelerator"
-        )
+        assert app.title == "Agentic Applications for Unified Data Foundation Solution Accelerator"
 
     def test_cors_middleware_configured(self):
         """Verify that CORS middleware is properly configured."""
@@ -58,6 +55,7 @@ class TestHealthEndpoints:
         data = response.json()
         # API returns name and version info
         assert "name" in data or "version" in data or "status" in data
+
 
 class TestAPIRouterRegistration:
     """Tests for API router registration."""

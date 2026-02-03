@@ -46,10 +46,6 @@ from agent_framework import (
     tool,
 )
 from agent_framework.azure import AzureOpenAIChatClient
-
-# Local imports - tool handlers
-from agents.web_agent import WebAgentHandler
-from auth.auth_utils import get_authenticated_user_details
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -57,9 +53,16 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+# Local imports - tool handlers
+from agents.web_agent import WebAgentHandler
+from auth.auth_utils import get_authenticated_user_details
+
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
 from knowledge_base_tool import KnowledgeBaseTool
+
+# MCP client for business analytics tools
+from mcp_client import get_mcp_tools
 
 # Import prompts from separate module for better maintainability
 from prompts import (
@@ -116,22 +119,14 @@ def get_knowledge_base_tool() -> KnowledgeBaseTool | None:
 instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
 if instrumentation_key:
     configure_azure_monitor(connection_string=instrumentation_key)
-    logging.info(
-        "Application Insights configured with the provided Instrumentation Key"
-    )
+    logging.info("Application Insights configured with the provided Instrumentation Key")
 else:
-    logging.warning(
-        "No Application Insights Instrumentation Key found. Skipping configuration"
-    )
+    logging.warning("No Application Insights Instrumentation Key found. Skipping configuration")
 
 # Suppress noisy loggers
-logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(
-    logging.WARNING
-)
+logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
 logging.getLogger("azure.identity.aio._internal").setLevel(logging.WARNING)
-logging.getLogger("azure.monitor.opentelemetry.exporter.export._base").setLevel(
-    logging.WARNING
-)
+logging.getLogger("azure.monitor.opentelemetry.exporter.export._base").setLevel(logging.WARNING)
 
 
 def track_event_if_configured(event_name: str, event_data: dict):
@@ -191,9 +186,7 @@ async def run_sql_query(
     try:
         conn = await get_db_connection()
         if not conn:
-            return json.dumps(
-                {"error": "Database connection not available"}, ensure_ascii=False
-            )
+            return json.dumps({"error": "Database connection not available"}, ensure_ascii=False)
 
         cursor = conn.cursor()
         cursor.execute(sql_query)
@@ -249,9 +242,7 @@ async def search_web(
             result_data = json.loads(result)
             if "citations" in result_data and result_data["citations"]:
                 _current_web_citations.extend(result_data["citations"])
-                logger.info(
-                    f"Stored {len(result_data['citations'])} web citations for UI display"
-                )
+                logger.info(f"Stored {len(result_data['citations'])} web citations for UI display")
         except json.JSONDecodeError:
             pass
 
@@ -391,9 +382,7 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     )
 
 
-async def stream_multi_agent_response(
-    conversation_id: str, query: str, user_id: str = "anonymous"
-):
+async def stream_multi_agent_response(conversation_id: str, query: str, user_id: str = "anonymous"):
     """
     Stream response using MagenticBuilder pattern for true multi-agent collaboration.
 
@@ -423,13 +412,9 @@ async def stream_multi_agent_response(
                     content = msg.get("content", "")
                     if isinstance(content, str) and content:
                         history_messages.append({"role": role, "content": content})
-                logger.info(
-                    f"Loaded {len(history_messages)} messages from conversation history"
-                )
-        except asyncio.TimeoutError:
-            logger.warning(
-                "Conversation history fetch timed out, continuing without history"
-            )
+                logger.info(f"Loaded {len(history_messages)} messages from conversation history")
+        except TimeoutError:
+            logger.warning("Conversation history fetch timed out, continuing without history")
         except Exception as e:
             logger.warning(f"Could not load conversation history: {e}")
             # Continue without history
@@ -445,9 +430,7 @@ async def stream_multi_agent_response(
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        logger.info(
-            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}"
-        )
+        logger.info(f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}")
 
         if not deployment_name:
             raise ValueError(
@@ -455,9 +438,7 @@ async def stream_multi_agent_response(
                 "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
             )
         if not endpoint:
-            raise ValueError(
-                "Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT"
-            )
+            raise ValueError("Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT")
 
         # Create chat client with explicit configuration
         chat_client = AzureOpenAIChatClient(
@@ -532,10 +513,7 @@ async def stream_multi_agent_response(
 
                 # executor_idでエージェントを識別
                 # MagenticManager または Manager を含む場合はManager
-                is_manager = (
-                    "manager" in executor_id.lower()
-                    or "magentic" in executor_id.lower()
-                )
+                is_manager = "manager" in executor_id.lower() or "magentic" in executor_id.lower()
 
                 # 新しいメッセージの場合
                 if message_id and message_id != last_message_id:
@@ -586,9 +564,7 @@ async def stream_multi_agent_response(
                             else final_text
                         )
                         if remaining:
-                            logger.info(
-                                f"Yielding remaining final output: {len(remaining)} chars"
-                            )
+                            logger.info(f"Yielding remaining final output: {len(remaining)} chars")
                             yield remaining
                             manager_output = final_text
 
@@ -596,9 +572,7 @@ async def stream_multi_agent_response(
 
             elif isinstance(event, WorkflowStatusEvent):
                 state_name = (
-                    str(event.state.name)
-                    if hasattr(event.state, "name")
-                    else str(event.state)
+                    str(event.state.name) if hasattr(event.state, "name") else str(event.state)
                 )
                 logger.info(f"Workflow status: {state_name}")
 
@@ -614,9 +588,7 @@ async def stream_multi_agent_response(
 
         # ストリーミングが全くなかった場合のフォールバック
         if not manager_output:
-            logger.warning(
-                "No manager output streamed, using accumulated specialist outputs"
-            )
+            logger.warning("No manager output streamed, using accumulated specialist outputs")
             # Specialistの出力を結合して返す
             combined = "\n\n".join(
                 f"### {agent_id}\n{output}"
@@ -664,13 +636,9 @@ async def stream_single_agent_response(
                     content = msg.get("content", "")
                     if isinstance(content, str) and content:
                         history_messages.append({"role": role, "content": content})
-                logger.info(
-                    f"Loaded {len(history_messages)} messages from conversation history"
-                )
-        except asyncio.TimeoutError:
-            logger.warning(
-                "Conversation history fetch timed out, continuing without history"
-            )
+                logger.info(f"Loaded {len(history_messages)} messages from conversation history")
+        except TimeoutError:
+            logger.warning("Conversation history fetch timed out, continuing without history")
         except Exception as e:
             logger.warning(f"Could not load conversation history: {e}")
 
@@ -684,9 +652,7 @@ async def stream_single_agent_response(
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        logger.info(
-            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}"
-        )
+        logger.info(f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}")
 
         if not deployment_name:
             raise ValueError(
@@ -694,9 +660,7 @@ async def stream_single_agent_response(
                 "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
             )
         if not endpoint:
-            raise ValueError(
-                "Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT"
-            )
+            raise ValueError("Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT")
 
         # Create chat client with explicit configuration
         chat_client = AzureOpenAIChatClient(
@@ -726,6 +690,12 @@ async def stream_single_agent_response(
             logger.warning(
                 "Document search tool NOT available - AI_SEARCH_* env vars may be missing"
             )
+
+        # Add MCP business analytics tools
+        mcp_tools = get_mcp_tools()
+        if mcp_tools:
+            all_tools.extend(mcp_tools)
+            logger.info(f"MCP business analytics tools enabled: {len(mcp_tools)} tools")
 
         logger.info(f"Available tools: {len(all_tools)} tools configured")
 
@@ -776,9 +746,7 @@ async def stream_single_agent_response(
             _db_connection = None
 
 
-async def stream_sql_only_response(
-    conversation_id: str, query: str, user_id: str = "anonymous"
-):
+async def stream_sql_only_response(conversation_id: str, query: str, user_id: str = "anonymous"):
     """
     Stream response using single agent mode with SQL tool only.
     This is the FASTEST mode - optimized for simple SQL queries.
@@ -799,10 +767,8 @@ async def stream_sql_only_response(
                     content = msg.get("content", "")
                     if isinstance(content, str) and content:
                         history_messages.append({"role": role, "content": content})
-                logger.info(
-                    f"SQL-only: Loaded {len(history_messages)} messages from history"
-                )
-        except asyncio.TimeoutError:
+                logger.info(f"SQL-only: Loaded {len(history_messages)} messages from history")
+        except TimeoutError:
             logger.warning("SQL-only: History fetch timed out")
         except Exception as e:
             logger.warning(f"SQL-only: Could not load history: {e}")
@@ -842,9 +808,7 @@ async def stream_sql_only_response(
 
 ## 現在の質問
 {query}"""
-            logger.info(
-                f"SQL-only: Including {len(history_messages)} messages in context"
-            )
+            logger.info(f"SQL-only: Including {len(history_messages)} messages in context")
         else:
             full_query = query
 
@@ -867,9 +831,7 @@ async def stream_sql_only_response(
             _db_connection = None
 
 
-async def stream_handoff_response(
-    conversation_id: str, query: str, user_id: str = "anonymous"
-):
+async def stream_handoff_response(conversation_id: str, query: str, user_id: str = "anonymous"):
     """
     Stream response using HandoffBuilder for expert delegation pattern.
 
@@ -903,10 +865,8 @@ async def stream_handoff_response(
                     content = msg.get("content", "")
                     if isinstance(content, str) and content:
                         history_messages.append({"role": role, "content": content})
-                logger.info(
-                    f"Handoff: Loaded {len(history_messages)} messages from history"
-                )
-        except asyncio.TimeoutError:
+                logger.info(f"Handoff: Loaded {len(history_messages)} messages from history")
+        except TimeoutError:
             logger.warning("Handoff: History fetch timed out")
         except Exception as e:
             logger.warning(f"Handoff: Could not load history: {e}")
@@ -1023,9 +983,7 @@ async def stream_handoff_response(
 
 ## 現在の質問
 {query}"""
-            logger.info(
-                f"Handoff: Including {len(history_messages)} messages in context"
-            )
+            logger.info(f"Handoff: Including {len(history_messages)} messages in context")
         else:
             full_query = query
 
@@ -1219,9 +1177,7 @@ async def stream_chat_request(
                     assistant_content += chunk_str
                     # Include web citations in the response for UI display (Bing terms of use)
                     citations_json = (
-                        json.dumps(_current_web_citations)
-                        if _current_web_citations
-                        else None
+                        json.dumps(_current_web_citations) if _current_web_citations else None
                     )
                     response = {
                         "choices": [
@@ -1263,18 +1219,14 @@ async def stream_chat_request(
                 logger.error(f"Rate limit error: {error_message}")
                 yield (
                     json.dumps(
-                        {
-                            "error": f"Rate limit is exceeded. Try again in {retry_after} seconds."
-                        }
+                        {"error": f"Rate limit is exceeded. Try again in {retry_after} seconds."}
                     )
                     + "\n\n"
                 )
             else:
                 logger.error(f"Unexpected error: {e}", exc_info=True)
                 yield (
-                    json.dumps(
-                        {"error": "An error occurred while processing the request."}
-                    )
+                    json.dumps({"error": "An error occurred while processing the request."})
                     + "\n\n"
                 )
 
@@ -1286,9 +1238,7 @@ async def conversation(request: Request):
     """Handle chat requests - streaming text or chart generation based on query keywords."""
     try:
         # Get authenticated user for conversation history
-        authenticated_user = get_authenticated_user_details(
-            request_headers=request.headers
-        )
+        authenticated_user = get_authenticated_user_details(request_headers=request.headers)
         user_id = authenticated_user.get("user_principal_id", "anonymous")
 
         request_json = await request.json()
@@ -1299,18 +1249,14 @@ async def conversation(request: Request):
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
 
         if not conversation_id:
-            return JSONResponse(
-                content={"error": "Conversation ID is required"}, status_code=400
-            )
+            return JSONResponse(content={"error": "Conversation ID is required"}, status_code=400)
 
         agent_mode = request_json.get(
             "agent_mode"
         )  # Optional: sql_only, multi_tool, handoff, magentic
 
         # stream_chat_request returns an async generator, so we need to wrap it in StreamingResponse
-        stream_generator = await stream_chat_request(
-            conversation_id, query, user_id, agent_mode
-        )
+        stream_generator = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
             "ChatStreamSuccess",
             {
@@ -1332,8 +1278,6 @@ async def conversation(request: Request):
     except Exception as ex:
         logger.error(f"Error in conversation endpoint: {ex}", exc_info=True)
         return JSONResponse(
-            content={
-                "error": "An internal error occurred while processing the conversation."
-            },
+            content={"error": "An internal error occurred while processing the conversation."},
             status_code=500,
         )

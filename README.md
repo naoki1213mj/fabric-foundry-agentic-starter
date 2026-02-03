@@ -27,10 +27,12 @@ Fabric の統合データ基盤アクセラレータ、SQL Database in Fabric、
 ### ソリューションアーキテクチャ
 
 Microsoft Fabric と Microsoft Copilot Studio:
+
 |![image](./documents/Images/ReadMe/solution-architecture-cps.png)
 |---|
 
-Microsoft Fabric と Microsoft Foundry: 
+Microsoft Fabric と Microsoft Foundry:
+
 |![image](./documents/Images/ReadMe/solution-architecture.png)
 |---|
 
@@ -40,14 +42,18 @@ Microsoft Fabric と Microsoft Foundry:
 
 <br/>
 <h2>
+
 機能
 </h2>
 
 ### 主な機能
+
 <details open>  
+
 <summary>このソリューションが実現する主要機能について詳しく見る</summary>  
 
 **Microsoft Fabric + Microsoft Foundry 上に構築**
+
 - **Fabric による統合データ基盤** <br/>  
 Microsoft Fabric と統合データ基盤の基本機能を活用し、オーケストレーション、検索、ユーザーエクスペリエンスにおいて優れたインテリジェントエージェントを構築
 
@@ -61,31 +67,35 @@ Microsoft Foundry エージェントがオーケストレーションと検索�
 
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/quick-deploy.png" width="48" />
+
 クイックデプロイ
 </h2>
 
 ### インストール・デプロイ方法
+
 このソリューションを自身の Azure サブスクリプションにデプロイするには、デプロイガイドのクイックデプロイ手順に従ってください。
 
 Azure デプロイ: [デプロイガイドはこちら](./documents/DeploymentGuide.md)
 <br/><br/>
-ローカル開発: 
+
 - [ローカル開発セットアップガイド](./documents/LocalDevelopmentSetup.md) - Windows および Linux 向けの包括的なセットアップ手順
 - ネイティブ Windows セットアップ、WSL2 構成、クロスプラットフォーム開発ツールを含む
 <br/><br/>
 
-
 | [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Visual Studio Code Web](https://img.shields.io/static/v1?style=for-the-badge&label=Visual%20Studio%20Code%20(Web)&message=Open&color=blue&logo=visualstudiocode&logoColor=white)](https://vscode.dev/azure/?vscode-azure-exp=foundry&agentPayload=eyJiYXNlVXJsIjogImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9taWNyb3NvZnQvYWdlbnRpYy1hcHBsaWNhdGlvbnMtZm9yLXVuaWZpZWQtZGF0YS1mb3VuZGF0aW9uLXNvbHV0aW9uLWFjY2VsZXJhdG9yL3JlZnMvaGVhZHMvbWFpbi9pbmZyYS92c2NvZGVfd2ViIiwgImluZGV4VXJsIjogIi9pbmRleC5qc29uIiwgInZhcmlhYmxlcyI6IHsiYWdlbnRJZCI6ICIiLCAiY29ubmVjdGlvblN0cmluZyI6ICIiLCAidGhyZWFkSWQiOiAiIiwgInVzZXJNZXNzYWdlIjogIiIsICJwbGF5Z3JvdW5kTmFtZSI6ICIiLCAibG9jYXRpb24iOiAiIiwgInN1YnNjcmlwdGlvbklkIjogIiIsICJyZXNvdXJjZUlkIjogIiIsICJwcm9qZWN0UmVzb3VyY2VJZCI6ICIiLCAiZW5kcG9pbnQiOiAiIn0sICJjb2RlUm91dGUiOiBbImFpLXByb2plY3RzLXNkayIsICJweXRob24iLCAiZGVmYXVsdC1henVyZS1hdXRoIiwgImVuZHBvaW50Il19) |
+
 |---|---|---|
 
 <br/>
 
 > ⚠️ **重要: Azure OpenAI クォータの確認**
+
  <br/>サブスクリプションで十分なクォータが利用可能であることを確認するため、ソリューションをデプロイする前に[クォータ確認手順ガイド](./documents/QuotaCheck.md)に従ってください。
 
 <br/>
 
 ### 前提条件とコスト
+
 このソリューションアクセラレータをデプロイするには、**リソースグループ、リソース、アプリ登録の作成、およびリソースグループレベルでのロール割り当て**に必要な権限を持つ [Azure サブスクリプション](https://azure.microsoft.com/ja-jp/free/)へのアクセスが必要です。これには、サブスクリプションレベルでの共同作成者ロールと、サブスクリプションおよび/またはリソースグループレベルでのロールベースアクセス制御ロールが含まれます。[Azure アカウントセットアップ](./documents/AzureAccountSetUp.md)の手順に従ってください。また、最低 F2 の Fabric 容量が必要です。[Fabric 容量セットアップ](https://learn.microsoft.com/ja-jp/fabric/admin/capacity-settings?tabs=fabric-capacity#create-a-new-capacity)の手順に従ってください。
 
 サービスが利用可能なリージョンの例: East US、East US2、Australia East、UK South、France Central、Japan East
@@ -123,7 +133,7 @@ _注: これはすべてのコストを網羅したものではありません�
 |![image](./documents/Images/ReadMe/ui.png)|
 |---|
 
-<br/>
+r/>
 
 サンプルデータは、このアクセラレータが様々な業界の営業分析シナリオでどのように使用できるかを示しています。
 このシナリオでは、組織が営業調査のためにトップパフォーマンス製品を分析しています。以前は、営業アナリストはデータサイロ全体に散在する異種の営業データと顧客データを手作業で調べる必要がありました。このソリューションアクセラレータを活用することで、アナリストは Microsoft Fabric の統合データにアクセスし、顧客と営業パフォーマンスデータの包括的なビューを得られるようになりました。この機能により、アナリストはデータを照会できます（例: 「前年比で最も収益成長が高い顧客セグメントはどれか」、「人口統計別のトップパフォーマンス製品は何か」）。
@@ -131,30 +141,30 @@ _注: これはすべてのコストを網羅したものではありません�
 ⚠️ このリポジトリで使用されているサンプルデータは合成的に生成されたものです。データはサンプルデータとしてのみ使用することを目的としています。
 
 ### ビジネス価値
+
 <details>
   <summary>このソリューションが提供する価値について詳しく見る</summary>
 <br/>
 
-  - **インテリジェントなデータインタラクション** 
+- **インテリジェントなデータインタラクション**
 企業独自のデータを理解し、自然言語の質問をデータ駆動の回答のための自動クエリに変換する会話エージェントを実現。指示を使用してエージェントをトレーニングし、可視性を獲得
-
 - **インサイトと生産性の加速**
 インテリジェントなデータ準備、シームレスな統合、AI ガイド付き探索により迅速なインサイトにアクセス。データを分析・強化してトレンドを発見し、ワークフローを自動化し、アイデアをスケーラブルな Agentic ソリューションに変換
 
 - **ガバナンス、スケーラブル、信頼性の高いデータ**
 堅牢なガバナンスとメタデータを通じて実用的なインサイトを提供。統合プラットフォームで高品質なデータへの安全なセルフサービスアクセスにより、意思決定、運用効率を改善し、コストを削減
 
-     
 </details>
 
 ### ユースケース
+
 <details>
   <summary>このソリューションが提供するユースケースについて詳しく見る</summary>
 <br/>
 
   | **ユースケース** | **ペルソナ** | **課題** | **概要/アプローチ** |
   |---|---|---|---|
-  | 営業分析・製品パフォーマンス | 営業アナリスト | 切り離されたデータサイロを検索するために多大な時間を費やし、完全な営業、製品、顧客情報に迅速かつ正確にアクセスすることが困難 | 自然言語を通じて顧客、製品、営業データの包括的なビューを提供。複雑なレポートやダッシュボードをナビゲートせずに迅速にインサイトを取得 | 
+  | 営業分析・製品パフォーマンス | 営業アナリスト | 切り離されたデータサイロを検索するために多大な時間を費やし、完全な営業、製品、顧客情報に迅速かつ正確にアクセスすることが困難 | 自然言語を通じて顧客、製品、営業データの包括的なビューを提供。複雑なレポートやダッシュボードをナビゲートせずに迅速にインサイトを取得 |
   顧客ミーティングの改善、クライアントミーティングの準備 | アカウントマネージャー | 手動プロセスと分断されたシステムが日常業務を遅らせ、インサイトの発見を困難にし、パーソナライズされた顧客インタラクションを制限し、解約率の上昇と満足度の低下を招く | ワークフロー内で顧客データを提供し、自然言語クエリを通じて実用的なインサイトを発見し、インタラクションをパーソナライズして解約を減らし、顧客満足度を向上 |
 
 </details>
@@ -179,6 +189,7 @@ _注: これはすべてのコストを網羅したものではありません�
 <br/>
 
 ### 関連リファレンス
+
 類似のソリューションアクセラレータをチェック
 
 | ソリューションアクセラレータ | 説明 |
@@ -186,6 +197,7 @@ _注: これはすべてのコストを網羅したものではありません�
 | [Fabric&nbsp;による&nbsp;統合&nbsp;データ&nbsp;基盤](https://github.com/microsoft/unified-data-foundation-with-fabric-solution-accelerator) | Microsoft Fabric、Microsoft Purview、Azure Databricks を活用した統合データアーキテクチャにより、統一された、統合された、ガバナンスされた分析プラットフォームを提供する統合データ基盤 |
 
 <br/>
+<https://aka.ms/exporting>
 
 ## フィードバック
 
@@ -193,7 +205,9 @@ _注: これはすべてのコストを網羅したものではありません�
 
 <br/>
 
-## 責任ある AI 透明性 FAQ 
+## 責任ある AI 透明性 FAQ
+
+<https://aka.ms/exporting>
 このソリューションアクセラレータの責任ある AI 透明性の詳細については、[Transparency FAQ](./TRANSPARENCY_FAQ.md)を参照してください。
 
 <br/>
@@ -202,7 +216,7 @@ _注: これはすべてのコストを網羅したものではありません�
 
 本ソフトウェアに、Microsoft 製品またはサービス（Azure サービスを含むがこれに限定されない、総称して「Microsoft 製品およびサービス」）で使用されている、または派生したコンポーネントまたはコードが含まれる限りにおいて、当該 Microsoft 製品およびサービスに適用される製品条項にも準拠する必要があります。本ソフトウェアを管理するライセンスは、Microsoft 製品およびサービスを使用するためのライセンスまたはその他の権利を付与するものではないことを認め、同意するものとします。ライセンスまたは本 ReadMe ファイルの内容は、Microsoft 製品およびサービスの製品条項の条件を上書き、修正、終了、または変更するものではありません。
 
-また、本ソフトウェアに適用されるすべての国内および国際輸出法規を遵守する必要があります。これには、仕向地、エンドユーザー、および最終用途に関する制限が含まれます。輸出制限の詳細については、https://aka.ms/exporting をご覧ください。
+また、本ソフトウェアに適用されるすべての国内および国際輸出法規を遵守する必要があります。これには、仕向地、エンドユーザー、および最終用途に関する制限が含まれます。輸出制限の詳細については、<https://aka.ms/exporting> をご覧ください。
 
 本ソフトウェアおよび Microsoft 製品およびサービスは、(1) 医療機器として設計、意図、または提供されるものではなく、(2) 専門的な医療アドバイス、診断、治療、または判断の代替として設計または意図されるものではなく、専門的な医療アドバイス、診断、治療、または判断の代替として使用すべきではないことを認めます。お客様は、オンラインサービスのお客様の実装のエンドユーザーに対して、適切な同意、警告、免責事項、および確認を表示および/または取得する責任を単独で負います。
 

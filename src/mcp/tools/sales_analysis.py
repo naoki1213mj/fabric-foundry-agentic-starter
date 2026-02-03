@@ -334,7 +334,9 @@ class SalesAnalysisTools:
         y_mean = sum(y_values) / n
 
         # Calculate slope (b) and intercept (a)
-        numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_values, y_values, strict=True))
+        numerator = sum(
+            (x - x_mean) * (y - y_mean) for x, y in zip(x_values, y_values, strict=True)
+        )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 
         if denominator == 0:

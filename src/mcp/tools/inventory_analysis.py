@@ -23,24 +23,18 @@ class InventoryAnalysisTools:
                     "properties": {
                         "cost_of_goods_sold": {
                             "type": "number",
-                            "description": "売上原価（期間中）"
+                            "description": "売上原価（期間中）",
                         },
-                        "average_inventory": {
-                            "type": "number",
-                            "description": "平均在庫金額"
-                        },
+                        "average_inventory": {"type": "number", "description": "平均在庫金額"},
                         "period_days": {
                             "type": "integer",
                             "description": "対象期間（日数）",
-                            "default": 365
+                            "default": 365,
                         },
-                        "product_name": {
-                            "type": "string",
-                            "description": "製品名（オプション）"
-                        }
+                        "product_name": {"type": "string", "description": "製品名（オプション）"},
                     },
-                    "required": ["cost_of_goods_sold", "average_inventory"]
-                }
+                    "required": ["cost_of_goods_sold", "average_inventory"],
+                },
             },
             {
                 "name": "calculate_reorder_point",
@@ -48,27 +42,24 @@ class InventoryAnalysisTools:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "daily_demand": {
-                            "type": "number",
-                            "description": "1日あたりの平均需要量"
-                        },
+                        "daily_demand": {"type": "number", "description": "1日あたりの平均需要量"},
                         "lead_time_days": {
                             "type": "integer",
-                            "description": "発注から納品までのリードタイム（日数）"
+                            "description": "発注から納品までのリードタイム（日数）",
                         },
                         "safety_stock_days": {
                             "type": "integer",
                             "description": "安全在庫日数",
-                            "default": 7
+                            "default": 7,
                         },
                         "demand_variability": {
                             "type": "number",
                             "description": "需要の変動係数（標準偏差/平均）",
-                            "default": 0.2
-                        }
+                            "default": 0.2,
+                        },
                     },
-                    "required": ["daily_demand", "lead_time_days"]
-                }
+                    "required": ["daily_demand", "lead_time_days"],
+                },
             },
             {
                 "name": "identify_slow_moving_inventory",
@@ -85,20 +76,20 @@ class InventoryAnalysisTools:
                                     "quantity": {"type": "number"},
                                     "unit_cost": {"type": "number"},
                                     "days_in_stock": {"type": "integer"},
-                                    "monthly_sales": {"type": "number"}
-                                }
+                                    "monthly_sales": {"type": "number"},
+                                },
                             },
-                            "description": "在庫アイテムリスト"
+                            "description": "在庫アイテムリスト",
                         },
                         "slow_moving_threshold_days": {
                             "type": "integer",
                             "description": "滞留判定日数（デフォルト: 90日）",
-                            "default": 90
-                        }
+                            "default": 90,
+                        },
                     },
-                    "required": ["inventory_items"]
-                }
-            }
+                    "required": ["inventory_items"],
+                },
+            },
         ]
 
     def calculate_inventory_turnover(
@@ -106,7 +97,7 @@ class InventoryAnalysisTools:
         cost_of_goods_sold: float,
         average_inventory: float,
         period_days: int = 365,
-        product_name: str | None = None
+        product_name: str | None = None,
     ) -> str:
         """
         Calculate inventory turnover rate.
@@ -121,10 +112,13 @@ class InventoryAnalysisTools:
             JSON string with turnover analysis
         """
         if average_inventory <= 0:
-            return json.dumps({
-                "error": "平均在庫は正の値である必要があります",
-                "average_inventory": average_inventory
-            }, ensure_ascii=False)
+            return json.dumps(
+                {
+                    "error": "平均在庫は正の値である必要があります",
+                    "average_inventory": average_inventory,
+                },
+                ensure_ascii=False,
+            )
 
         # Inventory turnover ratio
         turnover_ratio = cost_of_goods_sold / average_inventory
@@ -154,16 +148,16 @@ class InventoryAnalysisTools:
             "input_data": {
                 "cost_of_goods_sold": cost_of_goods_sold,
                 "average_inventory": average_inventory,
-                "period_days": period_days
+                "period_days": period_days,
             },
             "metrics": {
                 "turnover_ratio": round(turnover_ratio, 2),
                 "days_in_inventory": round(days_in_inventory, 1),
-                "turns_per_year": round(turnover_ratio * (365 / period_days), 2)
+                "turns_per_year": round(turnover_ratio * (365 / period_days), 2),
             },
             "rating": rating,
             "recommendation": recommendation,
-            "analysis": f"在庫回転分析: 回転率 {turnover_ratio:.2f}回 / 滞留日数 {days_in_inventory:.0f}日 - {rating}"
+            "analysis": f"在庫回転分析: 回転率 {turnover_ratio:.2f}回 / 滞留日数 {days_in_inventory:.0f}日 - {rating}",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)
@@ -173,7 +167,7 @@ class InventoryAnalysisTools:
         daily_demand: float,
         lead_time_days: int,
         safety_stock_days: int = 7,
-        demand_variability: float = 0.2
+        demand_variability: float = 0.2,
     ) -> str:
         """
         Calculate reorder point.
@@ -198,7 +192,7 @@ class InventoryAnalysisTools:
         # where z ≈ 1.65 for 95% service level
         z_score = 1.65
         std_dev = daily_demand * demand_variability
-        statistical_safety_stock = z_score * std_dev * (lead_time_days ** 0.5)
+        statistical_safety_stock = z_score * std_dev * (lead_time_days**0.5)
 
         # Use the larger of fixed days SS or statistical SS
         final_safety_stock = max(safety_stock, statistical_safety_stock)
@@ -220,30 +214,28 @@ class InventoryAnalysisTools:
                 "daily_demand": daily_demand,
                 "lead_time_days": lead_time_days,
                 "safety_stock_days": safety_stock_days,
-                "demand_variability": demand_variability
+                "demand_variability": demand_variability,
             },
             "calculations": {
                 "lead_time_demand": round(lead_time_demand, 0),
                 "safety_stock_fixed": round(safety_stock, 0),
                 "safety_stock_statistical": round(statistical_safety_stock, 0),
                 "final_safety_stock": round(final_safety_stock, 0),
-                "reorder_point": round(reorder_point, 0)
+                "reorder_point": round(reorder_point, 0),
             },
             "recommendations": {
                 "reorder_point": round(reorder_point, 0),
                 "suggested_order_quantity": round(eoq, 0),
-                "max_stock_level": round(reorder_point + eoq, 0)
+                "max_stock_level": round(reorder_point + eoq, 0),
             },
             "service_level": "95%（z=1.65）",
-            "analysis": f"発注点分析: 在庫が {reorder_point:.0f}個 を下回ったら発注（安全在庫 {final_safety_stock:.0f}個 含む）"
+            "analysis": f"発注点分析: 在庫が {reorder_point:.0f}個 を下回ったら発注（安全在庫 {final_safety_stock:.0f}個 含む）",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)
 
     def identify_slow_moving_inventory(
-        self,
-        inventory_items: list[dict[str, Any]],
-        slow_moving_threshold_days: int = 90
+        self, inventory_items: list[dict[str, Any]], slow_moving_threshold_days: int = 90
     ) -> str:
         """
         Identify slow-moving and dead stock.
@@ -256,9 +248,7 @@ class InventoryAnalysisTools:
             JSON string with slow-moving inventory analysis
         """
         if not inventory_items:
-            return json.dumps({
-                "error": "在庫アイテムリストが空です"
-            }, ensure_ascii=False)
+            return json.dumps({"error": "在庫アイテムリストが空です"}, ensure_ascii=False)
 
         analyzed_items = []
         dead_stock = []
@@ -282,7 +272,9 @@ class InventoryAnalysisTools:
                 months_of_stock = float("inf") if quantity > 0 else 0
 
             # Classify
-            if days_in_stock > slow_moving_threshold_days * 2 or (monthly_sales == 0 and quantity > 0):
+            if days_in_stock > slow_moving_threshold_days * 2 or (
+                monthly_sales == 0 and quantity > 0
+            ):
                 status = "デッドストック"
                 color = "red"
                 dead_stock.append(name)
@@ -300,18 +292,22 @@ class InventoryAnalysisTools:
                 healthy.append(name)
                 action = "現状維持"
 
-            analyzed_items.append({
-                "name": name,
-                "quantity": quantity,
-                "unit_cost": unit_cost,
-                "inventory_value": inventory_value,
-                "days_in_stock": days_in_stock,
-                "monthly_sales": monthly_sales,
-                "months_of_stock": round(months_of_stock, 1) if months_of_stock != float("inf") else "∞",
-                "status": status,
-                "color": color,
-                "recommended_action": action
-            })
+            analyzed_items.append(
+                {
+                    "name": name,
+                    "quantity": quantity,
+                    "unit_cost": unit_cost,
+                    "inventory_value": inventory_value,
+                    "days_in_stock": days_in_stock,
+                    "monthly_sales": monthly_sales,
+                    "months_of_stock": round(months_of_stock, 1)
+                    if months_of_stock != float("inf")
+                    else "∞",
+                    "status": status,
+                    "color": color,
+                    "recommended_action": action,
+                }
+            )
 
         # Sort by risk (dead stock first, then slow moving)
         status_order = {"デッドストック": 0, "スローモービング": 1, "正常": 2}
@@ -325,14 +321,16 @@ class InventoryAnalysisTools:
                 "slow_moving_count": len(slow_moving),
                 "healthy_count": len(healthy),
                 "dead_stock_items": dead_stock,
-                "slow_moving_items": slow_moving
+                "slow_moving_items": slow_moving,
             },
             "financial_impact": {
                 "total_value_at_risk": round(total_value_at_risk, 0),
-                "recommendation": "早期処分で損失最小化" if total_value_at_risk > 0 else "在庫状態良好"
+                "recommendation": "早期処分で損失最小化"
+                if total_value_at_risk > 0
+                else "在庫状態良好",
             },
             "threshold_used": slow_moving_threshold_days,
-            "analysis": f"滞留在庫分析: デッドストック {len(dead_stock)}件、スローモービング {len(slow_moving)}件 - リスク金額 ¥{total_value_at_risk:,.0f}"
+            "analysis": f"滞留在庫分析: デッドストック {len(dead_stock)}件、スローモービング {len(slow_moving)}件 - リスク金額 ¥{total_value_at_risk:,.0f}",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)

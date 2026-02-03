@@ -37,8 +37,7 @@ class TestMCPHandler:
     async def test_call_tool_yoy_growth(self, handler):
         """call_tool should execute yoy_growth correctly."""
         result = await handler.call_tool(
-            "calculate_yoy_growth",
-            {"current_value": 120000, "previous_value": 100000}
+            "calculate_yoy_growth", {"current_value": 120000, "previous_value": 100000}
         )
         assert "content" in result
         content = json.loads(result["content"][0]["text"])
@@ -48,8 +47,7 @@ class TestMCPHandler:
     async def test_call_tool_rfm_score(self, handler):
         """call_tool should execute rfm_score correctly."""
         result = await handler.call_tool(
-            "calculate_rfm_score",
-            {"recency_days": 5, "frequency": 10, "monetary": 200000}
+            "calculate_rfm_score", {"recency_days": 5, "frequency": 10, "monetary": 200000}
         )
         assert "content" in result
         content = json.loads(result["content"][0]["text"])
@@ -58,10 +56,7 @@ class TestMCPHandler:
     @pytest.mark.asyncio
     async def test_call_tool_unknown(self, handler):
         """call_tool should handle unknown tool name."""
-        result = await handler.call_tool(
-            "unknown_tool",
-            {}
-        )
+        result = await handler.call_tool("unknown_tool", {})
         # The handler returns isError=True with error message in content
         assert result.get("isError") is True
         assert "Unknown tool" in result["content"][0]["text"]
@@ -71,7 +66,7 @@ class TestMCPHandler:
         """call_tool should handle missing required arguments."""
         result = await handler.call_tool(
             "calculate_yoy_growth",
-            {"current_value": 100000}  # Missing previous_value
+            {"current_value": 100000},  # Missing previous_value
         )
         # Should return error or handle gracefully
         assert "content" in result or "error" in result

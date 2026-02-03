@@ -20,25 +20,13 @@ class CustomerSegmentTools:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "recency_days": {
-                            "type": "integer",
-                            "description": "最終購入からの日数"
-                        },
-                        "frequency": {
-                            "type": "integer",
-                            "description": "購入回数（期間内）"
-                        },
-                        "monetary": {
-                            "type": "number",
-                            "description": "累計購入金額"
-                        },
-                        "customer_id": {
-                            "type": "string",
-                            "description": "顧客ID（オプション）"
-                        }
+                        "recency_days": {"type": "integer", "description": "最終購入からの日数"},
+                        "frequency": {"type": "integer", "description": "購入回数（期間内）"},
+                        "monetary": {"type": "number", "description": "累計購入金額"},
+                        "customer_id": {"type": "string", "description": "顧客ID（オプション）"},
                     },
-                    "required": ["recency_days", "frequency", "monetary"]
-                }
+                    "required": ["recency_days", "frequency", "monetary"],
+                },
             },
             {
                 "name": "classify_customer_segment",
@@ -46,25 +34,13 @@ class CustomerSegmentTools:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "r_score": {
-                            "type": "integer",
-                            "description": "Recencyスコア（1-5）"
-                        },
-                        "f_score": {
-                            "type": "integer",
-                            "description": "Frequencyスコア（1-5）"
-                        },
-                        "m_score": {
-                            "type": "integer",
-                            "description": "Monetaryスコア（1-5）"
-                        },
-                        "customer_id": {
-                            "type": "string",
-                            "description": "顧客ID（オプション）"
-                        }
+                        "r_score": {"type": "integer", "description": "Recencyスコア（1-5）"},
+                        "f_score": {"type": "integer", "description": "Frequencyスコア（1-5）"},
+                        "m_score": {"type": "integer", "description": "Monetaryスコア（1-5）"},
+                        "customer_id": {"type": "string", "description": "顧客ID（オプション）"},
                     },
-                    "required": ["r_score", "f_score", "m_score"]
-                }
+                    "required": ["r_score", "f_score", "m_score"],
+                },
             },
             {
                 "name": "calculate_clv",
@@ -72,32 +48,29 @@ class CustomerSegmentTools:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "average_purchase_value": {
-                            "type": "number",
-                            "description": "平均購入単価"
-                        },
+                        "average_purchase_value": {"type": "number", "description": "平均購入単価"},
                         "purchase_frequency_per_year": {
                             "type": "number",
-                            "description": "年間平均購入回数"
+                            "description": "年間平均購入回数",
                         },
                         "customer_lifespan_years": {
                             "type": "number",
                             "description": "顧客継続年数（予測）",
-                            "default": 3
+                            "default": 3,
                         },
                         "profit_margin": {
                             "type": "number",
                             "description": "利益率（0-1）",
-                            "default": 0.3
+                            "default": 0.3,
                         },
                         "discount_rate": {
                             "type": "number",
                             "description": "割引率（NPV計算用）",
-                            "default": 0.1
-                        }
+                            "default": 0.1,
+                        },
                     },
-                    "required": ["average_purchase_value", "purchase_frequency_per_year"]
-                }
+                    "required": ["average_purchase_value", "purchase_frequency_per_year"],
+                },
             },
             {
                 "name": "recommend_next_action",
@@ -105,35 +78,28 @@ class CustomerSegmentTools:
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "segment": {
-                            "type": "string",
-                            "description": "顧客セグメント名"
-                        },
+                        "segment": {"type": "string", "description": "顧客セグメント名"},
                         "rfm_scores": {
                             "type": "object",
                             "properties": {
                                 "r": {"type": "integer"},
                                 "f": {"type": "integer"},
-                                "m": {"type": "integer"}
+                                "m": {"type": "integer"},
                             },
-                            "description": "RFMスコア（オプション）"
+                            "description": "RFMスコア（オプション）",
                         },
                         "last_purchase_days": {
                             "type": "integer",
-                            "description": "最終購入からの日数（オプション）"
-                        }
+                            "description": "最終購入からの日数（オプション）",
+                        },
                     },
-                    "required": ["segment"]
-                }
-            }
+                    "required": ["segment"],
+                },
+            },
         ]
 
     def calculate_rfm_score(
-        self,
-        recency_days: int,
-        frequency: int,
-        monetary: float,
-        customer_id: str | None = None
+        self, recency_days: int, frequency: int, monetary: float, customer_id: str | None = None
     ) -> str:
         """
         Calculate RFM scores.
@@ -191,27 +157,23 @@ class CustomerSegmentTools:
             "input_data": {
                 "recency_days": recency_days,
                 "frequency": frequency,
-                "monetary": monetary
+                "monetary": monetary,
             },
             "rfm_scores": {
                 "recency": r_score,
                 "frequency": f_score,
                 "monetary": m_score,
                 "total": total_score,
-                "average": round(avg_score, 2)
+                "average": round(avg_score, 2),
             },
             "score_label": f"R{r_score}F{f_score}M{m_score}",
-            "analysis": f"RFM分析: R{r_score}F{f_score}M{m_score}（平均{avg_score:.1f}点）- {'優良顧客' if avg_score >= 4 else '一般顧客' if avg_score >= 2.5 else '要フォロー顧客'}"
+            "analysis": f"RFM分析: R{r_score}F{f_score}M{m_score}（平均{avg_score:.1f}点）- {'優良顧客' if avg_score >= 4 else '一般顧客' if avg_score >= 2.5 else '要フォロー顧客'}",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)
 
     def classify_customer_segment(
-        self,
-        r_score: int,
-        f_score: int,
-        m_score: int,
-        customer_id: str | None = None
+        self, r_score: int, f_score: int, m_score: int, customer_id: str | None = None
     ) -> str:
         """
         Classify customer into segments based on RFM scores.
@@ -276,24 +238,20 @@ class CustomerSegmentTools:
             "休眠優良顧客": ["パーソナライズドオファー", "復帰キャンペーン", "アンケート実施"],
             "離反リスク顧客": ["緊急フォローコール", "限定割引クーポン", "サービス改善ヒアリング"],
             "休眠顧客": ["再活性化メール", "大幅割引オファー", "新商品案内"],
-            "一般顧客": ["定期メルマガ", "季節キャンペーン案内", "レビュー依頼"]
+            "一般顧客": ["定期メルマガ", "季節キャンペーン案内", "レビュー依頼"],
         }
 
         result = {
             "customer_id": customer_id or "N/A",
-            "rfm_scores": {
-                "recency": r_score,
-                "frequency": f_score,
-                "monetary": m_score
-            },
+            "rfm_scores": {"recency": r_score, "frequency": f_score, "monetary": m_score},
             "segment": {
                 "name": segment,
                 "description": description,
                 "priority": priority,
-                "color": color
+                "color": color,
             },
             "recommended_actions": actions.get(segment, []),
-            "analysis": f"顧客セグメント: {segment}（優先度{priority}）- {description}"
+            "analysis": f"顧客セグメント: {segment}（優先度{priority}）- {description}",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)
@@ -304,7 +262,7 @@ class CustomerSegmentTools:
         purchase_frequency_per_year: float,
         customer_lifespan_years: float = 3,
         profit_margin: float = 0.3,
-        discount_rate: float = 0.1
+        discount_rate: float = 0.1,
     ) -> str:
         """
         Calculate Customer Lifetime Value.
@@ -334,12 +292,14 @@ class CustomerSegmentTools:
         for year in range(1, int(customer_lifespan_years) + 1):
             year_value = (annual_revenue * profit_margin) / ((1 + discount_rate) ** year)
             npv_clv += year_value
-            yearly_values.append({
-                "year": year,
-                "revenue": round(annual_revenue, 0),
-                "profit": round(annual_revenue * profit_margin, 0),
-                "npv": round(year_value, 0)
-            })
+            yearly_values.append(
+                {
+                    "year": year,
+                    "revenue": round(annual_revenue, 0),
+                    "profit": round(annual_revenue * profit_margin, 0),
+                    "npv": round(year_value, 0),
+                }
+            )
 
         # CLV tier
         if npv_clv >= 500000:
@@ -361,20 +321,17 @@ class CustomerSegmentTools:
                 "purchase_frequency_per_year": purchase_frequency_per_year,
                 "customer_lifespan_years": customer_lifespan_years,
                 "profit_margin": profit_margin,
-                "discount_rate": discount_rate
+                "discount_rate": discount_rate,
             },
             "calculations": {
                 "annual_revenue": round(annual_revenue, 0),
                 "simple_clv": round(simple_clv, 0),
                 "clv_with_margin": round(clv_profit, 0),
-                "npv_clv": round(npv_clv, 0)
+                "npv_clv": round(npv_clv, 0),
             },
             "yearly_breakdown": yearly_values,
-            "tier": {
-                "name": tier,
-                "description": tier_description
-            },
-            "analysis": f"CLV分析: 顧客生涯価値 ¥{npv_clv:,.0f}（{tier}ランク）- 年間 ¥{annual_revenue:,.0f} × {customer_lifespan_years}年"
+            "tier": {"name": tier, "description": tier_description},
+            "analysis": f"CLV分析: 顧客生涯価値 ¥{npv_clv:,.0f}（{tier}ランク）- 年間 ¥{annual_revenue:,.0f} × {customer_lifespan_years}年",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)
@@ -383,7 +340,7 @@ class CustomerSegmentTools:
         self,
         segment: str,
         rfm_scores: dict[str, int] | None = None,
-        last_purchase_days: int | None = None
+        last_purchase_days: int | None = None,
     ) -> str:
         """
         Recommend next best action based on customer segment.
@@ -403,57 +360,57 @@ class CustomerSegmentTools:
                 "channels": ["専任担当者", "電話", "限定イベント"],
                 "offer_type": "プレミアム特典",
                 "urgency": "通常",
-                "message_tone": "感謝・特別感"
+                "message_tone": "感謝・特別感",
             },
             "優良顧客": {
                 "primary_action": "ロイヤルティ強化施策",
                 "channels": ["メール", "アプリ通知", "DM"],
                 "offer_type": "ポイント還元・限定商品",
                 "urgency": "通常",
-                "message_tone": "感謝・インセンティブ"
+                "message_tone": "感謝・インセンティブ",
             },
             "有望顧客": {
                 "primary_action": "アップセル/クロスセル提案",
                 "channels": ["メール", "Web", "アプリ"],
                 "offer_type": "セット割引・関連商品",
                 "urgency": "中",
-                "message_tone": "おすすめ・お得感"
+                "message_tone": "おすすめ・お得感",
             },
             "新規顧客": {
                 "primary_action": "オンボーディング完了",
                 "channels": ["メール", "アプリ", "LINE"],
                 "offer_type": "初回購入特典・チュートリアル",
                 "urgency": "高",
-                "message_tone": "歓迎・サポート"
+                "message_tone": "歓迎・サポート",
             },
             "休眠優良顧客": {
                 "primary_action": "再活性化キャンペーン",
                 "channels": ["メール", "電話", "DM"],
                 "offer_type": "復帰特典・限定割引",
                 "urgency": "高",
-                "message_tone": "お久しぶり・特別オファー"
+                "message_tone": "お久しぶり・特別オファー",
             },
             "離反リスク顧客": {
                 "primary_action": "緊急リテンション施策",
                 "channels": ["電話", "メール", "訪問"],
                 "offer_type": "大幅割引・サービス改善提案",
                 "urgency": "緊急",
-                "message_tone": "謝罪・改善約束"
+                "message_tone": "謝罪・改善約束",
             },
             "休眠顧客": {
                 "primary_action": "休眠掘り起こし",
                 "channels": ["メール", "郵送DM"],
                 "offer_type": "大幅割引・新商品案内",
                 "urgency": "低",
-                "message_tone": "新着情報・お得感"
+                "message_tone": "新着情報・お得感",
             },
             "一般顧客": {
                 "primary_action": "定期エンゲージメント",
                 "channels": ["メール", "SNS"],
                 "offer_type": "季節キャンペーン",
                 "urgency": "低",
-                "message_tone": "情報提供"
-            }
+                "message_tone": "情報提供",
+            },
         }
 
         # Get action for segment (or default)
@@ -472,16 +429,20 @@ class CustomerSegmentTools:
             action_items = [
                 {"priority": 1, "action": "担当者による電話連絡", "deadline": "24時間以内"},
                 {"priority": 2, "action": "特別オファー準備", "deadline": "48時間以内"},
-                {"priority": 3, "action": "フォローアップメール送信", "deadline": "1週間以内"}
+                {"priority": 3, "action": "フォローアップメール送信", "deadline": "1週間以内"},
             ]
         elif action_info["urgency"] == "高":
             action_items = [
                 {"priority": 1, "action": "パーソナライズドメール送信", "deadline": "3日以内"},
-                {"priority": 2, "action": "クーポン/オファー発行", "deadline": "1週間以内"}
+                {"priority": 2, "action": "クーポン/オファー発行", "deadline": "1週間以内"},
             ]
         else:
             action_items = [
-                {"priority": 1, "action": f"{action_info['channels'][0]}でのアプローチ", "deadline": "2週間以内"}
+                {
+                    "priority": 1,
+                    "action": f"{action_info['channels'][0]}でのアプローチ",
+                    "deadline": "2週間以内",
+                }
             ]
 
         result = {
@@ -493,10 +454,10 @@ class CustomerSegmentTools:
                 "channels": action_info["channels"],
                 "offer_type": action_info["offer_type"],
                 "urgency": action_info["urgency"],
-                "message_tone": action_info["message_tone"]
+                "message_tone": action_info["message_tone"],
             },
             "action_items": action_items,
-            "analysis": f"次のアクション: {action_info['primary_action']}（{action_info['urgency']}）- {action_info['channels'][0]}経由で{action_info['offer_type']}を提案"
+            "analysis": f"次のアクション: {action_info['primary_action']}（{action_info['urgency']}）- {action_info['channels'][0]}経由で{action_info['offer_type']}を提案",
         }
 
         return json.dumps(result, ensure_ascii=False, indent=2)

@@ -217,7 +217,7 @@ services:
     docker:
       path: ./Dockerfile
       context: .
-  
+
   web:
     project: src/web
     host: containerapp
@@ -242,17 +242,17 @@ infra:
 authentication:
   frontend:
     provider: "Entra ID (Container Apps EasyAuth)"
-  
+
   api:
     method: "Managed Identity (SystemAssigned)"
     credential: "DefaultAzureCredential"
-  
+
   foundry:
     method: "Entra ID + RBAC"
     roles:
       - "Azure AI Developer"
       - "Cognitive Services OpenAI User"
-  
+
   fabric:
     method: "Entra ID"
     roles:
@@ -340,7 +340,7 @@ class CustomSalesAgent(ChatAgent):
         # Fabric SQL Database への接続
         result = await self.fabric_client.execute_sql(query)
         return result
-    
+
     @ai_function
     async def get_customer_insights(self, customer_id: str) -> str:
         """顧客インサイトを取得する"""
