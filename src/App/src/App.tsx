@@ -3,6 +3,7 @@ import {
     Body2,
     FluentProvider,
     Subtitle2,
+    webDarkTheme,
     webLightTheme
 } from "@fluentui/react-components";
 import React, { useEffect, useRef, useState } from "react";
