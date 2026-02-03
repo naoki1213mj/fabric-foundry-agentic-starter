@@ -52,10 +52,50 @@ permissions:
 
 jobs:
   # ============================================
+  # Run Tests First (Gate for Deployment)
+  # ============================================
+  run-tests:
+    name: Run Tests (Gate)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/api/python
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -r requirements.txt
+          uv pip install --system -r requirements-test.txt
+
+      - name: Run Ruff lint
+        run: ruff check .
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v --tb=short -m "not slow"
+        env:
+          AZURE_AI_AGENT_ENDPOINT: "https://test.openai.azure.com/"
+          AZURE_OPENAI_ENDPOINT: "https://test.openai.azure.com/"
+          AZURE_OPENAI_API_KEY: "test-key"
+          FABRIC_SQL_CONNECTION_STRING: "Driver={ODBC Driver 18 for SQL Server};Server=test;Database=test;"
+          APPLICATIONINSIGHTS_CONNECTION_STRING: ""
+
+  # ============================================
   # Detect Changes
   # ============================================
   detect-changes:
     runs-on: ubuntu-latest
+    needs: run-tests  # Tests must pass before detecting changes
     outputs:
       frontend_changed: ${{ steps.changes.outputs.frontend }}
       api_changed: ${{ steps.changes.outputs.api }}
