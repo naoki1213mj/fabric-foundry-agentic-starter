@@ -1769,20 +1769,18 @@ async def conversation(request: Request):
             return JSONResponse(
                 content={"error": "Conversation ID is required"}, status_code=400
             )
+
         agent_mode = request_json.get("agent_mode")  # Optional: sql_only, multi_tool, handoff, magentic
-
-        if not query:
-            return JSONResponse(content={"error": "Query is required"}, status_code=400)
-
-        if not conversation_id:
-            return JSONResponse(
-                content={"error": "Conversation ID is required"}, status_code=400
-            )
 
         result = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
-            "ChatStreamSuccess", {"conversation_id": conversation_id, "query": query, "agent_mode": agent_mode
-            span.set_status(Status(StatusCode.ERROR, str(ex)))
+            "ChatStreamSuccess",
+            {"conversation_id": conversation_id, "query": query, "agent_mode": agent_mode},
+        )
+        return result
+
+    except Exception as ex:
+        logger.error(f"Error in conversation endpoint: {ex}", exc_info=True)
         return JSONResponse(
             content={
                 "error": "An internal error occurred while processing the conversation."
