@@ -696,7 +696,11 @@ const Chat: React.FC<ChatProps> = ({
               </div>
             );
           })}
-        {((generatingResponse && !isStreamingInProgress) || isChartLoading)  && (
+        {/* Show loading indicator: 
+            - "回答を生成中" when waiting for response (generatingResponse && !isStreamingInProgress && !isChartLoading)
+            - "チャート生成中" when chart is loading AND not streaming (to avoid duplicate with ChatMessage)
+        */}
+        {((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) && (
           <div className="assistant-message loading-indicator">
             <div className="typing-indicator">
               <span className="generating-text">{isChartLoading ? t("chat.generatingChart") : t("chat.generating")} </span>
