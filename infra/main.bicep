@@ -307,6 +307,10 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
       // When set, API requests will be routed through APIM for rate limiting and monitoring
       APIM_GATEWAY_URL: enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
+
+      // MCP Server Configuration (Business Analytics Tools)
+      MCP_SERVER_URL: (enableApimGateway && !empty(mcpServerEndpoint)) ? '${apimModule!.outputs.apimGatewayUrl}/mcp/' : (!empty(mcpServerEndpoint) ? mcpServerEndpoint : '')
+      MCP_ENABLED: !empty(mcpServerEndpoint) ? 'true' : 'false'
     }
   }
   scope: resourceGroup(resourceGroup().name)
@@ -377,6 +381,10 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
       // When set, API requests will be routed through APIM for rate limiting and monitoring
       APIM_GATEWAY_URL: enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
+
+      // MCP Server Configuration (Business Analytics Tools)
+      MCP_SERVER_URL: (enableApimGateway && !empty(mcpServerEndpoint)) ? '${apimModule!.outputs.apimGatewayUrl}/mcp/' : (!empty(mcpServerEndpoint) ? mcpServerEndpoint : '')
+      MCP_ENABLED: !empty(mcpServerEndpoint) ? 'true' : 'false'
     }
   }
   scope: resourceGroup(resourceGroup().name)
