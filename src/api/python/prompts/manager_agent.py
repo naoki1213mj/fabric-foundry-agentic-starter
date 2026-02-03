@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Manager Agent Prompts
 
@@ -6,9 +5,7 @@ MagenticBuilder パターンでチームを調整する管理エージェント�
 複数の専門エージェントを orchestrate して複合的な質問に回答。
 """
 
-MANAGER_AGENT_DESCRIPTION = (
-    """チームを調整して複雑なタスクを効率的に完了させるオーケストレーター"""
-)
+MANAGER_AGENT_DESCRIPTION = """チームを調整して複雑なタスクを効率的に完了させるオーケストレーター"""
 
 MANAGER_AGENT_PROMPT = """あなたはMagentic Oneのマネージャーエージェントです。
 チームを調整して複雑なタスクを効率的に完了させます。

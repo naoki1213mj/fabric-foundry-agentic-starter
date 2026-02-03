@@ -63,12 +63,8 @@ class KnowledgeBaseTool:
             logger.warning("AI_SEARCH_API_KEY not configured")
             return None
 
-        logger.info(
-            f"KnowledgeBaseTool configured: endpoint={search_endpoint}, index={index_name}"
-        )
-        return cls(
-            search_endpoint=search_endpoint, index_name=index_name, api_key=api_key
-        )
+        logger.info(f"KnowledgeBaseTool configured: endpoint={search_endpoint}, index={index_name}")
+        return cls(search_endpoint=search_endpoint, index_name=index_name, api_key=api_key)
 
     async def _get_session(self) -> aiohttp.ClientSession:
         """Get or create an aiohttp session."""
@@ -114,9 +110,7 @@ class KnowledgeBaseTool:
                     return self._parse_search_response(result)
                 else:
                     error_text = await response.text()
-                    logger.error(
-                        f"Search request failed: {response.status} - {error_text}"
-                    )
+                    logger.error(f"Search request failed: {response.status} - {error_text}")
                     return {"error": f"Search failed: {response.status}"}
 
         except aiohttp.ClientError as e:

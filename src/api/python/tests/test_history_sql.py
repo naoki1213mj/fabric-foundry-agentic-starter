@@ -141,9 +141,7 @@ class TestErrorHandling:
         """Database connection errors should be handled gracefully."""
         import pyodbc
 
-        mock_pyodbc_connection["connect"].side_effect = pyodbc.Error(
-            "Connection failed"
-        )
+        mock_pyodbc_connection["connect"].side_effect = pyodbc.Error("Connection failed")
 
         with pytest.raises(pyodbc.Error):
             import pyodbc
@@ -154,9 +152,7 @@ class TestErrorHandling:
         """Query timeouts should be handled gracefully."""
         import pyodbc
 
-        mock_pyodbc_connection["cursor"].execute.side_effect = pyodbc.Error(
-            "Query timeout"
-        )
+        mock_pyodbc_connection["cursor"].execute.side_effect = pyodbc.Error("Query timeout")
 
         with pytest.raises(pyodbc.Error):
             mock_pyodbc_connection["cursor"].execute("SELECT * FROM large_table")

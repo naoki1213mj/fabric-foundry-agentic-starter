@@ -7,7 +7,7 @@ and cleanup.
 """
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import uvicorn
 from dotenv import load_dotenv
@@ -46,9 +46,7 @@ def build_app() -> FastAPI:
     # Include routers
     fastapi_app.include_router(chat_router, prefix="/api", tags=["chat"])
     fastapi_app.include_router(history_router, prefix="/history", tags=["history"])
-    fastapi_app.include_router(
-        history_sql_router, prefix="/historyfab", tags=["historyfab"]
-    )
+    fastapi_app.include_router(history_sql_router, prefix="/historyfab", tags=["historyfab"])
 
     @fastapi_app.get("/health")
     async def health_check():
@@ -60,7 +58,7 @@ def build_app() -> FastAPI:
             "status": "healthy",
             "version": APP_VERSION,
             "build_date": BUILD_DATE,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "environment": os.getenv("AZURE_ENV_NAME", "development"),
             "model": os.getenv("AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME", "unknown"),
             "platform": "Microsoft Foundry",

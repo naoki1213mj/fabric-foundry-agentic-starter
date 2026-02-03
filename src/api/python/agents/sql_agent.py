@@ -7,7 +7,6 @@ Provides the run_sql_query tool implementation.
 
 import json
 import logging
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +41,7 @@ class SqlAgentHandler:
             cursor.execute(sql_query)
 
             # Get column names
-            columns = (
-                [column[0] for column in cursor.description]
-                if cursor.description
-                else []
-            )
+            columns = [column[0] for column in cursor.description] if cursor.description else []
 
             # Fetch all rows
             rows = cursor.fetchall()
@@ -67,15 +62,13 @@ class SqlAgentHandler:
 
             cursor.close()
 
-            logger.info(
-                f"SQL query executed successfully. Rows returned: {len(results)}"
-            )
+            logger.info(f"SQL query executed successfully. Rows returned: {len(results)}")
             return json.dumps(results, ensure_ascii=False, default=str)
 
         except Exception as e:
             logger.error(f"SQL query execution error: {e}")
             return json.dumps({"error": str(e)})
 
-    def get_tools(self) -> List[callable]:
+    def get_tools(self) -> list[callable]:
         """Return the list of tools for the SQL Agent."""
         return [self.run_sql_query]

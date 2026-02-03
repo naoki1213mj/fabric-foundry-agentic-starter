@@ -20,7 +20,6 @@ Pattern follows official Microsoft sample:
 import json
 import logging
 import os
-from typing import List, Optional
 
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import (
@@ -37,7 +36,7 @@ logger = logging.getLogger(__name__)
 class WebAgentHandler:
     """Handler for Web Agent tool execution using Bing Grounding via Foundry (New API)."""
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         """
         Initialize the Web Agent Handler.
 
@@ -83,9 +82,7 @@ class WebAgentHandler:
             )
 
         try:
-            logger.info(
-                f"Performing Bing Grounding search via Foundry (New API): {query[:100]}..."
-            )
+            logger.info(f"Performing Bing Grounding search via Foundry (New API): {query[:100]}...")
 
             # Create fresh client for each request (best practice to avoid transport issues)
             # Following official pattern from Microsoft docs
@@ -137,9 +134,7 @@ class WebAgentHandler:
                     response = openai_client.responses.create(
                         input=f"Search the web for: {query}",
                         tool_choice="required",  # Force the model to use Bing search
-                        extra_body={
-                            "agent": {"name": agent.name, "type": "agent_reference"}
-                        },
+                        extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
                     )
 
                     # Extract answer text safely
@@ -171,9 +166,7 @@ class WebAgentHandler:
                                         citations.append(
                                             {
                                                 "url": getattr(annotation, "url", ""),
-                                                "title": getattr(
-                                                    annotation, "title", ""
-                                                ),
+                                                "title": getattr(annotation, "title", ""),
                                             }
                                         )
 
@@ -188,19 +181,14 @@ class WebAgentHandler:
                         project_client.agents.delete_version(
                             agent_name=agent.name, agent_version=agent.version
                         )
-                        logger.info(
-                            f"Deleted Bing search agent: {agent.name} v{agent.version}"
-                        )
+                        logger.info(f"Deleted Bing search agent: {agent.name} v{agent.version}")
                     except Exception as cleanup_error:
-                        logger.warning(
-                            f"Failed to delete agent (non-critical): {cleanup_error}"
-                        )
+                        logger.warning(f"Failed to delete agent (non-critical): {cleanup_error}")
 
             # Return results
             if answer_text:
                 logger.info(
-                    f"Bing Grounding completed successfully. "
-                    f"Found {len(citations)} citations."
+                    f"Bing Grounding completed successfully. Found {len(citations)} citations."
                 )
                 # Format citations for UI display (Bing terms of use compliance)
                 # Each citation must have url and title for proper display
@@ -211,9 +199,7 @@ class WebAgentHandler:
                             "id": f"web-{i + 1}",
                             "title": cit.get("title") or f"Web Source {i + 1}",
                             "url": cit.get("url", ""),
-                            "filepath": cit.get(
-                                "url", ""
-                            ),  # UI uses filepath for display
+                            "filepath": cit.get("url", ""),  # UI uses filepath for display
                             "content": "",  # No content for web citations
                             "metadata": None,
                             "chunk_id": None,
@@ -256,6 +242,6 @@ class WebAgentHandler:
                 ensure_ascii=False,
             )
 
-    def get_tools(self) -> List[callable]:
+    def get_tools(self) -> list[callable]:
         """Return the list of tools for the Web Agent."""
         return [self.bing_grounding]

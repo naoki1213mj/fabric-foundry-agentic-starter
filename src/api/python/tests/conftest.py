@@ -69,9 +69,7 @@ def mock_azure_credential_async():
     """Mock async Azure credential."""
     with patch("auth.azure_credential_utils.get_azure_credential_async") as mock:
         mock_credential = AsyncMock()
-        mock_credential.get_token = AsyncMock(
-            return_value=MagicMock(token="test-token")
-        )
+        mock_credential.get_token = AsyncMock(return_value=MagicMock(token="test-token"))
         mock.return_value = mock_credential
         yield mock_credential
 
