@@ -6,12 +6,14 @@ registers API routers, and manages application lifespan events such as agent ini
 and cleanup.
 """
 
+import logging
 import os
+import time
 from datetime import UTC, datetime
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from chat import router as chat_router
@@ -20,10 +22,30 @@ from history_sql import router as history_sql_router
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# Application Insights setup (must be done early, before other imports that use logging)
+try:
+    from azure.monitor.opentelemetry import configure_azure_monitor
+
+    connection_string = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+    if connection_string:
+        configure_azure_monitor(connection_string=connection_string)
+        logger.info("Application Insights configured successfully")
+    else:
+        logger.warning("APPLICATIONINSIGHTS_CONNECTION_STRING not set, telemetry disabled")
+except ImportError:
+    logger.warning("azure-monitor-opentelemetry not installed, telemetry disabled")
+
 # Application version - updated for CI/CD pipeline validation
-APP_VERSION = "2.10.0"
-BUILD_DATE = "2026-01-16"
-BUILD_INFO = "Environment config sync and uv integration"
+APP_VERSION = "2.11.0"
+BUILD_DATE = "2026-02-04"
+BUILD_INFO = "Application Insights logging integration"
 
 
 def build_app() -> FastAPI:
@@ -42,6 +64,38 @@ def build_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Request logging middleware
+    @fastapi_app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        """Log all incoming requests with timing information."""
+        start_time = time.time()
+        request_id = request.headers.get("x-request-id", "unknown")
+
+        # Log request start
+        logger.info(
+            f"Request started: {request.method} {request.url.path} [request_id={request_id}]"
+        )
+
+        try:
+            response = await call_next(request)
+            duration = time.time() - start_time
+
+            # Log request completion
+            logger.info(
+                f"Request completed: {request.method} {request.url.path} "
+                f"status={response.status_code} duration={duration:.3f}s "
+                f"[request_id={request_id}]"
+            )
+            return response
+        except Exception as e:
+            duration = time.time() - start_time
+            logger.error(
+                f"Request failed: {request.method} {request.url.path} "
+                f"error={str(e)} duration={duration:.3f}s "
+                f"[request_id={request_id}]"
+            )
+            raise
 
     # Include routers
     fastapi_app.include_router(chat_router, prefix="/api", tags=["chat"])

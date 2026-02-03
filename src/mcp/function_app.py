@@ -7,13 +7,29 @@ Provides tools for sales analysis, product comparison, customer segmentation, an
 
 import json
 import logging
+import os
+import time
 
 import azure.functions as func
 from mcp_handler import MCPHandler
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 logger = logging.getLogger(__name__)
+
+# Application Insights setup
+try:
+    from azure.monitor.opentelemetry import configure_azure_monitor
+
+    connection_string = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+    if connection_string:
+        configure_azure_monitor(connection_string=connection_string)
+        logger.info("Application Insights configured for MCP Function")
+except ImportError:
+    logger.warning("azure-monitor-opentelemetry not installed")
 
 # Initialize Function App (ANONYMOUS for internal use, secured by network isolation)
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -73,12 +89,18 @@ async def mcp_endpoint(req: func.HttpRequest) -> func.HttpResponse:
         method = body.get("method")
         params = body.get("params", {})
         request_id = body.get("id", "unknown")
+        start_time = time.time()
 
-        logger.info(f"MCP Request: method={method}, id={request_id}")
+        logger.info(f"MCP Request started: method={method}, id={request_id}")
 
         # Handle methods
         if method == "tools/list":
             result = mcp_handler.list_tools()
+            duration = time.time() - start_time
+            logger.info(
+                f"MCP tools/list completed: tools_count={len(result.get('tools', []))} "
+                f"duration={duration:.3f}s"
+            )
         elif method == "tools/call":
             tool_name = params.get("name")
             tool_args = params.get("arguments", {})
@@ -100,6 +122,8 @@ async def mcp_endpoint(req: func.HttpRequest) -> func.HttpResponse:
                 )
 
             result = await mcp_handler.call_tool(tool_name, tool_args)
+            duration = time.time() - start_time
+            logger.info(f"MCP tools/call completed: tool={tool_name} duration={duration:.3f}s")
         else:
             return func.HttpResponse(
                 json.dumps(
