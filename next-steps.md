@@ -1,76 +1,75 @@
-# Next Steps after `azd init`
+# Next Steps after Initial Setup
 
 ## Table of Contents
 
-1. [Next Steps](#next-steps)
+1. [Deployment Methods](#deployment-methods)
 2. [What was added](#what-was-added)
 3. [Billing](#billing)
 4. [Troubleshooting](#troubleshooting)
 
-## Next Steps
+## Deployment Methods
 
-### Provision infrastructure and deploy application code
+### Option 1: GitHub Actions (推奨)
 
-Run `azd up` to provision your infrastructure and deploy to Azure (or run `azd provision` then `azd deploy` to accomplish the tasks separately). Visit the service endpoints listed to see your application up-and-running!
+このプロジェクトでは **GitHub Actions** による自動デプロイを使用しています。
 
-To troubleshoot any issues, see [troubleshooting](#troubleshooting).
+```bash
+# コード変更をコミット
+git add .
+git commit -m "feat: 機能追加"
 
-### Configure environment variables for running services
+# プッシュ = 自動デプロイ
+git push
+```
 
-Configure environment variables for running services by updating `settings` in [main.parameters.json](./infra/main.parameters.json).
+デプロイワークフロー:
+- `src/App/**` 変更 → Frontend (App Service) デプロイ
+- `src/api/python/**` 変更 → API (App Service) デプロイ
 
-### Configure CI/CD pipeline
+詳細: [GitHubActionsSetup.md](./documents/GitHubActionsSetup.md)
 
-1. Create a workflow pipeline file locally. The following starters are available:
-   - [Deploy with GitHub Actions](https://github.com/Azure-Samples/azd-starter-bicep/blob/main/.github/workflows/azure-dev.yml)
-   - [Deploy with Azure Pipelines](https://github.com/Azure-Samples/azd-starter-bicep/blob/main/.azdo/pipelines/azure-dev.yml)
-2. Run `azd pipeline config` to configure the deployment pipeline to connect securely to Azure.
+### Option 2: azd up (初回セットアップ用)
+
+インフラのプロビジョニングには `azd up` を使用します。
+
+```bash
+azd auth login
+azd up
+```
 
 ## What was added
 
 ### Infrastructure configuration
 
-To describe the infrastructure and application, `azure.yaml` along with Infrastructure as Code files using Bicep were added with the following directory structure:
-
 ```yaml
 - azure.yaml        # azd project configuration
 - infra/            # Infrastructure-as-code Bicep files
-  - main.bicep      # Subscription level resources
-  - resources.bicep # Primary resource group resources
-  - modules/        # Library modules
+  - main.bicep      # Main deployment template
+  - main.parameters.json  # Deployment parameters
+  - deploy_*.bicep  # Module files
 ```
 
-The resources declared in [resources.bicep](./infra/resources.bicep) are provisioned when running `azd up` or `azd provision`.
+The resources declared in [main.bicep](./infra/main.bicep) are provisioned when running `azd up` or `azd provision`.
 This includes:
 
-
-- Azure Container App to host the 'app' service.
-- Azure Container App to host the 'km-charts-function' service.
-- Azure Container App to host the 'km-rag-function' service.
-- Azure Container App to host the 'add-user-scripts' service.
-- Azure Container App to host the 'fabric-scripts' service.
-- Azure Container App to host the 'index-scripts' service.
+- **Azure App Service** (Frontend) - React アプリケーション
+- **Azure App Service** (API) - Python FastAPI バックエンド
+- **Azure Container Registry** - Docker イメージ管理
+- **Azure AI Foundry** - エージェントサービス
+- **Azure AI Services** - GPT-5 モデル
+- **Application Insights** - 監視・ログ
 
 More information about [Bicep](https://aka.ms/bicep) language.
 
-### Build from source (no Dockerfile)
+### Build with Docker
 
-#### Build with Buildpacks using Oryx
+Frontend と API は Docker イメージとしてビルドされ、Azure Container Registry にプッシュされます。
 
-If your project does not contain a Dockerfile, we will use [Buildpacks](https://buildpacks.io/) using [Oryx](https://github.com/microsoft/Oryx/blob/main/doc/README.md) to create an image for the services in `azure.yaml` and get your containerized app onto Azure.
-
-To produce and run the docker image locally:
-
-1. Run `azd package` to build the image.
-2. Copy the *Image Tag* shown.
-3. Run `docker run -it <Image Tag>` to run the image locally.
-
-#### Exposed port
-
-Oryx will automatically set `PORT` to a default value of `80` (port `8080` for Java). Additionally, it will auto-configure supported web servers such as `gunicorn` and `ASP .NET Core` to listen to the target `PORT`. If your application already listens to the port specified by the `PORT` variable, the application will work out-of-the-box. Otherwise, you may need to perform one of the steps below:
-
-1. Update your application code or configuration to listen to the port specified by the `PORT` variable
-1. (Alternatively) Search for `targetPort` in a .bicep file under the `infra/app` folder, and update the variable to match the port used by the application.
+```bash
+# ローカルでDockerイメージをビルド
+docker build -t frontend -f src/App/WebApp.Dockerfile src/App
+docker build -t api -f src/api/python/app.Dockerfile src/api/python
+```
 
 ## Billing
 
@@ -83,13 +82,12 @@ Q: I visited the service endpoint listed, and I'm seeing a blank page, a generic
 A: Your service may have failed to start, or it may be missing some configuration settings. To investigate further:
 
 1. Run `azd show`. Click on the link under "View in Azure Portal" to open the resource group in Azure Portal.
-2. Navigate to the specific Container App service that is failing to deploy.
-3. Click on the failing revision under "Revisions with Issues".
-4. Review "Status details" for more information about the type of failure.
-5. Observe the log outputs from Console log stream and System log stream to identify any errors.
-6. If logs are written to disk, use *Console* in the navigation to connect to a shell within the running container.
+2. Navigate to the specific **App Service** that is failing to deploy.
+3. Check **Deployment Center** for deployment logs.
+4. Review **Log stream** for runtime errors.
+5. Check **Application Insights** for detailed traces and exceptions.
 
-For more troubleshooting information, visit [Container Apps troubleshooting](https://learn.microsoft.com/azure/container-apps/troubleshooting). 
+For more troubleshooting information, visit [App Service troubleshooting](https://learn.microsoft.com/azure/app-service/troubleshoot-diagnostic-logs).
 
 ### Additional information
 

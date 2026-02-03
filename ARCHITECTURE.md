@@ -54,7 +54,6 @@ graph TB
     MAF --> SQLDB
     MAF --> SEARCH
     MAF --> BING
-    MAF --> COSMOS
     SQLDB --> ONELAKE
     ONELAKE --> FABRIC
 ```
@@ -73,7 +72,7 @@ graph TB
 | AI | Web | Bing Search | `bing-global-001` | Web検索 |
 | Data | Platform | Microsoft Fabric | - | 統合データ基盤 |
 | Data | Database | SQL DB in Fabric | `retail_sqldatabase_*` | 構造化データ |
-| Data | History | Cosmos DB | `capagentunifieddata001` | 会話履歴 |
+| Data | History | Fabric SQL DB | `hst_conversations`, `hst_conversation_messages` | 会話履歴 |
 | Data | Lake | OneLake | - | 生データ (Medallion) |
 
 ## エージェント構成

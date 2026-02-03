@@ -12,7 +12,7 @@
     box-shadow: var(--shadow-lg);
     transition: background-color 0.25s ease, border-color 0.25s ease;
   }
-  
+
   /* Styling the header section */
   .citationPanelInner {
     display: flex;
@@ -21,7 +21,7 @@
     padding-bottom: 10px;
     border-bottom: 1px solid var(--color-bg-tertiary, #ccc);
   }
-  
+
   /* Style the title */
   .citationPanelInner span {
     font-weight: bold;
@@ -29,19 +29,19 @@
     color: var(--color-text-primary, #333);
     transition: color 0.25s ease;
   }
-  
+
   /* Style the SVG button */
   .citationPanelInner svg {
     cursor: pointer;
     transition: transform 0.3s;
     color: var(--color-text-secondary, #666);
   }
-  
+
   .citationPanelInner svg:hover {
     transform: scale(1.1);
     color: var(--color-accent-primary, #0078d4);
   }
-  
+
   /* Styling the file path link */
   h5 {
     word-break: break-all;
@@ -50,16 +50,16 @@
     color: var(--color-text-secondary, #555);
     transition: color 0.25s ease;
   }
-  
+
   h5 a {
     color: var(--color-accent-primary, #0078d4);
     text-decoration: none;
   }
-  
+
   h5 a:hover {
     text-decoration: underline;
   }
-  
+
   /* Styling the paragraphs */
   .citationPanel p {
     margin: 10px 0;
@@ -68,7 +68,7 @@
     color: var(--color-text-secondary, #444);
     transition: color 0.25s ease;
   }
-  
+
   .citationPanel p a {
     word-break: break-all;
     color: var(--color-accent-primary, #0078d4);
@@ -78,12 +78,12 @@
   .citationPanel::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   .citationPanel::-webkit-scrollbar-thumb {
     background-color: var(--color-text-tertiary, #888);
     border-radius: 4px;
   }
-  
+
   .citationPanel::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-text-secondary, #555);
   }

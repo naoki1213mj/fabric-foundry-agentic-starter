@@ -52,3 +52,13 @@ src/App/acr-build/
 src/api/python/acr-build/
 multi_*
 *.zip
+
+# 一時ファイル・デバッグ用
+temp_*.json
+temp_*.txt
+
+# Bicep ARM出力（再生成可能）
+infra/main.json
+
+# 無効化されたワークフロー（整理済み）
+# *.disabled
