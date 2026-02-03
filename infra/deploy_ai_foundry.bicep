@@ -145,7 +145,7 @@ module existing_aiServicesModule 'existing_foundry_project.bicep' = if (!empty(a
 //       ipRules: []
 //     }
 //     publicNetworkAccess: 'Enabled'
-//     disableLocalAuth: false //needs to be false to access keys 
+//     disableLocalAuth: false //needs to be false to access keys
 //   }
 // }
 

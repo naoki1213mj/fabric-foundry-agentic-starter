@@ -111,6 +111,9 @@ param apimPublisherEmail string = 'hackathon@contoso.com'
 @description('Publisher name for APIM (required when enableApimGateway is true)')
 param apimPublisherName string = 'Agentic AI Hackathon'
 
+@description('MCP Server endpoint URL (Azure Functions)')
+param mcpServerEndpoint string = ''
+
 var solutionPrefix = 'da${padLeft(take(uniqueId, 12), 12, '0')}'
 
 @description('Name of the Azure Container Registry')
@@ -395,6 +398,7 @@ module apimModule 'deploy_apim.bicep' = if (enableApimGateway) {
     logAnalyticsWorkspaceId: existingLogAnalyticsWorkspaceId
     publisherEmail: apimPublisherEmail
     publisherName: apimPublisherName
+    mcpServerEndpoint: mcpServerEndpoint
   }
   scope: resourceGroup(resourceGroup().name)
 }
@@ -489,3 +493,4 @@ output APIM_ENABLED bool = enableApimGateway
 output APIM_GATEWAY_URL string = enableApimGateway ? apimModule!.outputs.apimGatewayUrl : ''
 output APIM_OPENAI_PROXY_ENDPOINT string = enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
 output APIM_NAME string = enableApimGateway ? apimModule!.outputs.apimName : ''
+output APIM_MCP_PROXY_ENDPOINT string = (enableApimGateway && !empty(mcpServerEndpoint)) ? apimModule!.outputs.mcpServerProxyEndpoint : ''

@@ -19,6 +19,8 @@ param logAnalyticsWorkspaceId string = ''
 param publisherEmail string = 'hackathon@contoso.com'
 @description('Publisher name for APIM (required)')
 param publisherName string = 'Agentic AI Hackathon'
+@description('MCP Server Function endpoint URL')
+param mcpServerEndpoint string = ''
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var apimResourceName = '${abbrs.integration.apiManagementService}${solutionName}'
@@ -85,6 +87,38 @@ resource aoaiBackend 'Microsoft.ApiManagement/service/backends@2024-05-01' = {
             interval: 'PT1M'
             statusCodeRanges: [
               { min: 429, max: 429 }  // Rate limit
+              { min: 500, max: 599 }  // Server errors
+            ]
+          }
+          tripDuration: 'PT30S'
+          acceptRetryAfter: true
+        }
+      ]
+    }
+  }
+}
+
+// MCP Server Backend (Azure Functions)
+resource mcpBackend 'Microsoft.ApiManagement/service/backends@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: apim
+  name: 'mcp-server'
+  properties: {
+    title: 'MCP Server (Business Analytics Tools)'
+    description: 'MCP Server providing business analytics tools via Azure Functions'
+    url: mcpServerEndpoint
+    protocol: 'http'
+    tls: {
+      validateCertificateChain: true
+      validateCertificateName: true
+    }
+    circuitBreaker: {
+      rules: [
+        {
+          name: 'mcp-circuit-breaker'
+          failureCondition: {
+            count: 5
+            interval: 'PT1M'
+            statusCodeRanges: [
               { min: 500, max: 599 }  // Server errors
             ]
           }
@@ -177,6 +211,146 @@ resource allOperations 'Microsoft.ApiManagement/service/apis/operations@2024-05-
     displayName: 'All Other Operations'
     method: '*'
     urlTemplate: '/*'
+  }
+}
+
+// ========================================
+// MCP Server API Definition
+// ========================================
+
+// MCP Server API
+resource mcpApi 'Microsoft.ApiManagement/service/apis@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: apim
+  name: 'mcp-server-api'
+  properties: {
+    displayName: 'MCP Server API'
+    description: 'Business Analytics MCP Server - Provides sales analysis, product comparison, customer segmentation, and inventory analysis tools'
+    serviceUrl: mcpServerEndpoint
+    path: 'mcp'
+    protocols: ['https']
+    subscriptionRequired: false  // Internal use only, secured by network
+    apiType: 'http'
+  }
+}
+
+// MCP Protocol Endpoint (POST /mcp)
+resource mcpProtocolOperation 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: mcpApi
+  name: 'mcp-protocol'
+  properties: {
+    displayName: 'MCP Protocol Endpoint'
+    description: 'JSON-RPC 2.0 endpoint for MCP protocol (tools/list, tools/call)'
+    method: 'POST'
+    urlTemplate: '/'
+    request: {
+      representations: [
+        {
+          contentType: 'application/json'
+          examples: {
+            'tools-list': {
+              summary: 'List available tools'
+              value: {
+                jsonrpc: '2.0'
+                id: '1'
+                method: 'tools/list'
+              }
+            }
+            'tools-call': {
+              summary: 'Call a tool'
+              value: {
+                jsonrpc: '2.0'
+                id: '2'
+                method: 'tools/call'
+                params: {
+                  name: 'calculate_yoy_growth'
+                  arguments: {
+                    current_value: 1200000
+                    previous_value: 1000000
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+    responses: [
+      {
+        statusCode: 200
+        description: 'Successful MCP response'
+        representations: [
+          {
+            contentType: 'application/json'
+          }
+        ]
+      }
+    ]
+  }
+}
+
+// MCP Health Check Endpoint
+resource mcpHealthOperation 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: mcpApi
+  name: 'mcp-health'
+  properties: {
+    displayName: 'Health Check'
+    description: 'MCP Server health check endpoint'
+    method: 'GET'
+    urlTemplate: '/health'
+  }
+}
+
+// MCP API Policy
+resource mcpApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: mcpApi
+  name: 'policy'
+  properties: {
+    format: 'xml'
+    value: '''
+<policies>
+  <inbound>
+    <base />
+    <!-- Request logging -->
+    <set-header name="x-ms-gateway-timestamp" exists-action="override">
+      <value>@(DateTime.UtcNow.ToString("o"))</value>
+    </set-header>
+    <set-variable name="request-start-time" value="@(DateTime.UtcNow)" />
+    <!-- CORS for internal API calls -->
+    <cors allow-credentials="false">
+      <allowed-origins>
+        <origin>*</origin>
+      </allowed-origins>
+      <allowed-methods>
+        <method>POST</method>
+        <method>GET</method>
+      </allowed-methods>
+      <allowed-headers>
+        <header>Content-Type</header>
+        <header>Accept</header>
+      </allowed-headers>
+    </cors>
+  </inbound>
+
+  <backend>
+    <base />
+  </backend>
+
+  <outbound>
+    <base />
+    <!-- Calculate and add latency header -->
+    <set-header name="x-gateway-latency-ms" exists-action="override">
+      <value>@{
+        var startTime = (DateTime)context.Variables["request-start-time"];
+        return ((int)(DateTime.UtcNow - startTime).TotalMilliseconds).ToString();
+      }</value>
+    </set-header>
+  </outbound>
+
+  <on-error>
+    <base />
+  </on-error>
+</policies>
+'''
   }
 }
 
@@ -290,16 +464,22 @@ resource product 'Microsoft.ApiManagement/service/products@2024-05-01' = {
   name: 'ai-gateway'
   properties: {
     displayName: 'AI Gateway'
-    description: 'AI Gateway product for Azure OpenAI access with rate limiting and monitoring'
+    description: 'AI Gateway product for Azure OpenAI and MCP Server access with monitoring'
     subscriptionRequired: false
     state: 'published'
   }
 }
 
-// Link API to Product
+// Link OpenAI API to Product
 resource productApi 'Microsoft.ApiManagement/service/products/apis@2024-05-01' = {
   parent: product
   name: aoaiApi.name
+}
+
+// Link MCP API to Product
+resource productMcpApi 'Microsoft.ApiManagement/service/products/apis@2024-05-01' = if (!empty(mcpServerEndpoint)) {
+  parent: product
+  name: mcpApi.name
 }
 
 // Grant APIM access to Azure OpenAI
@@ -334,3 +514,4 @@ output apimManagedIdentityPrincipalId string = apim.identity.principalId
 output apimResourceId string = apim.id
 output azureOpenAiProxyEndpoint string = '${apim.properties.gatewayUrl}/openai'
 output defaultDeploymentEndpoint string = '${apim.properties.gatewayUrl}/openai/deployments/${azureOpenAiDeploymentName}'
+output mcpServerProxyEndpoint string = !empty(mcpServerEndpoint) ? '${apim.properties.gatewayUrl}/mcp' : ''

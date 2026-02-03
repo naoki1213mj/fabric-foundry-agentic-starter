@@ -117,8 +117,10 @@ class MCPTestPage:
             if responses:
                 last_response = responses[-1].inner_text()
                 # Check if response is still generating
-                if not any(indicator in last_response for indicator in 
-                          ["生成中", "Generating", "考え中", "Thinking"]):
+                if not any(
+                    indicator in last_response
+                    for indicator in ["生成中", "Generating", "考え中", "Thinking"]
+                ):
                     if len(last_response.strip()) > 10:  # Has meaningful content
                         break
             self.page.wait_for_timeout(1000)

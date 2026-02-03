@@ -58,6 +58,9 @@
     },
     "apimPublisherName": {
       "value": "${APIM_PUBLISHER_NAME=Agentic AI Hackathon}"
+    },
+    "mcpServerEndpoint": {
+      "value": "${MCP_SERVER_ENDPOINT=}"
     }
   }
 }
