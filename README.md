@@ -1,78 +1,77 @@
-# Agentic Applications for Unified Data Foundation
+# 統合データ基盤のための Agentic アプリケーション
+
+[English](README_EN.md) | **日本語**
 
 <br/>
-This solution accelerator empowers organizations to make faster, smarter decisions at scale by leveraging agentic AI solutions built on a unified data foundation with Microsoft Fabric. With seamless integration of Microsoft Foundry agents and Agent Framework orchestration, teams can design intelligent workflows that automate routine processes, streamline operations, and enable natural language querying across enterprise datasets. This ensures that governed, high-quality data is accessible not only to technical specialists but also to business users, creating a shared environment where insights are surfaced more easily and decisions are grounded in trusted information. By unifying data access and applying AI in the flow of work, organizations gain the agility to respond rapidly to changing business needs, foster collaboration across teams, and drive innovation with greater confidence.
+
+このソリューションアクセラレータは、Microsoft Fabric の統合データ基盤上に構築された Agentic AI ソリューションを活用し、組織が迅速かつスマートな意思決定を大規模に行えるよう支援します。Microsoft Foundry エージェントと Agent Framework オーケストレーションのシームレスな統合により、日常的なプロセスを自動化し、業務を効率化し、企業データセット全体に対する自然言語クエリを可能にするインテリジェントなワークフローを設計できます。これにより、ガバナンスされた高品質なデータが技術専門家だけでなくビジネスユーザーにもアクセス可能となり、インサイトが容易に得られ、信頼できる情報に基づいた意思決定が可能な共有環境を構築します。
 
 <br/>
 
-<br/>
 <div align="center">
   
-[**SOLUTION OVERVIEW**](#solution-overview)  \| [**QUICK DEPLOY**](#quick-deploy)  \| [**BUSINESS SCENARIO**](#business-scenario)  \| [**SUPPORTING DOCUMENTATION**](#supporting-documentation)
+[**ソリューション概要**](#ソリューション概要)  \| [**クイックデプロイ**](#クイックデプロイ)  \| [**ビジネスシナリオ**](#ビジネスシナリオ)  \| [**関連ドキュメント**](#関連ドキュメント)
 
 </div>
 <br/>
 
- **Note:** With any AI solutions you create using these templates, you are responsible for assessing all associated risks and for complying with all applicable laws and safety standards. Learn more in the transparency documents for [Agent Service](https://learn.microsoft.com/en-us/azure/ai-foundry/responsible-ai/agents/transparency-note) and [Agent Framework](https://github.com/microsoft/agent-framework/blob/main/TRANSPARENCY_FAQ.md).
+**注意:** これらのテンプレートを使用して作成する AI ソリューションについては、関連するすべてのリスクを評価し、適用されるすべての法律および安全基準を遵守する責任があります。詳細は [Agent Service](https://learn.microsoft.com/ja-jp/azure/ai-foundry/responsible-ai/agents/transparency-note) および [Agent Framework](https://github.com/microsoft/agent-framework/blob/main/TRANSPARENCY_FAQ.md) の透明性ドキュメントをご覧ください。
 <br/>
 
 <h2><img src="./documents/Images/ReadMe/solution-overview.png" width="48" />
-Solution overview
+ソリューション概要
 </h2>
 
+Fabric の統合データ基盤アクセラレータ、SQL Database in Fabric、Agent Framework、AI Foundry を活用して構造化データをクエリします。構造化データセットは、セマンティックモデルとデータアセットを探索するためのインタラクティブな Web フロントエンドを通じて、インテリジェントかつオーケストレーションされた応答によって分析されます。インサイトは自然言語を使用して生成されます。
 
-Leverages the Unified Data Foundation in Fabric accelerator, SQL Database in Fabric, Agent Framework, and AI Foundry to query structured data. Structured data sets are analyzed through intelligent and orchestrated responses powered by an interactive web front-end for exploring semantic models and data assets. Insights are generated using natural language.
+### ソリューションアーキテクチャ
 
-### Solution architecture
-
-Microsoft Fabric and Microsoft Copilot Studio:
+Microsoft Fabric と Microsoft Copilot Studio:
 |![image](./documents/Images/ReadMe/solution-architecture-cps.png)
 |---|
 
-Microsoft Fabric and Microsoft Foundry: 
+Microsoft Fabric と Microsoft Foundry: 
 |![image](./documents/Images/ReadMe/solution-architecture.png)
 |---|
 
-### Additional resources
+### 追加リソース
 
-[Technical Architecture](./documents/TechnicalArchitecture.md)
+[技術アーキテクチャ](./documents/TechnicalArchitecture.md)
 
 <br/>
 <h2>
-Features
+機能
 </h2>
 
-### Key features
+### 主な機能
 <details open>  
-<summary>Click to learn more about the key features this solution enables</summary>  
+<summary>このソリューションが実現する主要機能について詳しく見る</summary>  
 
-**Built on Microsoft Fabric + Microsoft Foundry**
-- **Unified data foundation with Fabric** <br/>  
-Leverage the foundational capabilities of Microsoft Fabric and a Unified Data Foundation to build intelligent agents that stand apart in orchestration, retrieval, and user experience
+**Microsoft Fabric + Microsoft Foundry 上に構築**
+- **Fabric による統合データ基盤** <br/>  
+Microsoft Fabric と統合データ基盤の基本機能を活用し、オーケストレーション、検索、ユーザーエクスペリエンスにおいて優れたインテリジェントエージェントを構築
 
-- **Governed data at scale** <br/>  
-Seamlessly integrate with Fabric’s data foundation to ensure performance, scalability, and extensibility.
+- **スケーラブルなガバナンスされたデータ** <br/>  
+Fabric のデータ基盤とシームレスに統合し、パフォーマンス、スケーラビリティ、拡張性を確保
 
-- **Natural language interaction** <br/>  
-Microsoft Foundry Agents coordinate orchestration and retrieval to deliver fast, contextual answers realizing insights faster. Enable intuitive, natural language querying capabilities that unify access across enterprise data assets.
+- **自然言語インタラクション** <br/>  
+Microsoft Foundry エージェントがオーケストレーションと検索を調整し、迅速でコンテキストに即した回答を提供してインサイトを加速。企業データアセット全体への統一アクセスを可能にする直感的な自然言語クエリ機能を実現
 
 </details>
 
-
-
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/quick-deploy.png" width="48" />
-Quick deploy
+クイックデプロイ
 </h2>
 
-### How to install or deploy
-Follow the quick deploy steps on the deployment guide to deploy this solution to your own Azure subscription.
+### インストール・デプロイ方法
+このソリューションを自身の Azure サブスクリプションにデプロイするには、デプロイガイドのクイックデプロイ手順に従ってください。
 
-For Azure Deployment: [Click here to launch the deployment guide](./documents/DeploymentGuide.md)
+Azure デプロイ: [デプロイガイドはこちら](./documents/DeploymentGuide.md)
 <br/><br/>
-For Local Development: 
-- [Local Development Setup Guide](./documents/LocalDevelopmentSetup.md) - Comprehensive setup instructions for Windows and Linux.
-- Includes native Windows setup, WSL2 configuration, and cross-platform development tools
+ローカル開発: 
+- [ローカル開発セットアップガイド](./documents/LocalDevelopmentSetup.md) - Windows および Linux 向けの包括的なセットアップ手順
+- ネイティブ Windows セットアップ、WSL2 構成、クロスプラットフォーム開発ツールを含む
 <br/><br/>
 
 
@@ -81,142 +80,134 @@ For Local Development:
 
 <br/>
 
-> ⚠️ **Important: Check Azure OpenAI Quota Availability**
- <br/>To ensure sufficient quota is available in your subscription, please follow [quota check instructions guide](./documents/QuotaCheck.md) before you deploy the solution.
+> ⚠️ **重要: Azure OpenAI クォータの確認**
+ <br/>サブスクリプションで十分なクォータが利用可能であることを確認するため、ソリューションをデプロイする前に[クォータ確認手順ガイド](./documents/QuotaCheck.md)に従ってください。
 
 <br/>
 
-### Prerequisites and costs
-To deploy this solution accelerator, ensure you have access to an [Azure subscription](https://azure.microsoft.com/free/) with the necessary permissions to create **resource groups, resources, app registrations, and assign roles at the resource group level**. This should include Contributor role at the subscription level and  Role Based Access Control role on the subscription and/or resource group level. Follow the steps in [Azure Account Set Up](./documents/AzureAccountSetUp.md). You will also need to have a minimum of an F2 Fabric capacity. Follow the steps in [Fabric Capacity Set Up](https://learn.microsoft.com/en-us/fabric/admin/capacity-settings?tabs=fabric-capacity#create-a-new-capacity).
+### 前提条件とコスト
+このソリューションアクセラレータをデプロイするには、**リソースグループ、リソース、アプリ登録の作成、およびリソースグループレベルでのロール割り当て**に必要な権限を持つ [Azure サブスクリプション](https://azure.microsoft.com/ja-jp/free/)へのアクセスが必要です。これには、サブスクリプションレベルでの共同作成者ロールと、サブスクリプションおよび/またはリソースグループレベルでのロールベースアクセス制御ロールが含まれます。[Azure アカウントセットアップ](./documents/AzureAccountSetUp.md)の手順に従ってください。また、最低 F2 の Fabric 容量が必要です。[Fabric 容量セットアップ](https://learn.microsoft.com/ja-jp/fabric/admin/capacity-settings?tabs=fabric-capacity#create-a-new-capacity)の手順に従ってください。
 
-Here are some example regions where the services are available: East US, East US2, Australia East, UK South, France Central.
+サービスが利用可能なリージョンの例: East US、East US2、Australia East、UK South、France Central、Japan East
 
-Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/?products=all&regions=all) page and select a **region** where the following services are available.
+[リージョン別 Azure 製品](https://azure.microsoft.com/ja-jp/explore/global-infrastructure/products-by-region/?products=all&regions=all)ページで、以下のサービスが利用可能な**リージョン**を選択してください。
 
-Pricing varies by region and usage, so it isn't possible to predict exact costs for your usage. The majority of Azure resources used in this infrastructure are on usage-based pricing tiers. However, some services—such as Azure Container Registry, which has a fixed cost per registry per day, and others like Cosmos DB or SQL Database when provisioned—may incur baseline charges regardless of actual usage.
+料金はリージョンと使用量によって異なるため、正確なコストを予測することはできません。このインフラストラクチャで使用される Azure リソースの大部分は使用量ベースの価格設定です。ただし、Azure Container Registry（レジストリごとの固定日額コスト）や、プロビジョニング時の Cosmos DB や SQL Database などの一部のサービスは、実際の使用量に関係なく基本料金が発生する場合があります。
 
-Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) and the [Fabric Capacity Estimator](https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator) to calculate the cost of this solution in your subscription. 
+[Azure 料金計算ツール](https://azure.microsoft.com/ja-jp/pricing/calculator)および [Fabric 容量見積もりツール](https://www.microsoft.com/ja-jp/microsoft-fabric/capacity-estimator)を使用して、サブスクリプションでのソリューションのコストを計算してください。
 
-Review a [sample pricing sheet](https://azure.com/e/708895d4fc4449b1826016fad8a83fe0) in the event you want to customize and scale usage.
+[サンプル料金シート](https://azure.com/e/708895d4fc4449b1826016fad8a83fe0)を参照して、使用量のカスタマイズとスケーリングにご活用ください。
 
-_Note: This is not meant to outline all costs as selected SKUs, scaled use, customizations, and integrations into your own tenant can affect the total consumption of this sample solution. The sample pricing sheet is meant to give you a starting point to customize the estimate for your specific needs._
+_注: これはすべてのコストを網羅したものではありません。選択した SKU、スケールされた使用量、カスタマイズ、および独自のテナントへの統合により、このサンプルソリューションの総消費量に影響を与える可能性があります。サンプル料金シートは、特定のニーズに合わせて見積もりをカスタマイズするための出発点として提供されています。_
 
 <br/>
 
-| Product | Description | Tier / Expected Usage Notes | Cost |
+| 製品 | 説明 | ティア / 想定使用量 | コスト |
 |---|---|---|---|
-| [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-foundry) | Used to orchestrate and build AI workflows that combine Azure AI services. | Free Tier | [Pricing](https://azure.microsoft.com/pricing/details/ai-studio/) |
-| [Azure AI Services (OpenAI)](https://learn.microsoft.com/en-us/azure/cognitive-services/openai/overview) | Enables language understanding and chat capabilities using GPT models. | S0 Tier; pricing depends on token volume and model used (e.g., GPT-5, GPT-4o-mini). | [Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/) |
-| [Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/overview) | Hosts the frontend and backend API services. | B1/P1v2 Tier; fixed monthly cost per plan. | [Pricing](https://azure.microsoft.com/pricing/details/app-service/) |
-| [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-intro) | Stores and serves container images used by Azure App Service. | Basic/Premium Tier; fixed daily cost per registry. | [Pricing](https://azure.microsoft.com/pricing/details/container-registry/) |
-| [Azure Monitor / Log Analytics](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-overview) | Collects and analyzes telemetry and logs from services and containers. | Pay-as-you-go; charges based on data ingestion volume. | [Pricing](https://azure.microsoft.com/pricing/details/monitor/) |
-| [SQL Database in Fabric](https://learn.microsoft.com/en-us/fabric/fundamentals/microsoft-fabric-overview) | Stores structured data including insights, metadata, and chat history. | F2 capacity; fixed monthly cost per capacity. | [Pricing](https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/) |
-| 
-
+| [Microsoft Foundry](https://learn.microsoft.com/ja-jp/azure/ai-foundry) | Azure AI サービスを組み合わせた AI ワークフローのオーケストレーションと構築に使用 | Free ティア | [料金](https://azure.microsoft.com/ja-jp/pricing/details/ai-studio/) |
+| [Azure AI Services (OpenAI)](https://learn.microsoft.com/ja-jp/azure/cognitive-services/openai/overview) | GPT モデルを使用した言語理解とチャット機能を実現 | S0 ティア; トークン量と使用モデル（例: GPT-5, GPT-4o-mini）に応じた料金 | [料金](https://azure.microsoft.com/ja-jp/pricing/details/cognitive-services/) |
+| [Azure App Service](https://learn.microsoft.com/ja-jp/azure/app-service/overview) | フロントエンドとバックエンド API サービスをホスト | B1/P1v2 ティア; プランごとの固定月額 | [料金](https://azure.microsoft.com/ja-jp/pricing/details/app-service/) |
+| [Azure Container Registry](https://learn.microsoft.com/ja-jp/azure/container-registry/container-registry-intro) | Azure App Service で使用されるコンテナイメージを保存・提供 | Basic/Premium ティア; レジストリごとの固定日額 | [料金](https://azure.microsoft.com/ja-jp/pricing/details/container-registry/) |
+| [Azure Monitor / Log Analytics](https://learn.microsoft.com/ja-jp/azure/azure-monitor/logs/log-analytics-overview) | サービスとコンテナからのテレメトリとログを収集・分析 | 従量課金; データ取り込み量に応じた料金 | [料金](https://azure.microsoft.com/ja-jp/pricing/details/monitor/) |
+| [SQL Database in Fabric](https://learn.microsoft.com/ja-jp/fabric/fundamentals/microsoft-fabric-overview) | インサイト、メタデータ、チャット履歴を含む構造化データを保存 | F2 容量; 容量ごとの固定月額 | [料金](https://azure.microsoft.com/ja-jp/pricing/details/microsoft-fabric/) |
 
 <br/>
 
->⚠️ **Important:** To avoid unnecessary costs, remember to take down your app if it's no longer in use,
-either by deleting the resource group in the Portal or running `azd down`.
+>⚠️ **重要:** 不要なコストを避けるため、アプリを使用しなくなった場合は、ポータルでリソースグループを削除するか、`azd down` を実行して削除してください。
 
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/business-scenario.png" width="48" />
-Business scenario
+ビジネスシナリオ
 </h2>
-
 
 |![image](./documents/Images/ReadMe/ui.png)|
 |---|
 
 <br/>
 
-The sample data illustrates how this accelerator could be used for an sales analyst scenario across industries. 
-In this scenario, an organization is in the process of analyzing top performing products for sales research. Previously, the sales analyst had to sift through disparate sales and customer data across data silos. Leveraging the solution accelerator, the analyst now has access to unified data in Microsoft Fabric enabling a holistic view of customer and sales performance data. This functionality allows for the analyst to interrogate the data (e.g. "which customer segments show strongest year-over-year revenue growth", "what are my top performance products by demographic").
+サンプルデータは、このアクセラレータが様々な業界の営業分析シナリオでどのように使用できるかを示しています。
+このシナリオでは、組織が営業調査のためにトップパフォーマンス製品を分析しています。以前は、営業アナリストはデータサイロ全体に散在する異種の営業データと顧客データを手作業で調べる必要がありました。このソリューションアクセラレータを活用することで、アナリストは Microsoft Fabric の統合データにアクセスし、顧客と営業パフォーマンスデータの包括的なビューを得られるようになりました。この機能により、アナリストはデータを照会できます（例: 「前年比で最も収益成長が高い顧客セグメントはどれか」、「人口統計別のトップパフォーマンス製品は何か」）。
 
+⚠️ このリポジトリで使用されているサンプルデータは合成的に生成されたものです。データはサンプルデータとしてのみ使用することを目的としています。
 
-⚠️ The sample data used in this repository is synthetic and generated. The data is intended for use as sample data only.
-
-
-### Business value
+### ビジネス価値
 <details>
-  <summary>Click to learn more about what value this solution provides</summary>
+  <summary>このソリューションが提供する価値について詳しく見る</summary>
 <br/>
 
-  - **Intelligent data interaction** 
-Enable conversational agents that understand your company’s unique data and transform natural language questions into automated queries for data-driven answers. Train agents with instructions to gain visibility.
+  - **インテリジェントなデータインタラクション** 
+企業独自のデータを理解し、自然言語の質問をデータ駆動の回答のための自動クエリに変換する会話エージェントを実現。指示を使用してエージェントをトレーニングし、可視性を獲得
 
-- **Accelerated insights & productivity**
-Access rapid insights with intelligent data prep, seamless integration, and AI-guided exploration. Analyze, and enrich data to uncover trends, automate workflows, and turn ideas into scalable, agentic solutions.
+- **インサイトと生産性の加速**
+インテリジェントなデータ準備、シームレスな統合、AI ガイド付き探索により迅速なインサイトにアクセス。データを分析・強化してトレンドを発見し、ワークフローを自動化し、アイデアをスケーラブルな Agentic ソリューションに変換
 
-- **Governed, scalable and trusted data**
-Deliver actionable insights through robust governance and metadata. Improve decision-making, operational efficiency, and reduce costs with secure, self-service access to high-quality data in a unified platform. 
+- **ガバナンス、スケーラブル、信頼性の高いデータ**
+堅牢なガバナンスとメタデータを通じて実用的なインサイトを提供。統合プラットフォームで高品質なデータへの安全なセルフサービスアクセスにより、意思決定、運用効率を改善し、コストを削減
 
      
 </details>
 
-### Use Case
+### ユースケース
 <details>
-  <summary>Click to learn more about what use cases this solution provides</summary>
+  <summary>このソリューションが提供するユースケースについて詳しく見る</summary>
 <br/>
 
-  | **Use case** | **Persona** | **Challenges** | **Summary/approach** |
+  | **ユースケース** | **ペルソナ** | **課題** | **概要/アプローチ** |
   |---|---|---|---|
-  | Sales analysis & product performance | Sales Analyst | Significant amount of time spent searching through disconnected data silos, making it difficult to access complete sales, product and customer information quickly and accurately.| Providing a comprehensive view of customer, product, and sales data interacting through natural language. Faster time to insights without navigating complex reports and dashboards.| 
-  Improve customer meetings, client meeting preparation | Account Manager | Manual processes and fragmented systems slow down routine tasks, make insights hard to find, and limit personalized customer interactions, leading to higher churn and lower satisfaction | Providing customer data in the flow of work and uncovering actionable insights through natural language queries, and personalizing interactions to reduce churn and boost customer satisfaction. |
+  | 営業分析・製品パフォーマンス | 営業アナリスト | 切り離されたデータサイロを検索するために多大な時間を費やし、完全な営業、製品、顧客情報に迅速かつ正確にアクセスすることが困難 | 自然言語を通じて顧客、製品、営業データの包括的なビューを提供。複雑なレポートやダッシュボードをナビゲートせずに迅速にインサイトを取得 | 
+  顧客ミーティングの改善、クライアントミーティングの準備 | アカウントマネージャー | 手動プロセスと分断されたシステムが日常業務を遅らせ、インサイトの発見を困難にし、パーソナライズされた顧客インタラクションを制限し、解約率の上昇と満足度の低下を招く | ワークフロー内で顧客データを提供し、自然言語クエリを通じて実用的なインサイトを発見し、インタラクションをパーソナライズして解約を減らし、顧客満足度を向上 |
 
 </details>
 
 <br /><br />
 
 <h2><img src="./documents/Images/ReadMe/supporting-documentation.png" width="48" />
-Supporting documentation
+関連ドキュメント
 </h2>
 
-### Security guidelines
+### セキュリティガイドライン
 
-This solution uses [Managed Identity](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview) for secure access to Azure resources during local development and production deployment, eliminating the need for hard-coded credentials.
+このソリューションは、ローカル開発および本番デプロイ時に Azure リソースへの安全なアクセスのために[マネージド ID](https://learn.microsoft.com/ja-jp/entra/identity/managed-identities-azure-resources/overview)を使用し、ハードコードされた資格情報の必要性を排除しています。
 
-To maintain strong security practices, it is recommended that GitHub repositories built on this solution enable [GitHub secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning) to detect accidental secret exposure.
+強力なセキュリティプラクティスを維持するために、このソリューションを基に構築された GitHub リポジトリでは、誤った秘密情報の公開を検出するために [GitHub シークレットスキャン](https://docs.github.com/ja/code-security/secret-scanning/about-secret-scanning)を有効にすることを推奨します。
 
-Additional security considerations include:
+追加のセキュリティ考慮事項:
 
-- Enabling [Microsoft Defender for Cloud](https://learn.microsoft.com/en-us/azure/defender-for-cloud) to monitor and secure Azure resources.
-- Using [Virtual Networks](https://learn.microsoft.com/en-us/azure/app-service/networking-features) or [firewall rules](https://learn.microsoft.com/en-us/azure/app-service/app-service-ip-restrictions) to protect Azure App Service from unauthorized access.
+- Azure リソースの監視と保護のために [Microsoft Defender for Cloud](https://learn.microsoft.com/ja-jp/azure/defender-for-cloud) を有効化
+- 不正アクセスから Azure App Service を保護するために[仮想ネットワーク](https://learn.microsoft.com/ja-jp/azure/app-service/networking-features)または[ファイアウォールルール](https://learn.microsoft.com/ja-jp/azure/app-service/app-service-ip-restrictions)を使用
 
 <br/>
 
-### Cross references
-Check out similar solution accelerators
+### 関連リファレンス
+類似のソリューションアクセラレータをチェック
 
-| Solution Accelerator | Description |
+| ソリューションアクセラレータ | 説明 |
 |---|---|
-| [Unified&nbsp;data&nbsp;foundation&nbsp;with&nbsp;Fabric](https://github.com/microsoft/unified-data-foundation-with-fabric-solution-accelerator) | Provides a unified data foundation with integrated data architecture leveraging Microsoft Fabric, Microsoft Purview, and Azure Databricks to deliver a unified, integrated, and governed analytics platform. |
-
-
-<br/>
-
-
-## Provide feedback
-
-Have questions, find a bug, or want to request a feature? [Submit a new issue](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues) on this repo and we'll connect.
+| [Fabric&nbsp;による&nbsp;統合&nbsp;データ&nbsp;基盤](https://github.com/microsoft/unified-data-foundation-with-fabric-solution-accelerator) | Microsoft Fabric、Microsoft Purview、Azure Databricks を活用した統合データアーキテクチャにより、統一された、統合された、ガバナンスされた分析プラットフォームを提供する統合データ基盤 |
 
 <br/>
 
-## Responsible AI Transparency FAQ 
-Please refer to [Transparency FAQ](./TRANSPARENCY_FAQ.md) for responsible AI transparency details of this solution accelerator.
+## フィードバック
+
+質問がある、バグを見つけた、または機能をリクエストしたい場合は、このリポジトリで[新しい Issue を送信](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues)してください。
 
 <br/>
 
-## Disclaimers
+## 責任ある AI 透明性 FAQ 
+このソリューションアクセラレータの責任ある AI 透明性の詳細については、[Transparency FAQ](./TRANSPARENCY_FAQ.md)を参照してください。
 
-To the extent that the Software includes components or code used in or derived from Microsoft products or services, including without limitation Microsoft Azure Services (collectively, “Microsoft Products and Services”), you must also comply with the Product Terms applicable to such Microsoft Products and Services. You acknowledge and agree that the license governing the Software does not grant you a license or other right to use Microsoft Products and Services. Nothing in the license or this ReadMe file will serve to supersede, amend, terminate or modify any terms in the Product Terms for any Microsoft Products and Services. 
+<br/>
 
-You must also comply with all domestic and international export laws and regulations that apply to the Software, which include restrictions on destinations, end users, and end use. For further information on export restrictions, visit https://aka.ms/exporting. 
+## 免責事項
 
-You acknowledge that the Software and Microsoft Products and Services (1) are not designed, intended or made available as a medical device(s), and (2) are not designed or intended to be a substitute for professional medical advice, diagnosis, treatment, or judgment and should not be used to replace or as a substitute for professional medical advice, diagnosis, treatment, or judgment. Customer is solely responsible for displaying and/or obtaining appropriate consents, warnings, disclaimers, and acknowledgements to end users of Customer’s implementation of the Online Services. 
+本ソフトウェアに、Microsoft 製品またはサービス（Azure サービスを含むがこれに限定されない、総称して「Microsoft 製品およびサービス」）で使用されている、または派生したコンポーネントまたはコードが含まれる限りにおいて、当該 Microsoft 製品およびサービスに適用される製品条項にも準拠する必要があります。本ソフトウェアを管理するライセンスは、Microsoft 製品およびサービスを使用するためのライセンスまたはその他の権利を付与するものではないことを認め、同意するものとします。ライセンスまたは本 ReadMe ファイルの内容は、Microsoft 製品およびサービスの製品条項の条件を上書き、修正、終了、または変更するものではありません。
 
-You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits. No Microsoft technology, nor any of its component technologies, including the Software, is intended or made available as a substitute for the professional advice, opinion, or judgement of a certified financial services professional. Do not use the Software to replace, substitute, or provide professional financial advice or judgment.  
+また、本ソフトウェアに適用されるすべての国内および国際輸出法規を遵守する必要があります。これには、仕向地、エンドユーザー、および最終用途に関する制限が含まれます。輸出制限の詳細については、https://aka.ms/exporting をご覧ください。
 
-BY ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT THE SOFTWARE IS NOT DESIGNED OR INTENDED TO SUPPORT ANY USE IN WHICH A SERVICE INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE COULD RESULT IN THE DEATH OR SERIOUS BODILY INJURY OF ANY PERSON OR IN PHYSICAL OR ENVIRONMENTAL DAMAGE (COLLECTIVELY, “HIGH-RISK USE”), AND THAT YOU WILL ENSURE THAT, IN THE EVENT OF ANY INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE, THE SAFETY OF PEOPLE, PROPERTY, AND THE ENVIRONMENT ARE NOT REDUCED BELOW A LEVEL THAT IS REASONABLY, APPROPRIATE, AND LEGAL, WHETHER IN GENERAL OR IN A SPECIFIC INDUSTRY. BY ACCESSING THE SOFTWARE, YOU FURTHER ACKNOWLEDGE THAT YOUR HIGH-RISK USE OF THE SOFTWARE IS AT YOUR OWN RISK.
+本ソフトウェアおよび Microsoft 製品およびサービスは、(1) 医療機器として設計、意図、または提供されるものではなく、(2) 専門的な医療アドバイス、診断、治療、または判断の代替として設計または意図されるものではなく、専門的な医療アドバイス、診断、治療、または判断の代替として使用すべきではないことを認めます。お客様は、オンラインサービスのお客様の実装のエンドユーザーに対して、適切な同意、警告、免責事項、および確認を表示および/または取得する責任を単独で負います。
+
+本ソフトウェアは SOC 1 および SOC 2 コンプライアンス監査の対象ではないことを認めます。本ソフトウェアを含む Microsoft テクノロジーおよびそのコンポーネントテクノロジーは、認定金融サービス専門家の専門的なアドバイス、意見、または判断の代替として意図または提供されるものではありません。本ソフトウェアを専門的な金融アドバイスまたは判断の代替または代用として使用しないでください。
+
+本ソフトウェアにアクセスまたは使用することにより、本ソフトウェアがサービスの中断、欠陥、エラー、またはその他の障害が人の死亡または重傷、または物理的または環境的損害（総称して「高リスク使用」）をもたらす可能性のある使用をサポートするために設計または意図されていないこと、および本ソフトウェアの中断、欠陥、エラー、またはその他の障害が発生した場合、人、財産、および環境の安全性が、一般的にまたは特定の業界において合理的、適切、かつ合法的なレベルを下回らないようにすることを認めます。本ソフトウェアにアクセスすることにより、本ソフトウェアの高リスク使用は自己責任で行うことをさらに認めます。
 
 <!-- CI/CD Test: 2026-01-15 23:49:23 -->
