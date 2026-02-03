@@ -49,6 +49,15 @@
     },
     "usecases": {
       "value": "${AZURE_ENV_USE_CASE}"
+    },
+    "enableApimGateway": {
+      "value": "${ENABLE_APIM_GATEWAY=false}"
+    },
+    "apimPublisherEmail": {
+      "value": "${APIM_PUBLISHER_EMAIL=hackathon@contoso.com}"
+    },
+    "apimPublisherName": {
+      "value": "${APIM_PUBLISHER_NAME=Agentic AI Hackathon}"
     }
   }
 }

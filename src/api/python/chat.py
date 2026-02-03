@@ -85,6 +85,10 @@ load_dotenv()
 # Multi-Agent Configuration
 MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 
+# APIM Gateway Configuration
+APIM_GATEWAY_URL = os.getenv("APIM_GATEWAY_URL")
+USE_APIM_GATEWAY = bool(APIM_GATEWAY_URL)
+
 router = APIRouter()
 
 # Configure logging
@@ -134,6 +138,28 @@ def track_event_if_configured(event_name: str, event_data: dict):
     instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
     if instrumentation_key:
         track_event(event_name, event_data)
+
+
+def get_openai_endpoint() -> str:
+    """
+    Get the Azure OpenAI endpoint, preferring APIM Gateway if configured.
+
+    APIM Gateway provides:
+    - Rate limiting (100 calls/min)
+    - Token usage tracking via response headers
+    - Circuit breaker for resilience
+    - Centralized logging to Application Insights
+
+    Returns:
+        str: APIM gateway URL or direct Azure OpenAI endpoint
+    """
+    if USE_APIM_GATEWAY:
+        logger.info(f"Using APIM Gateway: {APIM_GATEWAY_URL}")
+        return APIM_GATEWAY_URL
+    else:
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        logger.info(f"Using direct Azure OpenAI: {endpoint}")
+        return endpoint
 
 
 # ============================================================================
@@ -427,10 +453,12 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        endpoint = get_openai_endpoint()
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        logger.info(f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}")
+        logger.info(
+            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
+        )
 
         if not deployment_name:
             raise ValueError(
@@ -438,7 +466,10 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
                 "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
             )
         if not endpoint:
-            raise ValueError("Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT")
+            raise ValueError(
+                "Azure OpenAI endpoint is required. "
+                "Set APIM_GATEWAY_URL (preferred) or AZURE_OPENAI_ENDPOINT"
+            )
 
         # Create chat client with explicit configuration
         chat_client = AzureOpenAIChatClient(
@@ -647,10 +678,12 @@ async def stream_single_agent_response(
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        endpoint = get_openai_endpoint()
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        logger.info(f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}")
+        logger.info(
+            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
+        )
 
         if not deployment_name:
             raise ValueError(
@@ -658,7 +691,10 @@ async def stream_single_agent_response(
                 "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
             )
         if not endpoint:
-            raise ValueError("Azure OpenAI endpoint is required. Set AZURE_OPENAI_ENDPOINT")
+            raise ValueError(
+                "Azure OpenAI endpoint is required. "
+                "Set APIM_GATEWAY_URL (preferred) or AZURE_OPENAI_ENDPOINT"
+            )
 
         # Create chat client with explicit configuration
         chat_client = AzureOpenAIChatClient(
@@ -775,11 +811,14 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        endpoint = get_openai_endpoint()
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
         if not deployment_name or not endpoint:
-            raise ValueError("Azure OpenAI configuration missing")
+            raise ValueError(
+                "Azure OpenAI configuration missing. "
+                "Set deployment name and APIM_GATEWAY_URL or AZURE_OPENAI_ENDPOINT"
+            )
 
         chat_client = AzureOpenAIChatClient(
             credential=credential,
@@ -880,7 +919,7 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        endpoint = get_openai_endpoint()
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
         if not deployment_name or not endpoint:

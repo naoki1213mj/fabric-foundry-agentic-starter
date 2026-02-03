@@ -102,6 +102,15 @@ var uniqueId = toLower(uniqueString(subscription().id, environmentName, solution
 @description('Location for AI Foundry deployment. This is the location where the AI Foundry resources will be deployed.')
 param aiDeploymentsLocation string
 
+@description('Enable Azure API Management (AI Gateway) for Azure OpenAI')
+param enableApimGateway bool = false
+
+@description('Publisher email for APIM (required when enableApimGateway is true)')
+param apimPublisherEmail string = 'hackathon@contoso.com'
+
+@description('Publisher name for APIM (required when enableApimGateway is true)')
+param apimPublisherName string = 'Agentic AI Hackathon'
+
 var solutionPrefix = 'da${padLeft(take(uniqueId, 12), 12, '0')}'
 
 @description('Name of the Azure Container Registry')
@@ -291,6 +300,10 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       FABRIC_SQL_DATABASE: ''
       FABRIC_SQL_SERVER: ''
       FABRIC_SQL_CONNECTION_STRING: ''
+
+      // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
+      // When set, API requests will be routed through APIM for rate limiting and monitoring
+      APIM_GATEWAY_URL: enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
     }
   }
   scope: resourceGroup(resourceGroup().name)
@@ -357,12 +370,44 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       FABRIC_SQL_DATABASE: ''
       FABRIC_SQL_SERVER: ''
       FABRIC_SQL_CONNECTION_STRING: ''
+
+      // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
+      // When set, API requests will be routed through APIM for rate limiting and monitoring
+      APIM_GATEWAY_URL: enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
     }
   }
   scope: resourceGroup(resourceGroup().name)
 }
 
 var landingText = usecase == 'Retail-sales-analysis' ? 'You can ask questions around sales, products and orders.' : 'You can ask questions around customer policies, claims and communications.'
+
+// ========== APIM Gateway (AI Gateway for Azure OpenAI) ========== //
+module apimModule 'deploy_apim.bicep' = if (enableApimGateway) {
+  name: 'deploy_apim'
+  params: {
+    location: solutionLocation
+    solutionName: solutionPrefix
+    azureOpenAiEndpoint: aifoundry.outputs.aiServicesTarget
+    azureOpenAiDeploymentName: gptModelName
+    managedIdentityObjectId: managedIdentityModule.outputs.managedIdentityOutput.objectId
+    applicationInsightsId: aifoundry.outputs.applicationInsightsId
+    logAnalyticsWorkspaceId: existingLogAnalyticsWorkspaceId
+    publisherEmail: apimPublisherEmail
+    publisherName: apimPublisherName
+  }
+  scope: resourceGroup(resourceGroup().name)
+}
+
+// RBAC: Grant APIM Managed Identity access to Azure OpenAI (Cognitive Services OpenAI User role)
+module apimRoleAssignment 'deploy_apim_role_assignment.bicep' = if (enableApimGateway) {
+  name: 'deploy_apim_role_assignment'
+  params: {
+    aiServicesName: aifoundry.outputs.aiServicesName
+    principalId: apimModule!.outputs.apimManagedIdentityPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+  scope: resourceGroup(resourceGroup().name)
+}
 
 module frontend_docker 'deploy_frontend_docker.bicep' = {
   name: 'deploy_frontend_docker'
@@ -437,3 +482,9 @@ output MANAGED_IDENTITY_CLIENT_ID string = managedIdentityModule.outputs.managed
 output AI_FOUNDRY_RESOURCE_ID string = aifoundry.outputs.aiFoundryResourceId
 output BACKEND_RUNTIME_STACK string = backendRuntimeStack
 output USE_CASE string = usecase
+
+// APIM Gateway Outputs (only when enabled)
+output APIM_ENABLED bool = enableApimGateway
+output APIM_GATEWAY_URL string = enableApimGateway ? apimModule!.outputs.apimGatewayUrl : ''
+output APIM_OPENAI_PROXY_ENDPOINT string = enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
+output APIM_NAME string = enableApimGateway ? apimModule!.outputs.apimName : ''
