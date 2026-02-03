@@ -391,6 +391,7 @@ module apimModule 'deploy_apim.bicep' = if (enableApimGateway) {
     azureOpenAiDeploymentName: gptModelName
     managedIdentityObjectId: managedIdentityModule.outputs.managedIdentityOutput.objectId
     applicationInsightsId: aifoundry.outputs.applicationInsightsId
+    applicationInsightsInstrumentationKey: aifoundry.outputs.applicationInsightsInstrumentationKey
     logAnalyticsWorkspaceId: existingLogAnalyticsWorkspaceId
     publisherEmail: apimPublisherEmail
     publisherName: apimPublisherName

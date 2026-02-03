@@ -496,6 +496,7 @@ output aiProjectName string = !empty(existingAIProjectName) ? existingAIProjectN
 output aiSearchConnectionName string = '' //aiSearchConnectionName
 
 output applicationInsightsId string = applicationInsights.id
+output applicationInsightsInstrumentationKey string = applicationInsights.properties.InstrumentationKey
 output logAnalyticsWorkspaceResourceName string = useExisting ? existingLogAnalyticsWorkspace.name : logAnalytics.name
 output logAnalyticsWorkspaceResourceGroup string = useExisting ? existingLawResourceGroup : resourceGroup().name
 output logAnalyticsWorkspaceSubscription string = useExisting ? existingLawSubscription : subscription().subscriptionId

@@ -10,6 +10,9 @@ param azureOpenAiDeploymentName string
 param managedIdentityObjectId string = ''
 @description('Application Insights resource ID for logging')
 param applicationInsightsId string = ''
+@description('Application Insights Instrumentation Key for APIM logging')
+@secure()
+param applicationInsightsInstrumentationKey string = ''
 @description('Log Analytics Workspace ID for diagnostics')
 param logAnalyticsWorkspaceId string = ''
 @description('Publisher email for APIM (required)')
@@ -45,26 +48,15 @@ resource apim 'Microsoft.ApiManagement/service@2024-05-01' = {
 }
 
 // Logger for Application Insights (if configured)
-resource apimLogger 'Microsoft.ApiManagement/service/loggers@2024-05-01' = if (!empty(applicationInsightsId)) {
+resource apimLogger 'Microsoft.ApiManagement/service/loggers@2024-05-01' = if (!empty(applicationInsightsId) && !empty(applicationInsightsInstrumentationKey)) {
   parent: apim
   name: 'appinsights-logger'
   properties: {
     loggerType: 'applicationInsights'
     resourceId: applicationInsightsId
     credentials: {
-      instrumentationKey: '{{appinsights-key}}'
+      instrumentationKey: applicationInsightsInstrumentationKey
     }
-  }
-}
-
-// Named Value for App Insights key (placeholder - set via portal or deployment)
-resource namedValueAppInsights 'Microsoft.ApiManagement/service/namedValues@2024-05-01' = if (!empty(applicationInsightsId)) {
-  parent: apim
-  name: 'appinsights-key'
-  properties: {
-    displayName: 'appinsights-key'
-    value: 'placeholder'  // Update after deployment with actual key
-    secret: true
   }
 }
 
@@ -201,10 +193,8 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
     <!-- Authenticate with Azure OpenAI using Managed Identity -->
     <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
 
-    <!-- Rate Limiting: 100 calls per minute per client IP -->
-    <rate-limit-by-key calls="100" renewal-period="60"
-      counter-key="@(context.Request.IpAddress)"
-      increment-condition="@(context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)" />
+    <!-- Note: rate-limit-by-key not available in Consumption tier -->
+    <!-- Rate limiting is handled by Azure OpenAI's built-in throttling -->
 
     <!-- Token usage tracking header -->
     <set-header name="x-ms-gateway-timestamp" exists-action="override">
@@ -225,7 +215,7 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
     <!-- Extract token usage from response -->
     <choose>
       <when condition="@(context.Response.StatusCode == 200)">
-        <set-variable name="response-body" value="@(context.Response.Body.As<JObject>(preserveContent: true))" />
+        <set-variable name="response-body" value="@(context.Response.Body.As&lt;JObject&gt;(preserveContent: true))" />
         <set-header name="x-openai-prompt-tokens" exists-action="override">
           <value>@{
             var body = (JObject)context.Variables["response-body"];
