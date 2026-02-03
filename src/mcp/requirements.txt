@@ -1,0 +1,10 @@
+# Azure Functions MCP Server Dependencies
+
+# Azure Functions
+azure-functions>=1.17.0
+
+# JSON handling (built-in, but explicit for clarity)
+# json is part of standard library
+
+# Type hints
+typing-extensions>=4.0.0
