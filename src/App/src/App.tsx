@@ -3,7 +3,7 @@ import {
     Body2,
     FluentProvider,
     Subtitle2,
-    webLightTheme,
+    webLightTheme
 } from "@fluentui/react-components";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -24,9 +24,30 @@ import { clearCitation } from "./store/citationSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 
 // Application version for display
-const APP_VERSION = "2.6.0";
-const BUILD_DATE = "2026-01-16";
-const BUILD_INFO = "UI refresh and chat test preparation";
+const APP_VERSION = "2.7.0";
+const BUILD_DATE = "2026-02-03";
+const BUILD_INFO = "Modern UI/UX refresh with dark mode";
+
+// Theme icons
+const SunIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
 
 const panels = {
   CHAT: "CHAT",
@@ -51,6 +72,13 @@ const Dashboard: React.FC = () => {
   const citation = useAppSelector((state) => state.citation);
   const fetchingConversations = useAppSelector((state) => state.chatHistory.fetchingConversations);
 
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
   const [panelShowStates, setPanelShowStates] = useState<
     Record<string, boolean>
   >({ ...defaultPanelShowStates });
@@ -70,6 +98,15 @@ const Dashboard: React.FC = () => {
   const [name, setName] = useState<string>("");
   const isInitialFetchStarted = useRef(false);
 
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
 
   const getUserInfoList = async () => {
     const result = await dispatch(fetchUserInfo());
@@ -223,21 +260,29 @@ const Dashboard: React.FC = () => {
 
   return (
     <FluentProvider
-      theme={webLightTheme}
-      style={{ height: "100%", backgroundColor: "#F5F5F5" }}
+      theme={isDarkMode ? webDarkTheme : webLightTheme}
+      style={{ height: "100%", backgroundColor: "var(--color-bg-primary)" }}
     >
       <CustomSpinner loading={showAppSpinner} label={t("loading.pleaseWait")} />
       <div className="header">
         <div className="header-left-section">
           <AppLogo />
-          <Subtitle2>
+          <Subtitle2 className="header-title">
             {t("header.title")} <Body2 style={{ gap: "10px" }}>| {t("header.subtitle")}</Body2>
           </Subtitle2>
         </div>
         <div className="header-right-section">
-          <Body2 style={{ color: "#666", marginRight: "16px", fontSize: "12px" }}>
-            {t("header.version")} ({t("header.buildDate")})
-          </Body2>
+          <span className="version-badge">
+            v{APP_VERSION}
+          </span>
+          <button
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            title={isDarkMode ? t("theme.switchToLight") || "ライトモードに切替" : t("theme.switchToDark") || "ダークモードに切替"}
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? <SunIcon /> : <MoonIcon />}
+          </button>
           <div>
             <Avatar name={name} title={name} />
           </div>
@@ -293,23 +338,10 @@ const Dashboard: React.FC = () => {
             </div>
           )}
       </div>
-      {/* Version footer */}
-      <div style={{
-        position: 'fixed',
-        bottom: 4,
-        right: 8,
-        fontSize: '10px',
-        color: '#999',
-        zIndex: 1000
-      }}>
-        v{APP_VERSION}
-      </div>
     </FluentProvider>
   );
 };
 
 export default Dashboard;
 
-// Build trigger: 2026-01-16 00:14:58
-
-// CI/CD pipeline validated: 2026-01-16 00:24:01
+// Build trigger: 2026-02-03 UI/UX Modernization

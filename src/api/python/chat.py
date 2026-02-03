@@ -60,8 +60,22 @@ from fastapi.responses import JSONResponse, StreamingResponse
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
 from knowledge_base_tool import KnowledgeBaseTool
-from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
+
+# Import prompts from separate module for better maintainability
+from prompts import (
+    DOC_AGENT_DESCRIPTION,
+    DOC_AGENT_PROMPT,
+    MANAGER_AGENT_DESCRIPTION,
+    MANAGER_AGENT_PROMPT,
+    SQL_AGENT_DESCRIPTION,
+    SQL_AGENT_PROMPT,
+    SQL_AGENT_PROMPT_MINIMAL,
+    TRIAGE_AGENT_DESCRIPTION,
+    TRIAGE_AGENT_PROMPT,
+    UNIFIED_AGENT_PROMPT,
+    WEB_AGENT_DESCRIPTION,
+    WEB_AGENT_PROMPT,
+)
 
 load_dotenv()
 
@@ -311,6 +325,8 @@ def create_specialist_agents(
     MagenticBuilder の Manager が各スペシャリストを動的に選択・調整するため、
     トリアージエージェントは不要。Manager がその役割を担う。
 
+    プロンプトは prompts/ モジュールから読み込み、疎結合を維持。
+
     Args:
         chat_client: The AzureOpenAIChatClient to use for creating agents.
 
@@ -318,330 +334,31 @@ def create_specialist_agents(
         Tuple of (sql_agent, web_agent, doc_agent)
     """
     # SQL specialist: Handles database queries
+    # プロンプトは prompts/sql_agent.py から読み込み
     sql_agent = ChatAgent(
         name="sql_agent",
-        description="【優先】Fabric SQLデータベースでビジネスデータ（売上、注文、顧客、製品）を直接分析・集計する専門家。数値データの質問にはこのエージェントを最優先で使用",
-        instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
-
-## 重要：迅速に回答
-- **1回のSQLクエリで回答を完成させる**
-- 結果が得られたら、すぐにChart.js JSONを含む最終回答を生成
-- 追加のクエリは不要（タイムアウト防止）
-
-## 🚫 絶対禁止：生JSONデータの出力
-- SQLの実行結果（生のJSON配列）をそのまま出力しないでください
-- 必ず**人間が読みやすい形式**（Markdown箇条書き、表、説明文）に変換して出力
-- 例：`[{"ProductName": "A", "Sales": 100}]` → `- 製品A: ¥100`
-
-## 利用可能なテーブル（実際のスキーマ）
-
-### 主要テーブル
-- **orders**: 注文ヘッダー
-  - OrderId, SalesChannelId, OrderNumber, CustomerId, CustomerAccountId
-  - OrderDate, OrderStatus (Completed/Pending/Cancelled), SubTotal, TaxAmount, OrderTotal
-  - PaymentMethod (MC/VISA/PayPal/Discover), IsoCurrencyCode, CreatedBy
-
-- **orderline**: 注文明細（売上詳細）
-  - OrderId, OrderLineNumber, ProductId, Quantity, UnitPrice, LineTotal, DiscountAmount, TaxAmount
-
-- **product**: 製品マスタ
-  - ProductID, ProductName, ProductDescription, BrandName, Color, ProductModel
-  - ProductCategoryID, CategoryName, ListPrice, StandardCost, Weight, ProductStatus
-
-- **productcategory**: 製品カテゴリ
-  - CategoryID, ParentCategoryId, CategoryName, CategoryDescription, BrandName
-
-- **customer**: 顧客マスタ
-  - CustomerId, CustomerTypeId (Individual/Business/Government)
-  - CustomerRelationshipTypeId, FirstName, LastName, Gender, PrimaryEmail, IsActive
-
-- **customerrelationshiptype**: 顧客セグメント
-  - CustomerRelationshipTypeId, CustomerRelationshipTypeName (VIP/Premium/Standard/SMB/Partner等)
-
-- **location**: 顧客所在地
-  - LocationId, CustomerId, AddressLine1, City, StateId, ZipCode, CountryId, Region, Latitude, Longitude
-
-- **invoice**: 請求書
-  - InvoiceId, InvoiceNumber, CustomerId, OrderId, InvoiceDate, DueDate, TotalAmount, InvoiceStatus
-
-- **payment**: 支払い
-  - PaymentId, PaymentNumber, InvoiceId, OrderId, PaymentDate, PaymentAmount, PaymentStatus, PaymentMethod
-
-## タスク（重要：この順番で実行）
-1. ユーザーの質問を分析し、適切なSQLクエリを作成
-2. run_sql_query ツールを使ってクエリを実行
-3. **結果を人間が読みやすい形式（Markdown）に変換して報告**
-4. グラフ表示が要求された場合のみ、最後に ```json コードブロックで Chart.js JSON を1つだけ出力
-
-## 回答フォーマット（必須）
-
-### グラフなしの場合
-```
-## 分析結果
-売上TOP5製品:
-1. **Mountain-200 Silver, 38** - $29,030.33（構成比 23.8%）
-2. **Touring-1000 Yellow, 54** - $26,487.88（構成比 21.7%）
-...
-
-### 傾向・考察
-- Mountain系製品が上位を占めている
-- 上位5製品で全体の約18%を占める
-```
-
-### グラフありの場合
-```
-## 分析結果
-売上TOP5製品:
-1. **Mountain-200 Silver, 38** - $29,030.33
-2. **Touring-1000 Yellow, 54** - $26,487.88
-...
-
-### 傾向・考察
-- 上位5製品で全体の約18%を占める
-
-```json
-{
-  "type": "bar",
-  "data": {...},
-  "options": {...}
-}
-```
-```
-
-## 重要なJOINパターン
-
-### 売上分析（orders + orderline + product）
-```sql
-SELECT p.ProductName, SUM(ol.LineTotal) as TotalSales
-FROM orders o
-JOIN orderline ol ON o.OrderId = ol.OrderId
-JOIN product p ON ol.ProductId = p.ProductID
-WHERE o.OrderStatus = 'Completed'
-GROUP BY p.ProductName
-```
-
-### 顧客別売上（orders + customer）
-```sql
-SELECT c.FirstName + ' ' + c.LastName as CustomerName, SUM(o.OrderTotal) as TotalSpent
-FROM orders o
-JOIN customer c ON o.CustomerId = c.CustomerId
-GROUP BY c.CustomerId, c.FirstName, c.LastName
-```
-
-### 地域別売上（orders + customer + location）
-```sql
-SELECT l.Region, SUM(o.OrderTotal) as TotalSales
-FROM orders o
-JOIN customer c ON o.CustomerId = c.CustomerId
-JOIN location l ON c.CustomerId = l.CustomerId
-GROUP BY l.Region
-```
-
-## よく使うクエリパターン
-
-### 売上TOP N製品
-```sql
-SELECT TOP {N} p.ProductName, SUM(ol.LineTotal) as TotalSales
-FROM orders o
-JOIN orderline ol ON o.OrderId = ol.OrderId
-JOIN product p ON ol.ProductId = p.ProductID
-WHERE o.OrderStatus = 'Completed'
-GROUP BY p.ProductID, p.ProductName
-ORDER BY TotalSales DESC
-```
-
-### カテゴリ別売上
-```sql
-SELECT p.CategoryName, SUM(ol.LineTotal) as TotalSales
-FROM orders o
-JOIN orderline ol ON o.OrderId = ol.OrderId
-JOIN product p ON ol.ProductId = p.ProductID
-WHERE o.OrderStatus = 'Completed'
-GROUP BY p.CategoryName
-ORDER BY TotalSales DESC
-```
-
-### 月別売上推移
-```sql
-SELECT FORMAT(o.OrderDate, 'yyyy-MM') as Month, SUM(o.OrderTotal) as Sales
-FROM orders o
-WHERE o.OrderStatus = 'Completed'
-GROUP BY FORMAT(o.OrderDate, 'yyyy-MM')
-ORDER BY Month
-```
-
-### 支払い方法別売上
-```sql
-SELECT o.PaymentMethod, SUM(o.OrderTotal) as TotalSales, COUNT(*) as OrderCount
-FROM orders o
-WHERE o.OrderStatus = 'Completed'
-GROUP BY o.PaymentMethod
-ORDER BY TotalSales DESC
-```
-
-### 顧客セグメント別売上
-```sql
-SELECT crt.CustomerRelationshipTypeName as Segment, SUM(o.OrderTotal) as TotalSales
-FROM orders o
-JOIN customer c ON o.CustomerId = c.CustomerId
-JOIN customerrelationshiptype crt ON c.CustomerRelationshipTypeId = crt.CustomerRelationshipTypeId
-WHERE o.OrderStatus = 'Completed'
-GROUP BY crt.CustomerRelationshipTypeName
-ORDER BY TotalSales DESC
-```
-
-## グラフ出力（重要：形式を厳守）
-ユーザーが「グラフ」「チャート」「可視化」「表示して」「見せて」などを要求した場合、
-以下の形式で出力してください（Vega-Liteは使用禁止）:
-
-### 出力形式（テキスト説明 + グラフJSON）
-1. まずテキストで分析結果・傾向を説明
-2. 最後に **```json** コードブロックでChart.js JSONを1つだけ出力
-
-例：
-```
-## 分析結果
-売上トップ5製品は以下の通りです：
-- 製品A: ¥1,000,000（全体の25%）
-- 製品B: ¥800,000（全体の20%）
-...
-
-## 傾向
-上位製品が売上の約60%を占めており...
-
-```json
-{
-  "type": "bar",
-  "data": {
-    "labels": ["製品A", "製品B", "製品C"],
-    "datasets": [{"label": "売上金額", "data": [1000000, 800000, 600000]}]
-  }
-}
-```
-
-### Chart.js JSON構造
-```json
-{
-  "type": "bar",
-  "data": {
-    "labels": ["ラベル1", "ラベル2", "ラベル3"],
-    "datasets": [{
-      "label": "データセット名",
-      "data": [100, 200, 300],
-      "backgroundColor": ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f"]
-    }]
-  },
-  "options": {
-    "responsive": true,
-    "plugins": {
-      "title": { "display": true, "text": "グラフタイトル" }
-    }
-  }
-}
-```
-
-### グラフの種類と選択基準
-- 棒グラフ("bar"): カテゴリ比較、ランキング
-- 横棒グラフ("horizontalBar"): 長いラベル名、多カテゴリ
-- 円グラフ("pie"): 構成比、割合（5項目以下推奨）
-- ドーナツ("doughnut"): 構成比（中央にサマリー表示可能）
-- 折れ線("line"): 時系列、トレンド、推移
-
-## 注意事項
-- T-SQL構文を使用してください
-- 大量のデータには TOP や集計関数を使用
-- OrderStatus = 'Completed' で完了した注文のみをフィルタ
-- グラフなしの場合は表形式または要約形式で報告
-- グラフ要求時は必ずChart.js JSON形式（Vega-Lite禁止）
-- **1回のクエリ実行後、すぐに最終回答を生成する（追加クエリ不要）**
-""",
+        description=SQL_AGENT_DESCRIPTION,
+        instructions=SQL_AGENT_PROMPT,
         chat_client=chat_client,
         tools=[run_sql_query],
     )
 
     # Web specialist: Handles web searches
+    # プロンプトは prompts/web_agent.py から読み込み
     web_agent = ChatAgent(
         name="web_agent",
-        description="ウェブ検索で最新のニュース、市場トレンド、外部情報を取得する専門家",
-        instructions="""あなたはウェブ検索を使って最新情報を取得する専門家です。
-
-## タスク
-1. リクエストに基づいて適切な検索クエリを作成
-2. search_web ツールを使って情報を検索
-3. 結果を分かりやすくまとめて報告
-
-## 対応範囲
-- 最新ニュースとトレンド
-- 市場動向と業界情報
-- 競合分析
-- その他の外部情報
-""",
+        description=WEB_AGENT_DESCRIPTION,
+        instructions=WEB_AGENT_PROMPT,
         chat_client=chat_client,
         tools=[search_web],
     )
 
     # Document specialist: Handles document searches
+    # プロンプトは prompts/doc_agent.py から読み込み
     doc_agent = ChatAgent(
         name="doc_agent",
-        description="製品仕様書（PDF）を検索する専門家。製品の詳細スペック、機能、技術仕様を調べる場合に使用。注意：売上・注文データの分析にはsql_agentを使用",
-        instructions="""あなたはAzure AI Searchを使って製品仕様書PDFから情報を検索する専門家です。
-
-## 重要：役割の明確化
-- 売上データ、注文データの「分析」「集計」はsql_agentの担当です
-- あなたは「製品仕様書」「技術スペック」「機能説明」の検索を担当します
-
-## 検索対象：製品仕様書PDF（SharePoint → Azure AI Search）
-
-### 利用可能な製品仕様書カテゴリ
-1. **バックパック (Backpacks)**
-   - Adventurer Pro, SummitClimber
-
-2. **自転車フレーム・パーツ (Bike Parts)**
-   - Mountain-100 Silver, Mountain-300 Black
-   - Road-150 Red, Road-250 Black
-   - Forks (HL, LL)
-   - Bike Stands (All Purpose)
-
-3. **ヘルメット (Helmets)**
-   - Sport-100 Helmet (Black, Red)
-
-4. **ジャージ (Jerseys)**
-   - Long-Sleeve Logo Jersey (S, M)
-
-5. **キャンプ用品 (Camping)**
-   - Tents: Alpine Explorer, TrailMaster X4
-   - Camping Tables: Adventure Dining, BaseCamp
-
-6. **キッチン用品**
-   - Coffee Makers: Drip, Espresso
-
-## タスク
-1. ユーザーの質問から製品名やカテゴリを特定
-2. search_documents ツールで製品仕様書を検索
-3. 仕様書の内容を分かりやすくまとめて報告
-
-## 検索クエリのコツ
-- 製品名で検索: "Mountain-100", "Sport-100 Helmet"
-- カテゴリで検索: "Backpack", "Tent", "Coffee Maker"
-- 機能で検索: "weight", "material", "dimensions", "capacity"
-- 日本語でも検索可能: "バックパック 容量", "テント 防水"
-
-## 回答に含めるべき情報（仕様書にある場合）
-- 製品名と型番
-- 主要スペック（サイズ、重量、素材など）
-- 主な機能・特徴
-- 使用シーン・推奨用途
-
-## 対応しない範囲（sql_agentに任せる）
-- 「この製品の売上は？」→ sql_agent
-- 「一番売れている製品は？」→ sql_agent
-- 「顧客の購入履歴」→ sql_agent
-
-## 注意
-- 検索は1回で十分です。同じ内容を複数回検索しないでください
-- 検索結果がない場合は「該当する製品仕様書が見つかりませんでした」と報告
-- 仕様書の内容を引用する際は出典を明記
-""",
+        description=DOC_AGENT_DESCRIPTION,
+        instructions=DOC_AGENT_PROMPT,
         chat_client=chat_client,
         tools=[search_documents],
     )
@@ -658,6 +375,8 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     3. 進捗の監視と必要に応じた再計画
     4. 全スペシャリストの結果を統合して最終回答を生成
 
+    プロンプトは prompts/manager_agent.py から読み込み。
+
     Args:
         chat_client: The AzureOpenAIChatClient to use.
 
@@ -666,90 +385,8 @@ def create_manager_agent(chat_client: AzureOpenAIChatClient) -> ChatAgent:
     """
     return ChatAgent(
         name="MagenticManager",
-        description="チームを調整して複雑なタスクを効率的に完了させるオーケストレーター",
-        instructions="""あなたはMagentic Oneのマネージャーエージェントです。
-チームを調整して複雑なタスクを効率的に完了させます。
-
-## あなたのチーム
-| エージェント | 役割 | 対象データ |
-|-------------|------|----------|
-| sql_agent | 【最優先】ビジネスデータ分析 | 売上、注文、顧客、製品（Fabric SQLデータベース） |
-| web_agent | 外部情報検索 | 最新ニュース、市場トレンド、業界動向 |
-| doc_agent | 製品仕様書検索 | バックパック、自転車、ヘルメット、テント等のPDF |
-| あなた自身 | 一般知識 | 概念説明、用語解説、ベストプラクティス |
-
-## クエリ解析フロー
-
-### ステップ1: ユーザーの意図を理解
-1. **何を知りたいか** - 数値、情報、手順、概念説明など
-2. **どのデータが必要か** - 売上データ、外部情報、社内文書、一般知識など
-3. **どう表示したいか** - テキスト、表、グラフなど
-
-### ステップ2: 適切なエージェント選択
-
-#### sql_agent を使う場合（データ分析全般 - 最優先）
-- 数値系: 「売上」「注文」「顧客」「製品」「金額」「数量」「件数」
-- 集計系: 「合計」「平均」「最大」「最小」「一番」「TOP」「ランキング」
-- 比較系: 「比較」「前月比」「前年比」「成長」「推移」「トレンド」
-- 分析系: 「内訳」「構成比」「割合」「分布」
-- 可視化: 「グラフ」「チャート」「棒グラフ」「円グラフ」「折れ線」「表示して」
-
-#### web_agent を使う場合
-- 「最新」「ニュース」「トレンド」「市場動向」「業界」「競合」
-- 「外部」「インターネット」「2025年」「2026年」（最新情報）
-
-#### doc_agent を使う場合
-- 「仕様」「スペック」「機能」「素材」「重量」「サイズ」「容量」
-- 製品名: 「Mountain-100」「Sport-100 Helmet」「Alpine Explorer」
-- カテゴリ: 「バックパック」「テント」「ヘルメット」「コーヒーメーカー」
-
-#### あなた自身の知識を使う場合（エージェント不要）
-- 「とは」「意味」「説明」「定義」「どうやって」「方法」
-- 概念説明: 「KPIとは」「ROIの計算方法」「RFM分析とは」
-- 一般的なベストプラクティスやアドバイス
-- 挨拶: 「こんにちは」「ありがとう」
-
-### ステップ3: 複合クエリの処理
-
-**パターン1: データ + 説明**
-例: 「売上TOP5を分析して傾向を説明」
-→ sql_agent で売上取得 → あなたの知識で傾向分析を追加
-
-**パターン2: データ + 外部情報**
-例: 「自社売上を市場動向と比較」
-→ sql_agent で売上取得 → web_agent で市場情報取得 → 統合
-
-**パターン3: 製品情報 + データ**
-例: 「Mountain-100の仕様と売上を教えて」
-→ doc_agent で仕様取得 → sql_agent で売上取得 → 統合
-
-**パターン4: 概念説明 + 実データ**
-例: 「RFM分析とは何か、顧客データに適用」
-→ あなたの知識でRFM説明 → sql_agent で顧客分析 → 統合
-
-### ステップ4: 回答の統合
-1. 各エージェントの結果を論理的に整理
-2. ユーザーの質問に直接答える形式で構成
-3. データと説明を組み合わせて分かりやすく提示
-
-## グラフ出力ルール（重複禁止）
-
-- sql_agentがグラフ（```json）を含む回答を返した場合 → **そのまま使用。追加のグラフを生成しない**
-- sql_agentがグラフなしでユーザーがグラフを要求 → あなたがChart.js JSONを1つだけ追加
-- **絶対禁止**: 同じグラフを2回出力、sql_agentのグラフに加えて別のグラフを追加
-
-## 処理ルール
-1. **効率優先**: 必要なエージェントのみ呼び出す
-2. **1ラウンド完結**: 可能な限り1回で完了
-3. **日本語で回答**: 自然で分かりやすく
-4. **結果統合**: 複数エージェントの結果は論理的に統合
-
-## 出力フォーマット
-- Markdown形式で構造化
-- 重要な数値は**強調**
-- 長い回答は見出しで区切る
-- グラフはChart.js JSON形式（Vega-Lite禁止）
-""",
+        description=MANAGER_AGENT_DESCRIPTION,
+        instructions=MANAGER_AGENT_PROMPT,
         chat_client=chat_client,
     )
 
@@ -1097,50 +734,10 @@ async def stream_single_agent_response(
         # 1. Single LLM call handles tool selection
         # 2. Can call multiple tools and INTEGRATE results
         # 3. Fast and flexible
+        # プロンプトは prompts/unified_agent.py から読み込み
         agent = chat_client.as_agent(
             name="unified_assistant",
-            instructions="""あなたは統合アシスタントです。ユーザーの質問に最適なツールを選んで回答します。
-
-## 重要：結果の統合
-複数のツールを使う場合は、**全ての結果を統合して1つの回答**を作成してください。
-
-## 利用可能なツール
-
-### 1. run_sql_query - ビジネスデータ分析（最重要）
-売上、注文、顧客、製品の数値データを取得・分析
-- テーブル: orders, orderline, product, customer, location, invoice, payment
-- 主要JOIN: orders JOIN orderline ON OrderId JOIN product ON ProductId
-- 用途: 「売上TOP3」「月別推移」「顧客分析」「グラフ表示」等
-
-### 2. search_web - Web検索（利用可能な場合）
-最新ニュース、市場トレンド、競合情報、外部情報
-- 用途: 「最新の〜」「2026年のトレンド」「市場動向」等
-
-### 3. search_documents - 製品仕様書検索（利用可能な場合）
-製品PDF（バックパック、自転車、テント等）から仕様・スペックを検索
-- 用途: 「Mountain-100のスペック」「Alpine Explorerの機能」等
-
-## SQLスキーマ
-- orders: OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod
-- orderline: OrderId, ProductId, Quantity, UnitPrice, LineTotal
-- product: ProductID, ProductName, CategoryName, ListPrice, BrandName, Color
-- customer: CustomerId, FirstName, LastName, CustomerTypeId
-- location: LocationId, CustomerId, Region, City, StateId
-
-## 回答ルール
-1. **ツール不要な質問**（挨拶、概念説明）→ ツールを使わず直接回答
-2. **単一ソース** → 適切なツールを1回使用
-3. **複合質問**（例：「売上と製品仕様を比較」）→ 複数ツールを順次呼び出し、**結果を統合**
-4. **結果の統合**は必ず行う - 各ツールの結果を論理的に組み合わせて回答
-5. 日本語で分かりやすく回答
-6. グラフはChart.js JSON形式（Vega-Lite禁止）
-
-## 複合質問の例
-「Mountain-100の売上と仕様を教えて」
-→ Step 1: run_sql_query で売上データ取得
-→ Step 2: search_documents で製品仕様取得
-→ Step 3: 両方の結果を統合して回答
-""",
+            instructions=UNIFIED_AGENT_PROMPT,
             tools=all_tools,
         )
 
@@ -1228,27 +825,10 @@ async def stream_sql_only_response(
         )
 
         # SQL-only agent - fastest mode
+        # プロンプトは prompts/sql_agent.py から読み込み（簡易版）
         agent = chat_client.as_agent(
             name="sql_analyst",
-            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析するアシスタントです。
-
-## 利用可能なテーブル
-- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
-- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
-- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
-- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
-- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
-
-## 主要なJOINパターン
-- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
-- 顧客分析: orders JOIN customer ON CustomerId
-
-## タスク
-1. ユーザーの質問を分析
-2. 必要に応じてrun_sql_queryツールでデータを取得
-3. 結果を分かりやすく整形して回答
-4. グラフはChart.js JSON形式（Vega-Lite禁止）
-""",
+            instructions=SQL_AGENT_PROMPT_MINIMAL,
             tools=[run_sql_query],
         )
 
@@ -1356,92 +936,37 @@ async def stream_handoff_response(
         )
 
         # Create triage agent - routes to the RIGHT specialist
+        # プロンプトは prompts/triage_agent.py から読み込み
         triage_agent = chat_client.as_agent(
             name="triage_agent",
-            description="ユーザーの質問を分析し、最適な専門エージェントにハンドオフする",
-            instructions="""あなたは質問を分析し、最適な専門エージェントにハンドオフするトリアージエージェントです。
-
-## 重要：1つの専門エージェントを選んでハンドオフ
-
-### sql_agent にハンドオフ
-- 売上、注文、顧客、製品のデータ分析
-- 数値データ、集計、ランキング、グラフ
-- 例: 「売上TOP3」「月別推移」「顧客分析」
-
-### web_agent にハンドオフ
-- 最新ニュース、市場トレンド、外部情報
-- リアルタイム情報、ウェブ検索が必要な質問
-- 例: 「2026年のトレンド」「最新の〜」
-
-### doc_agent にハンドオフ
-- 製品仕様書、マニュアル、技術ドキュメント
-- 製品の機能、スペック、特徴
-- 例: 「Mountain-100のスペック」「製品の機能」
-
-## ハンドオフしない場合
-- 挨拶、概念説明、一般的な質問
-- この場合は直接回答してください
-
-## 複数ソースが必要な場合
-最も重要なソースの専門エージェントにハンドオフしてください。
-（注：複数ソースの統合が必要な場合は multi_tool モードが推奨です）
-""",
+            description=TRIAGE_AGENT_DESCRIPTION,
+            instructions=TRIAGE_AGENT_PROMPT,
         )
 
         # SQL specialist - comprehensive instructions for final answer
+        # プロンプトは prompts/sql_agent.py から読み込み
         sql_agent = chat_client.as_agent(
             name="sql_agent",
-            description="Fabric SQLデータベースでビジネスデータを分析し、完全な回答を提供する専門家",
-            instructions="""あなたはFabric SQLデータベースを使ってビジネスデータを分析する専門家です。
-ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
-
-## 利用可能なテーブル
-- orders: 注文ヘッダー (OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod)
-- orderline: 注文明細 (OrderId, ProductId, Quantity, UnitPrice, LineTotal)
-- product: 製品 (ProductID, ProductName, CategoryName, ListPrice, BrandName, Color)
-- customer: 顧客 (CustomerId, FirstName, LastName, CustomerTypeId)
-- location: 所在地 (LocationId, CustomerId, Region, City, StateId)
-
-## 主要なJOINパターン
-- 売上分析: orders JOIN orderline ON OrderId JOIN product ON ProductId
-- 顧客分析: orders JOIN customer ON CustomerId
-
-## タスク
-1. run_sql_queryツールでデータ取得
-2. 結果を人間が読みやすい形式（Markdown）に整形
-3. グラフが適切な場合はChart.js JSON形式で追加
-4. **完全な回答を提供**（これが最終回答です）
-""",
+            description=SQL_AGENT_DESCRIPTION,
+            instructions=SQL_AGENT_PROMPT,
             tools=[run_sql_query],
         )
 
         # Web search specialist
+        # プロンプトは prompts/web_agent.py から読み込み
         web_agent = chat_client.as_agent(
             name="web_agent",
-            description="Web検索で最新情報を取得し、完全な回答を提供する専門家",
-            instructions="""あなたはWeb検索で最新情報、ニュース、トレンドを取得する専門家です。
-ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
-
-## タスク
-1. search_webツールで情報を収集
-2. 結果を分かりやすくまとめる
-3. **完全な回答を提供**（これが最終回答です）
-""",
+            description=WEB_AGENT_DESCRIPTION,
+            instructions=WEB_AGENT_PROMPT,
             tools=[search_web] if web_handler else [],
         )
 
         # Document search specialist
+        # プロンプトは prompts/doc_agent.py から読み込み
         doc_agent = chat_client.as_agent(
             name="doc_agent",
-            description="製品仕様書やドキュメントを検索し、完全な回答を提供する専門家",
-            instructions="""あなたは製品仕様書やドキュメントを検索する専門家です。
-ハンドオフされた質問に対して、**完全な最終回答**を提供してください。
-
-## タスク
-1. search_documentsツールで情報を取得
-2. 結果を分かりやすくまとめる
-3. **完全な回答を提供**（これが最終回答です）
-""",
+            description=DOC_AGENT_DESCRIPTION,
+            instructions=DOC_AGENT_PROMPT,
             tools=[search_documents] if kb_tool else [],
         )
 
@@ -1621,7 +1146,10 @@ def select_agent_mode(query: str) -> str:
 
 
 async def stream_chat_request(
-    conversation_id: str, query: str, user_id: str = "anonymous", agent_mode: str | None = None
+    conversation_id: str,
+    query: str,
+    user_id: str = "anonymous",
+    agent_mode: str | None = None,
 ):
     """
     Handles streaming chat requests with dynamic mode selection.
@@ -1642,7 +1170,12 @@ async def stream_chat_request(
             assistant_content = ""
 
             # Use request agent_mode if provided, otherwise auto-select
-            if agent_mode and agent_mode in ["sql_only", "multi_tool", "handoff", "magentic"]:
+            if agent_mode and agent_mode in [
+                "sql_only",
+                "multi_tool",
+                "handoff",
+                "magentic",
+            ]:
                 mode = agent_mode
                 logger.info(f"Using requested mode '{mode}' for query: {query[:50]}...")
             else:
@@ -1770,13 +1303,21 @@ async def conversation(request: Request):
                 content={"error": "Conversation ID is required"}, status_code=400
             )
 
-        agent_mode = request_json.get("agent_mode")  # Optional: sql_only, multi_tool, handoff, magentic
+        agent_mode = request_json.get(
+            "agent_mode"
+        )  # Optional: sql_only, multi_tool, handoff, magentic
 
         # stream_chat_request returns an async generator, so we need to wrap it in StreamingResponse
-        stream_generator = await stream_chat_request(conversation_id, query, user_id, agent_mode)
+        stream_generator = await stream_chat_request(
+            conversation_id, query, user_id, agent_mode
+        )
         track_event_if_configured(
             "ChatStreamSuccess",
-            {"conversation_id": conversation_id, "query": query, "agent_mode": agent_mode},
+            {
+                "conversation_id": conversation_id,
+                "query": query,
+                "agent_mode": agent_mode,
+            },
         )
         return StreamingResponse(
             stream_generator,
@@ -1785,7 +1326,7 @@ async def conversation(request: Request):
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
                 "X-Accel-Buffering": "no",
-            }
+            },
         )
 
     except Exception as ex:

@@ -1,30 +1,20 @@
 import React from "react";
-import { Spinner, SpinnerSize, ISpinnerStyles } from "@fluentui/react";
 import styles from "./CustomSpinner.module.css";
 
 interface CustomSpinnerProps {
   loading: boolean;
-  label?: string; // Label is optional
+  label?: string;
 }
-
-const spinnerStyles: ISpinnerStyles = {
-  label: {
-    fontSize: "20px",
-    color: "rgb(91 184 255)",
-    fontWeight: 600,
-  },
-};
 
 const CustomSpinner: React.FC<CustomSpinnerProps> = ({ loading, label }) => {
   if (!loading) return null;
 
   return (
     <div className={styles.overlay}>
-      <Spinner
-        label={label || undefined}
-        size={SpinnerSize.large}
-        styles={spinnerStyles}
-      />
+      <div className={styles.spinnerContainer}>
+        <div className={styles.pulsingRing} />
+        {label && <span className={styles.label}>{label}</span>}
+      </div>
     </div>
   );
 };

@@ -696,7 +696,7 @@ const Chat: React.FC<ChatProps> = ({
               </div>
             );
           })}
-        {/* Show loading indicator: 
+        {/* Show loading indicator:
             - "回答を生成中" when waiting for response (generatingResponse && !isStreamingInProgress && !isChartLoading)
             - "チャート生成中" when chart is loading AND not streaming (to avoid duplicate with ChatMessage)
         */}

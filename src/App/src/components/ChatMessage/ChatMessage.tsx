@@ -15,6 +15,21 @@ interface ChatMessageProps {
   parseCitationFromMessage: (citations: any) => any[];
 }
 
+// Helper function to format timestamp
+const formatTimestamp = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return '';
+  }
+};
+
 const ChatMessage: React.FC<ChatMessageProps> = memo(({
   message,
   index,
@@ -23,12 +38,15 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
   parseCitationFromMessage
 }) => {
   const { t } = useTranslation();
+  const timestamp = formatTimestamp(message.date);
+
   // Handle user messages
   if (message.role === "user" && typeof message.content === "string") {
     if (message.content === "show in a graph by default") return null;
     return (
       <div className="user-message">
         <span>{message.content}</span>
+        {timestamp && <div className="message-timestamp">{timestamp}</div>}
       </div>
     );
   }
@@ -45,12 +63,17 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
                 {t("message.aiDisclaimer")}
               </span>
             </div>
+            {timestamp && <div className="message-timestamp">{timestamp}</div>}
           </div>
         );
       } catch {
         return (
           <div className="assistant-message error-message">
-            ⚠️ {t("error.chartDisplay")}
+            <div className="error-icon">⚠️</div>
+            <div className="error-content">
+              <span className="error-title">{t("error.chartDisplayTitle") || "チャート表示エラー"}</span>
+              <span className="error-description">{t("error.chartDisplay")}</span>
+            </div>
           </div>
         );
       }
@@ -61,12 +84,16 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
   if (message.role === "error" && typeof message.content === "string") {
     return (
       <div className="assistant-message error-message">
-        <p>{message.content}</p>
+        <div className="error-icon">⚠️</div>
+        <div className="error-content">
+          <p className="error-text">{message.content}</p>
+        </div>
         <div className="answerDisclaimerContainer">
           <span className="answerDisclaimer">
             {t("message.aiDisclaimer")}
           </span>
         </div>
+        {timestamp && <div className="message-timestamp">{timestamp}</div>}
       </div>
     );
   }
@@ -416,6 +443,7 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
             {t("message.aiDisclaimer")}
           </span>
         </div>
+        {timestamp && <div className="message-timestamp">{timestamp}</div>}
       </div>
     );
   }

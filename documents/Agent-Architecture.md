@@ -1,0 +1,191 @@
+# エージェントアーキテクチャ
+
+> **注**: このドキュメントは現在の実装に基づくエージェント構成を説明します。
+
+## 1. エージェントモード
+
+環境変数 `AGENT_MODE` で動作モードを切り替えられます。
+
+### モード比較
+
+| モード | 速度 | 複雑度 | 用途 | ツール統合 |
+| ------ | ---- | ------ | ---- | ---------- |
+| `sql_only` | ⚡最速 | シンプル | 単純なSQLクエリ | SQLのみ |
+| `multi_tool` | 🔥高速 | 中程度 | **推奨** - 汎用 | 全ツール自動選択 |
+| `handoff` | 普通 | 複雑 | 専門家委譲 | 各専門家に委譲 |
+| `magentic` | 遅い | 最複雑 | 計画+統合 | マネージャー統合 |
+
+### sql_only モード
+
+単一エージェントでSQLツールのみ使用。最も高速。
+
+```
+User → SQL Agent → Fabric SQL → Response
+```
+
+**適用例**: "売上TOP3を教えて"
+
+### multi_tool モード（デフォルト・推奨）
+
+単一エージェントが全ツールにアクセス。LLMが最適なツールを選択。
+
+```
+User → Unified Agent ─┬─ SQL Tool ──→ Fabric SQL
+                      ├─ Web Tool ──→ Bing Search
+                      └─ Doc Tool ──→ AI Search
+```
+
+**適用例**: "売上データと製品仕様を比較して" → SQL + Doc を順次呼び出し
+
+### handoff モード
+
+トリアージエージェントが専門家に委譲。
+
+```
+User → Triage Agent ─┬─ SQL Specialist
+                     ├─ Web Specialist
+                     └─ Doc Specialist
+```
+
+**注意**: 複数専門家の結果は統合されません。最後の専門家の回答が返ります。
+
+### magentic モード
+
+マネージャーが計画し、専門家が実行、結果を統合。
+
+```
+User → Manager Agent ─┬─ Plan
+                      ├─ SQL Specialist → Result
+                      ├─ Web Specialist → Result
+                      └─ Integrate Results → Final Response
+```
+
+**用途**: 複雑な分析タスク（最も遅いが最も強力）
+
+## 2. エージェント構成
+
+### SQL Agent
+
+**役割**: Fabric SQL データベースへのクエリ実行
+
+```python
+@tool
+async def query_database(query: str) -> str:
+    """Execute SQL query against Fabric SQL Database"""
+    # Fabric SQL連携
+```
+
+**データスキーマ**:
+
+- `SalesData` - 売上データ
+- `Products` - 製品マスタ  
+- `Customers` - 顧客マスタ
+
+### Web Agent
+
+**役割**: Bing Search APIでウェブ検索
+
+```python
+@tool
+async def search_web(query: str) -> str:
+    """Search the web using Bing Search API"""
+    # Bing Search連携
+```
+
+**出力**: 検索結果 + 引用情報（citations）
+
+### Doc Agent
+
+**役割**: Azure AI Search でドキュメント検索
+
+```python
+@tool
+async def search_documents(query: str) -> str:
+    """Search internal documents using AI Search"""
+    # Azure AI Search連携
+```
+
+**データソース**: `製品仕様書/` フォルダ内のドキュメント
+
+## 3. ツール呼び出しフロー
+
+### multi_tool モードの例
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Unified Agent
+    participant S as SQL Tool
+    participant W as Web Tool
+    participant D as Doc Tool
+
+    U->>A: "売上TOP3と製品仕様を教えて"
+    A->>A: クエリ分析
+    A->>S: query_database("SELECT TOP 3...")
+    S-->>A: 売上データ
+    A->>D: search_documents("製品仕様")
+    D-->>A: 仕様書データ
+    A->>A: 結果統合
+    A-->>U: 統合レスポンス
+```
+
+### handoff モードの例
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant T as Triage Agent
+    participant S as SQL Specialist
+    participant D as Doc Specialist
+
+    U->>T: "売上TOP3と製品仕様を教えて"
+    T->>T: 委譲先判断
+    T->>S: Handoff(SQL)
+    S-->>T: 売上データ
+    Note over T: 結果は統合されない
+    T-->>U: SQL結果のみ
+```
+
+## 4. 設定方法
+
+### 環境変数
+
+```bash
+# モード選択
+AGENT_MODE=multi_tool  # sql_only | multi_tool | handoff | magentic
+
+# マルチエージェント有効化（handoff/magentic用）
+MULTI_AGENT_MODE=true
+```
+
+### コード内での切り替え
+
+```python
+# chat.py
+AGENT_MODE = os.getenv("AGENT_MODE", "multi_tool")
+
+if AGENT_MODE == "sql_only":
+    agent = create_sql_only_agent()
+elif AGENT_MODE == "multi_tool":
+    agent = create_unified_agent()
+elif AGENT_MODE == "handoff":
+    agent = create_handoff_agent()
+elif AGENT_MODE == "magentic":
+    agent = create_magentic_agent()
+```
+
+## 5. 推奨設定
+
+| シナリオ | 推奨モード | 理由 |
+| -------- | ---------- | ---- |
+| デモ | `multi_tool` | バランスが良い |
+| 高速応答 | `sql_only` | 最速 |
+| 複雑な分析 | `magentic` | 結果統合可能 |
+| プロダクション | `multi_tool` | 安定・高速 |
+
+---
+
+**関連ドキュメント**:
+
+- [Prompts-Module.md](./Prompts-Module.md) - プロンプト定義
+- [Implementation-Overview.md](./Implementation-Overview.md) - 実装概要

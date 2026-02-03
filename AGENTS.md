@@ -94,6 +94,26 @@ uv pip install <package-name>
 
 **重要**: `pip` ではなく必ず `uv pip` を使用してください。
 
+### Copilot Agent Mode でのPython実行
+
+**Copilotへの指示**: Python を実行する際は、必ず uv 仮想環境の Python を使用してください。
+
+```powershell
+# プロジェクトルートから実行する場合
+& ".\.venv\Scripts\python.exe" <script.py>
+
+# src/api/python から実行する場合
+& "../../../.venv/Scripts/python.exe" <script.py>
+
+# 仮想環境を有効化してから実行する場合
+.\.venv\Scripts\Activate.ps1
+python <script.py>
+```
+
+**やってはいけないこと**:
+- システムの `python` を直接使用（パッケージが見つからないエラーになる）
+- `py_compile` や `python -m` をグローバルPythonで実行
+
 ## 📂 ログ管理ルール
 
 デバッグ・エラー分析で取得したログは **必ず `.debug_logs/` フォルダに格納**してください。
