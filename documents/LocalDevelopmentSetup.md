@@ -1,5 +1,7 @@
 # Local Development Setup Guide
 
+**English** | [日本語](./LocalDevelopmentSetup_JA.md)
+
 This guide provides comprehensive instructions for setting up the Agentic Applications For Unified Data Foundation Solution Accelerator for local development across Windows and Linux platforms.
 
 ## Important Setup Notes

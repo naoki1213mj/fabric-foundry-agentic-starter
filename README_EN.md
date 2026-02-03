@@ -22,16 +22,17 @@ This solution accelerator empowers organizations to make faster, smarter decisio
 Solution overview
 </h2>
 
-
 Leverages the Unified Data Foundation in Fabric accelerator, SQL Database in Fabric, Agent Framework, and AI Foundry to query structured data. Structured data sets are analyzed through intelligent and orchestrated responses powered by an interactive web front-end for exploring semantic models and data assets. Insights are generated using natural language.
 
 ### Solution architecture
 
 Microsoft Fabric and Microsoft Copilot Studio:
+
 |![image](./documents/Images/ReadMe/solution-architecture-cps.png)
 |---|
 
-Microsoft Fabric and Microsoft Foundry: 
+Microsoft Fabric and Microsoft Foundry:
+
 |![image](./documents/Images/ReadMe/solution-architecture.png)
 |---|
 
@@ -45,10 +46,12 @@ Features
 </h2>
 
 ### Key features
+
 <details open>  
 <summary>Click to learn more about the key features this solution enables</summary>  
 
 **Built on Microsoft Fabric + Microsoft Foundry**
+
 - **Unified data foundation with Fabric** <br/>  
 Leverage the foundational capabilities of Microsoft Fabric and a Unified Data Foundation to build intelligent agents that stand apart in orchestration, retrieval, and user experience
 
@@ -60,23 +63,22 @@ Microsoft Foundry Agents coordinate orchestration and retrieval to deliver fast,
 
 </details>
 
-
-
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/quick-deploy.png" width="48" />
 Quick deploy
 </h2>
 
 ### How to install or deploy
+
 Follow the quick deploy steps on the deployment guide to deploy this solution to your own Azure subscription.
 
 For Azure Deployment: [Click here to launch the deployment guide](./documents/DeploymentGuide.md)
 <br/><br/>
-For Local Development: 
+For Local Development:
+
 - [Local Development Setup Guide](./documents/LocalDevelopmentSetup.md) - Comprehensive setup instructions for Windows and Linux.
 - Includes native Windows setup, WSL2 configuration, and cross-platform development tools
 <br/><br/>
-
 
 | [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Visual Studio Code Web](https://img.shields.io/static/v1?style=for-the-badge&label=Visual%20Studio%20Code%20(Web)&message=Open&color=blue&logo=visualstudiocode&logoColor=white)](https://vscode.dev/azure/?vscode-azure-exp=foundry&agentPayload=eyJiYXNlVXJsIjogImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9taWNyb3NvZnQvYWdlbnRpYy1hcHBsaWNhdGlvbnMtZm9yLXVuaWZpZWQtZGF0YS1mb3VuZGF0aW9uLXNvbHV0aW9uLWFjY2VsZXJhdG9yL3JlZnMvaGVhZHMvbWFpbi9pbmZyYS92c2NvZGVfd2ViIiwgImluZGV4VXJsIjogIi9pbmRleC5qc29uIiwgInZhcmlhYmxlcyI6IHsiYWdlbnRJZCI6ICIiLCAiY29ubmVjdGlvblN0cmluZyI6ICIiLCAidGhyZWFkSWQiOiAiIiwgInVzZXJNZXNzYWdlIjogIiIsICJwbGF5Z3JvdW5kTmFtZSI6ICIiLCAibG9jYXRpb24iOiAiIiwgInN1YnNjcmlwdGlvbklkIjogIiIsICJyZXNvdXJjZUlkIjogIiIsICJwcm9qZWN0UmVzb3VyY2VJZCI6ICIiLCAiZW5kcG9pbnQiOiAiIn0sICJjb2RlUm91dGUiOiBbImFpLXByb2plY3RzLXNkayIsICJweXRob24iLCAiZGVmYXVsdC1henVyZS1hdXRoIiwgImVuZHBvaW50Il19) |
 |---|---|---|
@@ -89,6 +91,7 @@ For Local Development:
 <br/>
 
 ### Prerequisites and costs
+
 To deploy this solution accelerator, ensure you have access to an [Azure subscription](https://azure.microsoft.com/free/) with the necessary permissions to create **resource groups, resources, app registrations, and assign roles at the resource group level**. This should include Contributor role at the subscription level and  Role Based Access Control role on the subscription and/or resource group level. Follow the steps in [Azure Account Set Up](./documents/AzureAccountSetUp.md). You will also need to have a minimum of an F2 Fabric capacity. Follow the steps in [Fabric Capacity Set Up](https://learn.microsoft.com/en-us/fabric/admin/capacity-settings?tabs=fabric-capacity#create-a-new-capacity).
 
 Here are some example regions where the services are available: East US, East US2, Australia East, UK South, France Central.
@@ -97,7 +100,7 @@ Check the [Azure Products by Region](https://azure.microsoft.com/en-us/explore/g
 
 Pricing varies by region and usage, so it isn't possible to predict exact costs for your usage. The majority of Azure resources used in this infrastructure are on usage-based pricing tiers. However, some services—such as Azure Container Registry, which has a fixed cost per registry per day, and others like Cosmos DB or SQL Database when provisioned—may incur baseline charges regardless of actual usage.
 
-Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) and the [Fabric Capacity Estimator](https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator) to calculate the cost of this solution in your subscription. 
+Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/calculator) and the [Fabric Capacity Estimator](https://www.microsoft.com/en-us/microsoft-fabric/capacity-estimator) to calculate the cost of this solution in your subscription.
 
 Review a [sample pricing sheet](https://azure.com/e/708895d4fc4449b1826016fad8a83fe0) in the event you want to customize and scale usage.
 
@@ -113,8 +116,7 @@ _Note: This is not meant to outline all costs as selected SKUs, scaled use, cust
 | [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-intro) | Stores and serves container images used by Azure App Service. | Basic/Premium Tier; fixed daily cost per registry. | [Pricing](https://azure.microsoft.com/pricing/details/container-registry/) |
 | [Azure Monitor / Log Analytics](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-overview) | Collects and analyzes telemetry and logs from services and containers. | Pay-as-you-go; charges based on data ingestion volume. | [Pricing](https://azure.microsoft.com/pricing/details/monitor/) |
 | [SQL Database in Fabric](https://learn.microsoft.com/en-us/fabric/fundamentals/microsoft-fabric-overview) | Stores structured data including insights, metadata, and chat history. | F2 capacity; fixed monthly cost per capacity. | [Pricing](https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/) |
-| 
-
+|
 
 <br/>
 
@@ -126,44 +128,42 @@ either by deleting the resource group in the Portal or running `azd down`.
 Business scenario
 </h2>
 
-
 |![image](./documents/Images/ReadMe/ui.png)|
 |---|
 
 <br/>
 
-The sample data illustrates how this accelerator could be used for an sales analyst scenario across industries. 
+The sample data illustrates how this accelerator could be used for an sales analyst scenario across industries.
 In this scenario, an organization is in the process of analyzing top performing products for sales research. Previously, the sales analyst had to sift through disparate sales and customer data across data silos. Leveraging the solution accelerator, the analyst now has access to unified data in Microsoft Fabric enabling a holistic view of customer and sales performance data. This functionality allows for the analyst to interrogate the data (e.g. "which customer segments show strongest year-over-year revenue growth", "what are my top performance products by demographic").
-
 
 ⚠️ The sample data used in this repository is synthetic and generated. The data is intended for use as sample data only.
 
-
 ### Business value
+
 <details>
   <summary>Click to learn more about what value this solution provides</summary>
 <br/>
 
-  - **Intelligent data interaction** 
+- **Intelligent data interaction**
 Enable conversational agents that understand your company’s unique data and transform natural language questions into automated queries for data-driven answers. Train agents with instructions to gain visibility.
 
 - **Accelerated insights & productivity**
 Access rapid insights with intelligent data prep, seamless integration, and AI-guided exploration. Analyze, and enrich data to uncover trends, automate workflows, and turn ideas into scalable, agentic solutions.
 
 - **Governed, scalable and trusted data**
-Deliver actionable insights through robust governance and metadata. Improve decision-making, operational efficiency, and reduce costs with secure, self-service access to high-quality data in a unified platform. 
+Deliver actionable insights through robust governance and metadata. Improve decision-making, operational efficiency, and reduce costs with secure, self-service access to high-quality data in a unified platform.
 
-     
 </details>
 
 ### Use Case
+
 <details>
   <summary>Click to learn more about what use cases this solution provides</summary>
 <br/>
 
   | **Use case** | **Persona** | **Challenges** | **Summary/approach** |
   |---|---|---|---|
-  | Sales analysis & product performance | Sales Analyst | Significant amount of time spent searching through disconnected data silos, making it difficult to access complete sales, product and customer information quickly and accurately.| Providing a comprehensive view of customer, product, and sales data interacting through natural language. Faster time to insights without navigating complex reports and dashboards.| 
+  | Sales analysis & product performance | Sales Analyst | Significant amount of time spent searching through disconnected data silos, making it difficult to access complete sales, product and customer information quickly and accurately.| Providing a comprehensive view of customer, product, and sales data interacting through natural language. Faster time to insights without navigating complex reports and dashboards.|
   Improve customer meetings, client meeting preparation | Account Manager | Manual processes and fragmented systems slow down routine tasks, make insights hard to find, and limit personalized customer interactions, leading to higher churn and lower satisfaction | Providing customer data in the flow of work and uncovering actionable insights through natural language queries, and personalizing interactions to reduce churn and boost customer satisfaction. |
 
 </details>
@@ -188,15 +188,14 @@ Additional security considerations include:
 <br/>
 
 ### Cross references
+
 Check out similar solution accelerators
 
 | Solution Accelerator | Description |
 |---|---|
 | [Unified&nbsp;data&nbsp;foundation&nbsp;with&nbsp;Fabric](https://github.com/microsoft/unified-data-foundation-with-fabric-solution-accelerator) | Provides a unified data foundation with integrated data architecture leveraging Microsoft Fabric, Microsoft Purview, and Azure Databricks to deliver a unified, integrated, and governed analytics platform. |
 
-
 <br/>
-
 
 ## Provide feedback
 
@@ -204,18 +203,19 @@ Have questions, find a bug, or want to request a feature? [Submit a new issue](h
 
 <br/>
 
-## Responsible AI Transparency FAQ 
+## Responsible AI Transparency FAQ
+
 Please refer to [Transparency FAQ](./TRANSPARENCY_FAQ.md) for responsible AI transparency details of this solution accelerator.
 
 <br/>
 
 ## Disclaimers
 
-To the extent that the Software includes components or code used in or derived from Microsoft products or services, including without limitation Microsoft Azure Services (collectively, “Microsoft Products and Services”), you must also comply with the Product Terms applicable to such Microsoft Products and Services. You acknowledge and agree that the license governing the Software does not grant you a license or other right to use Microsoft Products and Services. Nothing in the license or this ReadMe file will serve to supersede, amend, terminate or modify any terms in the Product Terms for any Microsoft Products and Services. 
+To the extent that the Software includes components or code used in or derived from Microsoft products or services, including without limitation Microsoft Azure Services (collectively, “Microsoft Products and Services”), you must also comply with the Product Terms applicable to such Microsoft Products and Services. You acknowledge and agree that the license governing the Software does not grant you a license or other right to use Microsoft Products and Services. Nothing in the license or this ReadMe file will serve to supersede, amend, terminate or modify any terms in the Product Terms for any Microsoft Products and Services.
 
-You must also comply with all domestic and international export laws and regulations that apply to the Software, which include restrictions on destinations, end users, and end use. For further information on export restrictions, visit https://aka.ms/exporting. 
+You must also comply with all domestic and international export laws and regulations that apply to the Software, which include restrictions on destinations, end users, and end use. For further information on export restrictions, visit <https://aka.ms/exporting>.
 
-You acknowledge that the Software and Microsoft Products and Services (1) are not designed, intended or made available as a medical device(s), and (2) are not designed or intended to be a substitute for professional medical advice, diagnosis, treatment, or judgment and should not be used to replace or as a substitute for professional medical advice, diagnosis, treatment, or judgment. Customer is solely responsible for displaying and/or obtaining appropriate consents, warnings, disclaimers, and acknowledgements to end users of Customer’s implementation of the Online Services. 
+You acknowledge that the Software and Microsoft Products and Services (1) are not designed, intended or made available as a medical device(s), and (2) are not designed or intended to be a substitute for professional medical advice, diagnosis, treatment, or judgment and should not be used to replace or as a substitute for professional medical advice, diagnosis, treatment, or judgment. Customer is solely responsible for displaying and/or obtaining appropriate consents, warnings, disclaimers, and acknowledgements to end users of Customer’s implementation of the Online Services.
 
 You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits. No Microsoft technology, nor any of its component technologies, including the Software, is intended or made available as a substitute for the professional advice, opinion, or judgement of a certified financial services professional. Do not use the Software to replace, substitute, or provide professional financial advice or judgment.  
 

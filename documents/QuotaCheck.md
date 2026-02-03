@@ -1,5 +1,7 @@
 ## Check Quota Availability Before Deployment
 
+**English** | [日本語](./QuotaCheck_JA.md)
+
 Before deploying the accelerator, **ensure sufficient quota availability** for the required model.
 > **We recommend increasing the capacity to 100k tokens for optimal performance.**
 

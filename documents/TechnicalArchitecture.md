@@ -1,5 +1,7 @@
 ## Technical Architecture
 
+**English** | [日本語](./TechnicalArchitecture_JA.md)
+
 This section outlines the components and interactions that powers the unified data analysis platform. The architecture ingests customer information, product details and transaction history and surfaces insights via an interactive web experience.
 
 #### Option 1: Architecture with Microsoft Fabric and Microsoft Copilot Studio:

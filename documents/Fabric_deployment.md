@@ -1,4 +1,7 @@
 ### Fabric deployment
+
+**English** | [日本語](./Fabric_deployment_JA.md)
+
 1.  **Create or Use an Existing Microsoft Fabric Workspace**
 
     > ℹ️ **Note:** If you already have an existing Microsoft Fabric Workspace, you can skip workspace creation.
