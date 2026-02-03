@@ -1772,12 +1772,21 @@ async def conversation(request: Request):
 
         agent_mode = request_json.get("agent_mode")  # Optional: sql_only, multi_tool, handoff, magentic
 
-        result = await stream_chat_request(conversation_id, query, user_id, agent_mode)
+        # stream_chat_request returns an async generator, so we need to wrap it in StreamingResponse
+        stream_generator = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
             "ChatStreamSuccess",
             {"conversation_id": conversation_id, "query": query, "agent_mode": agent_mode},
         )
-        return result
+        return StreamingResponse(
+            stream_generator,
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            }
+        )
 
     except Exception as ex:
         logger.error(f"Error in conversation endpoint: {ex}", exc_info=True)
