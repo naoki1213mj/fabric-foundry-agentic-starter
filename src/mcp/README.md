@@ -50,6 +50,54 @@ pip install -r requirements.txt
 func start
 ```
 
+### ローカル統合テスト（FastAPI ラッパー使用）
+
+Windows ARM64 環境などで Azure Functions Core Tools が動作しない場合：
+
+```bash
+# プロジェクトルートから実行
+python run_integration_test.py
+```
+
+これにより MCP サーバーが FastAPI で起動し、自動的に統合テストが実行されます。
+
+### Azure Functions へのデプロイ
+
+#### 1. リソースグループの作成（既存の場合はスキップ）
+
+```bash
+az group create --name rg-mcp-prod-jpe --location japaneast
+```
+
+#### 2. Azure Functions リソースをデプロイ（Bicep）
+
+```bash
+az deployment group create \
+  --resource-group rg-mcp-prod-jpe \
+  --template-file infra/deploy_mcp_function.bicep \
+  --parameters \
+    location=japaneast \
+    functionAppName=func-mcp-aiagent-prod \
+    appServicePlanName=plan-mcp-aiagent-prod \
+    storageAccountName=stmcpaiagentprod
+```
+
+#### 3. コードをデプロイ
+
+```bash
+cd src/mcp
+func azure functionapp publish func-mcp-aiagent-prod
+```
+
+#### 4. API サーバーの環境変数を設定
+
+デプロイ後、API サーバーの環境変数を更新：
+
+```bash
+MCP_SERVER_URL=https://func-mcp-aiagent-prod.azurewebsites.net/api/mcp
+MCP_ENABLED=true
+```
+
 ### テスト実行
 
 ```bash

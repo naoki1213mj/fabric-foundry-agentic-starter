@@ -15,8 +15,8 @@ from mcp_handler import MCPHandler
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize Function App
-app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+# Initialize Function App (ANONYMOUS for internal use, secured by network isolation)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 # Initialize MCP Handler
 mcp_handler = MCPHandler()
