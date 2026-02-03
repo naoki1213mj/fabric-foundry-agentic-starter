@@ -416,6 +416,71 @@ agentic-applications-for-unified-data-foundation-solution-accelerator/
 
 ---
 
+## 🧪 テスト運用ガイドライン
+
+### CI/CD パイプライン
+
+```
+コード変更 → ローカルテスト → git push → GitHub Actions → Azure デプロイ
+              .\scripts\test.ps1    (自動)        (自動)
+```
+
+### 必須ワークフロー
+
+| ワークフロー | ファイル | トリガー | 必須 |
+|--------------|----------|----------|------|
+| Test and Lint | `test.yml` | PR, push to main | ✅ |
+| Deploy | `deploy-app-service.yml` | push to main | ✅ |
+| Security Scan | `security-scan.yml` | 定期実行 | - |
+
+### コード品質ルール
+
+```yaml
+# PR マージ条件
+python_lint: required      # Ruff lint must pass
+python_tests: required     # pytest must pass
+frontend_lint: optional    # ESLint (warning only)
+```
+
+### テストコマンド
+
+```powershell
+# 推奨: すべてのチェック
+.\scripts\test.ps1
+
+# Lint のみ
+.\scripts\test.ps1 -LintOnly
+
+# Lint 自動修正
+.\scripts\test.ps1 -LintOnly -Fix
+
+# テストのみ（カバレッジ付き）
+.\scripts\test.ps1 -TestOnly -Coverage
+```
+
+### テストファイル構成
+
+```
+src/api/python/
+├── tests/
+│   ├── conftest.py         # 共通フィクスチャ・モック
+│   ├── test_app.py         # FastAPI アプリテスト
+│   ├── test_history_sql.py # Fabric SQL テスト
+│   └── test_utils.py       # ユーティリティテスト
+├── pyproject.toml          # pytest/ruff 設定
+└── requirements-test.txt   # テスト依存パッケージ
+```
+
+### 新機能追加時の必須事項
+
+1. **テストを先に書く（TDD推奨）** または機能実装後すぐにテスト追加
+2. **ローカルで `.\scripts\test.ps1` を実行**
+3. **すべてパスしてからコミット**
+
+詳細は [documents/Testing-Guide.md](../documents/Testing-Guide.md) を参照。
+
+---
+
 ## 🔗 参照リソース
 
 | リソース | URL |
