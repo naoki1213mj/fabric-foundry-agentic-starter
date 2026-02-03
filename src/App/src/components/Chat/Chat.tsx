@@ -79,7 +79,7 @@ const Chat: React.FC<ChatProps> = ({
   const { userMessage, generatingResponse, messages, isStreamingInProgress } = useAppSelector((state) => state.chat);
   const selectedConversationId = useAppSelector((state) => state.app.selectedConversationId);
   const generatedConversationId = useAppSelector((state) => state.app.generatedConversationId);
-  const { isFetchingConvMessages, isHistoryUpdateAPIPending } = useAppSelector((state) => state.chatHistory);
+  const { isFetchingConvMessages } = useAppSelector((state) => state.chatHistory);
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
   const [isChartLoading, setIsChartLoading] = useState(false)
   const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
@@ -102,14 +102,16 @@ const Chat: React.FC<ChatProps> = ({
 
   const hasMessages = useMemo(() => messages.length > 0, [messages.length]);
 
+  // UX改善: DB保存中も入力を許可（ストリーミング完了後すぐに次の質問を入力可能に）
+  // isHistoryUpdateAPIPending は入力ブロックの条件から除外
   const isInputDisabled = useMemo(() =>
-    generatingResponse || isHistoryUpdateAPIPending,
-    [generatingResponse, isHistoryUpdateAPIPending]
+    generatingResponse,
+    [generatingResponse]
   );
 
   const isSendDisabled = useMemo(() =>
-    generatingResponse || !userMessage.trim() || isHistoryUpdateAPIPending,
-    [generatingResponse, userMessage, isHistoryUpdateAPIPending]
+    generatingResponse || !userMessage.trim(),
+    [generatingResponse, userMessage]
   );
 
   const saveToDB = useCallback(async (newMessages: ChatMessage[], convId: string, reqType: string = 'Text') => {
