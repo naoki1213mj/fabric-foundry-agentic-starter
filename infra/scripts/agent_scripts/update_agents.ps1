@@ -109,9 +109,12 @@ $output = python "$ScriptDir\create_agents.py" `
 
 Write-Host $output
 
-# Extract agent names from output
-$chatAgentName = ($output | Select-String "^chatAgentName=(.+)$").Matches.Groups[1].Value
-$titleAgentName = ($output | Select-String "^titleAgentName=(.+)$").Matches.Groups[1].Value
+# Extract agent names from output (with null safety)
+$chatMatch = $output | Select-String "chatAgentName=(.+)"
+$titleMatch = $output | Select-String "titleAgentName=(.+)"
+
+$chatAgentName = if ($chatMatch) { $chatMatch.Matches[0].Groups[1].Value.Trim() } else { $null }
+$titleAgentName = if ($titleMatch) { $titleMatch.Matches[0].Groups[1].Value.Trim() } else { $null }
 
 # Update App Service and azd environment if values are set
 if ($chatAgentName -and $titleAgentName) {

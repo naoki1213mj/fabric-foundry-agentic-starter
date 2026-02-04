@@ -112,11 +112,17 @@ var tags = {
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
 │  │ Azure API Management (apim-daj6dri4yf3k3z)                          │    │
-│  │ ├─ AI Gateway (llm-emit-token-metric)                              │    │
+│  │ ├─ AI Gateway (Consumption SKU)                                    │    │
 │  │ ├─ Circuit Breaker (429/500-599)                                   │    │
 │  │ ├─ Azure OpenAI API → /openai                                      │    │
 │  │ ├─ MCP Server API → /mcp                                           │    │
 │  │ └─ Foundry Agent API → /foundry-agents                             │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure API Center (apic-daj6dri4yf3k3z)                              │    │
+│  │ ├─ Private Tool Catalog (MCP Server Discovery)                     │    │
+│  │ ├─ Business Analytics MCP Server API                               │    │
+│  │ └─ Azure OpenAI API                                                │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
                                    │

@@ -247,6 +247,7 @@ python <script.py>
 | **AI Search** | `search-sp-rag-australiaeast-001` | Standard SKU |
 | **Fabric Capacity** | `capagentunifieddata001` | F4 SKU |
 | **API Management** | `apim-daj6dri4yf3k3z` | Consumption SKU |
+| **API Center** | `apic-daj6dri4yf3k3z` | Free SKU - ツールカタログ |
 | **App Insights** | `appi-daj6dri4yf3k3z` | |
 | **Log Analytics** | `log-daj6dri4yf3k3z` | |
 
@@ -268,9 +269,20 @@ python <script.py>
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service |
 
 **AI Gateway機能:**
-- `llm-emit-token-metric`: トークン使用量メトリクス
+
+- トークン使用量ヘッダー: `x-openai-prompt-tokens`, `x-openai-completion-tokens`, `x-openai-total-tokens`
 - Circuit Breaker: 429/500-599エラー時の自動フェイルオーバー
 - Managed Identity認証
+- レイテンシ計測: `x-gateway-latency-ms` ヘッダー
+
+> **Note**: `llm-emit-token-metric` ポリシーは Consumption SKU では非対応。ヘッダーベースでメトリクス収集。
+
+### API Center (ツールカタログ)
+
+| API | 説明 |
+|-----|------|
+| Business Analytics MCP Server | 5つのビジネス分析ツール (YoY, RFM等) |
+| Azure OpenAI API | Chat Completions, Embeddings |
 
 ### エンドポイント
 

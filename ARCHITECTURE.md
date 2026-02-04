@@ -13,7 +13,9 @@
 | **Azure AI Services** | `aisa-daj6dri4yf3k3z` | S0 @ East US |
 | **AI Foundry Project** | `aifp-daj6dri4yf3k3z` | East US |
 | **Azure AI Search** | `search-sp-rag-australiaeast-001` | Standard @ Australia East |
-| **Bing Search** | `bing-global-001` | Global |
+| **API Management** | `apim-daj6dri4yf3k3z` | Consumption @ Australia East |
+| **API Center** | `apic-daj6dri4yf3k3z` | Free @ Australia East |
+| **MCP Server** | `func-mcp-daj6dri4yf3k3z` | Azure Functions @ Australia East |
 | **LLM Model** | `AZURE_OPENAI_DEPLOYMENT_MODEL` | **gpt-5** |
 | **AGENT_MODE** | 環境変数 | **multi_tool** |
 | **MULTI_AGENT_MODE** | 環境変数 | **true** |
@@ -36,7 +38,12 @@ graph TB
         FG["Foundry Guardrails"]
         OAI["Azure AI Services<br/>aisa-daj6dri4yf3k3z<br/>GPT-5"]
         SEARCH["Azure AI Search<br/>search-sp-rag-*<br/>Standard SKU"]
-        BING["Bing Web Search<br/>bing-global-001"]
+    end
+
+    subgraph Integration["Integration Layer"]
+        APIM["API Management<br/>apim-daj6dri4yf3k3z<br/>AI Gateway"]
+        APIC["API Center<br/>apic-daj6dri4yf3k3z<br/>Tool Catalog"]
+        MCP["MCP Server<br/>func-mcp-*<br/>Business Analytics"]
     end
 
     subgraph Data["Data Layer"]
@@ -47,13 +54,16 @@ graph TB
     end
 
     WEB --> ACA
-    ACA --> MAF
+    ACA --> APIM
+    APIM --> MAF
     MAF --> FAS
     FAS --> FG
     FAS --> OAI
+    MAF --> MCP
     MAF --> SQLDB
     MAF --> SEARCH
-    MAF --> BING
+    APIC --> MCP
+    APIC --> APIM
     SQLDB --> ONELAKE
     ONELAKE --> FABRIC
 ```
@@ -65,11 +75,13 @@ graph TB
 | Client | Frontend | App Service | `app-daj6dri4yf3k3z` | React UI |
 | API | Backend | App Service | `api-daj6dri4yf3k3z` | REST API (FastAPI) |
 | API | Agent | Agent Framework | - | エージェント実行・ツール呼び出し |
+| Integration | Gateway | API Management | `apim-daj6dri4yf3k3z` | AI Gateway (トークン計測、認証) |
+| Integration | Catalog | API Center | `apic-daj6dri4yf3k3z` | ツールカタログ・API管理 |
+| Integration | Tools | MCP Server | `func-mcp-daj6dri4yf3k3z` | ビジネス分析ツール |
 | AI | Runtime | Foundry Agent Service | `aifp-daj6dri4yf3k3z` | 会話管理 |
 | AI | Security | Guardrails | - | 安全性・ハルシネーション防止 |
 | AI | LLM | Azure AI Services | `aisa-daj6dri4yf3k3z` | **GPT-5** |
 | AI | Search | Azure AI Search | `search-sp-rag-*` | ドキュメント検索 |
-| AI | Web | Bing Search | `bing-global-001` | Web検索 |
 | Data | Platform | Microsoft Fabric | - | 統合データ基盤 |
 | Data | Database | SQL DB in Fabric | `retail_sqldatabase_*` | 構造化データ |
 | Data | History | Fabric SQL DB | `hst_conversations`, `hst_conversation_messages` | 会話履歴 |

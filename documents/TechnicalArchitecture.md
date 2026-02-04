@@ -58,14 +58,22 @@ The following resources are deployed in the `rg-agent-unified-data-acce-eastus-0
 | Resource | Type | SKU | Description |
 |----------|------|-----|-------------|
 | `apim-daj6dri4yf3k3z` | API Management | Consumption | AI Gateway with token metrics, circuit breaker |
+| `apic-daj6dri4yf3k3z` | API Center | Free | Private Tool Catalog for MCP Server discovery |
 
-**Registered APIs:**
+**Registered APIs in APIM:**
 
 | API Name | Path | Backend | Features |
 |----------|------|---------|----------|
 | Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` | Managed Identity auth, token usage headers, circuit breaker |
 | MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` | JSON-RPC 2.0 protocol, latency tracking |
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service | Agent responses, timeout handling |
+
+**Registered APIs in API Center:**
+
+| API Name | Description |
+|----------|-------------|
+| Business Analytics MCP Server | MCP Server providing 5 business analytics tools |
+| Azure OpenAI API | GPT-5, GPT-4o-mini, Embeddings endpoints |
 
 ### Data Platform
 
@@ -108,10 +116,19 @@ Handles orchestration and intelligent function/tool calling for contextualized r
 
 ### API Management (AI Gateway)
 Provides centralized governance for AI APIs:
-- **Token metrics**: `llm-emit-token-metric` policy for usage tracking
+- **Token usage headers**: `x-openai-prompt-tokens`, `x-openai-completion-tokens`, `x-openai-total-tokens`
 - **Managed Identity authentication**: Secure access to Foundry services
 - **Circuit breaker**: Automatic failover on backend errors (429, 500-599)
 - **Timeout handling**: Graceful degradation on 408 errors
+- **Latency tracking**: `x-gateway-latency-ms` header
+
+> **Note**: `llm-emit-token-metric` policy is not available in Consumption SKU. Token metrics are collected via response headers instead.
+
+### API Center (Private Tool Catalog)
+Provides centralized API governance and discovery:
+- **MCP Server registration**: Business Analytics MCP Server with 5 tools
+- **Azure OpenAI registration**: Chat Completions and Embeddings APIs
+- **Workspace management**: Default workspace for Agentic AI application
 
 ### MCP Server (Azure Functions)
 Model Context Protocol server providing business analytics tools:
