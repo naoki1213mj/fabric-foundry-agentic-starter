@@ -273,8 +273,10 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       AZURE_OPENAI_API_VERSION: azureOpenAIApiVersion
       AZURE_OPENAI_RESOURCE: aifoundry.outputs.aiServicesName
       AZURE_AI_AGENT_ENDPOINT: aifoundry.outputs.projectEndpoint
+      AZURE_AI_PROJECT_ENDPOINT: aifoundry.outputs.projectEndpoint  // For Web Search tool compatibility
       AZURE_AI_AGENT_API_VERSION: azureAiAgentApiVersion
       AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: gptModelName
+      AZURE_AI_MODEL_DEPLOYMENT_NAME: 'gpt-5'  // For Web Search tool (gpt-5 recommended)
       USE_CHAT_HISTORY_ENABLED: 'True'
       // AZURE_COSMOSDB_ACCOUNT: '' //cosmosDBModule.outputs.cosmosAccountName
       // AZURE_COSMOSDB_CONVERSATIONS_CONTAINER: '' //cosmosDBModule.outputs.cosmosContainerName
@@ -347,8 +349,10 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       AZURE_OPENAI_API_VERSION: azureOpenAIApiVersion
       AZURE_OPENAI_RESOURCE: aifoundry.outputs.aiServicesName
       AZURE_AI_AGENT_ENDPOINT: aifoundry.outputs.projectEndpoint
+      AZURE_AI_PROJECT_ENDPOINT: aifoundry.outputs.projectEndpoint  // For Web Search tool compatibility
       AZURE_AI_AGENT_API_VERSION: azureAiAgentApiVersion
       AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: gptModelName
+      AZURE_AI_MODEL_DEPLOYMENT_NAME: 'gpt-5'  // For Web Search tool (gpt-5 recommended)
       USE_CHAT_HISTORY_ENABLED: 'True'
       // AZURE_COSMOSDB_ACCOUNT: '' //cosmosDBModule.outputs.cosmosAccountName
       // AZURE_COSMOSDB_CONVERSATIONS_CONTAINER: '' //cosmosDBModule.outputs.cosmosContainerName
