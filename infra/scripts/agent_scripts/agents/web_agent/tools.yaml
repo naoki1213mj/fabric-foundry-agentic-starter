@@ -1,8 +1,13 @@
 # Web Agent Tools Configuration
-# Uses official BingGroundingAgentTool from Microsoft Foundry
+# Uses official WebSearchPreviewTool from Microsoft Foundry
+# Note: BingGroundingAgentTool does NOT support gpt-5 models
+# WebSearchPreviewTool is the recommended approach for all models including gpt-5
 
 tools:
-  - type: bing_grounding
-    # Connection name will be resolved from BING_CONNECTION_NAME environment variable
-    # or can be specified explicitly here:
-    # connection_name: bingglobal00149elbd
+  - type: web_search_preview
+    # Web Search tool (preview) is managed by Microsoft - no additional resources required
+    # Optional user_location helps return results relevant to user's geography
+    user_location:
+      country: "JP"
+      city: "Tokyo"
+      region: "Kanto"

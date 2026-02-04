@@ -26,11 +26,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import (
+    ApproximateLocation,
     BingGroundingAgentTool,
     BingGroundingSearchConfiguration,
     BingGroundingSearchToolParameters,
     FunctionTool,
     PromptAgentDefinition,
+    WebSearchPreviewTool,
 )
 from azure_credential_utils import get_azure_credential
 
@@ -104,13 +106,26 @@ class AgentManager:
     def _build_tools(self, tools_config: List[Dict]) -> List:
         """Build tool objects from configuration.
 
-        Handles both FunctionTool and BingGroundingAgentTool based on tool type.
+        Handles FunctionTool, WebSearchPreviewTool, and BingGroundingAgentTool based on tool type.
+        Note: WebSearchPreviewTool is recommended for gpt-5 models as BingGroundingAgentTool
+        does not support gpt-5.
         """
         tools = []
         for tool_def in tools_config:
             tool_type = tool_def.get("type", "function")
 
-            if tool_type == "bing_grounding":
+            if tool_type == "web_search_preview":
+                # Use official WebSearchPreviewTool - recommended for gpt-5
+                # No additional Azure resources required (managed by Microsoft)
+                user_location_config = tool_def.get("user_location", {})
+                user_location = ApproximateLocation(
+                    country=user_location_config.get("country", "JP"),
+                    city=user_location_config.get("city", "Tokyo"),
+                    region=user_location_config.get("region", "Kanto"),
+                )
+                tools.append(WebSearchPreviewTool(user_location=user_location))
+                print("  → Web Search Preview tool configured (recommended for gpt-5)")
+            elif tool_type == "bing_grounding":
                 # Use official BingGroundingAgentTool pattern
                 bing_connection_name = tool_def.get(
                     "connection_name", os.environ.get("BING_CONNECTION_NAME", "")

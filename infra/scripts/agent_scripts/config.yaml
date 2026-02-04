@@ -20,7 +20,7 @@ agents:
 
   web_agent:
     name_prefix: WebAgent
-    description: Web search agent using Bing Grounding
+    description: Web search agent using Web Search tool (preview) - supports gpt-5
     instructions_file: agents/web_agent/instructions.md
     tools_file: agents/web_agent/tools.yaml
     settings: {}
