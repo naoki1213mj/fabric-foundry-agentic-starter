@@ -39,7 +39,9 @@ from agent_framework import (
     GroupChatRequestSentEvent,
     HandoffAgentUserRequest,
     HandoffBuilder,
-    HostedWebSearchTool,
+    # NOTE: HostedWebSearchTool requires OpenAI's web_search_preview tool type
+    # which is not available in Azure OpenAI. Keeping import commented for future use.
+    # HostedWebSearchTool,
     MagenticBuilder,
     MagenticOrchestratorEvent,
     RequestInfoEvent,
@@ -843,23 +845,12 @@ async def stream_single_agent_response(
         all_tools = [run_sql_query]  # Always available
 
         # Add web search tool
-        # When using ResponsesClient, prefer HostedWebSearchTool (server-side, faster)
-        # When using ChatClient, use custom search_web function
-        if use_responses_client:
-            # HostedWebSearchTool: Server-side web search via Responses API
-            # - Faster than custom implementation (no extra API calls)
-            # - Built-in citations in response
-            # - Uses web_search_preview tool type
-            hosted_web_search = HostedWebSearchTool(
-                description="Search the web for real-time information and news",
-                additional_properties={"user_location": {"country": "JP"}},
-            )
-            all_tools.append(hosted_web_search)
-            logger.info("HostedWebSearchTool enabled (Responses API native)")
-        elif web_handler:
-            # Fallback: Custom search_web function for ChatClient
+        # NOTE: HostedWebSearchTool requires OpenAI's web_search_preview which is not
+        # available in Azure OpenAI. Using custom search_web for now.
+        # When Azure OpenAI supports web_search_preview, we can enable HostedWebSearchTool.
+        if web_handler:
             all_tools.append(search_web)
-            logger.info("Custom web search tool enabled (via WebAgentHandler)")
+            logger.info("Web search tool enabled (custom implementation via WebAgentHandler)")
 
         # Add document search if configured
         if kb_tool:
