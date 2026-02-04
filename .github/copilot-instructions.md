@@ -33,9 +33,11 @@ Solution Accelerator 構成例:
 ├── rg-aiagent-prod-jpe                    # リソースグループ
 ├── ai-aiagent-prod-jpe                    # Microsoft Foundry
 ├── oai-aiagent-prod-jpe                   # Azure OpenAI
-├── ca-aiagent-api-prod-jpe                # Container Apps (API)
-├── ca-aiagent-web-prod-jpe                # Container Apps (Frontend)
+├── app-aiagent-api-prod-jpe               # App Service (API)
+├── app-aiagent-web-prod-jpe               # App Service (Frontend)
+├── func-aiagent-mcp-prod-jpe              # Functions (MCP Server)
 ├── acr-aiagent-prod-jpe                   # Container Registry
+├── apim-aiagent-prod-jpe                  # API Management
 ├── fabric-aiagent-prod                    # Fabric Workspace
 ├── sqldb-aiagent-prod                     # SQL Database in Fabric
 ├── log-aiagent-prod-jpe                   # Log Analytics
@@ -48,8 +50,10 @@ Solution Accelerator 構成例:
 | サービス | 略称 | 用途 |
 |----------|------|------|
 | Microsoft Foundry | ai | AI基盤・エージェント管理 |
-| Azure OpenAI | oai | LLM (GPT-4o, GPT-4o-mini) |
-| Container Apps | ca | API / Frontend ホスティング |
+| Azure OpenAI | oai | LLM (GPT-5, GPT-4o-mini) |
+| App Service | app | API / Frontend ホスティング |
+| Functions | func | MCP Server |
+| API Management | apim | AI Gateway |
 | Container Registry | acr | コンテナイメージ管理 |
 | Fabric Workspace | fabric | データ統合基盤 |
 | SQL Database (Fabric) | sqldb | 構造化データ |
@@ -89,7 +93,7 @@ var tags = {
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                          Client Layer                                        │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure Container Apps - Frontend (ca-aiagent-web)                    │    │
+│  │ Azure App Service - Frontend (app-daj6dri4yf3k3z)                   │    │
 │  │ ├─ React + TypeScript                                               │    │
 │  │ ├─ Natural Language Query Interface                                 │    │
 │  │ ├─ Chat History / Session Management                                │    │
@@ -100,11 +104,19 @@ var tags = {
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                          API Layer                                           │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure Container Apps - API (ca-aiagent-api)                         │    │
+│  │ Azure App Service - API (api-daj6dri4yf3k3z)                        │    │
 │  │ ├─ Microsoft Agent Framework (Python/.NET)                          │    │
 │  │ ├─ REST API Endpoints                                               │    │
 │  │ ├─ Agent Orchestration                                              │    │
 │  │ └─ Tool Invocation / MCP Integration                               │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure API Management (apim-daj6dri4yf3k3z)                          │    │
+│  │ ├─ AI Gateway (llm-emit-token-metric)                              │    │
+│  │ ├─ Circuit Breaker (429/500-599)                                   │    │
+│  │ ├─ Azure OpenAI API → /openai                                      │    │
+│  │ ├─ MCP Server API → /mcp                                           │    │
+│  │ └─ Foundry Agent API → /foundry-agents                             │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
                                    │
@@ -242,7 +254,7 @@ infra:
 ```yaml
 authentication:
   frontend:
-    provider: "Entra ID (Container Apps EasyAuth)"
+    provider: "Entra ID (App Service EasyAuth)"
 
   api:
     method: "Managed Identity (SystemAssigned)"
@@ -290,9 +302,10 @@ guardrails_config = {
 
 | コンポーネント | サービス | 特徴 |
 |----------------|----------|------|
-| API Server | Azure Container Apps | Serverless, Auto-scale |
-| Frontend | Azure Container Apps | React + TypeScript |
-| Container Registry | Azure Container Registry | Basic Tier |
+| API Server | Azure App Service | Linux Container (da-api:main) |
+| Frontend | Azure App Service | Linux Container (da-app:main) |
+| MCP Server | Azure Functions | Python 3.12 |
+| Container Registry | Azure Container Registry | Premium SKU |
 
 ### AI/Agent
 
@@ -301,7 +314,7 @@ guardrails_config = {
 | Agent Framework | Microsoft Agent Framework | Public Preview (GA: Q1 2026) |
 | Agent Service | Foundry Agent Service | GA |
 | Hosted Agents | Foundry Hosted Agents | GA |
-| LLM | Azure OpenAI | GPT-5, GPT-4o |
+| LLM | Azure OpenAI | GPT-5, GPT-4o-mini |
 | Web Search | Web Search tool (preview) | Preview |
 | Guardrails | Foundry Guardrails | Public Preview |
 
@@ -309,7 +322,7 @@ guardrails_config = {
 
 | コンポーネント | サービス | 状態 (2026/2) |
 |----------------|----------|---------------|
-| Data Platform | Microsoft Fabric | F2 Capacity以上 |
+| Data Platform | Microsoft Fabric | F4 Capacity |
 | Database | SQL Database in Fabric | GA |
 | Data Lake | OneLake | Medallion Architecture |
 | AI Search | Azure AI Search | 製品仕様書検索 |
@@ -404,18 +417,20 @@ agentic-applications-for-unified-data-foundation-solution-accelerator/
 
 | サービス | SKU | 月額概算 |
 |----------|-----|----------|
-| Microsoft Fabric | F2 | ¥15,000〜 |
+| Microsoft Fabric | F4 | ¥30,000〜 |
 | Azure OpenAI | S0 (Pay-per-token) | ¥10,000〜 |
-| Container Apps | Consumption | ¥3,000〜 |
-| Container Registry | Basic | ¥800 |
+| App Service | B1/S1 × 2 | ¥5,000〜 |
+| Functions | Consumption | ¥500〜 |
+| Container Registry | Premium | ¥5,000 |
+| API Management | Consumption | ¥500〜 |
 | Application Insights | Pay-as-you-go | ¥1,000〜 |
-| **合計** | | **約¥30,000〜/月** |
+| **合計** | | **約¥50,000〜/月** |
 
 ### 注意事項
 
-- Fabric F2 Capacity は固定コスト（使用量に関わらず発生）
+- Fabric F4 Capacity は固定コスト（使用量に関わらず発生）
 - OpenAI はトークン数に応じた従量課金
-- Container Apps は使用しない時間帯はほぼ¥0
+- App Service は常時稼働（Always On設定）
 
 ---
 

@@ -300,6 +300,195 @@ resource mcpHealthOperation 'Microsoft.ApiManagement/service/apis/operations@202
   }
 }
 
+// ========================================
+// Foundry Agent Service API Definition
+// Reference: https://learn.microsoft.com/en-us/azure/api-management/azure-ai-foundry-api
+// ========================================
+
+// Foundry Agent Service Backend
+resource foundryAgentBackend 'Microsoft.ApiManagement/service/backends@2024-05-01' = {
+  parent: apim
+  name: 'foundry-agent-service'
+  properties: {
+    title: 'Microsoft Foundry Agent Service'
+    description: 'Foundry Agent Service for AI agents with Web Search, Code Interpreter, and custom tools'
+    url: '${replace(azureOpenAiEndpoint, '.openai.azure.com', '.services.ai.azure.com')}/api/projects'
+    protocol: 'http'
+    credentials: {
+      // Use Managed Identity for authentication
+    }
+    tls: {
+      validateCertificateChain: true
+      validateCertificateName: true
+    }
+    circuitBreaker: {
+      rules: [
+        {
+          name: 'foundry-circuit-breaker'
+          failureCondition: {
+            count: 3
+            interval: 'PT1M'
+            statusCodeRanges: [
+              { min: 408, max: 408 }  // Timeout
+              { min: 429, max: 429 }  // Rate limit
+              { min: 500, max: 599 }  // Server errors
+            ]
+          }
+          tripDuration: 'PT30S'
+          acceptRetryAfter: true
+        }
+      ]
+    }
+  }
+}
+
+// Foundry Agent Service API
+resource foundryAgentApi 'Microsoft.ApiManagement/service/apis@2024-05-01' = {
+  parent: apim
+  name: 'foundry-agent-api'
+  properties: {
+    displayName: 'Foundry Agent Service API'
+    description: 'Microsoft Foundry Agent Service API for AI agents with built-in tools (Web Search, Code Interpreter)'
+    serviceUrl: '${replace(azureOpenAiEndpoint, '.openai.azure.com', '.services.ai.azure.com')}/api/projects'
+    path: 'foundry-agents'
+    protocols: ['https']
+    subscriptionRequired: false
+    apiType: 'http'
+  }
+}
+
+// Agent Responses Operation (main API for agent conversations)
+resource agentResponsesOperation 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = {
+  parent: foundryAgentApi
+  name: 'responses-create'
+  properties: {
+    displayName: 'Create Agent Response'
+    description: 'Create a response from an AI agent with tools (Web Search, Code Interpreter, etc.)'
+    method: 'POST'
+    urlTemplate: '/{project-id}/openai/responses'
+    templateParameters: [
+      {
+        name: 'project-id'
+        type: 'string'
+        required: true
+        description: 'Foundry project ID'
+      }
+    ]
+    request: {
+      queryParameters: [
+        {
+          name: 'api-version'
+          type: 'string'
+          required: true
+          description: 'API Version (e.g., 2025-11-15-preview)'
+        }
+      ]
+    }
+  }
+}
+
+// Agent Create/List Operations
+resource agentCreateOperation 'Microsoft.ApiManagement/service/apis/operations@2024-05-01' = {
+  parent: foundryAgentApi
+  name: 'agents-create'
+  properties: {
+    displayName: 'Create Agent'
+    description: 'Create a new AI agent with specified tools and instructions'
+    method: 'POST'
+    urlTemplate: '/{project-id}/agents'
+    templateParameters: [
+      {
+        name: 'project-id'
+        type: 'string'
+        required: true
+        description: 'Foundry project ID'
+      }
+    ]
+  }
+}
+
+// Foundry Agent API Policy
+resource foundryAgentApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = {
+  parent: foundryAgentApi
+  name: 'policy'
+  properties: {
+    format: 'xml'
+    value: '''
+<policies>
+  <inbound>
+    <base />
+    <!-- Authenticate with Foundry Agent Service using Managed Identity -->
+    <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+
+    <!-- Request tracking -->
+    <set-header name="x-ms-gateway-timestamp" exists-action="override">
+      <value>@(DateTime.UtcNow.ToString("o"))</value>
+    </set-header>
+    <set-variable name="request-start-time" value="@(DateTime.UtcNow)" />
+  </inbound>
+
+  <backend>
+    <base />
+  </backend>
+
+  <outbound>
+    <base />
+
+    <!-- AI Gateway: Emit token metrics for agent responses -->
+    <choose>
+      <when condition="@(context.Response.StatusCode == 200)">
+        <llm-emit-token-metric namespace="FoundryAgents">
+          <dimension name="API" value="@(context.Api.Name)" />
+          <dimension name="Operation" value="@(context.Operation.Name)" />
+          <dimension name="Project" value="@(context.Request.MatchedParameters["project-id"] ?? "unknown")" />
+        </llm-emit-token-metric>
+      </when>
+    </choose>
+
+    <!-- Calculate latency -->
+    <set-header name="x-gateway-latency-ms" exists-action="override">
+      <value>@{
+        var startTime = (DateTime)context.Variables["request-start-time"];
+        return ((int)(DateTime.UtcNow - startTime).TotalMilliseconds).ToString();
+      }</value>
+    </set-header>
+  </outbound>
+
+  <on-error>
+    <base />
+
+    <!-- Handle timeout errors gracefully -->
+    <choose>
+      <when condition="@(context.Response.StatusCode == 408)">
+        <return-response>
+          <set-status code="504" reason="Gateway Timeout" />
+          <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+          </set-header>
+          <set-body>@{
+            return new JObject(
+              new JProperty("error", new JObject(
+                new JProperty("code", "GatewayTimeout"),
+                new JProperty("message", "Agent operation timed out. The request may be too complex or the service is experiencing high load."),
+                new JProperty("suggestion", "Try simplifying the request or retry after a few seconds.")
+              ))
+            ).ToString();
+          }</set-body>
+        </return-response>
+      </when>
+    </choose>
+  </on-error>
+</policies>
+'''
+  }
+}
+
+// Link Foundry Agent API to Product
+resource productFoundryAgentApi 'Microsoft.ApiManagement/service/products/apis@2024-05-01' = {
+  parent: product
+  name: foundryAgentApi.name
+}
+
 // MCP API Policy
 resource mcpApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = if (!empty(mcpServerEndpoint)) {
   parent: mcpApi
@@ -355,6 +544,7 @@ resource mcpApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01'
 }
 
 // API Policy with Azure OpenAI specific handling
+// Includes AI Gateway features: Token metrics, Managed Identity auth
 resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01' = {
   parent: aoaiApi
   name: 'policy'
@@ -377,9 +567,6 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
       return path;
     }" copy-unmatched-params="true" />
 
-    <!-- Note: rate-limit-by-key not available in Consumption tier -->
-    <!-- Rate limiting is handled by Azure OpenAI's built-in throttling -->
-
     <!-- Token usage tracking header -->
     <set-header name="x-ms-gateway-timestamp" exists-action="override">
       <value>@(DateTime.UtcNow.ToString("o"))</value>
@@ -395,6 +582,17 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
 
   <outbound>
     <base />
+
+    <!-- AI Gateway: Emit token metrics to Azure Monitor (all tiers including Consumption) -->
+    <choose>
+      <when condition="@(context.Response.StatusCode == 200)">
+        <llm-emit-token-metric namespace="AzureOpenAI">
+          <dimension name="API" value="@(context.Api.Name)" />
+          <dimension name="Operation" value="@(context.Operation.Name)" />
+          <dimension name="Model" value="@(context.Request.MatchedParameters["deployment-id"] ?? "unknown")" />
+        </llm-emit-token-metric>
+      </when>
+    </choose>
 
     <!-- Extract token usage from response -->
     <choose>
@@ -525,3 +723,4 @@ output apimResourceId string = apim.id
 output azureOpenAiProxyEndpoint string = '${apim.properties.gatewayUrl}/openai'
 output defaultDeploymentEndpoint string = '${apim.properties.gatewayUrl}/openai/deployments/${azureOpenAiDeploymentName}'
 output mcpServerProxyEndpoint string = !empty(mcpServerEndpoint) ? '${apim.properties.gatewayUrl}/mcp' : ''
+output foundryAgentProxyEndpoint string = '${apim.properties.gatewayUrl}/foundry-agents'

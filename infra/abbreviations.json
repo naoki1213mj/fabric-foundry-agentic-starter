@@ -126,6 +126,7 @@
   },
   "integration": {
     "apiManagementService": "apim-",
+    "apiCenter": "apic-",
     "integrationAccount": "ia-",
     "logicApp": "logic-",
     "serviceBusNamespace": "sbns-",

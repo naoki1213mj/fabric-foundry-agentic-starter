@@ -227,21 +227,50 @@ python <script.py>
 | Why Microsoft | Fabric + Foundry + Agent Framework |
 | Why Now | Agent Framework GA + Guardrails |
 | 技術統合 | 5領域カバー |
-| ACR | Fabric F2 + OpenAI 従量課金 |
+| ACR | Fabric F4 + OpenAI PTU/従量課金 |
 
 ---
 
-## 🌐 Azure 実機環境情報（2026/2/4 確認）
+## 🌐 Azure 実機環境情報（2026/2/4 更新）
 
-| 項目 | 値 |
-|------|-----|
-| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` |
-| **API App Service** | `api-daj6dri4yf3k3z` |
-| **Frontend App** | `app-daj6dri4yf3k3z` |
-| **ACR** | `crda672axowukix3.azurecr.io` |
-| **AI Foundry** | `aisa-daj6dri4yf3k3z` |
-| **AI Search** | `search-sp-rag-australiaeast-001` |
-| **Model** | `gpt-5` |
+### リソース一覧
+
+| 項目 | 値 | 備考 |
+|------|-----|------|
+| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` | |
+| **API App Service** | `api-daj6dri4yf3k3z` | Linux Container (da-api:main) |
+| **Frontend App** | `app-daj6dri4yf3k3z` | Linux Container (da-app:main) |
+| **MCP Function** | `func-mcp-daj6dri4yf3k3z` | Python 3.12 |
+| **ACR** | `crda672axowukix3.azurecr.io` | Premium SKU |
+| **AI Foundry** | `aisa-daj6dri4yf3k3z` | AIServices |
+| **Foundry Project** | `aifp-daj6dri4yf3k3z` | |
+| **AI Search** | `search-sp-rag-australiaeast-001` | Standard SKU |
+| **Fabric Capacity** | `capagentunifieddata001` | F4 SKU |
+| **API Management** | `apim-daj6dri4yf3k3z` | Consumption SKU |
+| **App Insights** | `appi-daj6dri4yf3k3z` | |
+| **Log Analytics** | `log-daj6dri4yf3k3z` | |
+
+### モデルデプロイメント
+
+| モデル | バージョン | TPM |
+|--------|-----------|-----|
+| `gpt-5` | 2025-08-07 | 500 |
+| `gpt-4o-mini` | 2024-07-18 | 30 |
+| `text-embedding-3-large` | 1 | 500 |
+| `text-embedding-3-small` | 1 | 120 |
+
+### API Management (AI Gateway)
+
+| API | Path | Backend |
+|-----|------|---------|
+| Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` |
+| MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` |
+| Foundry Agent API | `/foundry-agents` | Foundry Agent Service |
+
+**AI Gateway機能:**
+- `llm-emit-token-metric`: トークン使用量メトリクス
+- Circuit Breaker: 429/500-599エラー時の自動フェイルオーバー
+- Managed Identity認証
 
 ### エンドポイント
 
@@ -250,6 +279,8 @@ python <script.py>
 | Frontend | https://app-daj6dri4yf3k3z.azurewebsites.net |
 | API | https://api-daj6dri4yf3k3z.azurewebsites.net |
 | Health Check | https://api-daj6dri4yf3k3z.azurewebsites.net/health |
+| APIM Gateway | https://apim-daj6dri4yf3k3z.azure-api.net |
+| MCP Server | https://func-mcp-daj6dri4yf3k3z.azurewebsites.net/api/mcp |
 
 ### ツール対応状況（実機確認済み）
 
@@ -257,5 +288,5 @@ python <script.py>
 |--------|------|------|
 | SQL Query (Fabric) | ✅ 動作 | 売上データ、顧客データ |
 | Doc Search (AI Search) | ✅ 動作 | 製品仕様書検索 |
-| Web Search | ✅ 動作 | Web Search tool (preview) 使用 |
-| MCP Tools | ✅ 動作 | YoY, RFM, 在庫分析 |
+| Web Search | ⚠️ タイムアウト | Web Search tool (preview) 60秒タイムアウト設定 |
+| MCP Tools | ✅ 動作 | YoY, RFM, 在庫分析 (APIM経由) |
