@@ -26,11 +26,13 @@ Architecture Decision:
 - For complex planning → Use magentic (slow but powerful)
 """
 
+import asyncio
 import json
 import logging
 import os
 import re
 from contextvars import ContextVar
+from datetime import UTC, datetime
 from typing import Annotated
 
 from agent_framework import (
@@ -161,6 +163,101 @@ def get_reasoning_effort() -> str:
     return _reasoning_effort_var.get()
 
 
+# ============================================================================
+# Tool Event Streaming
+# Send real-time tool status updates to the frontend
+# ============================================================================
+
+def create_tool_event(tool_name: str, status: str, message: str | None = None) -> str:
+    """
+    Create a JSON-formatted tool event for streaming to frontend.
+
+    Args:
+        tool_name: Name of the tool (e.g., "run_sql_query", "search_documents")
+        status: "started", "completed", or "error"
+        message: Optional message for additional context
+
+    Returns:
+        JSON string with tool event data, prefixed with special marker
+    """
+    event = {
+        "type": "tool_event",
+        "tool": tool_name,
+        "status": status,
+        "timestamp": datetime.now(UTC).isoformat(),
+    }
+    if message:
+        event["message"] = message
+    # Use special prefix to distinguish from regular text chunks
+    return f"__TOOL_EVENT__{json.dumps(event, ensure_ascii=False)}__END_TOOL_EVENT__"
+
+
+# Thread-safe queue for tool events using asyncio.Queue
+# Each request gets its own queue via ContextVar
+_tool_event_queue: ContextVar[asyncio.Queue | None] = ContextVar("tool_event_queue", default=None)
+
+
+def get_tool_event_queue() -> asyncio.Queue | None:
+    """Get the current tool event queue."""
+    return _tool_event_queue.get()
+
+
+def set_tool_event_queue(queue: asyncio.Queue | None):
+    """Set the tool event queue for the current request."""
+    _tool_event_queue.set(queue)
+
+
+async def emit_tool_event(tool_name: str, status: str, message: str | None = None):
+    """Emit a tool event to the current request's queue (non-blocking)."""
+    queue = get_tool_event_queue()
+    if queue:
+        event = create_tool_event(tool_name, status, message)
+        try:
+            queue.put_nowait(event)  # Non-blocking put
+            logger.debug(f"Tool event emitted: {tool_name} - {status}")
+        except asyncio.QueueFull:
+            logger.warning(f"Tool event queue full, dropping event: {tool_name} - {status}")
+
+
+async def drain_tool_events(queue: asyncio.Queue) -> list:
+    """Drain all pending tool events from the queue (non-blocking)."""
+    events = []
+    while True:
+        try:
+            event = queue.get_nowait()
+            events.append(event)
+        except asyncio.QueueEmpty:
+            break
+    return events
+
+
+async def stream_with_tool_events(agent_stream):
+    """
+    Wrapper generator that interleaves tool events with agent stream chunks.
+
+    This enables real-time tool status updates in the UI while the agent is processing.
+    """
+    queue = asyncio.Queue(maxsize=100)  # Limit queue size
+    set_tool_event_queue(queue)
+
+    try:
+        async for chunk in agent_stream:
+            # First, drain any pending tool events
+            events = await drain_tool_events(queue)
+            for event in events:
+                yield event
+
+            # Then yield the agent chunk
+            if chunk and chunk.text:
+                yield chunk.text
+    finally:
+        # Drain any remaining events and clear queue
+        events = await drain_tool_events(queue)
+        for event in events:
+            yield event
+        set_tool_event_queue(None)
+
+
 # Check if the Application Insights Instrumentation Key is set in the environment variables
 instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
 if instrumentation_key:
@@ -277,9 +374,13 @@ async def run_sql_query(
     from datetime import date, datetime
     from decimal import Decimal
 
+    # Emit tool start event
+    await emit_tool_event("run_sql_query", "started", "SQLクエリを実行中...")
+
     try:
         conn = await get_db_connection()
         if not conn:
+            await emit_tool_event("run_sql_query", "error", "DB接続エラー")
             return json.dumps({"error": "Database connection not available"}, ensure_ascii=False)
 
         cursor = conn.cursor()
@@ -300,10 +401,14 @@ async def run_sql_query(
 
         cursor.close()
         logger.info(f"SQL query executed successfully, returned {len(result)} rows")
+
+        # Emit tool completion event
+        await emit_tool_event("run_sql_query", "completed", f"{len(result)}件のデータを取得しました")
         return json.dumps(result, ensure_ascii=False)
 
     except Exception as e:
         logger.error(f"Error executing SQL query: {e}")
+        await emit_tool_event("run_sql_query", "error", str(e))
         return json.dumps({"error": str(e)}, ensure_ascii=False)
 
 
@@ -326,6 +431,10 @@ async def search_web(
         JSON string with search results or error message.
     """
     global _current_web_citations
+
+    # Emit tool start event
+    await emit_tool_event("search_web", "started", "Web検索を実行中...")
+
     try:
         logger.info(f"Web search requested: {query}")
         web_agent = get_web_agent_handler()
@@ -341,9 +450,13 @@ async def search_web(
             pass
 
         logger.info(f"Web search completed for query: {query}")
+
+        # Emit tool completion event
+        await emit_tool_event("search_web", "completed", "検索結果を取得しました")
         return result  # Already JSON string
     except Exception as e:
         logger.error(f"Error in web search: {e}")
+        await emit_tool_event("search_web", "error", str(e))
         return json.dumps({"error": str(e)}, ensure_ascii=False)
 
 
@@ -373,6 +486,9 @@ async def search_documents(
     Returns:
         Formatted string with document search results and citations.
     """
+    # Emit tool start event
+    await emit_tool_event("search_documents", "started", "製品仕様書を検索中...")
+
     try:
         logger.info(f"Agentic document search requested: {query}")
 
@@ -389,11 +505,15 @@ async def search_documents(
             logger.info(f"Using Agentic Retrieval with reasoning_effort={effort.value}")
             result = await agentic_tool.retrieve_formatted(query, effort)
             logger.info(f"Agentic document search completed for query: {query}")
+
+            # Emit tool completion event
+            await emit_tool_event("search_documents", "completed", "ドキュメントを検索しました")
             return result
 
         # Fallback to basic search if Agentic Retrieval not configured
         kb_tool = get_knowledge_base_tool()
         if kb_tool is None:
+            await emit_tool_event("search_documents", "error", "検索が設定されていません")
             return json.dumps(
                 {
                     "message": (
@@ -418,9 +538,13 @@ async def search_documents(
                     doc["content"] = doc["content"][:1000] + "...(truncated)"
 
         logger.info(f"Basic document search completed for query: {query}")
+
+        # Emit tool completion event
+        await emit_tool_event("search_documents", "completed", "ドキュメントを検索しました")
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:
         logger.error(f"Error in document search: {e}")
+        await emit_tool_event("search_documents", "error", str(e))
         return json.dumps({"error": str(e)}, ensure_ascii=False)
 
 
@@ -899,10 +1023,9 @@ async def stream_single_agent_response(
 
         logger.info(f"Unified agent processing query: {query[:100]}...")
 
-        # Stream the agent response
-        async for chunk in agent.run_stream(full_query):
-            if chunk and chunk.text:
-                yield chunk.text
+        # Stream the agent response with tool events interleaved
+        async for output in stream_with_tool_events(agent.run_stream(full_query)):
+            yield output
 
     except Exception as e:
         logger.error(f"Error in single agent response: {e}", exc_info=True)
@@ -1015,9 +1138,9 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
 
         logger.info(f"SQL-only agent processing query: {query[:100]}...")
 
-        async for chunk in agent.run_stream(full_query):
-            if chunk and chunk.text:
-                yield chunk.text
+        # Stream with tool events
+        async for output in stream_with_tool_events(agent.run_stream(full_query)):
+            yield output
 
     except Exception as e:
         logger.error(f"Error in SQL-only response: {e}", exc_info=True)
@@ -1320,6 +1443,8 @@ async def stream_chat_request(
     - handoff: Multi-agent with HandoffBuilder
     - magentic: Multi-agent with MagenticBuilder (legacy)
     """
+    # Regex to extract tool events from streaming chunks
+    TOOL_EVENT_PATTERN = re.compile(r"__TOOL_EVENT__(.*?)__END_TOOL_EVENT__")
 
     async def generate():
         global _current_web_citations
@@ -1376,6 +1501,18 @@ async def stream_chat_request(
             async for chunk in stream_func(conversation_id, query):
                 if chunk:
                     chunk_str = str(chunk)
+
+                    # Check if this chunk is a tool event
+                    if chunk_str.startswith("__TOOL_EVENT__"):
+                        # Extract and send tool event separately
+                        match = TOOL_EVENT_PATTERN.search(chunk_str)
+                        if match:
+                            tool_event_json = match.group(1)
+                            # Send tool event as a special message type
+                            yield f"__TOOL_EVENT__{tool_event_json}__END_TOOL_EVENT__\n\n"
+                        continue  # Don't add to assistant_content
+
+                    # Regular text chunk - accumulate and send
                     assistant_content += chunk_str
                     # Include web citations in the response for UI display (Bing terms of use)
                     citations_json = (

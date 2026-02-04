@@ -23,6 +23,25 @@ MCP_ENABLED = os.getenv("MCP_ENABLED", "true").lower() == "true"
 # Cache for MCP tools (loaded once at startup)
 _mcp_tool_definitions: list[dict] | None = None
 
+# MCP tool name to display label mapping for tool events
+MCP_TOOL_LABELS = {
+    "calculate_yoy_growth": "前年比成長率を計算中",
+    "calculate_mom_growth": "前月比成長率を計算中",
+    "calculate_moving_average": "移動平均を計算中",
+    "calculate_abc_analysis": "ABC分析を実行中",
+    "calculate_sales_forecast": "売上予測を実行中",
+    "calculate_rfm_score": "RFMスコアを計算中",
+    "classify_customer_segment": "顧客セグメントを分類中",
+    "calculate_clv": "顧客生涯価値を計算中",
+    "recommend_next_action": "次のアクションを推奨中",
+    "calculate_inventory_turnover": "在庫回転率を計算中",
+    "calculate_reorder_point": "再発注点を計算中",
+    "identify_slow_moving_inventory": "滞留在庫を特定中",
+    "compare_products": "製品比較を実行中",
+    "calculate_price_performance": "価格性能比を計算中",
+    "calculate_bundle_discount": "バンドル割引を計算中",
+}
+
 
 async def fetch_mcp_tools() -> list[dict]:
     """Fetch tool definitions from the MCP server."""
@@ -59,6 +78,17 @@ async def call_mcp_tool(tool_name: str, arguments: dict) -> str:
     Returns:
         JSON string with tool result or error
     """
+    # Import emit_tool_event from chat module (avoid circular import)
+    try:
+        from chat import emit_tool_event
+    except ImportError:
+        emit_tool_event = None
+
+    # Emit tool start event
+    tool_label = MCP_TOOL_LABELS.get(tool_name, tool_name)
+    if emit_tool_event:
+        await emit_tool_event(tool_name, "started", f"{tool_label}...")
+
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
@@ -73,6 +103,10 @@ async def call_mcp_tool(tool_name: str, arguments: dict) -> str:
             response.raise_for_status()
             result = response.json()
 
+            # Emit completion event
+            if emit_tool_event:
+                await emit_tool_event(tool_name, "completed", "完了")
+
             if "result" in result:
                 content = result["result"].get("content", [])
                 if content and len(content) > 0:
@@ -83,9 +117,13 @@ async def call_mcp_tool(tool_name: str, arguments: dict) -> str:
             else:
                 return json.dumps(result, ensure_ascii=False)
     except httpx.TimeoutException:
+        if emit_tool_event:
+            await emit_tool_event(tool_name, "error", "タイムアウト")
         return json.dumps({"error": "MCP server timeout"}, ensure_ascii=False)
     except Exception as e:
         logger.error(f"MCP tool call failed: {e}")
+        if emit_tool_event:
+            await emit_tool_event(tool_name, "error", str(e))
         return json.dumps({"error": str(e)}, ensure_ascii=False)
 
 

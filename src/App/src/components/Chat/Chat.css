@@ -471,6 +471,13 @@
   border: 1px dashed var(--color-accent-primary);
 }
 
+/* === Tool Status Wrapper === */
+.tool-status-wrapper {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  margin-bottom: var(--spacing-sm, 8px);
+  animation: messageSlideIn 0.3s ease-out;
+}
+
 /* === Loading Indicator === */
 .loading-indicator {
   padding: var(--spacing-md, 16px);

@@ -85,7 +85,7 @@ useEffect(() => {
   // Apply theme colors to all scales dynamically
   const themedScales: Record<string, any> = {};
   const originalScales = chartContent?.options?.scales || {};
-  
+
   // Process all scales (x, y, y1, y2, etc.)
   for (const scaleKey of Object.keys(originalScales)) {
     themedScales[scaleKey] = {
@@ -104,7 +104,7 @@ useEffect(() => {
       },
     };
   }
-  
+
   // Ensure at least x and y scales have theme colors even if not in original
   if (!themedScales.x) {
     themedScales.x = {

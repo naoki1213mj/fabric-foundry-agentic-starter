@@ -39,6 +39,7 @@ import {
     type ConversationRequest,
     type ParsedChunk,
     type ReasoningEffort,
+    type ToolEvent,
     ToolMessageContent,
 } from "../../types/AppTypes";
 import {
@@ -46,6 +47,7 @@ import {
     parseChartContent,
 } from "../../utils/jsonUtils";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
+import { ToolStatusIndicator } from "../ToolStatusIndicator";
 import "./Chat.css";
 
 // Last updated: 2025-02-04 - Added Reasoning Effort UI for Agentic Retrieval (Foundry IQ)
@@ -60,6 +62,35 @@ const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: numb
       fn(...args);
     }
   };
+};
+
+// Tool event parsing: Extract tool events from streaming text
+const TOOL_EVENT_REGEX = /__TOOL_EVENT__(.*?)__END_TOOL_EVENT__/g;
+
+/**
+ * Parse tool events from streaming text and return cleaned text
+ * @param text Raw streaming text containing potential tool events
+ * @returns { events: ToolEvent[], cleanedText: string }
+ */
+const parseToolEvents = (text: string): { events: ToolEvent[]; cleanedText: string } => {
+  const events: ToolEvent[] = [];
+  let cleanedText = text;
+
+  const matches = text.matchAll(TOOL_EVENT_REGEX);
+  for (const match of matches) {
+    try {
+      const eventJson = match[1];
+      const event = JSON.parse(eventJson) as ToolEvent;
+      events.push(event);
+      // Remove the tool event marker from the text
+      cleanedText = cleanedText.replace(match[0], "");
+    } catch (e) {
+      // Skip malformed tool events
+      console.warn("Failed to parse tool event:", e);
+    }
+  }
+
+  return { events, cleanedText };
 };
 
 type ChatProps = {
@@ -87,6 +118,7 @@ const Chat: React.FC<ChatProps> = ({
   const [isChartLoading, setIsChartLoading] = useState(false)
   const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
   const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
+  const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -425,6 +457,8 @@ const Chat: React.FC<ChatProps> = ({
     if (isChart) {
       setIsChartLoading(true);
     }
+    // Clear tool events for new message
+    setToolEvents([]);
 
     dispatch(addMessages([newMessage]));
 
@@ -470,7 +504,14 @@ const Chat: React.FC<ChatProps> = ({
           const { done, value } = await reader.read();
           if (done) break;
 
-          const text = new TextDecoder("utf-8").decode(value);
+          let text = new TextDecoder("utf-8").decode(value);
+
+          // Parse and extract tool events from the stream
+          const { events: newToolEvents, cleanedText } = parseToolEvents(text);
+          if (newToolEvents.length > 0) {
+            setToolEvents((prev) => [...prev, ...newToolEvents]);
+            text = cleanedText; // Use cleaned text without tool event markers
+          }
 
           try {
             const textObj = JSON.parse(text);
@@ -711,6 +752,12 @@ const Chat: React.FC<ChatProps> = ({
               </div>
             );
           })}
+        {/* Tool status indicator - show active tools during response generation */}
+        {generatingResponse && toolEvents.length > 0 && (
+          <div className="tool-status-wrapper">
+            <ToolStatusIndicator toolEvents={toolEvents} />
+          </div>
+        )}
         {/* Show loading indicator:
             - "回答を生成中" when waiting for response (generatingResponse && !isStreamingInProgress && !isChartLoading)
             - "チャート生成中" when chart is loading AND not streaming (to avoid duplicate with ChatMessage)
