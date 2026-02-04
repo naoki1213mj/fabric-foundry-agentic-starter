@@ -137,6 +137,8 @@ export const ja = {
     message: {
       aiDisclaimer: "AIが生成したコンテンツは不正確な場合があります",
       noDataAvailable: "データがありません",
+      copy: "コピー",
+      copied: "コピーしました",
     },
 
     // 引用

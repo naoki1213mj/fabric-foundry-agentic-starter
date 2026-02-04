@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,6 +6,42 @@ import supersub from "remark-supersub";
 import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
 import ChatChart from "../ChatChart/ChatChart";
 import Citations from "../Citations/Citations";
+
+// Copy button component
+const CopyButton: React.FC<{ text: string; className?: string }> = ({ text, className = "" }) => {
+  const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [text]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className={`copy-button ${className} ${copied ? "copied" : ""}`}
+      title={copied ? t("message.copied") || "コピーしました" : t("message.copy") || "コピー"}
+      aria-label={copied ? t("message.copied") || "コピーしました" : t("message.copy") || "コピー"}
+    >
+      {copied ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      )}
+    </button>
+  );
+};
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -45,6 +81,9 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     if (message.content === "show in a graph by default") return null;
     return (
       <div className="user-message">
+        <div className="message-header">
+          <CopyButton text={message.content} className="user-copy-button" />
+        </div>
         <span>{message.content}</span>
         {timestamp && <div className="message-timestamp">{timestamp}</div>}
       </div>
@@ -404,8 +443,16 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
     // Plain text message (most common case)
     const containsHTML = /<\/?[a-z][\s\S]*>/i.test(message.content);
 
+    // Extract plain text for copy (strip HTML tags if present)
+    const plainTextForCopy = containsHTML
+      ? message.content.replace(/<[^>]*>/g, '')
+      : message.content;
+
     return (
       <div className="assistant-message">
+        <div className="message-header">
+          <CopyButton text={plainTextForCopy} className="assistant-copy-button" />
+        </div>
         {containsHTML ? (
           <div
             dangerouslySetInnerHTML={{ __html: message.content }}

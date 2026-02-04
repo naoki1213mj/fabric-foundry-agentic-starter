@@ -137,6 +137,8 @@ export const en = {
     message: {
       aiDisclaimer: "AI-generated content may be incorrect",
       noDataAvailable: "No Data Available",
+      copy: "Copy",
+      copied: "Copied",
     },
 
     // Citation
