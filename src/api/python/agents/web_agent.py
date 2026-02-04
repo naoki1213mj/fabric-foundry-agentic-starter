@@ -1,24 +1,7 @@
-"""
-Web Agent Handler
+"""Web Agent Handler using Grounding with Bing Search via Azure AI Foundry.
 
-Handles web search queries using Web Search tool (preview) via Azure AI Foundry.
 Uses the Foundry Agent Service with create_version() and responses API.
-
-Best Practice Reference:
-- https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/web-search
-
-Pattern follows official Microsoft sample:
-- Create AIProjectClient with DefaultAzureCredential
-- Get openai_client from project_client.get_openai_client()
-- Use `with project_client:` context manager
-- Create agent with agents.create_version()
-- Send query with openai_client.responses.create()
-- Extract citations from response.output items
-- Clean up with agents.delete_version()
-
-Note: Web Search tool (preview) is recommended over Bing Grounding because:
-- Bing Grounding does NOT support gpt-4o-mini (2024-07-18) and gpt-5 models
-- Web Search tool supports all models including gpt-5
+Best Practice Reference: https://learn.microsoft.com/azure/ai-foundry/agents/how-to/tools/bing-tools
 """
 
 import asyncio
@@ -28,49 +11,49 @@ import os
 
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import (
-    ApproximateLocation,
+    BingGroundingAgentTool,
+    BingGroundingSearchConfiguration,
+    BingGroundingSearchToolParameters,
     PromptAgentDefinition,
-    WebSearchPreviewTool,
 )
 from azure.identity import DefaultAzureCredential
 
 logger = logging.getLogger(__name__)
 
-# Timeout configuration for Web Search tool (preview)
-# Foundry Agent Service may take longer due to web search operations
-WEB_SEARCH_TIMEOUT_SECONDS = 60  # Total timeout for web search operation
+WEB_SEARCH_TIMEOUT_SECONDS = 90
 
 
 class WebAgentHandler:
-    """Handler for Web Agent tool execution using Web Search tool (preview) via Foundry."""
+    """Handler for Web Agent using Grounding with Bing Search via Foundry."""
 
     def __init__(self, api_key: str | None = None):
-        """
-        Initialize the Web Agent Handler.
+        """Initialize the Web Agent Handler.
 
         Args:
-            api_key: Bing Search API key (optional, kept for backward compatibility)
+            api_key: Legacy parameter (kept for backward compatibility, not used)
         """
-        self.api_key = api_key or os.getenv("BING_SEARCH_API_KEY")
-        # Support both AZURE_AI_PROJECT_ENDPOINT and AZURE_AI_AGENT_ENDPOINT for compatibility
         self.foundry_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT") or os.getenv(
             "AZURE_AI_AGENT_ENDPOINT"
         )
-        # Note: BING_PROJECT_CONNECTION_ID is no longer required for Web Search tool
-        self.bing_connection_id = os.getenv("BING_PROJECT_CONNECTION_ID")
-        # gpt-5 is now supported with Web Search tool (preview)
+        self.bing_connection_name = os.getenv("BING_PROJECT_CONNECTION_NAME")
         self.model_deployment = os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME", "gpt-5")
 
+        if not self.foundry_endpoint:
+            logger.warning("Foundry Web Search not configured (missing AZURE_AI_PROJECT_ENDPOINT)")
+        if not self.bing_connection_name:
+            logger.warning("Bing Grounding not configured (missing BING_PROJECT_CONNECTION_NAME)")
+        else:
+            logger.info(
+                f"WebAgentHandler configured: endpoint={self.foundry_endpoint}, "
+                f"bing_connection={self.bing_connection_name}"
+            )
+
+    def is_configured(self) -> bool:
+        """Check if the handler is properly configured."""
+        return bool(self.foundry_endpoint and self.bing_connection_name)
+
     async def web_search(self, query: str) -> str:
-        """
-        Search the web using Web Search tool (preview) via Foundry Agent Service.
-
-        Uses the recommended pattern from Microsoft official documentation:
-        - agents.create_version() for agent creation
-        - openai_client.responses.create() for responses
-
-        Note: Web Search tool is preferred over Bing Grounding because it supports
-        all models including gpt-5.
+        """Search the web using Grounding with Bing Search via Foundry Agent Service.
 
         Args:
             query: The search query to send to the web
@@ -78,148 +61,126 @@ class WebAgentHandler:
         Returns:
             JSON string containing search results with citations
         """
-        # Check if Foundry endpoint is configured
-        if not self.foundry_endpoint:
-            logger.warning(
-                "Foundry Web Search not configured "
-                "(missing AZURE_AI_PROJECT_ENDPOINT or AZURE_AI_AGENT_ENDPOINT)"
-            )
+        if not self.is_configured():
+            logger.warning("Bing Grounding not properly configured")
             return json.dumps(
                 {
                     "answer": f"[Web検索が設定されていません] '{query}'についての情報は、"
-                    f"私の学習データに基づいて回答します。\n\n"
-                    f"注: 以下は私の知識（2024年までの情報）に基づく回答です。",
+                    f"私の学習データに基づいて回答します。",
                     "citations": [],
                     "fallback": True,
-                    "note": "Foundry Web Search is not configured.",
+                    "note": "Bing Grounding is not configured.",
                 },
                 ensure_ascii=False,
             )
 
         try:
-            logger.info(f"Performing Web Search via Foundry (Web Search tool): {query[:100]}...")
+            logger.info(f"Performing Bing Grounding search: {query[:100]}...")
 
-            # Create fresh client for each request (best practice to avoid transport issues)
-            # Following official pattern from Microsoft docs
+            credential = DefaultAzureCredential()
             project_client = AIProjectClient(
                 endpoint=self.foundry_endpoint,
-                credential=DefaultAzureCredential(),
+                credential=credential,
             )
 
-            # Get OpenAI client BEFORE entering context manager
-            openai_client = project_client.get_openai_client()
-
-            # Create Web Search tool (preview) - new recommended API
-            # user_location helps return results relevant to user's geography
-            web_search_tool = WebSearchPreviewTool(
-                user_location=ApproximateLocation(
-                    country="JP",
-                    city="Tokyo",
-                    region="Kanto",
-                )
-            )
-
-            # Use context manager for proper resource management
             with project_client:
-                # Create agent version with Web Search tool
+                try:
+                    bing_connection = project_client.connections.get(self.bing_connection_name)
+                    bing_connection_id = bing_connection.id
+                    logger.info(f"Bing connection ID: {bing_connection_id}")
+                except Exception as conn_error:
+                    logger.error(f"Failed to get Bing connection: {conn_error}")
+                    return json.dumps(
+                        {
+                            "answer": f"[Bing接続エラー] '{query}'についての情報は、"
+                            f"私の学習データに基づいて回答します。",
+                            "citations": [],
+                            "fallback": True,
+                            "note": f"Bing connection error: {str(conn_error)}",
+                        },
+                        ensure_ascii=False,
+                    )
+
+                openai_client = project_client.get_openai_client()
+
+                bing_grounding_tool = BingGroundingAgentTool(
+                    bing_grounding=BingGroundingSearchToolParameters(
+                        search_configurations=[
+                            BingGroundingSearchConfiguration(
+                                project_connection_id=bing_connection_id,
+                            )
+                        ]
+                    )
+                )
+
                 agent = project_client.agents.create_version(
-                    agent_name="web-search-agent",
+                    agent_name="web-search-agent-bing",
                     definition=PromptAgentDefinition(
                         model=self.model_deployment,
                         instructions=(
-                            "You are a web search assistant. Search the web and return "
-                            "relevant information with citations. Focus on current trends "
-                            "and recent data. Always cite your sources. "
+                            "You are a web search assistant with access to Bing Search. "
+                            "Search the web and return relevant information with citations. "
                             "Respond in Japanese when the query is in Japanese."
                         ),
-                        tools=[web_search_tool],
+                        tools=[bing_grounding_tool],
                     ),
-                    description="Agent for web search with Web Search tool (preview)",
+                    description="Web search agent with Bing Grounding",
                 )
-                logger.info(
-                    f"Created Web Search agent: id={agent.id}, "
-                    f"name={agent.name}, version={agent.version}"
-                )
+                logger.info(f"Created Bing agent: {agent.name} v{agent.version}")
 
                 try:
-                    # Use responses API (recommended pattern)
-                    # Wrap in asyncio.to_thread with timeout to handle 408 errors
-                    logger.info(
-                        f"Calling responses.create with timeout={WEB_SEARCH_TIMEOUT_SECONDS}s"
-                    )
 
                     def _create_response():
                         return openai_client.responses.create(
                             input=f"Search the web for: {query}",
-                            tool_choice="required",  # Force the model to use web search
-                            extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+                            tool_choice="required",
+                            extra_body={
+                                "agent": {
+                                    "name": agent.name,
+                                    "type": "agent_reference",
+                                }
+                            },
                         )
 
-                    try:
-                        response = await asyncio.wait_for(
-                            asyncio.to_thread(_create_response),
-                            timeout=WEB_SEARCH_TIMEOUT_SECONDS,
-                        )
-                    except TimeoutError:
-                        logger.error(f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s")
-                        raise TimeoutError(
-                            f"Web search operation timed out after "
-                            f"{WEB_SEARCH_TIMEOUT_SECONDS} seconds"
-                        )
+                    response = await asyncio.wait_for(
+                        asyncio.to_thread(_create_response),
+                        timeout=WEB_SEARCH_TIMEOUT_SECONDS,
+                    )
 
-                    # Extract answer text safely
                     answer_text = ""
                     if hasattr(response, "output_text") and response.output_text:
                         answer_text = response.output_text
 
-                    # Extract URL citations from output items with proper null checks
                     citations = []
                     if hasattr(response, "output") and response.output:
                         for item in response.output:
-                            # Check if item has content attribute and it's not None
                             if not hasattr(item, "content") or item.content is None:
                                 continue
-
                             for content in item.content:
-                                # Check if content has annotations and it's not None
-                                if (
-                                    not hasattr(content, "annotations")
-                                    or content.annotations is None
-                                ):
-                                    continue
-
-                                for annotation in content.annotations:
-                                    if (
-                                        hasattr(annotation, "type")
-                                        and annotation.type == "url_citation"
-                                    ):
-                                        citations.append(
-                                            {
-                                                "url": getattr(annotation, "url", ""),
-                                                "title": getattr(annotation, "title", ""),
-                                            }
-                                        )
+                                if hasattr(content, "annotations") and content.annotations:
+                                    for annotation in content.annotations:
+                                        if getattr(annotation, "type", "") == "url_citation":
+                                            citations.append(
+                                                {
+                                                    "url": getattr(annotation, "url", ""),
+                                                    "title": getattr(annotation, "title", ""),
+                                                }
+                                            )
 
                     logger.info(
-                        f"Web Search response received. "
-                        f"Answer length: {len(answer_text)}, Citations: {len(citations)}"
+                        f"Bing response: len={len(answer_text)}, citations={len(citations)}"
                     )
 
                 finally:
-                    # Clean up the agent version
                     try:
                         project_client.agents.delete_version(
                             agent_name=agent.name, agent_version=agent.version
                         )
-                        logger.info(f"Deleted Web Search agent: {agent.name} v{agent.version}")
+                        logger.info(f"Deleted agent: {agent.name} v{agent.version}")
                     except Exception as cleanup_error:
-                        logger.warning(f"Failed to delete agent (non-critical): {cleanup_error}")
+                        logger.warning(f"Failed to delete agent: {cleanup_error}")
 
-            # Return results
             if answer_text:
-                logger.info(f"Web Search completed successfully. Found {len(citations)} citations.")
-                # Format citations for UI display (Bing terms of use compliance)
-                # Each citation must have url and title for proper display
                 formatted_citations = []
                 for i, cit in enumerate(citations):
                     formatted_citations.append(
@@ -227,8 +188,8 @@ class WebAgentHandler:
                             "id": f"web-{i + 1}",
                             "title": cit.get("title") or f"Web Source {i + 1}",
                             "url": cit.get("url", ""),
-                            "filepath": cit.get("url", ""),  # UI uses filepath for display
-                            "content": "",  # No content for web citations
+                            "filepath": cit.get("url", ""),
+                            "content": "",
                             "metadata": None,
                             "chunk_id": None,
                             "reindex_id": None,
@@ -239,61 +200,46 @@ class WebAgentHandler:
                     {
                         "answer": answer_text,
                         "citations": formatted_citations,
-                        "source": "web_search_preview_tool",
+                        "source": "bing_grounding_tool",
                     },
                     ensure_ascii=False,
                 )
             else:
-                logger.warning("Web Search returned empty response")
                 return json.dumps(
                     {
-                        "answer": f"[Web検索結果が空でした] '{query}'についての情報は、"
-                        f"私の学習データに基づいて回答します。",
+                        "answer": f"[Web検索結果が空でした] '{query}'について回答します。",
                         "citations": [],
                         "fallback": True,
-                        "note": "Web search returned empty results.",
                     },
                     ensure_ascii=False,
                 )
 
-        except TimeoutError as te:
-            # Handle timeout specifically with user-friendly message
-            logger.error(f"Web Search timeout: {te}")
+        except TimeoutError:
+            logger.error(f"Bing Grounding timeout after {WEB_SEARCH_TIMEOUT_SECONDS}s")
             return json.dumps(
                 {
-                    "answer": f"[Web検索がタイムアウトしました] '{query}'についての情報は、"
-                    f"私の学習データに基づいて回答します。\n\n"
-                    f"Web検索サービスが混雑しているため、後でもう一度お試しください。",
+                    "answer": f"[Web検索タイムアウト] '{query}'について回答します。",
                     "citations": [],
                     "fallback": True,
                     "timeout": True,
-                    "note": f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s",
                 },
                 ensure_ascii=False,
             )
 
         except Exception as e:
-            logger.error(f"Web Search error: {e}", exc_info=True)
+            logger.error(f"Bing Grounding error: {e}", exc_info=True)
             return json.dumps(
                 {
-                    "answer": f"[Web検索でエラーが発生しました] '{query}'についての情報は、"
-                    f"私の学習データに基づいて回答します。\n\n"
-                    f"エラー詳細: {str(e)[:200]}",
+                    "answer": f"[Web検索エラー] '{query}'について回答します。",
                     "citations": [],
                     "fallback": True,
-                    "note": f"Web Search failed: {str(e)}",
+                    "note": f"Error: {str(e)[:200]}",
                 },
                 ensure_ascii=False,
             )
 
-    # Backward compatibility alias
     async def bing_grounding(self, query: str) -> str:
-        """
-        Backward compatibility alias for web_search.
-
-        Note: This method now uses Web Search tool (preview) instead of Bing Grounding
-        because Bing Grounding does not support gpt-5 models.
-        """
+        """Backward compatibility alias for web_search."""
         return await self.web_search(query)
 
     def get_tools(self) -> list[callable]:
