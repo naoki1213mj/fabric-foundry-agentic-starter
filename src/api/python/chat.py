@@ -39,6 +39,7 @@ from agent_framework import (
     GroupChatRequestSentEvent,
     HandoffAgentUserRequest,
     HandoffBuilder,
+    HostedWebSearchTool,
     MagenticBuilder,
     MagenticOrchestratorEvent,
     RequestInfoEvent,
@@ -841,10 +842,24 @@ async def stream_single_agent_response(
         # Collect all available tools
         all_tools = [run_sql_query]  # Always available
 
-        # Add web search if configured
-        if web_handler:
+        # Add web search tool
+        # When using ResponsesClient, prefer HostedWebSearchTool (server-side, faster)
+        # When using ChatClient, use custom search_web function
+        if use_responses_client:
+            # HostedWebSearchTool: Server-side web search via Responses API
+            # - Faster than custom implementation (no extra API calls)
+            # - Built-in citations in response
+            # - Uses web_search_preview tool type
+            hosted_web_search = HostedWebSearchTool(
+                description="Search the web for real-time information and news",
+                additional_properties={"user_location": {"country": "JP"}},
+            )
+            all_tools.append(hosted_web_search)
+            logger.info("HostedWebSearchTool enabled (Responses API native)")
+        elif web_handler:
+            # Fallback: Custom search_web function for ChatClient
             all_tools.append(search_web)
-            logger.info("Web search tool enabled")
+            logger.info("Custom web search tool enabled (via WebAgentHandler)")
 
         # Add document search if configured
         if kb_tool:
