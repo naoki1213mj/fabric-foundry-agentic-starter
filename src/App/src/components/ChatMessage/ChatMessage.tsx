@@ -186,8 +186,20 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       const availableText = extractTextExcludingChart(message.content);
       const containsHTML = availableText ? /<\/?[a-z][\s\S]*>/i.test(availableText) : false;
 
+      // Extract plain text for copy (strip HTML tags if present)
+      const plainTextForCopy = availableText
+        ? (containsHTML ? availableText.replace(/<[^>]*>/g, '') : availableText)
+        : '';
+
       return (
         <div className="assistant-message">
+          {/* Copy button for available text */}
+          {plainTextForCopy && (
+            <div className="message-header">
+              <CopyButton text={plainTextForCopy} className="assistant-copy-button" />
+            </div>
+          )}
+
           {/* Show text content (before and after chart, excluding JSON) */}
           {availableText && (
             containsHTML ? (
@@ -389,8 +401,20 @@ const ChatMessage: React.FC<ChatMessageProps> = memo(({
       // Render text + multiple charts
       const containsHTML = /<\/?[a-z][\s\S]*>/i.test(textPart);
 
+      // Extract plain text for copy (strip HTML tags if present)
+      const plainTextForCopy = textPart
+        ? (containsHTML ? textPart.replace(/<[^>]*>/g, '') : textPart)
+        : '';
+
       return (
         <div className="assistant-message">
+          {/* Copy button for text content */}
+          {plainTextForCopy && (
+            <div className="message-header">
+              <CopyButton text={plainTextForCopy} className="assistant-copy-button" />
+            </div>
+          )}
+
           {/* Text content above the charts */}
           {textPart && (
             containsHTML ? (
