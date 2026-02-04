@@ -1,6 +1,6 @@
 # 実装概要ドキュメント
 
-> **注**: このドキュメントは **Azure 実機環境を確認して** 2026年2月3日に更新されました。
+> **注**: このドキュメントは **Azure 実機環境を確認して** 2026年2月4日に更新されました。
 > オリジナルの Solution Accelerator ドキュメントは同フォルダ内に保持されています。
 
 ## 1. プロジェクト概要
@@ -84,7 +84,7 @@
 - **LLM**: Azure OpenAI (**GPT-5** - 実機確認)
 - **エージェント管理**: Microsoft Foundry Agent Service (`aifp-daj6dri4yf3k3z`)
 - **ドキュメント検索**: Azure AI Search (Standard SKU)
-- **Web検索**: Bing Search API
+- **Web検索**: Web Search tool (preview) ※ Bing Grounding の後継
 - **安全性**: Foundry Guardrails
 
 ### データ

@@ -1,11 +1,11 @@
 """
 Web Agent Handler
 
-Handles web search queries using Bing Grounding via Azure AI Foundry (New API).
+Handles web search queries using Web Search tool (preview) via Azure AI Foundry.
 Uses the Foundry Agent Service with create_version() and responses API.
 
 Best Practice Reference:
-- https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/bing-tools
+- https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/web-search
 
 Pattern follows official Microsoft sample:
 - Create AIProjectClient with DefaultAzureCredential
@@ -15,6 +15,10 @@ Pattern follows official Microsoft sample:
 - Send query with openai_client.responses.create()
 - Extract citations from response.output items
 - Clean up with agents.delete_version()
+
+Note: Web Search tool (preview) is recommended over Bing Grounding because:
+- Bing Grounding does NOT support gpt-4o-mini (2024-07-18) and gpt-5 models
+- Web Search tool supports all models including gpt-5
 """
 
 import json
@@ -23,10 +27,9 @@ import os
 
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import (
-    BingGroundingAgentTool,
-    BingGroundingSearchConfiguration,
-    BingGroundingSearchToolParameters,
+    ApproximateLocation,
     PromptAgentDefinition,
+    WebSearchPreviewTool,
 )
 from azure.identity import DefaultAzureCredential
 
@@ -34,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 class WebAgentHandler:
-    """Handler for Web Agent tool execution using Bing Grounding via Foundry (New API)."""
+    """Handler for Web Agent tool execution using Web Search tool (preview) via Foundry."""
 
     def __init__(self, api_key: str | None = None):
         """
@@ -45,29 +48,32 @@ class WebAgentHandler:
         """
         self.api_key = api_key or os.getenv("BING_SEARCH_API_KEY")
         self.foundry_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT")
+        # Note: BING_PROJECT_CONNECTION_ID is no longer required for Web Search tool
         self.bing_connection_id = os.getenv("BING_PROJECT_CONNECTION_ID")
-        # Use gpt-5 for web search agent (best quality)
+        # gpt-5 is now supported with Web Search tool (preview)
         self.model_deployment = os.getenv("AZURE_AI_MODEL_DEPLOYMENT_NAME", "gpt-5")
 
-    async def bing_grounding(self, query: str) -> str:
+    async def web_search(self, query: str) -> str:
         """
-        Search the web using Bing Grounding via Foundry Agent Service (New API).
+        Search the web using Web Search tool (preview) via Foundry Agent Service.
 
         Uses the recommended pattern from Microsoft official documentation:
         - agents.create_version() for agent creation
         - openai_client.responses.create() for responses
 
+        Note: Web Search tool is preferred over Bing Grounding because it supports
+        all models including gpt-5.
+
         Args:
-            query: The search query to send to Bing
+            query: The search query to send to the web
 
         Returns:
             JSON string containing search results with citations
         """
-        # Check if Foundry Bing Grounding is configured
-        if not self.foundry_endpoint or not self.bing_connection_id:
+        # Check if Foundry endpoint is configured
+        if not self.foundry_endpoint:
             logger.warning(
-                "Foundry Bing Grounding not configured "
-                "(missing AZURE_AI_PROJECT_ENDPOINT or BING_PROJECT_CONNECTION_ID)"
+                "Foundry Web Search not configured (missing AZURE_AI_PROJECT_ENDPOINT)"
             )
             return json.dumps(
                 {
@@ -76,13 +82,13 @@ class WebAgentHandler:
                     f"注: 以下は私の知識（2024年までの情報）に基づく回答です。",
                     "citations": [],
                     "fallback": True,
-                    "note": "Foundry Bing Grounding is not configured.",
+                    "note": "Foundry Web Search is not configured.",
                 },
                 ensure_ascii=False,
             )
 
         try:
-            logger.info(f"Performing Bing Grounding search via Foundry (New API): {query[:100]}...")
+            logger.info(f"Performing Web Search via Foundry (Web Search tool): {query[:100]}...")
 
             # Create fresh client for each request (best practice to avoid transport issues)
             # Following official pattern from Microsoft docs
@@ -94,23 +100,19 @@ class WebAgentHandler:
             # Get OpenAI client BEFORE entering context manager
             openai_client = project_client.get_openai_client()
 
-            # Create Bing Grounding tool with New API
-            bing_grounding_tool = BingGroundingAgentTool(
-                bing_grounding=BingGroundingSearchToolParameters(
-                    search_configurations=[
-                        BingGroundingSearchConfiguration(
-                            project_connection_id=self.bing_connection_id,
-                            count=5,  # Number of search results
-                            market="ja-JP",  # Japanese market
-                            freshness="Week",  # Recent results
-                        )
-                    ]
+            # Create Web Search tool (preview) - new recommended API
+            # user_location helps return results relevant to user's geography
+            web_search_tool = WebSearchPreviewTool(
+                user_location=ApproximateLocation(
+                    country="JP",
+                    city="Tokyo",
+                    region="Kanto",
                 )
             )
 
             # Use context manager for proper resource management
             with project_client:
-                # Create agent version with New API (create_version)
+                # Create agent version with Web Search tool
                 agent = project_client.agents.create_version(
                     agent_name="web-search-agent",
                     definition=PromptAgentDefinition(
@@ -118,14 +120,15 @@ class WebAgentHandler:
                         instructions=(
                             "You are a web search assistant. Search the web and return "
                             "relevant information with citations. Focus on current trends "
-                            "and recent data. Always cite your sources."
+                            "and recent data. Always cite your sources. "
+                            "Respond in Japanese when the query is in Japanese."
                         ),
-                        tools=[bing_grounding_tool],
+                        tools=[web_search_tool],
                     ),
-                    description="Agent for web search with Bing Grounding",
+                    description="Agent for web search with Web Search tool (preview)",
                 )
                 logger.info(
-                    f"Created Bing search agent: id={agent.id}, "
+                    f"Created Web Search agent: id={agent.id}, "
                     f"name={agent.name}, version={agent.version}"
                 )
 
@@ -133,7 +136,7 @@ class WebAgentHandler:
                     # Use responses API (recommended pattern)
                     response = openai_client.responses.create(
                         input=f"Search the web for: {query}",
-                        tool_choice="required",  # Force the model to use Bing search
+                        tool_choice="required",  # Force the model to use web search
                         extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
                     )
 
@@ -171,7 +174,7 @@ class WebAgentHandler:
                                         )
 
                     logger.info(
-                        f"Bing Grounding response received. "
+                        f"Web Search response received. "
                         f"Answer length: {len(answer_text)}, Citations: {len(citations)}"
                     )
 
@@ -181,14 +184,14 @@ class WebAgentHandler:
                         project_client.agents.delete_version(
                             agent_name=agent.name, agent_version=agent.version
                         )
-                        logger.info(f"Deleted Bing search agent: {agent.name} v{agent.version}")
+                        logger.info(f"Deleted Web Search agent: {agent.name} v{agent.version}")
                     except Exception as cleanup_error:
                         logger.warning(f"Failed to delete agent (non-critical): {cleanup_error}")
 
             # Return results
             if answer_text:
                 logger.info(
-                    f"Bing Grounding completed successfully. Found {len(citations)} citations."
+                    f"Web Search completed successfully. Found {len(citations)} citations."
                 )
                 # Format citations for UI display (Bing terms of use compliance)
                 # Each citation must have url and title for proper display
@@ -211,25 +214,25 @@ class WebAgentHandler:
                     {
                         "answer": answer_text,
                         "citations": formatted_citations,
-                        "source": "bing_grounding_foundry_new_api",
+                        "source": "web_search_preview_tool",
                     },
                     ensure_ascii=False,
                 )
             else:
-                logger.warning("Bing Grounding returned empty response")
+                logger.warning("Web Search returned empty response")
                 return json.dumps(
                     {
                         "answer": f"[Web検索結果が空でした] '{query}'についての情報は、"
                         f"私の学習データに基づいて回答します。",
                         "citations": [],
                         "fallback": True,
-                        "note": "Bing search returned empty results.",
+                        "note": "Web search returned empty results.",
                     },
                     ensure_ascii=False,
                 )
 
         except Exception as e:
-            logger.error(f"Bing Grounding error: {e}", exc_info=True)
+            logger.error(f"Web Search error: {e}", exc_info=True)
             return json.dumps(
                 {
                     "answer": f"[Web検索でエラーが発生しました] '{query}'についての情報は、"
@@ -237,11 +240,21 @@ class WebAgentHandler:
                     f"エラー詳細: {str(e)[:200]}",
                     "citations": [],
                     "fallback": True,
-                    "note": f"Bing Grounding failed: {str(e)}",
+                    "note": f"Web Search failed: {str(e)}",
                 },
                 ensure_ascii=False,
             )
 
+    # Backward compatibility alias
+    async def bing_grounding(self, query: str) -> str:
+        """
+        Backward compatibility alias for web_search.
+
+        Note: This method now uses Web Search tool (preview) instead of Bing Grounding
+        because Bing Grounding does not support gpt-5 models.
+        """
+        return await self.web_search(query)
+
     def get_tools(self) -> list[callable]:
         """Return the list of tools for the Web Agent."""
-        return [self.bing_grounding]
+        return [self.web_search]

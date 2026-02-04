@@ -4,11 +4,11 @@
 >
 > **Base**: [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
 >
-> **Last Updated**: 2026/1/15
+> **Last Updated**: 2026/2/4
 
 ---
 
-## 📊 サービス状態（2026年1月時点）
+## 📊 サービス状態（2026年2月時点）
 
 | サービス | 状態 | 備考 |
 |----------|------|------|
@@ -18,6 +18,7 @@
 | **Foundry Guardrails** | Public Preview | Task Adherence, Prompt Shields, PII |
 | **SQL Database in Fabric** | GA | 2025年11月〜 |
 | **OneLake Security** | Preview | RLS/CLS対応 |
+| **Web Search tool** | Public Preview | Bing Groundingの後継（gpt-5対応） |
 
 ---
 
@@ -295,21 +296,23 @@ guardrails_config = {
 
 ### AI/Agent
 
-| コンポーネント | サービス | 状態 (2026/1) |
+| コンポーネント | サービス | 状態 (2026/2) |
 |----------------|----------|---------------|
 | Agent Framework | Microsoft Agent Framework | Public Preview (GA: Q1 2026) |
 | Agent Service | Foundry Agent Service | GA |
 | Hosted Agents | Foundry Hosted Agents | GA |
-| LLM | Azure OpenAI | GPT-4o, GPT-4o-mini |
+| LLM | Azure OpenAI | GPT-5, GPT-4o |
+| Web Search | Web Search tool (preview) | Preview |
 | Guardrails | Foundry Guardrails | Public Preview |
 
 ### Data
 
-| コンポーネント | サービス | 状態 (2026/1) |
+| コンポーネント | サービス | 状態 (2026/2) |
 |----------------|----------|---------------|
 | Data Platform | Microsoft Fabric | F2 Capacity以上 |
 | Database | SQL Database in Fabric | GA |
 | Data Lake | OneLake | Medallion Architecture |
+| AI Search | Azure AI Search | 製品仕様書検索 |
 | Security | OneLake Security | Preview (RLS/CLS) |
 
 ---

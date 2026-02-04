@@ -228,3 +228,34 @@ python <script.py>
 | Why Now | Agent Framework GA + Guardrails |
 | 技術統合 | 5領域カバー |
 | ACR | Fabric F2 + OpenAI 従量課金 |
+
+---
+
+## 🌐 Azure 実機環境情報（2026/2/4 確認）
+
+| 項目 | 値 |
+|------|-----|
+| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` |
+| **API App Service** | `api-daj6dri4yf3k3z` |
+| **Frontend App** | `app-daj6dri4yf3k3z` |
+| **ACR** | `crda672axowukix3.azurecr.io` |
+| **AI Foundry** | `aisa-daj6dri4yf3k3z` |
+| **AI Search** | `search-sp-rag-australiaeast-001` |
+| **Model** | `gpt-5` |
+
+### エンドポイント
+
+| サービス | URL |
+|----------|-----|
+| Frontend | https://app-daj6dri4yf3k3z.azurewebsites.net |
+| API | https://api-daj6dri4yf3k3z.azurewebsites.net |
+| Health Check | https://api-daj6dri4yf3k3z.azurewebsites.net/health |
+
+### ツール対応状況（実機確認済み）
+
+| ツール | 状態 | 備考 |
+|--------|------|------|
+| SQL Query (Fabric) | ✅ 動作 | 売上データ、顧客データ |
+| Doc Search (AI Search) | ✅ 動作 | 製品仕様書検索 |
+| Web Search | ✅ 動作 | Web Search tool (preview) 使用 |
+| MCP Tools | ✅ 動作 | YoY, RFM, 在庫分析 |

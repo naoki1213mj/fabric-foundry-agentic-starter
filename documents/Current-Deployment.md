@@ -1,6 +1,6 @@
 # 現在のデプロイ設定
 
-> **注**: このドキュメントは **Azure 実機環境を確認して** 2026年2月3日に更新されました。
+> **注**: このドキュメントは **Azure 実機環境を確認して** 2026年2月4日に更新されました。
 > オリジナルの `azd up` 方式は [DeploymentGuide.md](./DeploymentGuide.md) を参照してください。
 
 ## 1. デプロイフロー概要
@@ -11,11 +11,39 @@ git push → GitHub Actions → Docker Build → ACR Push → App Service Deploy
 
 ### トリガー条件
 
-| トリガー | 条件 |
-| -------- | ---- |
-| Push (main) | `src/App/**`, `src/api/python/**`, `infra/scripts/agent_scripts/agents/**` の変更時 |
-| Pull Request | 同上（ビルドのみ、デプロイなし） |
-| 手動実行 | workflow_dispatch で任意タイミング |
+| トリガー | 条件 | デプロイ |
+| -------- | ---- | -------- |
+| Push (main) | `src/App/**`, `src/api/python/**`, `infra/scripts/agent_scripts/agents/**` の変更時 | ✅ 実行 |
+| Pull Request | 同上 | ❌ ビルドのみ |
+| 手動実行 | workflow_dispatch で任意タイミング | ✅ 実行 |
+
+### CI/CD パイプライン図
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────┐
+│  git push → test.yml → deploy-app-service.yml                                  │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  1️⃣ テストゲート (run-tests)                                                   │
+│     ├─ Python Lint (Ruff)        → ❌ 失敗 = ビルド停止                         │
+│     └─ Python Unit Tests         → ❌ 失敗 = ビルド停止                         │
+│                        │                                                       │
+│                        ▼ (テスト成功時のみ)                                     │
+│  2️⃣ 変更検知 (detect-changes)                                                  │
+│     ├─ frontend: src/App/** が変更？                                           │
+│     └─ api: src/api/python/** が変更？                                         │
+│                        │                                                       │
+│          ┌────────────┴────────────┐                                           │
+│          ▼                         ▼                                           │
+│  3️⃣ [Frontend変更時]        [Backend変更時]                                    │
+│     ├─ npm ci && build          ├─ Docker build                                │
+│     ├─ Docker build             ├─ ACR push (da-api:xxx)                       │
+│     ├─ ACR push (da-app:xxx)    └─ App Service deploy                          │
+│     └─ App Service deploy            (api-daj6dri4yf3k3z)                      │
+│          (app-daj6dri4yf3k3z)                                                  │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+```
 
 ## 2. ワークフロー構成
 
