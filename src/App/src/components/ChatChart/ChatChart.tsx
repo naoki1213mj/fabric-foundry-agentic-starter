@@ -82,6 +82,45 @@ useEffect(() => {
   // Get theme-aware colors
   const colors = getChartColors();
 
+  // Apply theme colors to all scales dynamically
+  const themedScales: Record<string, any> = {};
+  const originalScales = chartContent?.options?.scales || {};
+  
+  // Process all scales (x, y, y1, y2, etc.)
+  for (const scaleKey of Object.keys(originalScales)) {
+    themedScales[scaleKey] = {
+      ...originalScales[scaleKey],
+      ticks: {
+        ...originalScales[scaleKey]?.ticks,
+        color: colors.textColor,
+      },
+      grid: {
+        ...originalScales[scaleKey]?.grid,
+        color: colors.gridColor,
+      },
+      title: {
+        ...originalScales[scaleKey]?.title,
+        color: colors.textColor,
+      },
+    };
+  }
+  
+  // Ensure at least x and y scales have theme colors even if not in original
+  if (!themedScales.x) {
+    themedScales.x = {
+      ticks: { color: colors.textColor },
+      grid: { color: colors.gridColor },
+      title: { color: colors.textColor },
+    };
+  }
+  if (!themedScales.y) {
+    themedScales.y = {
+      ticks: { color: colors.textColor },
+      grid: { color: colors.gridColor },
+      title: { color: colors.textColor },
+    };
+  }
+
   const chartConfigData = {
     type:
       chartContent.type === "horizontalBar"
@@ -97,32 +136,8 @@ useEffect(() => {
         chartContent.type === "horizontalBar"
           ? "y"
           : chartContent?.options?.indexAxis,
-      // Dark mode support for text colors
-      scales: {
-        ...chartContent?.options?.scales,
-        x: {
-          ...chartContent?.options?.scales?.x,
-          ticks: {
-            ...chartContent?.options?.scales?.x?.ticks,
-            color: colors.textColor,
-          },
-          grid: {
-            ...chartContent?.options?.scales?.x?.grid,
-            color: colors.gridColor,
-          },
-        },
-        y: {
-          ...chartContent?.options?.scales?.y,
-          ticks: {
-            ...chartContent?.options?.scales?.y?.ticks,
-            color: colors.textColor,
-          },
-          grid: {
-            ...chartContent?.options?.scales?.y?.grid,
-            color: colors.gridColor,
-          },
-        },
-      },
+      // Dark mode support for text colors - apply to all scales
+      scales: themedScales,
       plugins: {
         ...chartContent?.options?.plugins,
         legend: {
