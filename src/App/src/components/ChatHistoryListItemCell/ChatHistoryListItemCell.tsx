@@ -124,6 +124,24 @@ export const ChatHistoryListItemCell: React.FC<
       ? `${item.title.substring(0, 28)} ...`
       : item.title;
 
+  // フォーマット済みタイムスタンプ
+  const formatTimestamp = (dateStr?: string) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    
+    if (isToday) {
+      // 今日なら時刻のみ
+      return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    }
+    // それ以外は日付と時刻
+    return date.toLocaleDateString("ja-JP", { month: "short", day: "numeric" }) + " " +
+           date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const timestamp = formatTimestamp(item?.updatedAt || item?.date);
+
   const handleSaveEdit = async (e: any) => {
     e.preventDefault();
     e.stopPropagation();
@@ -205,7 +223,7 @@ export const ChatHistoryListItemCell: React.FC<
       onMouseLeave={() => setIsHovered(false)}
       styles={{
         root: {
-          backgroundColor: isSelected ? "#e6e6e6" : "transparent",
+          backgroundColor: isSelected ? "var(--color-accent-primary, #0078d4)" : "transparent",
         },
       }}
     >
@@ -293,13 +311,19 @@ export const ChatHistoryListItemCell: React.FC<
             className={styles.chatHistoryItem}
             title={item?.title}
           >
-            <Stack horizontal verticalAlign={"center"} style={{ flex: 1, minWidth: 0 }}>
-              <div className={styles.chatTitle}>
+            <Stack verticalAlign={"center"} style={{ flex: 1, minWidth: 0 }}>
+              <div className={`${styles.chatTitle} ${isSelected ? styles.selectedTitle : ""}`}>
                 {truncatedTitle}
               </div>
-              {deleteLoading && (
-                <Spinner
-                  size={SpinnerSize.small}
+              {timestamp && (
+                <div className={`${styles.chatTimestamp} ${isSelected ? styles.selectedTimestamp : ""}`}>
+                  {timestamp}
+                </div>
+              )}
+            </Stack>
+            {deleteLoading && (
+              <Spinner
+                size={SpinnerSize.small}
                   aria-label="Deleting conversation"
                   styles={{ root: { marginLeft: "8px" } }}
                 />

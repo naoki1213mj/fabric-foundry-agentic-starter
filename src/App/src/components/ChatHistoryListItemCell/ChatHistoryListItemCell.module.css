@@ -1,5 +1,5 @@
 .itemCell {
-  height: 42px;
+  min-height: 48px;
   cursor: pointer;
   padding: 8px 12px;
   box-sizing: border-box;
@@ -12,6 +12,11 @@
 
 .itemCell:hover {
   background: var(--color-bg-hover, #e2e8f0);
+}
+
+/* 選択状態 - ダークモード対応 */
+.itemCellSelected {
+  background: var(--color-accent-primary, #0078d4) !important;
 }
 
 .cursorDefault {
@@ -47,7 +52,25 @@
   padding-right: 8px;
   color: var(--color-text-primary, #0f172a);
   font-size: 0.875rem;
+  font-weight: 500;
   transition: color 0.25s ease;
+}
+
+/* 選択時のタイトル - 白文字で見やすく */
+.selectedTitle {
+  color: white !important;
+}
+
+/* タイムスタンプ */
+.chatTimestamp {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary, #94a3b8);
+  margin-top: 2px;
+}
+
+/* 選択時のタイムスタンプ - 少し薄い白 */
+.selectedTimestamp {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .chatHistoryItem {
