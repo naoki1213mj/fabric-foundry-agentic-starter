@@ -48,6 +48,8 @@ import {
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import "./Chat.css";
 
+// Last updated: 2025-02-04 - Added Reasoning Effort UI for Agentic Retrieval (Foundry IQ)
+
 // Throttle utility for scroll during streaming
 const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
   let lastCall = 0;

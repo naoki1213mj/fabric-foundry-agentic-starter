@@ -30,6 +30,7 @@ import json
 import logging
 import os
 import re
+from contextvars import ContextVar
 from typing import Annotated
 
 from agent_framework import (
@@ -106,9 +107,8 @@ _agentic_retrieval_tool: AgenticRetrievalTool | None = None
 # Global storage for web citations (per-request, thread-local would be better but this works for demo)
 _current_web_citations: list = []
 
-# Global storage for current reasoning effort (per-request)
-_current_reasoning_effort: str = "low"
-
+# Context variable for reasoning effort (thread-safe, per-request scoped)
+_reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
 
 def get_web_agent_handler() -> WebAgentHandler:
     """Get or create WebAgentHandler singleton."""
@@ -135,15 +135,13 @@ def get_agentic_retrieval_tool() -> AgenticRetrievalTool | None:
 
 
 def set_reasoning_effort(effort: str):
-    """Set the reasoning effort for the current request."""
-    global _current_reasoning_effort
-    _current_reasoning_effort = effort
+    """Set the reasoning effort for the current request (thread-safe via ContextVar)."""
+    _reasoning_effort_var.set(effort)
 
 
 def get_reasoning_effort() -> str:
-    """Get the current reasoning effort setting."""
-    global _current_reasoning_effort
-    return _current_reasoning_effort
+    """Get the current reasoning effort setting (thread-safe via ContextVar)."""
+    return _reasoning_effort_var.get()
 
 
 # Check if the Application Insights Instrumentation Key is set in the environment variables
