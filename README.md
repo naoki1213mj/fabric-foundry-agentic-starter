@@ -2,6 +2,9 @@
 
 [English](README_EN.md) | **日本語**
 
+> **🛠️ 本プロジェクトについて**  
+> このリポジトリは [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) をベースに、Hackathon 向けにカスタマイズしたプロジェクトです。
+
 <br/>
 
 このソリューションアクセラレータは、Microsoft Fabric の統合データ基盤上に構築された Agentic AI ソリューションを活用し、組織が迅速かつスマートな意思決定を大規模に行えるよう支援します。Microsoft Foundry エージェントと Agent Framework オーケストレーションのシームレスな統合により、日常的なプロセスを自動化し、業務を効率化し、企業データセット全体に対する自然言語クエリを可能にするインテリジェントなワークフローを設計できます。これにより、ガバナンスされた高品質なデータが技術専門家だけでなくビジネスユーザーにもアクセス可能となり、インサイトが容易に得られ、信頼できる情報に基づいた意思決定が可能な共有環境を構築します。
@@ -82,9 +85,9 @@ Azure デプロイ: [デプロイガイドはこちら](./documents/DeploymentGu
 - ネイティブ Windows セットアップ、WSL2 構成、クロスプラットフォーム開発ツールを含む
 <br/><br/>
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Visual Studio Code Web](https://img.shields.io/static/v1?style=for-the-badge&label=Visual%20Studio%20Code%20(Web)&message=Open&color=blue&logo=visualstudiocode&logoColor=white)](https://vscode.dev/azure/?vscode-azure-exp=foundry&agentPayload=eyJiYXNlVXJsIjogImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9taWNyb3NvZnQvYWdlbnRpYy1hcHBsaWNhdGlvbnMtZm9yLXVuaWZpZWQtZGF0YS1mb3VuZGF0aW9uLXNvbHV0aW9uLWFjY2VsZXJhdG9yL3JlZnMvaGVhZHMvbWFpbi9pbmZyYS92c2NvZGVfd2ViIiwgImluZGV4VXJsIjogIi9pbmRleC5qc29uIiwgInZhcmlhYmxlcyI6IHsiYWdlbnRJZCI6ICIiLCAiY29ubmVjdGlvblN0cmluZyI6ICIiLCAidGhyZWFkSWQiOiAiIiwgInVzZXJNZXNzYWdlIjogIiIsICJwbGF5Z3JvdW5kTmFtZSI6ICIiLCAibG9jYXRpb24iOiAiIiwgInN1YnNjcmlwdGlvbklkIjogIiIsICJyZXNvdXJjZUlkIjogIiIsICJwcm9qZWN0UmVzb3VyY2VJZCI6ICIiLCAiZW5kcG9pbnQiOiAiIn0sICJjb2RlUm91dGUiOiBbImFpLXByb2plY3RzLXNkayIsICJweXRob24iLCAiZGVmYXVsdC1henVyZS1hdXRoIiwgImVuZHBvaW50Il19) |
+| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai) |
 
-|---|---|---|
+|---|---|
 
 <br/>
 
@@ -203,7 +206,9 @@ r/>
 
 ## フィードバック
 
-質問がある、バグを見つけた、または機能をリクエストしたい場合は、このリポジトリで[新しい Issue を送信](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues)してください。
+質問がある、バグを見つけた、または機能をリクエストしたい場合は、このリポジトリで[新しい Issue を送信](https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai/issues)してください。
+
+元の Solution Accelerator に関する Issue は [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues) へお願いします。
 
 <br/>
 

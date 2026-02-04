@@ -763,14 +763,14 @@ const Chat: React.FC<ChatProps> = ({
         </div>
         <div className="footer-settings-row">
           <div className="setting-item">
-            <span className="setting-label">🤖</span>
+            <span className="setting-label" title="エージェントの動作モード">🤖 Agent Mode:</span>
             <Dropdown
               placeholder="Agent Mode"
               value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
               selectedOptions={[agentMode]}
               onOptionSelect={(_, data) => setAgentMode(data.optionValue as AgentMode)}
               disabled={isInputDisabled}
-              style={{ minWidth: "140px" }}
+              style={{ minWidth: "160px" }}
             >
               {agentModeOptions.map((option) => (
                 <Option key={option.value} value={option.value} text={option.label}>
@@ -783,7 +783,7 @@ const Chat: React.FC<ChatProps> = ({
             </Dropdown>
           </div>
           <div className="setting-item">
-            <span className="setting-label">🔍</span>
+            <span className="setting-label" title="ドキュメント検索の推論レベル (Foundry IQ)">🔍 Doc Search:</span>
             <Dropdown
               placeholder="Reasoning Effort"
               value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
@@ -791,7 +791,7 @@ const Chat: React.FC<ChatProps> = ({
               onOptionSelect={(_, data) => setReasoningEffort(data.optionValue as ReasoningEffort)}
               disabled={isInputDisabled}
               style={{ minWidth: "140px" }}
-              title="Document Search の推論レベル (Foundry IQ)"
+              title="ドキュメント検索の推論レベル (Foundry IQ)"
             >
               {reasoningEffortOptions.map((option) => (
                 <Option key={option.value} value={option.value} text={option.label}>

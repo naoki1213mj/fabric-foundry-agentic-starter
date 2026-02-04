@@ -492,12 +492,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .setting-label {
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: help;
 }
 
 .setting-item .fui-Dropdown {
