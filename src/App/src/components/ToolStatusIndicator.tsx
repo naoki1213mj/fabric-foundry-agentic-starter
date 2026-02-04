@@ -28,15 +28,13 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
     }, [toolEvents]);
 
     // 完了したツールのみ表示（startedは完了後は表示しない）
-    const completedTools = latestEvents.filter((e) => e.status === "completed");
-    const errorTools = latestEvents.filter((e) => e.status === "error");
-    const allTools = [...completedTools, ...errorTools];
+    const allTools = React.useMemo(() => {
+        const completedTools = latestEvents.filter((e) => e.status === "completed");
+        const errorTools = latestEvents.filter((e) => e.status === "error");
+        return [...completedTools, ...errorTools];
+    }, [latestEvents]);
 
-    if (allTools.length === 0) {
-        return null;
-    }
-
-    // カテゴリ別にグループ化
+    // カテゴリ別にグループ化（Hookは早期リターンの前に配置）
     const toolsByCategory = React.useMemo(() => {
         const groups = new Map<string, typeof allTools>();
         allTools.forEach((event) => {
@@ -49,6 +47,11 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
         });
         return groups;
     }, [allTools]);
+
+    // 表示するツールがない場合は何も表示しない
+    if (allTools.length === 0) {
+        return null;
+    }
 
     return (
         <div className={`tool-status-container tool-status-summary ${className}`}>
