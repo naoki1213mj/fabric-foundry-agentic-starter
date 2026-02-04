@@ -753,10 +753,10 @@ const Chat: React.FC<ChatProps> = ({
               </div>
             );
           })}
-        {/* Tool status indicator - show during generation and keep as summary after completion */}
-        {toolEvents.length > 0 && (
+        {/* Tool status indicator - show only after response completion */}
+        {!generatingResponse && toolEvents.length > 0 && (
           <div className="tool-status-wrapper">
-            <ToolStatusIndicator toolEvents={toolEvents} isGenerating={generatingResponse} />
+            <ToolStatusIndicator toolEvents={toolEvents} />
           </div>
         )}
         {/* Show loading indicator:
