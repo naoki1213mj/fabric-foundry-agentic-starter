@@ -22,6 +22,9 @@ resource apiCenter 'Microsoft.ApiCenter/services@2024-03-01' = {
     type: 'SystemAssigned'
   }
   properties: {}
+  sku: {
+    name: 'Free'
+  }
   tags: {
     environment: 'hackathon'
     purpose: 'mcp-tool-catalog'

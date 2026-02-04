@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "2366187620271524008"
+      "templateHash": "3146895693811207902"
     }
   },
   "parameters": {
@@ -275,6 +275,9 @@
         "type": "SystemAssigned"
       },
       "properties": {},
+      "sku": {
+        "name": "Free"
+      },
       "tags": {
         "environment": "hackathon",
         "purpose": "mcp-tool-catalog",
