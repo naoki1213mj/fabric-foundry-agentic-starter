@@ -440,7 +440,7 @@ resource foundryAgentApiPolicy 'Microsoft.ApiManagement/service/apis/policies@20
         <llm-emit-token-metric namespace="FoundryAgents">
           <dimension name="API" value="@(context.Api.Name)" />
           <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Project" value="@(context.Request.MatchedParameters.GetValueOrDefault("projectId", "unknown"))" />
+          <dimension name="Project" value="@(context.Request.MatchedParameters.GetValueOrDefault(&apos;projectId&apos;, &apos;unknown&apos;))" />
         </llm-emit-token-metric>
       </when>
     </choose>
@@ -589,7 +589,7 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
         <llm-emit-token-metric namespace="AzureOpenAI">
           <dimension name="API" value="@(context.Api.Name)" />
           <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Model" value="@(context.Request.MatchedParameters.GetValueOrDefault("deploymentId", "unknown"))" />
+          <dimension name="Model" value="@(context.Request.MatchedParameters.GetValueOrDefault(&apos;deploymentId&apos;, &apos;unknown&apos;))" />
         </llm-emit-token-metric>
       </when>
     </choose>
