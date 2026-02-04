@@ -1,0 +1,153 @@
+{
+  "timestamp": "2026-02-04T22:06:19.218702",
+  "api_url": "https://api-daj6dri4yf3k3z.azurewebsites.net",
+  "total_scenarios": 6,
+  "success_count": 6,
+  "total_time_seconds": 44.32,
+  "results": [
+    {
+      "scenario_id": "scenario-1-abc",
+      "scenario_name": "ABC分析（SQL → MCP）",
+      "conversation_id": "test-scenario-1-abc-4525b5b1",
+      "difficulty": "中級",
+      "reasoning_effort": "low",
+      "query": "Mountain Bikeカテゴリの全製品の売上データを取得してABC分析を行ってください。",
+      "success": true,
+      "elapsed_seconds": 4.79,
+      "tool_analysis": {
+        "expected": [
+          "run_sql_query",
+          "calculate_abc_analysis"
+        ],
+        "detected": [],
+        "missing": [
+          "run_sql_query",
+          "calculate_abc_analysis"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    },
+    {
+      "scenario_id": "scenario-2-yoy",
+      "scenario_name": "YoY成長率分析",
+      "conversation_id": "test-scenario-2-yoy-607660d1",
+      "difficulty": "中級",
+      "reasoning_effort": "low",
+      "query": "2024年と2025年のRoad Bikeカテゴリの売上を比較して、前年同期比成長率（YoY）を計算してください。",
+      "success": true,
+      "elapsed_seconds": 5.9,
+      "tool_analysis": {
+        "expected": [
+          "run_sql_query",
+          "calculate_yoy_growth"
+        ],
+        "detected": [],
+        "missing": [
+          "run_sql_query",
+          "calculate_yoy_growth"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    },
+    {
+      "scenario_id": "scenario-5-doc-minimal",
+      "scenario_name": "Doc検索（minimal）",
+      "conversation_id": "test-scenario-5-doc-minimal-c59ce123",
+      "difficulty": "初級",
+      "reasoning_effort": "minimal",
+      "query": "Mountain-100の製品仕様を教えてください。",
+      "success": true,
+      "elapsed_seconds": 3.43,
+      "tool_analysis": {
+        "expected": [
+          "search_documents"
+        ],
+        "detected": [],
+        "missing": [
+          "search_documents"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    },
+    {
+      "scenario_id": "scenario-6-doc-low",
+      "scenario_name": "Doc検索（low）",
+      "conversation_id": "test-scenario-6-doc-low-639a14aa",
+      "difficulty": "中級",
+      "reasoning_effort": "low",
+      "query": "Mountain BikeシリーズのサスペンションタイプとフレームSize一覧を教えてください。",
+      "success": true,
+      "elapsed_seconds": 3.25,
+      "tool_analysis": {
+        "expected": [
+          "search_documents"
+        ],
+        "detected": [],
+        "missing": [
+          "search_documents"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    },
+    {
+      "scenario_id": "scenario-7-doc-medium",
+      "scenario_name": "Doc検索（medium）",
+      "conversation_id": "test-scenario-7-doc-medium-4673f0c0",
+      "difficulty": "上級",
+      "reasoning_effort": "medium",
+      "query": "全製品カテゴリの中で軽量化に優れている製品を仕様書から特定し、比較表を作成してください。",
+      "success": true,
+      "elapsed_seconds": 11.78,
+      "tool_analysis": {
+        "expected": [
+          "search_documents"
+        ],
+        "detected": [],
+        "missing": [
+          "search_documents"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    },
+    {
+      "scenario_id": "scenario-8-sql-doc",
+      "scenario_name": "SQL + Doc複合",
+      "conversation_id": "test-scenario-8-sql-doc-b39533f8",
+      "difficulty": "上級",
+      "reasoning_effort": "low",
+      "query": "売上TOP3の製品の仕様を製品仕様書から取得して、売上と仕様の関係を分析してください。",
+      "success": true,
+      "elapsed_seconds": 2.8,
+      "tool_analysis": {
+        "expected": [
+          "run_sql_query",
+          "search_documents"
+        ],
+        "detected": [],
+        "missing": [
+          "run_sql_query",
+          "search_documents"
+        ],
+        "coverage": 0.0
+      },
+      "error": null,
+      "response_length": 62,
+      "chunk_count": 1
+    }
+  ]
+}

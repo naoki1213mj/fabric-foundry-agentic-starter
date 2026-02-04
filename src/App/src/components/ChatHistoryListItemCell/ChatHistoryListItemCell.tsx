@@ -1,28 +1,28 @@
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
 import {
-  DefaultButton,
-  Dialog,
-  DialogFooter,
-  DialogType,
-  IconButton,
-  ITextField,
-  PrimaryButton,
-  Stack,
-  Spinner,
-  SpinnerSize,
-  Text,
-  TextField,
+    DefaultButton,
+    Dialog,
+    DialogFooter,
+    DialogType,
+    IconButton,
+    ITextField,
+    PrimaryButton,
+    Spinner,
+    SpinnerSize,
+    Stack,
+    Text,
+    TextField,
 } from "@fluentui/react";
 import { useBoolean } from "@fluentui/react-hooks";
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
-import styles from "./ChatHistoryListItemCell.module.css";
-import { Conversation } from "../../types/AppTypes";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { deleteConversation, renameConversation } from "../../store/chatHistorySlice";
 import { setSelectedConversationId } from "../../store/appSlice";
-import { setCitation } from "../../store/citationSlice";
+import { deleteConversation, renameConversation } from "../../store/chatHistorySlice";
 import { clearChat } from "../../store/chatSlice";
+import { setCitation } from "../../store/citationSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { Conversation } from "../../types/AppTypes";
+import styles from "./ChatHistoryListItemCell.module.css";
 
 interface ChatHistoryListItemCellProps {
   item?: Conversation;

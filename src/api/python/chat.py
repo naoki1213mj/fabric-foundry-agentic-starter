@@ -105,12 +105,9 @@ USE_APIM_GATEWAY = bool(APIM_GATEWAY_URL)
 # Foundry API (Responses API v1) Configuration
 # Format: https://<apim>.azure-api.net/foundry-openai/openai/v1/
 # Used by AzureOpenAIResponsesClient for native APIM Foundry API integration
-# NOTE: Disabled because AzureOpenAIResponsesClient adds api-version query param
-# which causes "API version not supported" error with APIM Foundry API.
-# Using AzureOpenAIChatClient with standard Chat Completions API for now.
+# NOTE: APIM policy strips api-version query param (Responses API v1 doesn't accept it)
 AZURE_OPENAI_BASE_URL = os.getenv("AZURE_OPENAI_BASE_URL")
-# USE_RESPONSES_CLIENT = bool(AZURE_OPENAI_BASE_URL)  # Temporarily disabled
-USE_RESPONSES_CLIENT = False  # Force use of AzureOpenAIChatClient
+USE_RESPONSES_CLIENT = bool(AZURE_OPENAI_BASE_URL)  # Re-enabled with APIM policy fix
 
 router = APIRouter()
 
