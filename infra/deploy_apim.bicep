@@ -574,18 +574,7 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
   <outbound>
     <base />
 
-    <!-- AI Gateway: Emit token metrics to Azure Monitor (all tiers including Consumption) -->
-    <choose>
-      <when condition="@(context.Response.StatusCode == 200)">
-        <llm-emit-token-metric namespace="AzureOpenAI">
-          <dimension name="API" value="@(context.Api.Name)" />
-          <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Model" value="@(context.Request.MatchedParameters.GetValueOrDefault(&apos;deploymentId&apos;, &apos;unknown&apos;))" />
-        </llm-emit-token-metric>
-      </when>
-    </choose>
-
-    <!-- Extract token usage from response -->
+    <!-- Extract token usage from response (Consumption SKU compatible) -->
     <choose>
       <when condition="@(context.Response.StatusCode == 200)">
         <set-variable name="response-body" value="@(context.Response.Body.As&lt;JObject&gt;(preserveContent: true))" />
