@@ -1,6 +1,0 @@
-{
-  "properties": {
-    "format": "xml",
-    "value": "<policies><inbound><base /><set-query-parameter name=\"api-version\" exists-action=\"delete\" /><set-backend-service id=\"apim-generated-policy\" backend-id=\"foundry-openai-api-ai-endpoint\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
-  }
-}

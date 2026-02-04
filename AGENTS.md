@@ -231,20 +231,20 @@ python <script.py>
 
 ---
 
-## 🌐 Azure 実機環境情報（2026/2/4 更新）
+## 🌐 Azure 実機環境情報（2026/2/5 更新）
 
 ### リソース一覧
 
 | 項目 | 値 | 備考 |
 |------|-----|------|
-| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` | |
+| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` | East US |
 | **API App Service** | `api-daj6dri4yf3k3z` | Linux Container (da-api:main) |
 | **Frontend App** | `app-daj6dri4yf3k3z` | Linux Container (da-app:main) |
 | **MCP Function** | `func-mcp-daj6dri4yf3k3z` | Python 3.12 |
 | **ACR** | `crda672axowukix3.azurecr.io` | Premium SKU |
 | **AI Foundry** | `aisa-daj6dri4yf3k3z` | AIServices |
 | **Foundry Project** | `aifp-daj6dri4yf3k3z` | |
-| **AI Search** | `search-sp-rag-australiaeast-001` | Standard SKU |
+| **AI Search** | `search-sp-rag-australiaeast-001` | Standard SKU (Australia East) |
 | **Fabric Capacity** | `capagentunifieddata001` | F4 SKU |
 | **API Management** | `apim-daj6dri4yf3k3z` | Consumption SKU |
 | **API Center** | `apic-daj6dri4yf3k3z` | Free SKU - ツールカタログ |
@@ -255,10 +255,10 @@ python <script.py>
 
 | モデル | バージョン | TPM |
 |--------|-----------|-----|
-| `gpt-5` | 2025-08-07 | 500 |
-| `gpt-4o-mini` | 2024-07-18 | 30 |
-| `text-embedding-3-large` | 1 | 500 |
-| `text-embedding-3-small` | 1 | 120 |
+| `gpt-5` | 2025-08-07 | 500K |
+| `gpt-4o-mini` | 2024-07-18 | 30K |
+| `text-embedding-3-large` | 1 | 500K |
+| `text-embedding-3-small` | 1 | 120K |
 
 ### API Management (AI Gateway)
 
@@ -281,12 +281,12 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 > - `AZURE_OPENAI_BASE_URL` が設定されている場合 → `AzureOpenAIResponsesClient` を使用
 > - 設定されていない場合 → `AzureOpenAIChatClient` にフォールバック
 > - multi_tool / sql_only モードは ResponsesClient に移行済み
-> - handoff / magentic モードは ChatClient を維持（WorkflowBuilder制約）
+> - handoff / magentic モードは ChatClient を維持（WorkflowBuilder SDK制約）
 
 **AI Gateway機能:**
 
 - トークン使用量ヘッダー: `x-openai-prompt-tokens`, `x-openai-completion-tokens`, `x-openai-total-tokens`
-- Circuit Breaker: 429/500-599エラー時の自動フェイルオーバー
+- Circuit Breaker: 429/500-599エラー時の自動フェイルオーバー（30秒trip duration）
 - Managed Identity認証
 - レイテンシ計測: `x-gateway-latency-ms` ヘッダー
 
@@ -309,20 +309,35 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 | APIM Gateway | https://apim-daj6dri4yf3k3z.azure-api.net |
 | MCP Server | https://func-mcp-daj6dri4yf3k3z.azurewebsites.net/api/mcp |
 
-### ツール対応状況（実機確認済み）
+### ツール対応状況（実機確認済み 2026/2/5）
 
 | ツール | 状態 | 備考 |
 |--------|------|------|
 | SQL Query (Fabric) | ✅ 動作 | 売上データ、顧客データ |
-| Doc Search (AI Search) | ✅ 動作 | Agentic Retrieval (Foundry IQ) 対応 |
-| Web Search | ⚠️ タイムアウト | Web Search tool (preview) 60秒タイムアウト設定 |
+| Doc Search (Foundry IQ) | ✅ 動作 | Agentic Retrieval 対応 |
+| Web Search (Bing Grounding) | ✅ 実装済み | BingGroundingAgentTool + プロジェクトコネクション |
 | MCP Tools | ✅ 動作 | YoY, RFM, 在庫分析 (APIM経由) |
+
+### Web Search 設定（Bing Grounding）
+
+| 項目 | 値 |
+|------|-----|
+| Connection Name | `bingglobal00149elbd` |
+| Tool Pattern | `BingGroundingAgentTool` |
+| Timeout | 90秒 |
+
+**環境変数**:
+```
+BING_PROJECT_CONNECTION_NAME=bingglobal00149elbd
+AZURE_AI_PROJECT_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z
+```
 
 ### Agentic Retrieval (Foundry IQ) 設定
 
 | 項目 | 値 |
 |------|-----|
 | Knowledge Base | `product-specs-kb` |
+| Knowledge Source Index | `product-specs-sharepoint-ks-index` |
 | Reasoning Effort | `minimal` / `low` / `medium` |
 | API Version | `2025-11-01-preview` |
 
@@ -336,5 +351,19 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 ```
 AI_SEARCH_ENDPOINT=https://search-sp-rag-australiaeast-001.search.windows.net
 AI_SEARCH_KNOWLEDGE_BASE_NAME=product-specs-kb
+AI_SEARCH_INDEX_NAME=product-specs-sharepoint-ks-index
 AI_SEARCH_REASONING_EFFORT=low
+```
+
+### Fabric SQL Database 設定
+
+| 項目 | 値 |
+|------|-----|
+| Database | `retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44` |
+| Server | `l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com,1433` |
+
+**環境変数**:
+```
+FABRIC_SQL_DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
+FABRIC_SQL_SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com,1433
 ```
