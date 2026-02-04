@@ -118,8 +118,8 @@ resource mcpServerDeployment 'Microsoft.ApiCenter/services/workspaces/apis/deplo
   properties: {
     title: 'Production Deployment'
     description: 'MCP Server deployed via Azure Functions with API Management gateway'
-    environmentId: prodEnvironment.id
-    definitionId: mcpServerApiDefinition.id
+    environmentId: '/workspaces/${workspace.name}/environments/${prodEnvironment.name}'
+    definitionId: '/workspaces/${workspace.name}/apis/${mcpServerApi.name}/versions/${mcpServerApiVersion.name}/definitions/${mcpServerApiDefinition.name}'
     state: 'active'
     server: {
       runtimeUri: [

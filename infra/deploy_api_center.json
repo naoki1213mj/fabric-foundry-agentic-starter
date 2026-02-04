@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "3146895693811207902"
+      "templateHash": "15410181190591616060"
     }
   },
   "parameters": {
@@ -372,8 +372,8 @@
       "properties": {
         "title": "Production Deployment",
         "description": "MCP Server deployed via Azure Functions with API Management gateway",
-        "environmentId": "[resourceId('Microsoft.ApiCenter/services/workspaces/environments', variables('apiCenterName'), 'default', 'production')]",
-        "definitionId": "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions/definitions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
+        "environmentId": "[format('/workspaces/{0}/environments/{1}', 'default', 'production')]",
+        "definitionId": "[format('/workspaces/{0}/apis/{1}/versions/{2}/definitions/{3}', 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
         "state": "active",
         "server": {
           "runtimeUri": [
@@ -385,7 +385,9 @@
       "dependsOn": [
         "[resourceId('Microsoft.ApiCenter/services/workspaces/apis', variables('apiCenterName'), 'default', 'mcp-business-analytics')]",
         "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions/definitions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
-        "[resourceId('Microsoft.ApiCenter/services/workspaces/environments', variables('apiCenterName'), 'default', 'production')]"
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0')]",
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/environments', variables('apiCenterName'), 'default', 'production')]",
+        "[resourceId('Microsoft.ApiCenter/services/workspaces', variables('apiCenterName'), 'default')]"
       ]
     },
     {
