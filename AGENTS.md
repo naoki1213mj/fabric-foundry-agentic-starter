@@ -265,8 +265,23 @@ python <script.py>
 | API | Path | Backend |
 |-----|------|---------|
 | Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` |
+| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-daj6dri4yf3k3z.services.ai.azure.com` |
 | MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` |
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service |
+
+**AzureOpenAIResponsesClient 設定（推奨）:**
+
+```bash
+# Responses API v1 を使用するための環境変数
+AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
+```
+
+> **ResponsesClient vs ChatClient:**
+> - `AZURE_OPENAI_BASE_URL` が設定されている場合 → `AzureOpenAIResponsesClient` を使用
+> - 設定されていない場合 → `AzureOpenAIChatClient` にフォールバック
+> - multi_tool / sql_only モードは ResponsesClient に移行済み
+> - handoff / magentic モードは ChatClient を維持（WorkflowBuilder制約）
 
 **AI Gateway機能:**
 

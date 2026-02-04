@@ -46,7 +46,13 @@ from agent_framework import (
     WorkflowStatusEvent,
     tool,
 )
-from agent_framework.azure import AzureOpenAIChatClient
+
+# AzureOpenAIResponsesClient: Responses API v1 client with base_url support
+# - Works natively with APIM Foundry API (/openai/v1/ endpoint format)
+# - No api-version required (uses 'preview' or 'latest')
+# - Supports Thread management for server-side conversation context
+# - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
+from agent_framework.azure import AzureOpenAIChatClient, AzureOpenAIResponsesClient
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -93,6 +99,12 @@ MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 APIM_GATEWAY_URL = os.getenv("APIM_GATEWAY_URL")
 USE_APIM_GATEWAY = bool(APIM_GATEWAY_URL)
 
+# Foundry API (Responses API v1) Configuration
+# Format: https://<apim>.azure-api.net/foundry-openai/openai/v1/
+# Used by AzureOpenAIResponsesClient for native APIM Foundry API integration
+AZURE_OPENAI_BASE_URL = os.getenv("AZURE_OPENAI_BASE_URL")
+USE_RESPONSES_CLIENT = bool(AZURE_OPENAI_BASE_URL)
+
 router = APIRouter()
 
 # Configure logging
@@ -104,7 +116,7 @@ _web_agent_handler: WebAgentHandler | None = None
 _knowledge_base_tool: KnowledgeBaseTool | None = None
 _agentic_retrieval_tool: AgenticRetrievalTool | None = None
 
-# Global storage for web citations (per-request, thread-local would be better but this works for demo)
+# Global storage for web citations (per-request, for demo purposes)
 _current_web_citations: list = []
 
 # Context variable for reasoning effort (thread-safe, per-request scoped)
@@ -166,7 +178,7 @@ def track_event_if_configured(event_name: str, event_data: dict):
         track_event(event_name, event_data)
 
 
-def get_openai_endpoint() -> str:
+def get_openai_endpoint() -> str | None:
     """
     Get the Azure OpenAI endpoint, preferring APIM Gateway if configured.
 
@@ -177,7 +189,7 @@ def get_openai_endpoint() -> str:
     - Centralized logging to Application Insights
 
     Returns:
-        str: APIM gateway URL or direct Azure OpenAI endpoint
+        str | None: APIM gateway URL or direct Azure OpenAI endpoint
     """
     if USE_APIM_GATEWAY:
         logger.info(f"Using APIM Gateway: {APIM_GATEWAY_URL}")
@@ -186,6 +198,32 @@ def get_openai_endpoint() -> str:
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         logger.info(f"Using direct Azure OpenAI: {endpoint}")
         return endpoint
+
+
+def get_responses_api_base_url() -> str | None:
+    """
+    Get the base URL for AzureOpenAIResponsesClient (Responses API v1).
+
+    The Responses API v1 uses a different endpoint format (/openai/v1/)
+    that works natively with APIM-imported Foundry OpenAI APIs.
+
+    Priority:
+    1. AZURE_OPENAI_BASE_URL (explicit Responses API base URL)
+    2. Fall back to ChatClient endpoint (not recommended for Foundry API)
+
+    Returns:
+        str | None: Base URL ending with /openai/v1/ or None if not configured
+    """
+    if AZURE_OPENAI_BASE_URL:
+        base_url = AZURE_OPENAI_BASE_URL
+        # Ensure trailing slash for proper URL construction
+        if not base_url.endswith("/"):
+            base_url = base_url + "/"
+        logger.info(f"Using Responses API base_url: {base_url}")
+        return base_url
+    else:
+        logger.warning("AZURE_OPENAI_BASE_URL not configured. ResponsesClient will not be used.")
+        return None
 
 
 # ============================================================================
@@ -222,7 +260,7 @@ async def run_sql_query(
     - customer: Customers (CustomerId, FirstName, LastName, CustomerTypeId)
     - location: Customer locations (LocationId, CustomerId, Region, City)
     - productcategory: Product categories (CategoryID, CategoryName)
-    - customerrelationshiptype: Customer segments (CustomerRelationshipTypeId, CustomerRelationshipTypeName)
+    - customerrelationshiptype: Customer segments (TypeId, TypeName)
     - invoice: Invoices (InvoiceId, CustomerId, OrderId, TotalAmount)
     - payment: Payments (PaymentId, InvoiceId, PaymentAmount, PaymentStatus)
 
@@ -354,7 +392,10 @@ async def search_documents(
         if kb_tool is None:
             return json.dumps(
                 {
-                    "message": "Document search is not configured. AI_SEARCH_* environment variables are missing.",
+                    "message": (
+                        "Document search is not configured. "
+                        "AI_SEARCH_* environment variables are missing."
+                    ),
                     "query": query,
                     "results": [],
                 },
@@ -507,7 +548,7 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
         logger.info(
-            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
+            f"OpenAI config: deploy={deployment_name}, endpoint={endpoint}, apim={USE_APIM_GATEWAY}"
         )
 
         if not deployment_name:
@@ -518,10 +559,12 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         if not endpoint:
             raise ValueError(
                 "Azure OpenAI endpoint is required. "
-                "Set APIM_GATEWAY_URL (preferred) or AZURE_OPENAI_ENDPOINT"
+                "Set AZURE_OPENAI_BASE_URL (for Foundry API), "
+                "APIM_GATEWAY_URL, or AZURE_OPENAI_ENDPOINT"
             )
 
         # Create chat client with explicit configuration
+        # Note: MagenticBuilder requires AzureOpenAIChatClient (not ResponsesClient)
         chat_client = AzureOpenAIChatClient(
             credential=credential,
             deployment_name=deployment_name,
@@ -694,9 +737,17 @@ async def stream_single_agent_response(
     conversation_id: str, query: str, user_id: str = "anonymous"
 ):
     """
-    Stream response using single agent mode with AzureOpenAIChatClient.
+    Stream response using single agent mode with AzureOpenAIResponsesClient (preferred)
+    or AzureOpenAIChatClient (fallback).
+
     This is the PRIMARY mode - a single intelligent agent with multiple tools.
     The LLM automatically selects which tools to use based on the query.
+
+    AzureOpenAIResponsesClient advantages:
+    - Native compatibility with APIM Foundry API (/openai/v1/ endpoint)
+    - No api-version required (uses 'preview' or 'latest')
+    - Supports Thread management for server-side conversation context
+    - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
     """
     try:
         # Load conversation history for multi-turn support
@@ -728,31 +779,60 @@ async def stream_single_agent_response(
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = get_openai_endpoint()
-        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        logger.info(
-            f"Azure OpenAI config: deployment={deployment_name}, endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
-        )
+        # Determine which client to use based on configuration
+        base_url = get_responses_api_base_url()
+        use_responses_client = USE_RESPONSES_CLIENT and base_url is not None
 
-        if not deployment_name:
-            raise ValueError(
-                "Azure OpenAI deployment name is required. "
-                "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
-            )
-        if not endpoint:
-            raise ValueError(
-                "Azure OpenAI endpoint is required. "
-                "Set APIM_GATEWAY_URL (preferred) or AZURE_OPENAI_ENDPOINT"
+        if use_responses_client:
+            # Use AzureOpenAIResponsesClient for APIM Foundry API
+            logger.info(
+                f"Using AzureOpenAIResponsesClient: deployment={deployment_name}, "
+                f"base_url={base_url}"
             )
 
-        # Create chat client with explicit configuration
-        chat_client = AzureOpenAIChatClient(
-            credential=credential,
-            deployment_name=deployment_name,
-            endpoint=endpoint,
-            api_version=api_version,
-        )
+            if not deployment_name:
+                raise ValueError(
+                    "Azure OpenAI deployment name is required. "
+                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+                )
+
+            # Create ResponsesClient with base_url (no api-version needed)
+            responses_client = AzureOpenAIResponsesClient(
+                base_url=base_url,
+                deployment_name=deployment_name,
+                credential=credential,
+            )
+            client = responses_client
+        else:
+            # Fallback to AzureOpenAIChatClient (Chat Completions API)
+            endpoint = get_openai_endpoint()
+            api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+            logger.info(
+                f"Using AzureOpenAIChatClient (fallback): deployment={deployment_name}, "
+                f"endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
+            )
+
+            if not deployment_name:
+                raise ValueError(
+                    "Azure OpenAI deployment name is required. "
+                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+                )
+            if not endpoint:
+                raise ValueError(
+                    "Azure OpenAI endpoint is required. "
+                    "Set AZURE_OPENAI_BASE_URL (preferred for Foundry API), "
+                    "APIM_GATEWAY_URL, or AZURE_OPENAI_ENDPOINT"
+                )
+
+            # Create ChatClient with explicit configuration
+            client = AzureOpenAIChatClient(
+                credential=credential,
+                deployment_name=deployment_name,
+                endpoint=endpoint,
+                api_version=api_version,
+            )
 
         # Initialize tool handlers (ensure singletons are created)
         web_handler = get_web_agent_handler()
@@ -789,7 +869,7 @@ async def stream_single_agent_response(
         # 2. Can call multiple tools and INTEGRATE results
         # 3. Fast and flexible
         # プロンプトは prompts/unified_agent.py から読み込み
-        agent = chat_client.as_agent(
+        agent = client.as_agent(
             name="unified_assistant",
             instructions=UNIFIED_AGENT_PROMPT,
             tools=all_tools,
@@ -834,6 +914,8 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
     """
     Stream response using single agent mode with SQL tool only.
     This is the FASTEST mode - optimized for simple SQL queries.
+
+    Uses AzureOpenAIResponsesClient (preferred) or AzureOpenAIChatClient (fallback).
     """
     try:
         # Load conversation history for multi-turn support
@@ -861,25 +943,50 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-        endpoint = get_openai_endpoint()
-        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        if not deployment_name or not endpoint:
-            raise ValueError(
-                "Azure OpenAI configuration missing. "
-                "Set deployment name and APIM_GATEWAY_URL or AZURE_OPENAI_ENDPOINT"
+        # Determine which client to use based on configuration
+        base_url = get_responses_api_base_url()
+        use_responses_client = USE_RESPONSES_CLIENT and base_url is not None
+
+        if use_responses_client:
+            # Use AzureOpenAIResponsesClient for APIM Foundry API
+            logger.info(f"SQL-only: Using ResponsesClient with base_url={base_url}")
+
+            if not deployment_name:
+                raise ValueError(
+                    "Azure OpenAI deployment name is required. "
+                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+                )
+
+            client = AzureOpenAIResponsesClient(
+                base_url=base_url,
+                deployment_name=deployment_name,
+                credential=credential,
             )
+        else:
+            # Fallback to AzureOpenAIChatClient
+            endpoint = get_openai_endpoint()
+            api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
-        chat_client = AzureOpenAIChatClient(
-            credential=credential,
-            deployment_name=deployment_name,
-            endpoint=endpoint,
-            api_version=api_version,
-        )
+            if not deployment_name or not endpoint:
+                raise ValueError(
+                    "Azure OpenAI configuration missing. "
+                    "Set deployment name and AZURE_OPENAI_BASE_URL, APIM_GATEWAY_URL, "
+                    "or AZURE_OPENAI_ENDPOINT"
+                )
+
+            logger.info(f"SQL-only: Using ChatClient with endpoint={endpoint}")
+
+            client = AzureOpenAIChatClient(
+                credential=credential,
+                deployment_name=deployment_name,
+                endpoint=endpoint,
+                api_version=api_version,
+            )
 
         # SQL-only agent - fastest mode
         # プロンプトは prompts/sql_agent.py から読み込み（簡易版）
-        agent = chat_client.as_agent(
+        agent = client.as_agent(
             name="sql_analyst",
             instructions=SQL_AGENT_PROMPT_MINIMAL,
             tools=[run_sql_query],
@@ -973,8 +1080,12 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
         if not deployment_name or not endpoint:
-            raise ValueError("Azure OpenAI configuration missing")
+            raise ValueError(
+                "Azure OpenAI configuration missing. "
+                "Set AZURE_OPENAI_DEPLOYMENT_MODEL and APIM_GATEWAY_URL or AZURE_OPENAI_ENDPOINT"
+            )
 
+        # Note: HandoffBuilder requires AzureOpenAIChatClient (not ResponsesClient)
         chat_client = AzureOpenAIChatClient(
             credential=credential,
             deployment_name=deployment_name,
@@ -1281,13 +1392,17 @@ async def stream_chat_request(
             # Fallback if no response
             if not assistant_content:
                 logger.info("No response received")
+                fallback_msg = (
+                    "申し訳ございませんが、この質問にはお答えできません。"
+                    "質問を変えてお試しください。"
+                )
                 response = {
                     "choices": [
                         {
                             "messages": [
                                 {
                                     "role": "assistant",
-                                    "content": "申し訳ございませんが、この質問にはお答えできません。質問を変えてお試しください。",
+                                    "content": fallback_msg,
                                 }
                             ]
                         }
