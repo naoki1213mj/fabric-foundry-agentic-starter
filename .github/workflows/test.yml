@@ -6,19 +6,9 @@ name: Test and Lint
 # ============================================
 # This workflow runs on:
 # - All PRs to main branch (code quality check before merge)
-# - Push to main branch (validate deployed code)
 # - Manual trigger for debugging
+# Note: Push to main is handled by deploy-app-service.yml (run-tests job)
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/api/python/**'
-      - 'src/App/**'
-      - 'tests/**'
-      - 'ruff.toml'
-      - 'pyproject.toml'
-      - '.github/workflows/test.yml'
   pull_request:
     branches:
       - main
