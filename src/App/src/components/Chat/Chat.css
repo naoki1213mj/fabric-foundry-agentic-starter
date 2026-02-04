@@ -422,7 +422,36 @@
   transition: all var(--transition-normal);
 }
 
-/* === Agent Mode Selector === */
+/* === Settings Panel (Agent Mode + Reasoning Effort) === */
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm, 8px);
+  flex-shrink: 0;
+  padding: var(--spacing-sm, 8px);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md, 10px);
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.setting-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding-left: 4px;
+}
+
+.settings-panel .fui-Dropdown {
+  min-width: 180px;
+  border-radius: var(--radius-md, 10px);
+}
+
+/* === Legacy: Agent Mode Selector (keep for backward compat) === */
 .agent-mode-selector {
   flex-shrink: 0;
 }
@@ -514,6 +543,23 @@
   .chat-footer {
     flex-wrap: wrap;
     padding: var(--spacing-md);
+  }
+
+  .settings-panel {
+    width: 100%;
+    order: -1;
+    margin-bottom: var(--spacing-sm);
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .setting-item {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .settings-panel .fui-Dropdown {
+    width: 100%;
   }
 
   .agent-mode-selector {

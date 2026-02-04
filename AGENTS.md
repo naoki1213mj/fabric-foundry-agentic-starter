@@ -299,6 +299,27 @@ python <script.py>
 | ツール | 状態 | 備考 |
 |--------|------|------|
 | SQL Query (Fabric) | ✅ 動作 | 売上データ、顧客データ |
-| Doc Search (AI Search) | ✅ 動作 | 製品仕様書検索 |
+| Doc Search (AI Search) | ✅ 動作 | Agentic Retrieval (Foundry IQ) 対応 |
 | Web Search | ⚠️ タイムアウト | Web Search tool (preview) 60秒タイムアウト設定 |
 | MCP Tools | ✅ 動作 | YoY, RFM, 在庫分析 (APIM経由) |
+
+### Agentic Retrieval (Foundry IQ) 設定
+
+| 項目 | 値 |
+|------|-----|
+| Knowledge Base | `product-specs-kb` |
+| Reasoning Effort | `minimal` / `low` / `medium` |
+| API Version | `2025-11-01-preview` |
+
+**UIでの設定方法**:
+- フロントエンド左側の「🔍 Doc Search (Foundry IQ)」ドロップダウンで Reasoning Effort を選択
+- `minimal`: 高速・直接検索（LLMなし）
+- `low`: シングルパス推論（バランス型、デフォルト）
+- `medium`: 反復検索（最高品質）
+
+**環境変数**:
+```
+AI_SEARCH_ENDPOINT=https://search-sp-rag-australiaeast-001.search.windows.net
+AI_SEARCH_KNOWLEDGE_BASE_NAME=product-specs-kb
+AI_SEARCH_REASONING_EFFORT=low
+```

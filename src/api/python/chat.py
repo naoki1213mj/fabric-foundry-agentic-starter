@@ -110,6 +110,7 @@ _current_web_citations: list = []
 # Context variable for reasoning effort (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
 
+
 def get_web_agent_handler() -> WebAgentHandler:
     """Get or create WebAgentHandler singleton."""
     global _web_agent_handler

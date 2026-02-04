@@ -16,6 +16,7 @@
 | **Foundry Agent Service** | GA | 2025年5月〜 |
 | **Hosted Agents** | GA | azd deploy対応 |
 | **Foundry Guardrails** | Public Preview | Task Adherence, Prompt Shields, PII |
+| **Foundry IQ (Agentic Retrieval)** | GA | Knowledge Base + Reasoning Effort |
 | **SQL Database in Fabric** | GA | 2025年11月〜 |
 | **OneLake Security** | Preview | RLS/CLS対応 |
 | **Web Search tool** | Public Preview | Bing Groundingの後継（gpt-5対応） |

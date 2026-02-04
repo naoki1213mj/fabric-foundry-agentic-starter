@@ -125,12 +125,13 @@ Agent: [Chart.js でグラフ生成]
 
 ---
 
-#### シーン3: 製品仕様書検索（DocAgent）
+#### シーン3: 製品仕様書検索（DocAgent + Foundry IQ）
 
 ```
 User: 「Adventure Works Touring Bike の仕様を教えて」
 
 [OrchestratorAgent がドキュメント検索と判断 → DocAgent にハンドオフ]
+[Agentic Retrieval (Foundry IQ) がクエリを分解・最適化]
 
 Agent: 「Adventure Works Touring Bike の仕様です：
        
@@ -142,14 +143,24 @@ Agent: 「Adventure Works Touring Bike の仕様です：
        🎯 推奨用途
        - ロングツーリング、通勤、週末ライド
        
-       【1:0†product_spec_touring_bike.pdf】」
+       ---
+       📊 Reasoning Effort: low | 推論トークン: 150 | 検索: 3件 (45ms)
+       【ref_1†relevance:0.92】【ref_2†relevance:0.85】」
 ```
 
 **話しながらデモ**:
-> 「これが RAG（検索拡張生成）です。
-> SharePoint の製品仕様書を Azure AI Search で検索し、
-> DocAgent が回答を生成しています。
-> 出典も明示されるので、信頼性を確認できます。」
+> 「これが **Agentic Retrieval（Foundry IQ）** です。
+> 
+> UI左側の **Doc Search (Foundry IQ)** ドロップダウンで
+> Reasoning Effort を選択できます：
+> - **Minimal**: 高速・直接検索（LLMなし）
+> - **Low**: シングルパス推論（バランス型、推奨）
+> - **Medium**: 反復検索（最高品質）
+> 
+> LLMがクエリを分解・最適化し、
+> Azure AI Search の Knowledge Base から
+> 最適な結果を取得しています。
+> relevance スコアで検索品質も可視化されています。」
 
 ---
 
