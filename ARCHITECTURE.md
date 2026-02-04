@@ -329,6 +329,190 @@ graph TB
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### API Management ポリシー設定詳細
+
+#### 1. Inbound ポリシー
+
+```xml
+<inbound>
+    <!-- Managed Identity 認証 -->
+    <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+    
+    <!-- CORS 設定 -->
+    <cors allow-credentials="true">
+        <allowed-origins>
+            <origin>https://app-daj6dri4yf3k3z.azurewebsites.net</origin>
+        </allowed-origins>
+        <allowed-methods><method>*</method></allowed-methods>
+        <allowed-headers><header>*</header></allowed-headers>
+    </cors>
+    
+    <!-- レート制限 (Consumption SKU では制限あり) -->
+    <rate-limit-by-key calls="100" renewal-period="60" 
+                       counter-key="@(context.Subscription.Id)" />
+</inbound>
+```
+
+#### 2. Backend ポリシー
+
+```xml
+<backend>
+    <!-- Circuit Breaker 設定 -->
+    <circuit-breaker>
+        <rule name="openai-circuit-breaker" 
+              trip-duration="30"
+              accept-retry-after="true">
+            <failure-condition>
+                <status-code-range min="429" max="429"/>
+                <status-code-range min="500" max="599"/>
+            </failure-condition>
+        </rule>
+    </circuit-breaker>
+    
+    <!-- タイムアウト設定 -->
+    <forward-request timeout="120" />
+</backend>
+```
+
+#### 3. Outbound ポリシー
+
+```xml
+<outbound>
+    <!-- トークン使用量をレスポンスヘッダーに追加 -->
+    <set-header name="x-openai-prompt-tokens" exists-action="override">
+        <value>@(context.Response.Body?.As<JObject>()?["usage"]?["prompt_tokens"]?.ToString() ?? "0")</value>
+    </set-header>
+    <set-header name="x-openai-completion-tokens" exists-action="override">
+        <value>@(context.Response.Body?.As<JObject>()?["usage"]?["completion_tokens"]?.ToString() ?? "0")</value>
+    </set-header>
+    <set-header name="x-openai-total-tokens" exists-action="override">
+        <value>@(context.Response.Body?.As<JObject>()?["usage"]?["total_tokens"]?.ToString() ?? "0")</value>
+    </set-header>
+    
+    <!-- レイテンシ計測 -->
+    <set-header name="x-gateway-latency-ms" exists-action="override">
+        <value>@(context.Elapsed.TotalMilliseconds.ToString("0"))</value>
+    </set-header>
+</outbound>
+```
+
+### API エンドポイント詳細
+
+| API | パス | メソッド | バックエンド | 認証 | 用途 |
+|-----|------|----------|--------------|------|------|
+| **Azure OpenAI (Legacy)** | `/openai/deployments/{deployment}/chat/completions` | POST | `aisa-*.openai.azure.com` | Managed Identity | 旧形式の Chat Completions |
+| **Foundry OpenAI** | `/foundry-openai/openai/v1/chat/completions` | POST | `aisa-*.services.ai.azure.com` | Managed Identity | **ResponsesClient 推奨** |
+| **Foundry OpenAI** | `/foundry-openai/openai/v1/responses` | POST | `aisa-*.services.ai.azure.com` | Managed Identity | Responses API |
+| **MCP Server** | `/mcp` | POST | `func-mcp-*.azurewebsites.net/api/mcp` | API Key | JSON-RPC 2.0 |
+| **Foundry Agents** | `/foundry-agents/threads/{thread_id}/messages` | POST | Foundry Agent Service | Managed Identity | Agent Thread メッセージ |
+
+---
+
+## API Center (ツールカタログ) 詳細
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              API CENTER CONFIGURATION                                        │
+│                              apic-daj6dri4yf3k3z (Free SKU)                                 │
+│                                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  目的: プライベート API/ツールのカタログ管理・発見・ガバナンス                       │   │
+│  │                                                                                      │   │
+│  │  ┌─────────────────────────────────────────────────────────────────────────────┐    │   │
+│  │  │  登録済み API                                                               │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  1. Business Analytics MCP Server                                          │    │   │
+│  │  │     ├─ Type: MCP Server (JSON-RPC 2.0)                                     │    │   │
+│  │  │     ├─ Version: 1.0.0                                                      │    │   │
+│  │  │     ├─ Lifecycle: Production                                               │    │   │
+│  │  │     ├─ Endpoint: https://apim-*/mcp                                        │    │   │
+│  │  │     └─ Tools: 5 (下記参照)                                                 │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  2. Azure OpenAI API                                                       │    │   │
+│  │  │     ├─ Type: REST API (OpenAPI 3.0)                                        │    │   │
+│  │  │     ├─ Version: 2024-02-15-preview                                         │    │   │
+│  │  │     ├─ Lifecycle: Production                                               │    │   │
+│  │  │     └─ Endpoint: https://apim-*/foundry-openai/openai/v1/                  │    │   │
+│  │  └─────────────────────────────────────────────────────────────────────────────┘    │   │
+│  │                                                                                      │   │
+│  │  ┌─────────────────────────────────────────────────────────────────────────────┐    │   │
+│  │  │  MCP Server ツール一覧                                                      │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
+│  │  │  │ Tool: analyze_yoy_performance                                        │ │    │   │
+│  │  │  │ Description: 前年同期比（Year-over-Year）売上成長率を分析            │ │    │   │
+│  │  │  │ Input: { period: string, category?: string }                         │ │    │   │
+│  │  │  │ Output: { yoy_growth: number, breakdown: array }                     │ │    │   │
+│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
+│  │  │  │ Tool: analyze_rfm_segments                                           │ │    │   │
+│  │  │  │ Description: 顧客のRFM分析（Recency/Frequency/Monetary）              │ │    │   │
+│  │  │  │ Input: { customer_ids?: array, period?: string }                     │ │    │   │
+│  │  │  │ Output: { segments: array, distribution: object }                    │ │    │   │
+│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
+│  │  │  │ Tool: analyze_inventory                                              │ │    │   │
+│  │  │  │ Description: 在庫最適化分析（回転率、発注点、滞留在庫）               │ │    │   │
+│  │  │  │ Input: { product_ids?: array, threshold?: number }                   │ │    │   │
+│  │  │  │ Output: { turnover_rates: array, recommendations: array }            │ │    │   │
+│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
+│  │  │  │ Tool: analyze_seasonal_trends                                        │ │    │   │
+│  │  │  │ Description: 季節性トレンド分析（月別・四半期別パターン）              │ │    │   │
+│  │  │  │ Input: { category?: string, years?: number }                         │ │    │   │
+│  │  │  │ Output: { seasonal_index: array, peak_periods: array }               │ │    │   │
+│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │                                                                             │    │   │
+│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
+│  │  │  │ Tool: analyze_regional_performance                                   │ │    │   │
+│  │  │  │ Description: 地域別パフォーマンス分析（売上・成長率・シェア）         │ │    │   │
+│  │  │  │ Input: { regions?: array, metric?: string }                          │ │    │   │
+│  │  │  │ Output: { regional_data: array, rankings: array }                    │ │    │   │
+│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  └─────────────────────────────────────────────────────────────────────────────┘    │   │
+│  └──────────────────────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### API Center の役割
+
+| 機能 | 説明 |
+|------|------|
+| **API Discovery** | エージェントが利用可能なツールを発見・検索 |
+| **Version Management** | API/ツールのバージョン管理とライフサイクル追跡 |
+| **Schema Registry** | OpenAPI/JSON Schema の一元管理 |
+| **Governance** | API の命名規則、セキュリティ、コンプライアンス |
+| **Analytics** | API 利用状況の可視化（将来拡張） |
+
+### API Center と APIM の連携
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│  Agent Framework からの Tool 呼び出しフロー                                      │
+│                                                                                  │
+│  1. 初期化フェーズ                                                               │
+│     ├─ API Center から利用可能な MCP Tools の一覧を取得                         │
+│     └─ Tool 定義 (名前、説明、パラメータ) を Agent に登録                       │
+│                                                                                  │
+│  2. 実行フェーズ                                                                 │
+│     ├─ LLM が最適な Tool を選択                                                 │
+│     ├─ Agent Framework が JSON-RPC リクエストを構築                             │
+│     ├─ APIM Gateway 経由で MCP Server に送信                                    │
+│     │   └─ POST https://apim-*/mcp                                              │
+│     │       Content-Type: application/json                                       │
+│     │       Body: {"jsonrpc":"2.0","method":"tools/call",...}                   │
+│     └─ MCP Server がツールを実行し結果を返却                                    │
+│                                                                                  │
+│  3. 監視フェーズ                                                                 │
+│     ├─ APIM: レイテンシ、エラー率、スループット                                 │
+│     ├─ Application Insights: 分散トレーシング                                   │
+│     └─ API Center: 利用状況レポート（将来）                                     │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
 ## プロンプトモジュール

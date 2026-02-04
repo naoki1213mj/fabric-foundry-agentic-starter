@@ -38,11 +38,13 @@
 | **Azure AI Services** | `aisa-daj6dri4yf3k3z` | AIServices | East US | S0 |
 | **AI Foundry Project** | `aifp-daj6dri4yf3k3z` | - | East US | - |
 | **Azure AI Search** | `search-sp-rag-australiaeast-001` | Cognitive Search | Australia East | **Standard** |
-| **Bing Search** | `bing-global-001` | Bing Search | Global | - |
+| **Bing Grounding** | `bingglobal00149elbd` (connection) | Project Connection | - | - |
 | **Application Insights** | `appi-daj6dri4yf3k3z` | APM | East US | - |
 | **Log Analytics** | `log-daj6dri4yf3k3z` | Logs | East US | - |
 | **Managed Identity** | `id-daj6dri4yf3k3z` | User Assigned | Australia East | - |
-| **Cosmos DB Account** | `capagentunifieddata001` | NoSQL | Australia East | - |
+| **Fabric Capacity** | `capagentunifieddata001` | Microsoft Fabric | Australia East | **F4** |
+| **API Management** | `apim-daj6dri4yf3k3z` | AI Gateway | East US | **Consumption** |
+| **API Center** | `apic-daj6dri4yf3k3z` | Tool Catalog | East US | Free |
 
 ### 現在の設定値（API App Service）
 
@@ -83,16 +85,16 @@
 
 - **LLM**: Azure OpenAI (**GPT-5** - 実機確認)
 - **エージェント管理**: Microsoft Foundry Agent Service (`aifp-daj6dri4yf3k3z`)
-- **ドキュメント検索**: Azure AI Search (Standard SKU)
-- **Web検索**: Web Search tool (preview) ※ Bing Grounding の後継
+- **ドキュメント検索**: Foundry IQ (Agentic Retrieval) + Azure AI Search
+- **Web検索**: BingGroundingAgentTool (プロジェクトコネクション: `bingglobal00149elbd`)
 - **安全性**: Foundry Guardrails
 
 ### データ
 
-- **プラットフォーム**: Microsoft Fabric
+- **プラットフォーム**: Microsoft Fabric (**F4 Capacity**)
 - **データベース**: SQL Database in Fabric (`retail_sqldatabase_*`)
 - **データレイク**: OneLake
-- **会話履歴**: Cosmos DB (`capagentunifieddata001`)
+- **会話履歴**: SQL Database in Fabric (`hst_conversations`, `hst_conversation_*`)
 
 ### インフラ
 

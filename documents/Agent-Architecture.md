@@ -62,7 +62,38 @@ User → Manager Agent ─┬─ Plan
 
 **用途**: 複雑な分析タスク（最も遅いが最も強力）
 
-## 2. エージェント構成
+## 2. クライアントパターン
+
+### SDK クライアント選択
+
+| クライアント | API | 対応モード | 特徴 |
+| ------------ | --- | ---------- | ---- |
+| `AzureOpenAIResponsesClient` | Responses API v1 | sql_only, multi_tool | 最新API、ツール統合最適化 |
+| `AzureOpenAIChatClient` | Chat Completions | handoff, magentic | SDK制約によりWorkflowBuilder使用時必須 |
+
+### 環境変数による切り替え
+
+```python
+# AZURE_OPENAI_BASE_URL が設定されている場合 → ResponsesClient
+# 設定されていない場合 → ChatClient (フォールバック)
+
+if os.getenv("AZURE_OPENAI_BASE_URL"):
+    client = AzureOpenAIResponsesClient(...)
+else:
+    client = AzureOpenAIChatClient(...)
+```
+
+### APIM 経由の Responses API
+
+```bash
+# 推奨: APIM 経由で Foundry OpenAI を使用
+AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
+```
+
+---
+
+## 3. エージェント構成
 
 ### SQL Agent
 
@@ -81,33 +112,66 @@ async def query_database(query: str) -> str:
 - `Products` - 製品マスタ  
 - `Customers` - 顧客マスタ
 
-### Web Agent
+### Web Agent (BingGroundingAgentTool)
 
-**役割**: Bing Search APIでウェブ検索
+**役割**: Bing Grounding によるWeb検索
 
 ```python
-@tool
-async def search_web(query: str) -> str:
-    """Search the web using Bing Search API"""
-    # Bing Search連携
+# プロジェクトコネクション経由での BingGroundingAgentTool 使用
+from azure.ai.agents.models import BingGroundingAgentTool
+
+bing_tool = BingGroundingAgentTool(
+    connection_id="/subscriptions/.../connections/bingglobal00149elbd"
+)
+
+# ツール登録
+tools = [bing_tool]
 ```
 
 **出力**: 検索結果 + 引用情報（citations）
 
-### Doc Agent
+### Doc Agent (Foundry IQ)
 
-**役割**: Azure AI Search でドキュメント検索
+**役割**: Foundry IQ (Agentic Retrieval) でドキュメント検索
 
 ```python
-@tool
-async def search_documents(query: str) -> str:
-    """Search internal documents using AI Search"""
-    # Azure AI Search連携
+# Foundry IQ による Agentic Retrieval
+# Reasoning Effort: minimal / low / medium
+
+async def search_documents(query: str, reasoning_effort: str = "low") -> str:
+    """Search internal documents using Foundry IQ Agentic Retrieval
+    
+    Args:
+        query: 検索クエリ
+        reasoning_effort: 推論レベル
+            - minimal: 高速・直接検索（LLMなし）
+            - low: シングルパス推論（バランス型、デフォルト）
+            - medium: 反復検索（最高品質）
+    """
+    # Knowledge Base: product-specs-kb
+    # Index: product-specs-sharepoint-ks-index
 ```
 
-**データソース**: `製品仕様書/` フォルダ内のドキュメント
+**データソース**: `製品仕様書/` フォルダ内のドキュメント（AI Search インデックス）
 
-## 3. ツール呼び出しフロー
+### MCP Tools
+
+**役割**: MCP Server (Azure Functions) 経由のビジネス分析ツール
+
+```python
+# JSON-RPC 2.0 で MCP Server を呼び出し
+mcp_tools = [
+    "analyze_yoy_performance",      # 前年比分析
+    "analyze_rfm_segments",         # 顧客RFM
+    "analyze_inventory",            # 在庫最適化
+    "analyze_seasonal_trends",      # 季節トレンド
+    "analyze_regional_performance", # 地域分析
+]
+```
+
+---
+
+## 5. ツール呼び出しフロー
 
 ### multi_tool モードの例
 
@@ -116,15 +180,20 @@ sequenceDiagram
     participant U as User
     participant A as Unified Agent
     participant S as SQL Tool
-    participant W as Web Tool
-    participant D as Doc Tool
+    participant W as Web Tool (Bing Grounding)
+    participant D as Doc Tool (Foundry IQ)
+    participant M as MCP Tools
 
-    U->>A: "売上TOP3と製品仕様を教えて"
+    U->>A: "売上TOP3と製品仕様、市場動向を教えて"
     A->>A: クエリ分析
     A->>S: query_database("SELECT TOP 3...")
     S-->>A: 売上データ
-    A->>D: search_documents("製品仕様")
+    A->>D: search_documents("製品仕様", reasoning_effort="low")
     D-->>A: 仕様書データ
+    A->>W: search_web("自転車市場動向 2025")
+    W-->>A: Web検索結果 + citations
+    A->>M: analyze_yoy_performance(sales_data)
+    M-->>A: 前年比分析結果
     A->>A: 結果統合
     A-->>U: 統合レスポンス
 ```
@@ -146,7 +215,7 @@ sequenceDiagram
     T-->>U: SQL結果のみ
 ```
 
-## 4. 設定方法
+## 6. 設定方法
 
 ### 環境変数
 
@@ -156,6 +225,19 @@ AGENT_MODE=multi_tool  # sql_only | multi_tool | handoff | magentic
 
 # マルチエージェント有効化（handoff/magentic用）
 MULTI_AGENT_MODE=true
+
+# Responses API 使用（推奨）
+AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
+
+# Bing Grounding
+BING_PROJECT_CONNECTION_NAME=bingglobal00149elbd
+AZURE_AI_PROJECT_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z
+
+# Foundry IQ
+AI_SEARCH_KNOWLEDGE_BASE_NAME=product-specs-kb
+AI_SEARCH_INDEX_NAME=product-specs-sharepoint-ks-index
+AI_SEARCH_REASONING_EFFORT=low  # minimal | low | medium
 ```
 
 ### コード内での切り替え
@@ -174,7 +256,7 @@ elif AGENT_MODE == "magentic":
     agent = create_magentic_agent()
 ```
 
-## 5. 推奨設定
+## 7. 推奨設定
 
 | シナリオ | 推奨モード | 理由 |
 | -------- | ---------- | ---- |

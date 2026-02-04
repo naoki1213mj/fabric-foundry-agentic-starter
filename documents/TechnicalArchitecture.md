@@ -49,9 +49,9 @@ The following resources are deployed in the `rg-agent-unified-data-acce-eastus-0
 | Resource | Type | Models | Description |
 |----------|------|--------|-------------|
 | `aisa-daj6dri4yf3k3z` | Azure AI Services | - | Microsoft Foundry hub |
-| `aifp-daj6dri4yf3k3z` | Foundry Project | gpt-5 (500 TPM), gpt-4o-mini (30 TPM), text-embedding-3-large (500 TPM), text-embedding-3-small (120 TPM) | AI model deployments |
-| `search-sp-rag-australiaeast-001` | AI Search | Standard | Product documentation search index |
-| `bing-global-001` | Bing Search (deprecated) | - | Previously used for Web Search (migrated to Web Search tool) |
+| `aifp-daj6dri4yf3k3z` | Foundry Project | gpt-5 (500K TPM), gpt-4o-mini (30K TPM), text-embedding-3-large (500K TPM), text-embedding-3-small (120K TPM) | AI model deployments |
+| `search-sp-rag-australiaeast-001` | AI Search | Standard | Foundry IQ knowledge base index (product-specs-kb) |
+| Bing Grounding Connection | - | `bingglobal00149elbd` | Web search via BingGroundingAgentTool |
 
 ### Integration & API Management
 
@@ -64,16 +64,37 @@ The following resources are deployed in the `rg-agent-unified-data-acce-eastus-0
 
 | API Name | Path | Backend | Features |
 |----------|------|---------|----------|
-| Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` | Managed Identity auth, token usage headers, circuit breaker |
+| Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` | Legacy endpoint |
+| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-daj6dri4yf3k3z.services.ai.azure.com` | **Primary endpoint for Responses API** |
 | MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` | JSON-RPC 2.0 protocol, latency tracking |
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service | Agent responses, timeout handling |
 
+**APIM Policy Configuration:**
+
+```xml
+<!-- Inbound: Managed Identity authentication -->
+<authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+
+<!-- Backend: Circuit Breaker (30s trip on 429/5xx) -->
+<circuit-breaker rule="FoundryCircuitBreaker">
+    <trip-duration>PT30S</trip-duration>
+    <accepted-count>5</accepted-count>
+    <sampling-window>PT10S</sampling-window>
+    <trip-threshold percentage="0.5" />
+</circuit-breaker>
+
+<!-- Outbound: Token usage headers -->
+<set-header name="x-openai-prompt-tokens" exists-action="skip">
+    <value>@(context.Response.Headers.GetValueOrDefault("x-ratelimit-remaining-tokens",""))</value>
+</set-header>
+```
+
 **Registered APIs in API Center:**
 
-| API Name | Description |
-|----------|-------------|
-| Business Analytics MCP Server | MCP Server providing 5 business analytics tools |
-| Azure OpenAI API | GPT-5, GPT-4o-mini, Embeddings endpoints |
+| API Name | Tools | Description |
+|----------|-------|-------------|
+| Business Analytics MCP Server | 5 tools | YoY分析, RFM分析, 在庫分析, 季節トレンド, 地域分析 |
+| Azure OpenAI API | - | Chat Completions, Embeddings endpoints |
 
 ### Data Platform
 
@@ -107,18 +128,30 @@ Provides large language model (LLM) capabilities to support natural language que
 
 ### Foundry Agent Service
 Provides agent runtime with built-in tools:
-- **Web Search tool (preview)**: Real-time web search for current information
+- **BingGroundingAgentTool**: Real-time web search using project connection (`bingglobal00149elbd`)
 - **Code Interpreter**: Execute Python code for data analysis
 - **Custom tools**: MCP Server integration for business analytics
+
+### Foundry IQ (Agentic Retrieval)
+Advanced RAG capabilities with reasoning:
+- **Knowledge Base**: `product-specs-kb` - 製品仕様書のナレッジベース
+- **Index**: `product-specs-sharepoint-ks-index` - AI Search インデックス
+- **Reasoning Effort**: `minimal` (高速) / `low` (バランス) / `medium` (高品質)
+- **API Version**: `2025-11-01-preview`
 
 ### Agent Framework  
 Handles orchestration and intelligent function/tool calling for contextualized responses and multi-step reasoning over retrieved data.
 
+**クライアントパターン:**
+- `AzureOpenAIResponsesClient`: Responses API v1 (sql_only, multi_tool モード)
+- `AzureOpenAIChatClient`: Chat Completions API (handoff, magentic モード - SDK制約)
+
 ### API Management (AI Gateway)
 Provides centralized governance for AI APIs:
+- **Foundry OpenAI endpoint**: `/foundry-openai/openai/v1/` - Primary endpoint for Responses API
 - **Token usage headers**: `x-openai-prompt-tokens`, `x-openai-completion-tokens`, `x-openai-total-tokens`
 - **Managed Identity authentication**: Secure access to Foundry services
-- **Circuit breaker**: Automatic failover on backend errors (429, 500-599)
+- **Circuit breaker**: Automatic failover on backend errors (429, 500-599) with 30s trip duration
 - **Timeout handling**: Graceful degradation on 408 errors
 - **Latency tracking**: `x-gateway-latency-ms` header
 
@@ -127,16 +160,21 @@ Provides centralized governance for AI APIs:
 ### API Center (Private Tool Catalog)
 Provides centralized API governance and discovery:
 - **MCP Server registration**: Business Analytics MCP Server with 5 tools
+  - `analyze_yoy_performance` - 前年同期比成長率分析
+  - `analyze_rfm_segments` - 顧客RFMセグメンテーション
+  - `analyze_inventory` - 在庫最適化分析
+  - `analyze_seasonal_trends` - 季節性トレンド分析
+  - `analyze_regional_performance` - 地域別パフォーマンス分析
 - **Azure OpenAI registration**: Chat Completions and Embeddings APIs
 - **Workspace management**: Default workspace for Agentic AI application
 
 ### MCP Server (Azure Functions)
-Model Context Protocol server providing business analytics tools:
-- `calculate_yoy_growth`: Year-over-year growth calculation
-- `calculate_rfm_score`: Customer RFM segmentation
-- `identify_slow_moving_inventory`: Inventory analysis
-- `compare_products`: Product comparison across metrics
-- `analyze_customer_segment`: Customer segment analysis
+Model Context Protocol server providing business analytics tools via JSON-RPC 2.0:
+- `analyze_yoy_performance`: Year-over-year growth calculation
+- `analyze_rfm_segments`: Customer RFM segmentation
+- `analyze_inventory`: Inventory analysis (turnover, reorder point, slow-moving)
+- `analyze_seasonal_trends`: Seasonal trend analysis
+- `analyze_regional_performance`: Regional performance comparison
 
 ### App Service  
 Hosts the web application and API layer that interfaces with the AI services and storage layers. Manages user sessions and handles REST calls. Both API and Frontend are containerized and deployed from Azure Container Registry.
