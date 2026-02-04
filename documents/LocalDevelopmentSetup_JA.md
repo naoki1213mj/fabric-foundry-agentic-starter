@@ -127,9 +127,13 @@ source ~/.bashrc
 ### リポジトリのクローン
 
 ```bash
-git clone https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator.git
+# このカスタマイズプロジェクトの場合:
+git clone https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai.git
+cd hackathon202601-stu-se-agentic-ai
 
-cd agentic-applications-for-unified-data-foundation-solution-accelerator
+# またはオリジナル Solution Accelerator の場合:
+# git clone https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator.git
+# cd agentic-applications-for-unified-data-foundation-solution-accelerator
 ```
 
 **任意のステップを開始する前に、リポジトリルートディレクトリにいることを確認してください：**

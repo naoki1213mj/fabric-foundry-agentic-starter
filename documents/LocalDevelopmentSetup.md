@@ -2,6 +2,8 @@
 
 **English** | [日本語](./LocalDevelopmentSetup_JA.md)
 
+> **🛠️ Note:** This document is based on the original [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator). For this customized project, some paths and configurations may differ.
+
 This guide provides comprehensive instructions for setting up the Agentic Applications For Unified Data Foundation Solution Accelerator for local development across Windows and Linux platforms.
 
 ## Important Setup Notes
@@ -127,9 +129,13 @@ source ~/.bashrc
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator.git
+# For this customized project:
+git clone https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai.git
+cd hackathon202601-stu-se-agentic-ai
 
-cd agentic-applications-for-unified-data-foundation-solution-accelerator
+# Or for the original Solution Accelerator:
+# git clone https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator.git
+# cd agentic-applications-for-unified-data-foundation-solution-accelerator
 ```
 
 **Before starting any step, ensure you are in the repository root directory:**

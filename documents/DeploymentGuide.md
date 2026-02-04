@@ -2,6 +2,8 @@
 
 **English** | [日本語](./DeploymentGuide_JA.md)
 
+> **🛠️ Note:** This document is based on the original [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator). Some links and commands below reference the original repository. For this customized project, GitHub Actions CI/CD is configured for automatic deployment.
+
 ## **Pre-requisites**
 
 To deploy this solution, ensure you have access to an [Azure subscription](https://azure.microsoft.com/free/) with the necessary permissions to create **resource groups, resources, app registrations, and assign roles at the resource group level**. This should include Contributor role at the subscription level and Role Based Access Control (RBAC) permissions at the subscription and/or resource group level. Follow the steps in [Azure Account Set Up](./AzureAccountSetUp.md). Follow the steps in [Fabric Capacity Set Up](https://learn.microsoft.com/en-us/fabric/admin/capacity-settings?tabs=fabric-capacity#create-a-new-capacity).
@@ -34,8 +36,8 @@ This will allow the scripts to run for the current session without permanently c
 
 Pick from the options below to see step-by-step instructions for GitHub Codespaces, VS Code Dev Containers, VS Code (Web), Local Environments, and Bicep deployments.
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) | [![Open in Visual Studio Code Web](https://img.shields.io/static/v1?style=for-the-badge&label=Visual%20Studio%20Code%20(Web)&message=Open&color=blue&logo=visualstudiocode&logoColor=white)](https://vscode.dev/azure/?vscode-azure-exp=foundry&agentPayload=eyJiYXNlVXJsIjogImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9taWNyb3NvZnQvYWdlbnRpYy1hcHBsaWNhdGlvbnMtZm9yLXVuaWZpZWQtZGF0YS1mb3VuZGF0aW9uLXNvbHV0aW9uLWFjY2VsZXJhdG9yL3JlZnMvaGVhZHMvbWFpbi9pbmZyYS92c2NvZGVfd2ViIiwgImluZGV4VXJsIjogIi9pbmRleC5qc29uIiwgInZhcmlhYmxlcyI6IHsiYWdlbnRJZCI6ICIiLCAiY29ubmVjdGlvblN0cmluZyI6ICIiLCAidGhyZWFkSWQiOiAiIiwgInVzZXJNZXNzYWdlIjogIiIsICJwbGF5Z3JvdW5kTmFtZSI6ICIiLCAibG9jYXRpb24iOiAiIiwgInN1YnNjcmlwdGlvbklkIjogIiIsICJyZXNvdXJjZUlkIjogIiIsICJwcm9qZWN0UmVzb3VyY2VJZCI6ICIiLCAiZW5kcG9pbnQiOiAiIn0sICJjb2RlUm91dGUiOiBbImFpLXByb2plY3RzLXNkayIsICJweXRob24iLCAiZGVmYXVsdC1henVyZS1hdXRoIiwgImVuZHBvaW50Il19) |
-|---|---|---|
+| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai) |
+|---|---|
 
 <details>
   <summary><b>Deploy in GitHub Codespaces</b></summary>
@@ -46,7 +48,7 @@ You can run this solution using GitHub Codespaces. The button will open a web-ba
 
 1. Open the solution accelerator (this may take several minutes):
 
-    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
+    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai)
 
 2. Accept the default values on the create Codespaces page.
 3. Open a terminal window if it is not already open.
@@ -64,7 +66,7 @@ You can run this solution in VS Code Dev Containers, which will open the project
 1. Start Docker Desktop (install it if not already installed).
 2. Open the project:
 
-    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai)
 
 3. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window.
 4. Continue with the [deploying steps](#deploying-with-azd).
@@ -127,7 +129,12 @@ If you're not using one of the above options for opening the project, then you'l
 2. Clone the repository or download the project code via command-line:
 
     ```shell
-    azd init -t microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/
+    # For this customized project:
+    git clone https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai.git
+    cd hackathon202601-stu-se-agentic-ai
+    
+    # Or for the original Solution Accelerator:
+    # azd init -t microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/
     ```
 
 3. Open the project folder in your terminal or editor.
