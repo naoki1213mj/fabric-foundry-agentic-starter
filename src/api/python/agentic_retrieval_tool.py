@@ -19,7 +19,7 @@ Reference:
 import json
 import logging
 import os
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import aiohttp
@@ -27,7 +27,7 @@ import aiohttp
 logger = logging.getLogger(__name__)
 
 
-class ReasoningEffort(str, Enum):
+class ReasoningEffort(StrEnum):
     """Reasoning effort levels for agentic retrieval.
 
     minimal: No LLM processing, direct search only. Lowest cost/latency.
