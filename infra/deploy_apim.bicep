@@ -152,10 +152,10 @@ resource chatCompletionsOperation 'Microsoft.ApiManagement/service/apis/operatio
   properties: {
     displayName: 'Create Chat Completion'
     method: 'POST'
-    urlTemplate: '/deployments/{deployment-id}/chat/completions'
+    urlTemplate: '/deployments/{deploymentId}/chat/completions'
     templateParameters: [
       {
-        name: 'deployment-id'
+        name: 'deploymentId'
         type: 'string'
         required: true
         description: 'Model deployment name'
@@ -181,10 +181,10 @@ resource embeddingsOperation 'Microsoft.ApiManagement/service/apis/operations@20
   properties: {
     displayName: 'Create Embeddings'
     method: 'POST'
-    urlTemplate: '/deployments/{deployment-id}/embeddings'
+    urlTemplate: '/deployments/{deploymentId}/embeddings'
     templateParameters: [
       {
-        name: 'deployment-id'
+        name: 'deploymentId'
         type: 'string'
         required: true
         description: 'Model deployment name'
@@ -365,10 +365,10 @@ resource agentResponsesOperation 'Microsoft.ApiManagement/service/apis/operation
     displayName: 'Create Agent Response'
     description: 'Create a response from an AI agent with tools (Web Search, Code Interpreter, etc.)'
     method: 'POST'
-    urlTemplate: '/{project-id}/openai/responses'
+    urlTemplate: '/{projectId}/openai/responses'
     templateParameters: [
       {
-        name: 'project-id'
+        name: 'projectId'
         type: 'string'
         required: true
         description: 'Foundry project ID'
@@ -395,10 +395,10 @@ resource agentCreateOperation 'Microsoft.ApiManagement/service/apis/operations@2
     displayName: 'Create Agent'
     description: 'Create a new AI agent with specified tools and instructions'
     method: 'POST'
-    urlTemplate: '/{project-id}/agents'
+    urlTemplate: '/{projectId}/agents'
     templateParameters: [
       {
-        name: 'project-id'
+        name: 'projectId'
         type: 'string'
         required: true
         description: 'Foundry project ID'
@@ -440,7 +440,7 @@ resource foundryAgentApiPolicy 'Microsoft.ApiManagement/service/apis/policies@20
         <llm-emit-token-metric namespace="FoundryAgents">
           <dimension name="API" value="@(context.Api.Name)" />
           <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Project" value="@(context.Request.MatchedParameters["project-id"] ?? "unknown")" />
+          <dimension name="Project" value="@(context.Request.MatchedParameters.GetValueOrDefault("projectId", "unknown"))" />
         </llm-emit-token-metric>
       </when>
     </choose>
@@ -589,7 +589,7 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
         <llm-emit-token-metric namespace="AzureOpenAI">
           <dimension name="API" value="@(context.Api.Name)" />
           <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Model" value="@(context.Request.MatchedParameters["deployment-id"] ?? "unknown")" />
+          <dimension name="Model" value="@(context.Request.MatchedParameters.GetValueOrDefault("deploymentId", "unknown"))" />
         </llm-emit-token-metric>
       </when>
     </choose>

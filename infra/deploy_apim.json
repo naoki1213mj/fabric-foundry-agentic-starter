@@ -1,0 +1,877 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "12826517497683471855"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "solutionName": {
+      "type": "string"
+    },
+    "azureOpenAiEndpoint": {
+      "type": "string"
+    },
+    "azureOpenAiDeploymentName": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure OpenAI deployment name (used in API path)"
+      }
+    },
+    "managedIdentityObjectId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Managed Identity Object ID for RBAC (for future use)"
+      }
+    },
+    "applicationInsightsId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Insights resource ID for logging"
+      }
+    },
+    "applicationInsightsInstrumentationKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Application Insights Instrumentation Key for APIM logging"
+      }
+    },
+    "logAnalyticsWorkspaceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Log Analytics Workspace ID for diagnostics"
+      }
+    },
+    "publisherEmail": {
+      "type": "string",
+      "defaultValue": "hackathon@contoso.com",
+      "metadata": {
+        "description": "Publisher email for APIM (required)"
+      }
+    },
+    "publisherName": {
+      "type": "string",
+      "defaultValue": "Agentic AI Hackathon",
+      "metadata": {
+        "description": "Publisher name for APIM (required)"
+      }
+    },
+    "mcpServerEndpoint": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "MCP Server Function endpoint URL"
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": {
+      "ai": {
+        "aiSearch": "srch-",
+        "aiServices": "aisa-",
+        "aiVideoIndexer": "avi-",
+        "machineLearningWorkspace": "mlw-",
+        "openAIService": "oai-",
+        "botService": "bot-",
+        "computerVision": "cv-",
+        "contentModerator": "cm-",
+        "contentSafety": "cs-",
+        "customVisionPrediction": "cstv-",
+        "customVisionTraining": "cstvt-",
+        "documentIntelligence": "di-",
+        "faceApi": "face-",
+        "healthInsights": "hi-",
+        "immersiveReader": "ir-",
+        "languageService": "lang-",
+        "speechService": "spch-",
+        "translator": "trsl-",
+        "aiHub": "aih-",
+        "aiHubProject": "aihp-",
+        "aiFoundry": "aif-",
+        "aiFoundryProject": "aifp-"
+      },
+      "analytics": {
+        "analysisServicesServer": "as",
+        "databricksWorkspace": "dbw-",
+        "dataExplorerCluster": "dec",
+        "dataExplorerClusterDatabase": "dedb",
+        "dataFactory": "adf-",
+        "digitalTwin": "dt-",
+        "streamAnalytics": "asa-",
+        "synapseAnalyticsPrivateLinkHub": "synplh-",
+        "synapseAnalyticsSQLDedicatedPool": "syndp",
+        "synapseAnalyticsSparkPool": "synsp",
+        "synapseAnalyticsWorkspaces": "synw",
+        "dataLakeStoreAccount": "dls",
+        "dataLakeAnalyticsAccount": "dla",
+        "eventHubsNamespace": "evhns-",
+        "eventHub": "evh-",
+        "eventGridDomain": "evgd-",
+        "eventGridSubscriptions": "evgs-",
+        "eventGridTopic": "evgt-",
+        "eventGridSystemTopic": "egst-",
+        "hdInsightHadoopCluster": "hadoop-",
+        "hdInsightHBaseCluster": "hbase-",
+        "hdInsightKafkaCluster": "kafka-",
+        "hdInsightSparkCluster": "spark-",
+        "hdInsightStormCluster": "storm-",
+        "hdInsightMLServicesCluster": "mls-",
+        "iotHub": "iot-",
+        "provisioningServices": "provs-",
+        "provisioningServicesCertificate": "pcert-",
+        "powerBIEmbedded": "pbi-",
+        "timeSeriesInsightsEnvironment": "tsi-"
+      },
+      "compute": {
+        "appServiceEnvironment": "ase-",
+        "appServicePlan": "asp-",
+        "loadTesting": "lt-",
+        "availabilitySet": "avail-",
+        "arcEnabledServer": "arcs-",
+        "arcEnabledKubernetesCluster": "arck",
+        "batchAccounts": "ba-",
+        "cloudService": "cld-",
+        "communicationServices": "acs-",
+        "diskEncryptionSet": "des",
+        "functionApp": "func-",
+        "gallery": "gal",
+        "hostingEnvironment": "host-",
+        "imageTemplate": "it-",
+        "managedDiskOS": "osdisk",
+        "managedDiskData": "disk",
+        "notificationHubs": "ntf-",
+        "notificationHubsNamespace": "ntfns-",
+        "proximityPlacementGroup": "ppg-",
+        "restorePointCollection": "rpc-",
+        "snapshot": "snap-",
+        "staticWebApp": "stapp-",
+        "virtualMachine": "vm",
+        "virtualMachineScaleSet": "vmss-",
+        "virtualMachineMaintenanceConfiguration": "mc-",
+        "virtualMachineStorageAccount": "stvm",
+        "webApp": "app-"
+      },
+      "containers": {
+        "aksCluster": "aks-",
+        "aksSystemNodePool": "npsystem-",
+        "aksUserNodePool": "np-",
+        "containerApp": "ca-",
+        "containerAppsEnvironment": "cae-",
+        "containerRegistry": "cr",
+        "containerInstance": "ci",
+        "serviceFabricCluster": "sf-",
+        "serviceFabricManagedCluster": "sfmc-"
+      },
+      "databases": {
+        "cosmosDBDatabase": "cosmos-",
+        "cosmosDBApacheCassandra": "coscas-",
+        "cosmosDBMongoDB": "cosmon-",
+        "cosmosDBNoSQL": "cosno-",
+        "cosmosDBTable": "costab-",
+        "cosmosDBGremlin": "cosgrm-",
+        "cosmosDBPostgreSQL": "cospos-",
+        "cacheForRedis": "redis-",
+        "sqlDatabaseServer": "sql-",
+        "sqlDatabase": "sqldb-",
+        "sqlElasticJobAgent": "sqlja-",
+        "sqlElasticPool": "sqlep-",
+        "mariaDBServer": "maria-",
+        "mariaDBDatabase": "mariadb-",
+        "mySQLDatabase": "mysql-",
+        "postgreSQLDatabase": "psql-",
+        "sqlServerStretchDatabase": "sqlstrdb-",
+        "sqlManagedInstance": "sqlmi-"
+      },
+      "developerTools": {
+        "appConfigurationStore": "appcs-",
+        "mapsAccount": "map-",
+        "signalR": "sigr",
+        "webPubSub": "wps-"
+      },
+      "devOps": {
+        "managedGrafana": "amg-"
+      },
+      "integration": {
+        "apiManagementService": "apim-",
+        "apiCenter": "apic-",
+        "integrationAccount": "ia-",
+        "logicApp": "logic-",
+        "serviceBusNamespace": "sbns-",
+        "serviceBusQueue": "sbq-",
+        "serviceBusTopic": "sbt-",
+        "serviceBusTopicSubscription": "sbts-"
+      },
+      "managementGovernance": {
+        "automationAccount": "aa-",
+        "applicationInsights": "appi-",
+        "monitorActionGroup": "ag-",
+        "monitorDataCollectionRules": "dcr-",
+        "monitorAlertProcessingRule": "apr-",
+        "blueprint": "bp-",
+        "blueprintAssignment": "bpa-",
+        "dataCollectionEndpoint": "dce-",
+        "logAnalyticsWorkspace": "log-",
+        "logAnalyticsQueryPacks": "pack-",
+        "managementGroup": "mg-",
+        "purviewInstance": "pview-",
+        "resourceGroup": "rg-",
+        "templateSpecsName": "ts-"
+      },
+      "migration": {
+        "migrateProject": "migr-",
+        "databaseMigrationService": "dms-",
+        "recoveryServicesVault": "rsv-"
+      },
+      "networking": {
+        "applicationGateway": "agw-",
+        "applicationSecurityGroup": "asg-",
+        "cdnProfile": "cdnp-",
+        "cdnEndpoint": "cdne-",
+        "connections": "con-",
+        "dnsForwardingRuleset": "dnsfrs-",
+        "dnsPrivateResolver": "dnspr-",
+        "dnsPrivateResolverInboundEndpoint": "in-",
+        "dnsPrivateResolverOutboundEndpoint": "out-",
+        "firewall": "afw-",
+        "firewallPolicy": "afwp-",
+        "expressRouteCircuit": "erc-",
+        "expressRouteGateway": "ergw-",
+        "frontDoorProfile": "afd-",
+        "frontDoorEndpoint": "fde-",
+        "frontDoorFirewallPolicy": "fdfp-",
+        "ipGroups": "ipg-",
+        "loadBalancerInternal": "lbi-",
+        "loadBalancerExternal": "lbe-",
+        "loadBalancerRule": "rule-",
+        "localNetworkGateway": "lgw-",
+        "natGateway": "ng-",
+        "networkInterface": "nic-",
+        "networkSecurityGroup": "nsg-",
+        "networkSecurityGroupSecurityRules": "nsgsr-",
+        "networkWatcher": "nw-",
+        "privateLink": "pl-",
+        "privateEndpoint": "pep-",
+        "publicIPAddress": "pip-",
+        "publicIPAddressPrefix": "ippre-",
+        "routeFilter": "rf-",
+        "routeServer": "rtserv-",
+        "routeTable": "rt-",
+        "serviceEndpointPolicy": "se-",
+        "trafficManagerProfile": "traf-",
+        "userDefinedRoute": "udr-",
+        "virtualNetwork": "vnet-",
+        "virtualNetworkGateway": "vgw-",
+        "virtualNetworkManager": "vnm-",
+        "virtualNetworkPeering": "peer-",
+        "virtualNetworkSubnet": "snet-",
+        "virtualWAN": "vwan-",
+        "virtualWANHub": "vhub-"
+      },
+      "security": {
+        "bastion": "bas-",
+        "keyVault": "kv-",
+        "keyVaultManagedHSM": "kvmhsm-",
+        "managedIdentity": "id-",
+        "sshKey": "sshkey-",
+        "vpnGateway": "vpng-",
+        "vpnConnection": "vcn-",
+        "vpnSite": "vst-",
+        "webApplicationFirewallPolicy": "waf",
+        "webApplicationFirewallPolicyRuleGroup": "wafrg"
+      },
+      "storage": {
+        "storSimple": "ssimp",
+        "backupVault": "bvault-",
+        "backupVaultPolicy": "bkpol-",
+        "fileShare": "share-",
+        "storageAccount": "st",
+        "storageSyncService": "sss-"
+      },
+      "virtualDesktop": {
+        "labServicesPlan": "lp-",
+        "virtualDesktopHostPool": "vdpool-",
+        "virtualDesktopApplicationGroup": "vdag-",
+        "virtualDesktopWorkspace": "vdws-",
+        "virtualDesktopScalingPlan": "vdscaling-"
+      }
+    },
+    "abbrs": "[variables('$fxv#0')]",
+    "apimResourceName": "[format('{0}{1}', variables('abbrs').integration.apiManagementService, parameters('solutionName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2024-05-01",
+      "name": "[variables('apimResourceName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Consumption",
+        "capacity": 0
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "publisherEmail": "[parameters('publisherEmail')]",
+        "publisherName": "[parameters('publisherName')]"
+      },
+      "tags": {
+        "environment": "hackathon",
+        "purpose": "ai-gateway",
+        "workload": "agentic-ai",
+        "managedIdentityId": "[parameters('managedIdentityObjectId')]"
+      }
+    },
+    {
+      "condition": "[and(not(empty(parameters('applicationInsightsId'))), not(empty(parameters('applicationInsightsInstrumentationKey'))))]",
+      "type": "Microsoft.ApiManagement/service/loggers",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'appinsights-logger')]",
+      "properties": {
+        "loggerType": "applicationInsights",
+        "resourceId": "[parameters('applicationInsightsId')]",
+        "credentials": {
+          "instrumentationKey": "[parameters('applicationInsightsInstrumentationKey')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'azure-openai')]",
+      "properties": {
+        "title": "Azure OpenAI Service",
+        "description": "Azure OpenAI backend with Managed Identity authentication",
+        "url": "[parameters('azureOpenAiEndpoint')]",
+        "protocol": "http",
+        "credentials": {},
+        "tls": {
+          "validateCertificateChain": true,
+          "validateCertificateName": true
+        },
+        "circuitBreaker": {
+          "rules": [
+            {
+              "name": "openai-circuit-breaker",
+              "failureCondition": {
+                "count": 3,
+                "interval": "PT1M",
+                "statusCodeRanges": [
+                  {
+                    "min": 429,
+                    "max": 429
+                  },
+                  {
+                    "min": 500,
+                    "max": 599
+                  }
+                ]
+              },
+              "tripDuration": "PT30S",
+              "acceptRetryAfter": true
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'mcp-server')]",
+      "properties": {
+        "title": "MCP Server (Business Analytics Tools)",
+        "description": "MCP Server providing business analytics tools via Azure Functions",
+        "url": "[parameters('mcpServerEndpoint')]",
+        "protocol": "http",
+        "tls": {
+          "validateCertificateChain": true,
+          "validateCertificateName": true
+        },
+        "circuitBreaker": {
+          "rules": [
+            {
+              "name": "mcp-circuit-breaker",
+              "failureCondition": {
+                "count": 5,
+                "interval": "PT1M",
+                "statusCodeRanges": [
+                  {
+                    "min": 500,
+                    "max": 599
+                  }
+                ]
+              },
+              "tripDuration": "PT30S",
+              "acceptRetryAfter": true
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'azure-openai-api')]",
+      "properties": {
+        "displayName": "Azure OpenAI API",
+        "description": "AI Gateway for Azure OpenAI with rate limiting and logging",
+        "serviceUrl": "[parameters('azureOpenAiEndpoint')]",
+        "path": "openai",
+        "protocols": [
+          "https"
+        ],
+        "subscriptionRequired": false,
+        "apiType": "http"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'azure-openai-api', 'chat-completions')]",
+      "properties": {
+        "displayName": "Create Chat Completion",
+        "method": "POST",
+        "urlTemplate": "/deployments/{deploymentId}/chat/completions",
+        "templateParameters": [
+          {
+            "name": "deploymentId",
+            "type": "string",
+            "required": true,
+            "description": "Model deployment name"
+          }
+        ],
+        "request": {
+          "queryParameters": [
+            {
+              "name": "api-version",
+              "type": "string",
+              "required": true,
+              "description": "API Version"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'azure-openai-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'azure-openai-api', 'embeddings')]",
+      "properties": {
+        "displayName": "Create Embeddings",
+        "method": "POST",
+        "urlTemplate": "/deployments/{deploymentId}/embeddings",
+        "templateParameters": [
+          {
+            "name": "deploymentId",
+            "type": "string",
+            "required": true,
+            "description": "Model deployment name"
+          }
+        ],
+        "request": {
+          "queryParameters": [
+            {
+              "name": "api-version",
+              "type": "string",
+              "required": true,
+              "description": "API Version"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'azure-openai-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'azure-openai-api', 'all-operations')]",
+      "properties": {
+        "displayName": "All Other Operations",
+        "method": "*",
+        "urlTemplate": "/*"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'azure-openai-api')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'mcp-server-api')]",
+      "properties": {
+        "displayName": "MCP Server API",
+        "description": "Business Analytics MCP Server - Provides sales analysis, product comparison, customer segmentation, and inventory analysis tools",
+        "serviceUrl": "[parameters('mcpServerEndpoint')]",
+        "path": "mcp",
+        "protocols": [
+          "https"
+        ],
+        "subscriptionRequired": false,
+        "apiType": "http"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'mcp-server-api', 'mcp-protocol')]",
+      "properties": {
+        "displayName": "MCP Protocol Endpoint",
+        "description": "JSON-RPC 2.0 endpoint for MCP protocol (tools/list, tools/call)",
+        "method": "POST",
+        "urlTemplate": "/",
+        "request": {
+          "representations": [
+            {
+              "contentType": "application/json",
+              "examples": {
+                "tools-list": {
+                  "summary": "List available tools",
+                  "value": {
+                    "jsonrpc": "2.0",
+                    "id": "1",
+                    "method": "tools/list"
+                  }
+                },
+                "tools-call": {
+                  "summary": "Call a tool",
+                  "value": {
+                    "jsonrpc": "2.0",
+                    "id": "2",
+                    "method": "tools/call",
+                    "params": {
+                      "name": "calculate_yoy_growth",
+                      "arguments": {
+                        "current_value": 1200000,
+                        "previous_value": 1000000
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "responses": [
+          {
+            "statusCode": 200,
+            "description": "Successful MCP response",
+            "representations": [
+              {
+                "contentType": "application/json"
+              }
+            ]
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'mcp-server-api')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'mcp-server-api', 'mcp-health')]",
+      "properties": {
+        "displayName": "Health Check",
+        "description": "MCP Server health check endpoint",
+        "method": "GET",
+        "urlTemplate": "/health"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'mcp-server-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/backends",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'foundry-agent-service')]",
+      "properties": {
+        "title": "Microsoft Foundry Agent Service",
+        "description": "Foundry Agent Service for AI agents with Web Search, Code Interpreter, and custom tools",
+        "url": "[format('{0}/api/projects', replace(parameters('azureOpenAiEndpoint'), '.openai.azure.com', '.services.ai.azure.com'))]",
+        "protocol": "http",
+        "credentials": {},
+        "tls": {
+          "validateCertificateChain": true,
+          "validateCertificateName": true
+        },
+        "circuitBreaker": {
+          "rules": [
+            {
+              "name": "foundry-circuit-breaker",
+              "failureCondition": {
+                "count": 3,
+                "interval": "PT1M",
+                "statusCodeRanges": [
+                  {
+                    "min": 408,
+                    "max": 408
+                  },
+                  {
+                    "min": 429,
+                    "max": 429
+                  },
+                  {
+                    "min": 500,
+                    "max": 599
+                  }
+                ]
+              },
+              "tripDuration": "PT30S",
+              "acceptRetryAfter": true
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'foundry-agent-api')]",
+      "properties": {
+        "displayName": "Foundry Agent Service API",
+        "description": "Microsoft Foundry Agent Service API for AI agents with built-in tools (Web Search, Code Interpreter)",
+        "serviceUrl": "[format('{0}/api/projects', replace(parameters('azureOpenAiEndpoint'), '.openai.azure.com', '.services.ai.azure.com'))]",
+        "path": "foundry-agents",
+        "protocols": [
+          "https"
+        ],
+        "subscriptionRequired": false,
+        "apiType": "http"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'foundry-agent-api', 'responses-create')]",
+      "properties": {
+        "displayName": "Create Agent Response",
+        "description": "Create a response from an AI agent with tools (Web Search, Code Interpreter, etc.)",
+        "method": "POST",
+        "urlTemplate": "/{projectId}/openai/responses",
+        "templateParameters": [
+          {
+            "name": "projectId",
+            "type": "string",
+            "required": true,
+            "description": "Foundry project ID"
+          }
+        ],
+        "request": {
+          "queryParameters": [
+            {
+              "name": "api-version",
+              "type": "string",
+              "required": true,
+              "description": "API Version (e.g., 2025-11-15-preview)"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'foundry-agent-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/operations",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'foundry-agent-api', 'agents-create')]",
+      "properties": {
+        "displayName": "Create Agent",
+        "description": "Create a new AI agent with specified tools and instructions",
+        "method": "POST",
+        "urlTemplate": "/{projectId}/agents",
+        "templateParameters": [
+          {
+            "name": "projectId",
+            "type": "string",
+            "required": true,
+            "description": "Foundry project ID"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'foundry-agent-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'foundry-agent-api', 'policy')]",
+      "properties": {
+        "format": "xml",
+        "value": "<policies>\n  <inbound>\n    <base />\n    <!-- Authenticate with Foundry Agent Service using Managed Identity -->\n    <authentication-managed-identity resource=\"https://cognitiveservices.azure.com\" />\n\n    <!-- Request tracking -->\n    <set-header name=\"x-ms-gateway-timestamp\" exists-action=\"override\">\n      <value>@(DateTime.UtcNow.ToString(\"o\"))</value>\n    </set-header>\n    <set-variable name=\"request-start-time\" value=\"@(DateTime.UtcNow)\" />\n  </inbound>\n\n  <backend>\n    <base />\n  </backend>\n\n  <outbound>\n    <base />\n\n    <!-- AI Gateway: Emit token metrics for agent responses -->\n    <choose>\n      <when condition=\"@(context.Response.StatusCode == 200)\">\n        <llm-emit-token-metric namespace=\"FoundryAgents\">\n          <dimension name=\"API\" value=\"@(context.Api.Name)\" />\n          <dimension name=\"Operation\" value=\"@(context.Operation.Name)\" />\n          <dimension name=\"Project\" value=\"@(context.Request.MatchedParameters.GetValueOrDefault(\"projectId\", \"unknown\"))\" />\n        </llm-emit-token-metric>\n      </when>\n    </choose>\n\n    <!-- Calculate latency -->\n    <set-header name=\"x-gateway-latency-ms\" exists-action=\"override\">\n      <value>@{\n        var startTime = (DateTime)context.Variables[\"request-start-time\"];\n        return ((int)(DateTime.UtcNow - startTime).TotalMilliseconds).ToString();\n      }</value>\n    </set-header>\n  </outbound>\n\n  <on-error>\n    <base />\n\n    <!-- Handle timeout errors gracefully -->\n    <choose>\n      <when condition=\"@(context.Response.StatusCode == 408)\">\n        <return-response>\n          <set-status code=\"504\" reason=\"Gateway Timeout\" />\n          <set-header name=\"Content-Type\" exists-action=\"override\">\n            <value>application/json</value>\n          </set-header>\n          <set-body>@{\n            return new JObject(\n              new JProperty(\"error\", new JObject(\n                new JProperty(\"code\", \"GatewayTimeout\"),\n                new JProperty(\"message\", \"Agent operation timed out. The request may be too complex or the service is experiencing high load.\"),\n                new JProperty(\"suggestion\", \"Try simplifying the request or retry after a few seconds.\")\n              ))\n            ).ToString();\n          }</set-body>\n        </return-response>\n      </when>\n    </choose>\n  </on-error>\n</policies>\n"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'foundry-agent-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'ai-gateway', 'foundry-agent-api')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'foundry-agent-api')]",
+        "[resourceId('Microsoft.ApiManagement/service/products', variables('apimResourceName'), 'ai-gateway')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'mcp-server-api', 'policy')]",
+      "properties": {
+        "format": "xml",
+        "value": "<policies>\n  <inbound>\n    <base />\n    <!-- Request logging -->\n    <set-header name=\"x-ms-gateway-timestamp\" exists-action=\"override\">\n      <value>@(DateTime.UtcNow.ToString(\"o\"))</value>\n    </set-header>\n    <set-variable name=\"request-start-time\" value=\"@(DateTime.UtcNow)\" />\n    <!-- CORS for internal API calls -->\n    <cors allow-credentials=\"false\">\n      <allowed-origins>\n        <origin>*</origin>\n      </allowed-origins>\n      <allowed-methods>\n        <method>POST</method>\n        <method>GET</method>\n      </allowed-methods>\n      <allowed-headers>\n        <header>Content-Type</header>\n        <header>Accept</header>\n      </allowed-headers>\n    </cors>\n  </inbound>\n\n  <backend>\n    <base />\n  </backend>\n\n  <outbound>\n    <base />\n    <!-- Calculate and add latency header -->\n    <set-header name=\"x-gateway-latency-ms\" exists-action=\"override\">\n      <value>@{\n        var startTime = (DateTime)context.Variables[\"request-start-time\"];\n        return ((int)(DateTime.UtcNow - startTime).TotalMilliseconds).ToString();\n      }</value>\n    </set-header>\n  </outbound>\n\n  <on-error>\n    <base />\n  </on-error>\n</policies>\n"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'mcp-server-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/apis/policies",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'azure-openai-api', 'policy')]",
+      "properties": {
+        "format": "xml",
+        "value": "<policies>\n  <inbound>\n    <base />\n    <!-- Authenticate with Azure OpenAI using Managed Identity -->\n    <authentication-managed-identity resource=\"https://cognitiveservices.azure.com\" />\n\n    <!-- Fix duplicate /openai path issue: SDK sends /openai/deployments/... but APIM path is already /openai -->\n    <!-- Rewrite /openai/openai/... to /openai/... -->\n    <rewrite-uri template=\"@{\n      var path = context.Request.Url.Path;\n      if (path.StartsWith(\"/openai/openai/\")) {\n        return path.Substring(7);\n      }\n      return path;\n    }\" copy-unmatched-params=\"true\" />\n\n    <!-- Token usage tracking header -->\n    <set-header name=\"x-ms-gateway-timestamp\" exists-action=\"override\">\n      <value>@(DateTime.UtcNow.ToString(\"o\"))</value>\n    </set-header>\n\n    <!-- Log request to App Insights -->\n    <set-variable name=\"request-start-time\" value=\"@(DateTime.UtcNow)\" />\n  </inbound>\n\n  <backend>\n    <base />\n  </backend>\n\n  <outbound>\n    <base />\n\n    <!-- AI Gateway: Emit token metrics to Azure Monitor (all tiers including Consumption) -->\n    <choose>\n      <when condition=\"@(context.Response.StatusCode == 200)\">\n        <llm-emit-token-metric namespace=\"AzureOpenAI\">\n          <dimension name=\"API\" value=\"@(context.Api.Name)\" />\n          <dimension name=\"Operation\" value=\"@(context.Operation.Name)\" />\n          <dimension name=\"Model\" value=\"@(context.Request.MatchedParameters.GetValueOrDefault(\"deploymentId\", \"unknown\"))\" />\n        </llm-emit-token-metric>\n      </when>\n    </choose>\n\n    <!-- Extract token usage from response -->\n    <choose>\n      <when condition=\"@(context.Response.StatusCode == 200)\">\n        <set-variable name=\"response-body\" value=\"@(context.Response.Body.As&lt;JObject&gt;(preserveContent: true))\" />\n        <set-header name=\"x-openai-prompt-tokens\" exists-action=\"override\">\n          <value>@{\n            var body = (JObject)context.Variables[\"response-body\"];\n            var usage = body?[\"usage\"];\n            return usage?[\"prompt_tokens\"]?.ToString() ?? \"0\";\n          }</value>\n        </set-header>\n        <set-header name=\"x-openai-completion-tokens\" exists-action=\"override\">\n          <value>@{\n            var body = (JObject)context.Variables[\"response-body\"];\n            var usage = body?[\"usage\"];\n            return usage?[\"completion_tokens\"]?.ToString() ?? \"0\";\n          }</value>\n        </set-header>\n        <set-header name=\"x-openai-total-tokens\" exists-action=\"override\">\n          <value>@{\n            var body = (JObject)context.Variables[\"response-body\"];\n            var usage = body?[\"usage\"];\n            return usage?[\"total_tokens\"]?.ToString() ?? \"0\";\n          }</value>\n        </set-header>\n      </when>\n    </choose>\n\n    <!-- Calculate latency -->\n    <set-header name=\"x-gateway-latency-ms\" exists-action=\"override\">\n      <value>@{\n        var startTime = (DateTime)context.Variables[\"request-start-time\"];\n        return ((int)(DateTime.UtcNow - startTime).TotalMilliseconds).ToString();\n      }</value>\n    </set-header>\n  </outbound>\n\n  <on-error>\n    <base />\n\n    <!-- Handle rate limiting -->\n    <choose>\n      <when condition=\"@(context.Response.StatusCode == 429)\">\n        <set-header name=\"Retry-After\" exists-action=\"override\">\n          <value>@{\n            var retryAfter = context.Response.Headers.GetValueOrDefault(\"Retry-After\", \"60\");\n            return retryAfter;\n          }</value>\n        </set-header>\n        <return-response>\n          <set-status code=\"429\" reason=\"Rate Limit Exceeded\" />\n          <set-header name=\"Content-Type\" exists-action=\"override\">\n            <value>application/json</value>\n          </set-header>\n          <set-body>@{\n            return new JObject(\n              new JProperty(\"error\", new JObject(\n                new JProperty(\"code\", \"RateLimitExceeded\"),\n                new JProperty(\"message\", \"Request rate limit exceeded. Please retry after the specified time.\"),\n                new JProperty(\"retry_after\", context.Response.Headers.GetValueOrDefault(\"Retry-After\", \"60\"))\n              ))\n            ).ToString();\n          }</set-body>\n        </return-response>\n      </when>\n    </choose>\n  </on-error>\n</policies>\n"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'azure-openai-api')]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}', variables('apimResourceName'), 'ai-gateway')]",
+      "properties": {
+        "displayName": "AI Gateway",
+        "description": "AI Gateway product for Azure OpenAI and MCP Server access with monitoring",
+        "subscriptionRequired": false,
+        "state": "published"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'ai-gateway', 'azure-openai-api')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'azure-openai-api')]",
+        "[resourceId('Microsoft.ApiManagement/service/products', variables('apimResourceName'), 'ai-gateway')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerEndpoint')))]",
+      "type": "Microsoft.ApiManagement/service/products/apis",
+      "apiVersion": "2024-05-01",
+      "name": "[format('{0}/{1}/{2}', variables('apimResourceName'), 'ai-gateway', 'mcp-server-api')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service/apis', variables('apimResourceName'), 'mcp-server-api')]",
+        "[resourceId('Microsoft.ApiManagement/service/products', variables('apimResourceName'), 'ai-gateway')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('logAnalyticsWorkspaceId')))]",
+      "type": "Microsoft.Insights/diagnosticSettings",
+      "apiVersion": "2021-05-01-preview",
+      "scope": "[format('Microsoft.ApiManagement/service/{0}', variables('apimResourceName'))]",
+      "name": "[format('{0}-diagnostics', variables('apimResourceName'))]",
+      "properties": {
+        "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
+        "logs": [
+          {
+            "category": "GatewayLogs",
+            "enabled": true
+          }
+        ],
+        "metrics": [
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "apimName": {
+      "type": "string",
+      "value": "[variables('apimResourceName')]"
+    },
+    "apimGatewayUrl": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01').gatewayUrl]"
+    },
+    "apimManagedIdentityPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01', 'full').identity.principalId]"
+    },
+    "apimResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ApiManagement/service', variables('apimResourceName'))]"
+    },
+    "azureOpenAiProxyEndpoint": {
+      "type": "string",
+      "value": "[format('{0}/openai', reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01').gatewayUrl)]"
+    },
+    "defaultDeploymentEndpoint": {
+      "type": "string",
+      "value": "[format('{0}/openai/deployments/{1}', reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01').gatewayUrl, parameters('azureOpenAiDeploymentName'))]"
+    },
+    "mcpServerProxyEndpoint": {
+      "type": "string",
+      "value": "[if(not(empty(parameters('mcpServerEndpoint'))), format('{0}/mcp', reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01').gatewayUrl), '')]"
+    },
+    "foundryAgentProxyEndpoint": {
+      "type": "string",
+      "value": "[format('{0}/foundry-agents', reference(resourceId('Microsoft.ApiManagement/service', variables('apimResourceName')), '2024-05-01').gatewayUrl)]"
+    }
+  }
+}
