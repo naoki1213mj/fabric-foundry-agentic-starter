@@ -6,17 +6,22 @@
   border-radius: var(--radius-md, 10px);
   display: flex;
   align-items: center;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   color: var(--color-text-primary, #0f172a);
 }
 
-.itemCell:hover {
+.itemCell:hover:not(.itemCellSelected) {
   background: var(--color-bg-hover, #e2e8f0);
 }
 
-/* 選択状態 - ダークモード対応 */
+/* 選択状態 - 固定の青背景と白文字 */
 .itemCellSelected {
-  background: var(--color-accent-primary, #0078d4) !important;
+  background-color: #0078d4 !important;
+  color: white !important;
+}
+
+.itemCellSelected:hover {
+  background-color: #106ebe !important;
 }
 
 .cursorDefault {
@@ -50,13 +55,14 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   padding-right: 8px;
-  color: var(--color-text-primary, #0f172a);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: color 0.25s ease;
+  transition: color 0.2s ease;
+  /* 親の.itemCellSelectedから色を継承 */
+  color: inherit;
 }
 
-/* 選択時のタイトル - 白文字で見やすく */
+/* 選択時のタイトル - 白文字 */
 .selectedTitle {
   color: white !important;
 }
@@ -66,11 +72,12 @@
   font-size: 0.75rem;
   color: var(--color-text-tertiary, #94a3b8);
   margin-top: 2px;
+  transition: color 0.2s ease;
 }
 
-/* 選択時のタイムスタンプ - 少し薄い白 */
+/* 選択時のタイムスタンプ */
 .selectedTimestamp {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .chatHistoryItem {

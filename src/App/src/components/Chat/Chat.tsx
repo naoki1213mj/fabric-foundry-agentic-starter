@@ -728,51 +728,6 @@ const Chat: React.FC<ChatProps> = ({
         <div data-testid="streamendref-id" ref={chatMessageStreamEnd} />
       </div>
       <div className="chat-footer">
-        <div className="footer-top-row">
-          <div className="settings-panel">
-            <div className="setting-item">
-              <span className="setting-label">🤖 Agent</span>
-              <Dropdown
-                placeholder="Agent Mode"
-                value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
-                selectedOptions={[agentMode]}
-                onOptionSelect={(_, data) => setAgentMode(data.optionValue as AgentMode)}
-                disabled={isInputDisabled}
-                style={{ minWidth: "150px" }}
-              >
-                {agentModeOptions.map((option) => (
-                  <Option key={option.value} value={option.value} text={option.label}>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span style={{ fontWeight: 500 }}>{option.label}</span>
-                      <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
-                    </div>
-                  </Option>
-                ))}
-              </Dropdown>
-            </div>
-            <div className="setting-item">
-              <span className="setting-label">🔍 Search</span>
-              <Dropdown
-                placeholder="Reasoning Effort"
-                value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
-                selectedOptions={[reasoningEffort]}
-                onOptionSelect={(_, data) => setReasoningEffort(data.optionValue as ReasoningEffort)}
-                disabled={isInputDisabled}
-                style={{ minWidth: "150px" }}
-                title="Document Search の推論レベル (Foundry IQ)"
-              >
-                {reasoningEffortOptions.map((option) => (
-                  <Option key={option.value} value={option.value} text={option.label}>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <span style={{ fontWeight: 500 }}>{option.label}</span>
-                      <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
-                    </div>
-                  </Option>
-                ))}
-              </Dropdown>
-            </div>
-          </div>
-        </div>
         <div className="footer-input-row">
           <Button
             className="btn-create-conv"
@@ -804,6 +759,49 @@ const Chat: React.FC<ChatProps> = ({
               aria-disabled={isSendDisabled}
               title={t("chat.sendQuestion")}
             />
+          </div>
+        </div>
+        <div className="footer-settings-row">
+          <div className="setting-item">
+            <span className="setting-label">🤖</span>
+            <Dropdown
+              placeholder="Agent Mode"
+              value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
+              selectedOptions={[agentMode]}
+              onOptionSelect={(_, data) => setAgentMode(data.optionValue as AgentMode)}
+              disabled={isInputDisabled}
+              style={{ minWidth: "140px" }}
+            >
+              {agentModeOptions.map((option) => (
+                <Option key={option.value} value={option.value} text={option.label}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontWeight: 500 }}>{option.label}</span>
+                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  </div>
+                </Option>
+              ))}
+            </Dropdown>
+          </div>
+          <div className="setting-item">
+            <span className="setting-label">🔍</span>
+            <Dropdown
+              placeholder="Reasoning Effort"
+              value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
+              selectedOptions={[reasoningEffort]}
+              onOptionSelect={(_, data) => setReasoningEffort(data.optionValue as ReasoningEffort)}
+              disabled={isInputDisabled}
+              style={{ minWidth: "140px" }}
+              title="Document Search の推論レベル (Foundry IQ)"
+            >
+              {reasoningEffortOptions.map((option) => (
+                <Option key={option.value} value={option.value} text={option.label}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontWeight: 500 }}>{option.label}</span>
+                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  </div>
+                </Option>
+              ))}
+            </Dropdown>
           </div>
         </div>
       </div>

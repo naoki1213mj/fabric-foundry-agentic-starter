@@ -473,48 +473,37 @@
   transition: all var(--transition-normal);
 }
 
-/* Top row: Settings panel (dropdowns) */
-.footer-top-row {
+/* Main input row: new conv button + textarea + send button */
+.footer-input-row {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm, 8px);
+  width: 100%;
 }
 
-/* Settings Panel (Agent Mode + Reasoning Effort) - horizontal layout */
-.settings-panel {
+/* Settings row: compact dropdowns at bottom */
+.footer-settings-row {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
   gap: var(--spacing-md, 16px);
-  flex-shrink: 0;
-  padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
-  background: var(--color-bg-tertiary);
-  border-radius: var(--radius-md, 10px);
 }
 
 .setting-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .setting-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
   color: var(--color-text-secondary);
-  white-space: nowrap;
 }
 
-.settings-panel .fui-Dropdown {
-  min-width: 140px;
+.setting-item .fui-Dropdown {
+  min-width: 130px;
   border-radius: var(--radius-md, 10px);
-}
-
-/* Bottom row: Input area with buttons */
-.footer-input-row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm, 8px);
-  width: 100%;
+  font-size: 12px;
 }
 
 /* === Legacy: Agent Mode Selector (keep for backward compat) === */

@@ -130,7 +130,7 @@ export const ChatHistoryListItemCell: React.FC<
     const date = new Date(dateStr);
     const now = new Date();
     const isToday = date.toDateString() === now.toDateString();
-    
+
     if (isToday) {
       // 今日なら時刻のみ
       return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
@@ -208,24 +208,19 @@ export const ChatHistoryListItemCell: React.FC<
       handleSelectItem(e);
     }
   };
-  
+
   const isButtonDisabled = generatingResponse && isSelected;
   return (
     <Stack
       key={item.id}
       tabIndex={0}
       aria-label="chat history item"
-      className={`${styles.itemCell} ${isSelected ? styles.cursorDefault : ""}`}
+      className={`${styles.itemCell} ${isSelected ? `${styles.cursorDefault} ${styles.itemCellSelected}` : ""}`}
       onClick={(e) => handleSelectItem(e)}
       onKeyDown={(e) => handleOnKeyDownOnItemcell(e)}
       verticalAlign="center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      styles={{
-        root: {
-          backgroundColor: isSelected ? "var(--color-accent-primary, #0078d4)" : "transparent",
-        },
-      }}
     >
       {edit ? (
         <>
