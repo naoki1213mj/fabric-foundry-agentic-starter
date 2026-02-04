@@ -91,9 +91,16 @@ async def get_fabric_db_connection():
     server = os.getenv("FABRIC_SQL_SERVER")
     driver17 = "ODBC Driver 17 for SQL Server"
     driver18 = "ODBC Driver 18 for SQL Server"
-    api_uid = os.getenv("API_UID", "")
-    fabric_sql_connection_string18 = os.getenv("FABRIC_SQL_CONNECTION_STRING", "")
-    fabric_sql_connection_string17 = f"DRIVER={driver17};SERVER={server};DATABASE={database};UID={api_uid};Authentication=ActiveDirectoryMSI"
+    fabric_sql_connection_string_env = os.getenv("FABRIC_SQL_CONNECTION_STRING", "")
+
+    # Build connection strings with Managed Identity authentication
+    # For Fabric SQL, we use ActiveDirectoryMsi for managed identity auth
+    fabric_sql_connection_string18 = (
+        fabric_sql_connection_string_env
+        if fabric_sql_connection_string_env
+        else f"DRIVER={{{driver18}}};SERVER={server};DATABASE={database};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no"
+    )
+    fabric_sql_connection_string17 = f"DRIVER={{{driver17}}};SERVER={server};DATABASE={database};Authentication=ActiveDirectoryMsi;Encrypt=yes;TrustServerCertificate=no"
 
     try:
         conn = None
