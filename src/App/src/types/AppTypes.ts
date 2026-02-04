@@ -38,10 +38,13 @@ export type ChatMessage = {
 
 export type AgentMode = "sql_only" | "multi_tool" | "handoff" | "magentic";
 
+export type ReasoningEffort = "minimal" | "low" | "medium";
+
 export type ConversationRequest = {
   id?: string;
   query: string;
   agentMode?: AgentMode;
+  reasoningEffort?: ReasoningEffort;
 };
 
 export type AskResponse = {

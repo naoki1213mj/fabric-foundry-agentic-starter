@@ -194,7 +194,8 @@ export async function callConversationApi(
       conversation_id: options.id,
       query: options.query,
       user_id: getUserId() || "anonymous",
-      agent_mode: options.agentMode
+      agent_mode: options.agentMode,
+      reasoning_effort: options.reasoningEffort || "low"
     }, {
       signal: abortSignal
     });

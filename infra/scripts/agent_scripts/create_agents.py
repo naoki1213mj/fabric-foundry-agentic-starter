@@ -17,7 +17,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import yaml
 
@@ -46,21 +46,21 @@ class AgentManager:
         self.config_path = config_path or self.script_dir / "config.yaml"
         self.config = self._load_config()
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load main configuration file."""
-        with open(self.config_path, "r", encoding="utf-8") as f:
+        with open(self.config_path, encoding="utf-8") as f:
             return yaml.safe_load(f)
 
-    def _load_yaml(self, relative_path: str) -> Dict[str, Any]:
+    def _load_yaml(self, relative_path: str) -> dict[str, Any]:
         """Load a YAML file relative to script directory."""
         full_path = self.script_dir / relative_path
-        with open(full_path, "r", encoding="utf-8") as f:
+        with open(full_path, encoding="utf-8") as f:
             return yaml.safe_load(f)
 
     def _load_instructions(self, relative_path: str) -> str:
         """Load instructions from markdown file."""
         full_path = self.script_dir / relative_path
-        with open(full_path, "r", encoding="utf-8") as f:
+        with open(full_path, encoding="utf-8") as f:
             return f.read()
 
     def _load_tables_schema(self, usecase: str) -> str:
@@ -70,13 +70,13 @@ class AgentManager:
             raise ValueError(f"Unknown usecase: {usecase}")
 
         tables_path = self.script_dir / usecase_config["tables_file"]
-        with open(tables_path, "r", encoding="utf-8") as f:
+        with open(tables_path, encoding="utf-8") as f:
             data = json.load(f)
 
         schema_format = usecase_config.get("schema_format", "simple")
         return self._format_tables_schema(data, schema_format)
 
-    def _format_tables_schema(self, data: Dict, schema_format: str) -> str:
+    def _format_tables_schema(self, data: dict, schema_format: str) -> str:
         """Format table schema based on the specified format."""
         tables_str = ""
         for i, table in enumerate(data.get("tables", []), 1):
@@ -103,7 +103,7 @@ class AgentManager:
 
         return tables_str
 
-    def _build_tools(self, tools_config: List[Dict]) -> List:
+    def _build_tools(self, tools_config: list[dict]) -> list:
         """Build tool objects from configuration.
 
         Handles FunctionTool, WebSearchPreviewTool, and BingGroundingAgentTool based on tool type.
@@ -168,7 +168,7 @@ class AgentManager:
         solution_name: str,
         gpt_model_name: str,
         usecase: str,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Create or update all configured agents."""
         # Normalize usecase (case-insensitive)
         usecase = usecase.lower()
@@ -265,14 +265,14 @@ class AgentManager:
         source_path = self.script_dir / usecase_config["tables_file"]
         dest_path = self.script_dir.parent / "fabric_scripts" / "data" / "tables.json"
 
-        with open(source_path, "r", encoding="utf-8") as f:
+        with open(source_path, encoding="utf-8") as f:
             data = json.load(f)
 
         with open(dest_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
 
-def get_azd_env_value(key: str) -> Optional[str]:
+def get_azd_env_value(key: str) -> str | None:
     """Get value from azd environment."""
     try:
         result = subprocess.run(

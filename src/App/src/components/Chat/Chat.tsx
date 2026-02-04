@@ -38,6 +38,7 @@ import {
     type Conversation,
     type ConversationRequest,
     type ParsedChunk,
+    type ReasoningEffort,
     ToolMessageContent,
 } from "../../types/AppTypes";
 import {
@@ -83,6 +84,7 @@ const Chat: React.FC<ChatProps> = ({
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
   const [isChartLoading, setIsChartLoading] = useState(false)
   const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
+  const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -92,6 +94,13 @@ const Chat: React.FC<ChatProps> = ({
     { value: "multi_tool", label: "Multi Tool (推奨)", description: "全ツール使用・バランス型" },
     { value: "handoff", label: "Handoff", description: "専門家エージェント委譲" },
     { value: "magentic", label: "Magentic", description: "複雑な計画・マネージャー型" },
+  ];
+
+  // Reasoning effort options for Agentic Retrieval (Foundry IQ)
+  const reasoningEffortOptions: { value: ReasoningEffort; label: string; description: string }[] = [
+    { value: "minimal", label: "Minimal", description: "高速・直接検索（LLMなし）" },
+    { value: "low", label: "Low (推奨)", description: "シングルパス・バランス型" },
+    { value: "medium", label: "Medium", description: "反復検索・最高品質" },
   ];
 
   // Memoized computed values
@@ -308,7 +317,8 @@ const Chat: React.FC<ChatProps> = ({
     const request: ConversationRequest = {
       id: conversationId,
       query: question,
-      agentMode: agentMode
+      agentMode: agentMode,
+      reasoningEffort: reasoningEffort
     };
 
     let updatedMessages: ChatMessage[] = [];
@@ -426,7 +436,8 @@ const Chat: React.FC<ChatProps> = ({
     const request: ConversationRequest = {
       id: conversationId,
       query: userMessage,
-      agentMode: agentMode
+      agentMode: agentMode,
+      reasoningEffort: reasoningEffort
     };
 
     const streamMessage: ChatMessage = {
@@ -725,6 +736,24 @@ const Chat: React.FC<ChatProps> = ({
             style={{ minWidth: "160px" }}
           >
             {agentModeOptions.map((option) => (
+              <Option key={option.value} value={option.value} text={option.label}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontWeight: 500 }}>{option.label}</span>
+                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                </div>
+              </Option>
+            ))}
+          </Dropdown>
+          <Dropdown
+            placeholder="Reasoning Effort"
+            value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
+            selectedOptions={[reasoningEffort]}
+            onOptionSelect={(_, data) => setReasoningEffort(data.optionValue as ReasoningEffort)}
+            disabled={isInputDisabled}
+            style={{ minWidth: "140px" }}
+            title="Document Search の推論レベル (Foundry IQ)"
+          >
+            {reasoningEffortOptions.map((option) => (
               <Option key={option.value} value={option.value} text={option.label}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span style={{ fontWeight: 500 }}>{option.label}</span>

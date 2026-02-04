@@ -53,6 +53,9 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
+# Agentic Retrieval with Foundry IQ
+from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
+
 # Local imports - tool handlers
 from agents.web_agent import WebAgentHandler
 from auth.auth_utils import get_authenticated_user_details
@@ -98,9 +101,13 @@ logger = logging.getLogger(__name__)
 # Initialize tool handlers (singletons)
 _web_agent_handler: WebAgentHandler | None = None
 _knowledge_base_tool: KnowledgeBaseTool | None = None
+_agentic_retrieval_tool: AgenticRetrievalTool | None = None
 
 # Global storage for web citations (per-request, thread-local would be better but this works for demo)
 _current_web_citations: list = []
+
+# Global storage for current reasoning effort (per-request)
+_current_reasoning_effort: str = "low"
 
 
 def get_web_agent_handler() -> WebAgentHandler:
@@ -117,6 +124,26 @@ def get_knowledge_base_tool() -> KnowledgeBaseTool | None:
     if _knowledge_base_tool is None:
         _knowledge_base_tool = KnowledgeBaseTool.create_from_env()
     return _knowledge_base_tool
+
+
+def get_agentic_retrieval_tool() -> AgenticRetrievalTool | None:
+    """Get or create AgenticRetrievalTool singleton."""
+    global _agentic_retrieval_tool
+    if _agentic_retrieval_tool is None:
+        _agentic_retrieval_tool = AgenticRetrievalTool.create_from_env()
+    return _agentic_retrieval_tool
+
+
+def set_reasoning_effort(effort: str):
+    """Set the reasoning effort for the current request."""
+    global _current_reasoning_effort
+    _current_reasoning_effort = effort
+
+
+def get_reasoning_effort() -> str:
+    """Get the current reasoning effort setting."""
+    global _current_reasoning_effort
+    return _current_reasoning_effort
 
 
 # Check if the Application Insights Instrumentation Key is set in the environment variables
@@ -283,7 +310,12 @@ async def search_web(
 async def search_documents(
     query: Annotated[str, "The search query for enterprise documents"],
 ) -> str:
-    """Search enterprise documents, product specifications, and knowledge base.
+    """Search enterprise documents using Agentic Retrieval (Foundry IQ).
+
+    This tool uses Azure AI Search Knowledge Base with intelligent retrieval:
+    - Query decomposition and planning (LLM-based)
+    - Multi-source retrieval with semantic reranking
+    - Source attribution and citations
 
     IMPORTANT: For data analysis questions (sales, orders, customers, products),
     use run_sql_query instead. This tool is for documentation lookup only.
@@ -298,10 +330,27 @@ async def search_documents(
         query: The search query string.
 
     Returns:
-        JSON string with document search results (max 3 results, truncated).
+        Formatted string with document search results and citations.
     """
     try:
-        logger.info(f"Document search requested: {query}")
+        logger.info(f"Agentic document search requested: {query}")
+
+        # Try Agentic Retrieval first (with Knowledge Base)
+        agentic_tool = get_agentic_retrieval_tool()
+        if agentic_tool is not None:
+            # Get reasoning effort from global state (set per-request)
+            effort_str = get_reasoning_effort()
+            try:
+                effort = ReasoningEffort(effort_str.lower())
+            except ValueError:
+                effort = ReasoningEffort.LOW
+
+            logger.info(f"Using Agentic Retrieval with reasoning_effort={effort.value}")
+            result = await agentic_tool.retrieve_formatted(query, effort)
+            logger.info(f"Agentic document search completed for query: {query}")
+            return result
+
+        # Fallback to basic search if Agentic Retrieval not configured
         kb_tool = get_knowledge_base_tool()
         if kb_tool is None:
             return json.dumps(
@@ -312,6 +361,8 @@ async def search_documents(
                 },
                 ensure_ascii=False,
             )
+
+        logger.info("Falling back to basic search (Agentic Retrieval not configured)")
         result = await kb_tool.search(query)
 
         # Limit results to prevent token overflow
@@ -322,7 +373,7 @@ async def search_documents(
                 if "content" in doc and len(doc["content"]) > 1000:
                     doc["content"] = doc["content"][:1000] + "...(truncated)"
 
-        logger.info(f"Document search completed for query: {query}")
+        logger.info(f"Basic document search completed for query: {query}")
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:
         logger.error(f"Error in document search: {e}")
@@ -1289,6 +1340,13 @@ async def conversation(request: Request):
             "agent_mode"
         )  # Optional: sql_only, multi_tool, handoff, magentic
 
+        # Set reasoning effort for Agentic Retrieval (minimal/low/medium)
+        reasoning_effort = request_json.get("reasoning_effort", "low")
+        if reasoning_effort not in ["minimal", "low", "medium"]:
+            reasoning_effort = "low"
+        set_reasoning_effort(reasoning_effort)
+        logger.info(f"Reasoning effort set to: {reasoning_effort}")
+
         # stream_chat_request returns an async generator, so we need to wrap it in StreamingResponse
         stream_generator = await stream_chat_request(conversation_id, query, user_id, agent_mode)
         track_event_if_configured(
@@ -1297,6 +1355,7 @@ async def conversation(request: Request):
                 "conversation_id": conversation_id,
                 "query": query,
                 "agent_mode": agent_mode,
+                "reasoning_effort": reasoning_effort,
             },
         )
         return StreamingResponse(

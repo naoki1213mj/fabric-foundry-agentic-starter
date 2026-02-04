@@ -118,6 +118,17 @@ param fabricSqlDatabase string = ''
 @description('Fabric SQL Connection String (optional, overrides server/database if provided)')
 param fabricSqlConnectionString string = ''
 
+// ========== Azure AI Search / Foundry IQ Parameters ========== //
+@description('Azure AI Search endpoint URL (e.g., https://search-xxx.search.windows.net)')
+param aiSearchEndpoint string = ''
+
+@description('Azure AI Search Knowledge Base name for Agentic Retrieval')
+param aiSearchKnowledgeBaseName string = ''
+
+@description('Default reasoning effort for Agentic Retrieval (minimal/low/medium)')
+@allowed(['minimal', 'low', 'medium'])
+param aiSearchReasoningEffort string = 'low'
+
 @description('Publisher name for APIM (required when enableApimGateway is true)')
 param apimPublisherName string = 'Agentic AI Hackathon'
 
@@ -307,10 +318,11 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       AGENT_NAME_WEB: ''
       AGENT_NAME_DOC: ''
 
-      // Foundry IQ / AI Search Configuration (for DocAgent)
-      AI_SEARCH_ENDPOINT: ''
-      AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
-      AI_SEARCH_MCP_ENDPOINT: ''
+      // Foundry IQ / AI Search Configuration (for Agentic Retrieval)
+      AI_SEARCH_ENDPOINT: aiSearchEndpoint
+      AI_SEARCH_KNOWLEDGE_BASE_NAME: aiSearchKnowledgeBaseName
+      AI_SEARCH_MCP_ENDPOINT: !empty(aiSearchEndpoint) && !empty(aiSearchKnowledgeBaseName) ? '${aiSearchEndpoint}/knowledgebases/${aiSearchKnowledgeBaseName}/mcp?api-version=2025-11-01-preview' : ''
+      AI_SEARCH_REASONING_EFFORT: aiSearchReasoningEffort
 
       FABRIC_SQL_DATABASE: fabricSqlDatabase
       FABRIC_SQL_SERVER: fabricSqlServer
@@ -383,10 +395,11 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       AGENT_NAME_WEB: ''
       AGENT_NAME_DOC: ''
 
-      // Foundry IQ / AI Search Configuration (for DocAgent)
-      AI_SEARCH_ENDPOINT: ''
-      AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
-      AI_SEARCH_MCP_ENDPOINT: ''
+      // Foundry IQ / AI Search Configuration (for Agentic Retrieval)
+      AI_SEARCH_ENDPOINT: aiSearchEndpoint
+      AI_SEARCH_KNOWLEDGE_BASE_NAME: aiSearchKnowledgeBaseName
+      AI_SEARCH_MCP_ENDPOINT: !empty(aiSearchEndpoint) && !empty(aiSearchKnowledgeBaseName) ? '${aiSearchEndpoint}/knowledgebases/${aiSearchKnowledgeBaseName}/mcp?api-version=2025-11-01-preview' : ''
+      AI_SEARCH_REASONING_EFFORT: aiSearchReasoningEffort
 
       FABRIC_SQL_DATABASE: fabricSqlDatabase
       FABRIC_SQL_SERVER: fabricSqlServer

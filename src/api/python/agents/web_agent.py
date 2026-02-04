@@ -152,9 +152,7 @@ class WebAgentHandler:
                         return openai_client.responses.create(
                             input=f"Search the web for: {query}",
                             tool_choice="required",  # Force the model to use web search
-                            extra_body={
-                                "agent": {"name": agent.name, "type": "agent_reference"}
-                            },
+                            extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
                         )
 
                     try:
@@ -163,9 +161,7 @@ class WebAgentHandler:
                             timeout=WEB_SEARCH_TIMEOUT_SECONDS,
                         )
                     except TimeoutError:
-                        logger.error(
-                            f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s"
-                        )
+                        logger.error(f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s")
                         raise TimeoutError(
                             f"Web search operation timed out after "
                             f"{WEB_SEARCH_TIMEOUT_SECONDS} seconds"
@@ -221,9 +217,7 @@ class WebAgentHandler:
 
             # Return results
             if answer_text:
-                logger.info(
-                    f"Web Search completed successfully. Found {len(citations)} citations."
-                )
+                logger.info(f"Web Search completed successfully. Found {len(citations)} citations.")
                 # Format citations for UI display (Bing terms of use compliance)
                 # Each citation must have url and title for proper display
                 formatted_citations = []
