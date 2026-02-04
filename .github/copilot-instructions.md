@@ -84,7 +84,7 @@ var tags = {
 | **Why Microsoft** | Unified Data Foundation | Fabric + Foundry + Agent Framework |
 | **Why Now** | Agentic AI の統合プラットフォーム | Agent Framework GA + Foundry Agent Service |
 | **技術統合** | 5領域カバー | AI App + Data + Infra + Security + GitHub |
-| **ACRインパクト** | エンタープライズAI消費 | Fabric F2+ / OpenAI PTU |
+| **ACRインパクト** | エンタープライズAI消費 | Fabric F4 / OpenAI PTU |
 
 ---
 
@@ -97,32 +97,40 @@ var tags = {
 │  │ Azure App Service - Frontend (app-daj6dri4yf3k3z)                   │    │
 │  │ ├─ React + TypeScript                                               │    │
 │  │ ├─ Natural Language Query Interface                                 │    │
-│  │ ├─ Chat History / Session Management                                │    │
-│  │ └─ Built-in Auth (Entra ID)                                        │    │
+│  │ ├─ Agent Mode Selector (sql_only/multi_tool/handoff/magentic)      │    │
+│  │ ├─ Doc Search Reasoning Effort (minimal/low/medium)                │    │
+│  │ └─ Built-in Auth (Entra ID EasyAuth)                               │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
-                                   │
+                                   │ HTTPS
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                          API Layer                                           │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
 │  │ Azure App Service - API (api-daj6dri4yf3k3z)                        │    │
-│  │ ├─ Microsoft Agent Framework (Python/.NET)                          │    │
-│  │ ├─ REST API Endpoints                                               │    │
-│  │ ├─ Agent Orchestration                                              │    │
+│  │ ├─ Python FastAPI + Microsoft Agent Framework                       │    │
+│  │ ├─ AzureOpenAIResponsesClient (sql_only, multi_tool)               │    │
+│  │ ├─ AzureOpenAIChatClient (handoff, magentic - SDK制約)             │    │
+│  │ ├─ REST API: /api/chat, /api/conversations, /health                │    │
 │  │ └─ Tool Invocation / MCP Integration                               │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure API Management (apim-daj6dri4yf3k3z)                          │    │
-│  │ ├─ AI Gateway (Consumption SKU)                                    │    │
-│  │ ├─ Circuit Breaker (429/500-599)                                   │    │
-│  │ ├─ Azure OpenAI API → /openai                                      │    │
-│  │ ├─ MCP Server API → /mcp                                           │    │
-│  │ └─ Foundry Agent API → /foundry-agents                             │    │
+│  │ Azure API Management (apim-daj6dri4yf3k3z) - AI Gateway             │    │
+│  │ ├─ /openai → Azure OpenAI (legacy)                                 │    │
+│  │ ├─ /foundry-openai/openai/v1/ → Foundry AI Services ★ Primary     │    │
+│  │ ├─ /mcp → MCP Server (func-mcp-*)                                  │    │
+│  │ ├─ /foundry-agents → Foundry Agent Service                         │    │
+│  │ ├─ Circuit Breaker: 429/500-599 → 30s trip                         │    │
+│  │ ├─ Token Headers: x-openai-{prompt,completion,total}-tokens        │    │
+│  │ └─ Managed Identity Authentication                                  │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure API Center (apic-daj6dri4yf3k3z)                              │    │
-│  │ ├─ Private Tool Catalog (MCP Server Discovery)                     │    │
-│  │ ├─ Business Analytics MCP Server API                               │    │
+│  │ Azure API Center (apic-daj6dri4yf3k3z) - Tool Catalog               │    │
+│  │ ├─ Business Analytics MCP Server (5 tools)                         │    │
+│  │ │   ├─ analyze_yoy_performance (前年比分析)                        │    │
+│  │ │   ├─ analyze_rfm_segments (顧客RFM)                              │    │
+│  │ │   ├─ analyze_inventory (在庫最適化)                              │    │
+│  │ │   ├─ analyze_seasonal_trends (季節トレンド)                      │    │
+│  │ │   └─ analyze_regional_performance (地域分析)                     │    │
 │  │ └─ Azure OpenAI API                                                │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
@@ -130,55 +138,55 @@ var tags = {
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                       AI / Agent Layer                                       │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Microsoft Foundry (ai-aiagent-prod)                                 │    │
-│  │ ├─ Foundry Agent Service                                            │    │
-│  │ │   ├─ Agent Runtime (Conversation, Tool Call, Safety)             │    │
-│  │ │   ├─ Hosted Agents (azd deploy)                                  │    │
-│  │ │   └─ OpenTelemetry Integration                                   │    │
-│  │ ├─ Foundry IQ (Agentic RAG) [Optional]                             │    │
-│  │ │   ├─ Query Decomposition                                          │    │
-│  │ │   └─ SharePoint / OneLake Integration                            │    │
+│  │ Microsoft Foundry (aisa-daj6dri4yf3k3z / aifp-daj6dri4yf3k3z)      │    │
+│  │ ├─ Azure OpenAI Models                                              │    │
+│  │ │   ├─ gpt-5 (500K TPM) - Primary                                  │    │
+│  │ │   ├─ gpt-4o-mini (30K TPM) - Cost Optimized                      │    │
+│  │ │   └─ text-embedding-3-large (500K TPM)                           │    │
+│  │ ├─ Foundry IQ (Agentic RAG)                                        │    │
+│  │ │   ├─ Knowledge Base: product-specs-kb                            │    │
+│  │ │   ├─ Index: product-specs-sharepoint-ks-index                    │    │
+│  │ │   └─ Reasoning Effort: minimal/low/medium                        │    │
+│  │ ├─ Bing Grounding (Web Search)                                     │    │
+│  │ │   ├─ Connection: bingglobal00149elbd                             │    │
+│  │ │   └─ Tool: BingGroundingAgentTool                                │    │
 │  │ └─ Foundry Guardrails                                               │    │
 │  │     ├─ Task Adherence                                               │    │
 │  │     ├─ Prompt Shields + Spotlighting                               │    │
 │  │     └─ Groundedness Detection                                       │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure OpenAI (oai-aiagent-prod)                                     │    │
-│  │ ├─ GPT-4o (Reasoning / Chat)                                       │    │
-│  │ ├─ GPT-4o-mini (Cost Optimized)                                    │    │
-│  │ └─ text-embedding-3-large (Vector Embedding)                       │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
 │  │ Microsoft Agent Framework                                           │    │
 │  │ ├─ ChatAgent (Multi-turn Conversation)                             │    │
 │  │ ├─ Tools (@ai_function decorator)                                  │    │
-│  │ │   ├─ SQL Query Tool (Fabric連携)                                 │    │
-│  │ │   ├─ Search Tool (AI Search連携)                                 │    │
-│  │ │   └─ Custom Business Tools                                       │    │
-│  │ ├─ Workflow Orchestration (Graph-based)                            │    │
-│  │ │   ├─ Sequential / Concurrent / HandOff                           │    │
-│  │ │   └─ Magentic (Manager-Specialist)                               │    │
-│  │ └─ Memory (Cosmos DB / Redis / Postgres)                           │    │
+│  │ │   ├─ SQL Tool → Fabric SQL Database                              │    │
+│  │ │   ├─ Doc Tool → Foundry IQ (Agentic Retrieval)                  │    │
+│  │ │   ├─ Web Tool → Bing Grounding                                   │    │
+│  │ │   └─ MCP Tools → Business Analytics (5 tools)                   │    │
+│  │ ├─ Workflow Orchestration                                           │    │
+│  │ │   ├─ HandoffBuilder (専門家委譲)                                 │    │
+│  │ │   └─ MagenticBuilder (マネージャー統合)                          │    │
+│  │ └─ Conversation History → Fabric SQL DB                            │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ Azure AI Search (search-sp-rag-australiaeast-001)                   │    │
+│  │ ├─ Standard SKU                                                     │    │
+│  │ └─ Index: product-specs-sharepoint-ks-index                        │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
                                    │
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                       Data Layer (Unified Data Foundation)                   │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Microsoft Fabric (fabric-aiagent-prod)                              │    │
+│  │ Microsoft Fabric (capagentunifieddata001) - F4 Capacity             │    │
+│  │ ├─ SQL Database in Fabric                                           │    │
+│  │ │   └─ retail_sqldatabase_daj6dri4yf3k3z-*                         │    │
+│  │ │       ├─ Business Tables: customers, products, orders, inventory │    │
+│  │ │       └─ History Tables: hst_conversations, hst_conversation_*   │    │
 │  │ ├─ OneLake (Unified Data Lake)                                     │    │
 │  │ │   ├─ Bronze: Raw Data                                             │    │
 │  │ │   ├─ Silver: Validated/Cleansed                                  │    │
 │  │ │   └─ Gold: Business-Ready                                         │    │
-│  │ ├─ SQL Database in Fabric (sqldb-aiagent-prod)                     │    │
-│  │ │   ├─ Structured Data Storage                                      │    │
-│  │ │   ├─ T-SQL Queries                                                │    │
-│  │ │   └─ Agent Memory / Chat History                                 │    │
-│  │ ├─ Fabric Data Agent [Optional]                                    │    │
-│  │ │   ├─ NL2SQL (Natural Language → T-SQL)                          │    │
-│  │ │   ├─ NL2DAX (Natural Language → DAX)                            │    │
-│  │ │   └─ Ontology (Business Context)                                 │    │
 │  │ └─ Power BI Semantic Models                                         │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
@@ -188,13 +196,15 @@ var tags = {
 │  ┌──────────────────────────────┐  ┌────────────────────────────────────┐   │
 │  │ Azure Monitor               │  │ Microsoft Defender for Cloud       │   │
 │  │ ├─ Application Insights    │  │ ├─ AI Security Posture            │   │
-│  │ ├─ Log Analytics          │  │ └─ Container Security             │   │
-│  │ └─ OpenTelemetry          │  └────────────────────────────────────┘   │
+│  │ │   (appi-daj6dri4yf3k3z) │  │ └─ Container Security             │   │
+│  │ ├─ Log Analytics          │  └────────────────────────────────────┘   │
+│  │ │   (log-daj6dri4yf3k3z)  │                                          │
+│  │ └─ OpenTelemetry          │  ┌────────────────────────────────────┐   │
+│  └──────────────────────────────┘  │ Managed Identity                   │   │
+│  ┌──────────────────────────────┐  │ └─ DefaultAzureCredential         │   │
+│  │ Key Vault                   │  │     RBAC (最小権限)                │   │
+│  │ └─ Secrets / Keys          │  └────────────────────────────────────┘   │
 │  └──────────────────────────────┘                                          │
-│  ┌──────────────────────────────┐  ┌────────────────────────────────────┐   │
-│  │ Key Vault                   │  │ Managed Identity                   │   │
-│  │ └─ Secrets / Keys          │  │ └─ RBAC (最小権限)                │   │
-│  └──────────────────────────────┘  └────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
