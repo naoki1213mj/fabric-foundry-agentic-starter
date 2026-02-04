@@ -76,7 +76,8 @@ const parseToolEvents = (text: string): { events: ToolEvent[]; cleanedText: stri
   const events: ToolEvent[] = [];
   let cleanedText = text;
 
-  const matches = text.matchAll(TOOL_EVENT_REGEX);
+  // Use Array.from for ES5 compatibility (matchAll returns IterableIterator)
+  const matches = Array.from(text.matchAll(TOOL_EVENT_REGEX));
   for (const match of matches) {
     try {
       const eventJson = match[1];
