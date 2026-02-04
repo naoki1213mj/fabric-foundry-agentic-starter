@@ -52,7 +52,10 @@ class WebAgentHandler:
             api_key: Bing Search API key (optional, kept for backward compatibility)
         """
         self.api_key = api_key or os.getenv("BING_SEARCH_API_KEY")
-        self.foundry_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT")
+        # Support both AZURE_AI_PROJECT_ENDPOINT and AZURE_AI_AGENT_ENDPOINT for compatibility
+        self.foundry_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT") or os.getenv(
+            "AZURE_AI_AGENT_ENDPOINT"
+        )
         # Note: BING_PROJECT_CONNECTION_ID is no longer required for Web Search tool
         self.bing_connection_id = os.getenv("BING_PROJECT_CONNECTION_ID")
         # gpt-5 is now supported with Web Search tool (preview)
@@ -78,7 +81,8 @@ class WebAgentHandler:
         # Check if Foundry endpoint is configured
         if not self.foundry_endpoint:
             logger.warning(
-                "Foundry Web Search not configured (missing AZURE_AI_PROJECT_ENDPOINT)"
+                "Foundry Web Search not configured "
+                "(missing AZURE_AI_PROJECT_ENDPOINT or AZURE_AI_AGENT_ENDPOINT)"
             )
             return json.dumps(
                 {
