@@ -61,6 +61,15 @@
     },
     "mcpServerEndpoint": {
       "value": "${MCP_SERVER_ENDPOINT=}"
+    },
+    "fabricSqlServer": {
+      "value": "${FABRIC_SQL_SERVER=}"
+    },
+    "fabricSqlDatabase": {
+      "value": "${FABRIC_SQL_DATABASE=}"
+    },
+    "fabricSqlConnectionString": {
+      "value": "${FABRIC_SQL_CONNECTION_STRING=}"
     }
   }
 }

@@ -108,6 +108,16 @@ param enableApimGateway bool = false
 @description('Publisher email for APIM (required when enableApimGateway is true)')
 param apimPublisherEmail string = 'hackathon@contoso.com'
 
+// ========== Fabric SQL Database Parameters ========== //
+@description('Fabric SQL Database Server (format: servername.database.fabric.microsoft.com,1433)')
+param fabricSqlServer string = ''
+
+@description('Fabric SQL Database Name')
+param fabricSqlDatabase string = ''
+
+@description('Fabric SQL Connection String (optional, overrides server/database if provided)')
+param fabricSqlConnectionString string = ''
+
 @description('Publisher name for APIM (required when enableApimGateway is true)')
 param apimPublisherName string = 'Agentic AI Hackathon'
 
@@ -300,9 +310,9 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
       AI_SEARCH_MCP_ENDPOINT: ''
 
-      FABRIC_SQL_DATABASE: ''
-      FABRIC_SQL_SERVER: ''
-      FABRIC_SQL_CONNECTION_STRING: ''
+      FABRIC_SQL_DATABASE: fabricSqlDatabase
+      FABRIC_SQL_SERVER: fabricSqlServer
+      FABRIC_SQL_CONNECTION_STRING: fabricSqlConnectionString
 
       // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
       // When set, API requests will be routed through APIM for rate limiting and monitoring
@@ -374,9 +384,9 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       AI_SEARCH_KNOWLEDGE_BASE_NAME: ''
       AI_SEARCH_MCP_ENDPOINT: ''
 
-      FABRIC_SQL_DATABASE: ''
-      FABRIC_SQL_SERVER: ''
-      FABRIC_SQL_CONNECTION_STRING: ''
+      FABRIC_SQL_DATABASE: fabricSqlDatabase
+      FABRIC_SQL_SERVER: fabricSqlServer
+      FABRIC_SQL_CONNECTION_STRING: fabricSqlConnectionString
 
       // APIM Gateway Configuration (AI Gateway for Azure OpenAI)
       // When set, API requests will be routed through APIM for rate limiting and monitoring
@@ -487,9 +497,9 @@ output WEB_APP_URL string = frontend_docker.outputs.appUrl
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = aifoundry.outputs.applicationInsightsConnectionString
 output AGENT_NAME_CHAT string = ''
 output AGENT_NAME_TITLE string = ''
-output FABRIC_SQL_DATABASE string = ''
-output FABRIC_SQL_SERVER string = ''
-output FABRIC_SQL_CONNECTION_STRING string = ''
+output FABRIC_SQL_DATABASE string = fabricSqlDatabase
+output FABRIC_SQL_SERVER string = fabricSqlServer
+output FABRIC_SQL_CONNECTION_STRING string = fabricSqlConnectionString
 
 output MANAGED_IDENTITY_CLIENT_ID string = managedIdentityModule.outputs.managedIdentityOutput.clientId
 output AI_FOUNDRY_RESOURCE_ID string = aifoundry.outputs.aiFoundryResourceId
