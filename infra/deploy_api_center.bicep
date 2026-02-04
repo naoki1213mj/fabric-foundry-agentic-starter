@@ -65,7 +65,10 @@ resource mcpServerApi 'Microsoft.ApiCenter/services/workspaces/apis@2024-03-01' 
     description: '''
       Model Context Protocol (MCP) Server providing business analytics tools for AI agents.
 
-      Available Tools:
+      Protocol Version: 2024-11-05
+      Category: Business Analytics
+
+      Available Tools (5):
       - calculate_yoy_growth: Calculate year-over-year growth rates
       - calculate_rfm_score: Customer segmentation using RFM analysis
       - identify_slow_moving_inventory: Inventory analysis for slow-moving products
@@ -82,11 +85,6 @@ resource mcpServerApi 'Microsoft.ApiCenter/services/workspaces/apis@2024-03-01' 
         email: 'hackathon@contoso.com'
       }
     ]
-    customProperties: {
-      mcpProtocolVersion: '2024-11-05'
-      toolCount: '5'
-      category: 'Business Analytics'
-    }
   }
 }
 

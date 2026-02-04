@@ -1,0 +1,425 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "2366187620271524008"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "solutionName": {
+      "type": "string"
+    },
+    "mcpServerHostname": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "MCP Server Function App default hostname"
+      }
+    },
+    "apimGatewayUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "API Management Gateway URL"
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": {
+      "ai": {
+        "aiSearch": "srch-",
+        "aiServices": "aisa-",
+        "aiVideoIndexer": "avi-",
+        "machineLearningWorkspace": "mlw-",
+        "openAIService": "oai-",
+        "botService": "bot-",
+        "computerVision": "cv-",
+        "contentModerator": "cm-",
+        "contentSafety": "cs-",
+        "customVisionPrediction": "cstv-",
+        "customVisionTraining": "cstvt-",
+        "documentIntelligence": "di-",
+        "faceApi": "face-",
+        "healthInsights": "hi-",
+        "immersiveReader": "ir-",
+        "languageService": "lang-",
+        "speechService": "spch-",
+        "translator": "trsl-",
+        "aiHub": "aih-",
+        "aiHubProject": "aihp-",
+        "aiFoundry": "aif-",
+        "aiFoundryProject": "aifp-"
+      },
+      "analytics": {
+        "analysisServicesServer": "as",
+        "databricksWorkspace": "dbw-",
+        "dataExplorerCluster": "dec",
+        "dataExplorerClusterDatabase": "dedb",
+        "dataFactory": "adf-",
+        "digitalTwin": "dt-",
+        "streamAnalytics": "asa-",
+        "synapseAnalyticsPrivateLinkHub": "synplh-",
+        "synapseAnalyticsSQLDedicatedPool": "syndp",
+        "synapseAnalyticsSparkPool": "synsp",
+        "synapseAnalyticsWorkspaces": "synw",
+        "dataLakeStoreAccount": "dls",
+        "dataLakeAnalyticsAccount": "dla",
+        "eventHubsNamespace": "evhns-",
+        "eventHub": "evh-",
+        "eventGridDomain": "evgd-",
+        "eventGridSubscriptions": "evgs-",
+        "eventGridTopic": "evgt-",
+        "eventGridSystemTopic": "egst-",
+        "hdInsightHadoopCluster": "hadoop-",
+        "hdInsightHBaseCluster": "hbase-",
+        "hdInsightKafkaCluster": "kafka-",
+        "hdInsightSparkCluster": "spark-",
+        "hdInsightStormCluster": "storm-",
+        "hdInsightMLServicesCluster": "mls-",
+        "iotHub": "iot-",
+        "provisioningServices": "provs-",
+        "provisioningServicesCertificate": "pcert-",
+        "powerBIEmbedded": "pbi-",
+        "timeSeriesInsightsEnvironment": "tsi-"
+      },
+      "compute": {
+        "appServiceEnvironment": "ase-",
+        "appServicePlan": "asp-",
+        "loadTesting": "lt-",
+        "availabilitySet": "avail-",
+        "arcEnabledServer": "arcs-",
+        "arcEnabledKubernetesCluster": "arck",
+        "batchAccounts": "ba-",
+        "cloudService": "cld-",
+        "communicationServices": "acs-",
+        "diskEncryptionSet": "des",
+        "functionApp": "func-",
+        "gallery": "gal",
+        "hostingEnvironment": "host-",
+        "imageTemplate": "it-",
+        "managedDiskOS": "osdisk",
+        "managedDiskData": "disk",
+        "notificationHubs": "ntf-",
+        "notificationHubsNamespace": "ntfns-",
+        "proximityPlacementGroup": "ppg-",
+        "restorePointCollection": "rpc-",
+        "snapshot": "snap-",
+        "staticWebApp": "stapp-",
+        "virtualMachine": "vm",
+        "virtualMachineScaleSet": "vmss-",
+        "virtualMachineMaintenanceConfiguration": "mc-",
+        "virtualMachineStorageAccount": "stvm",
+        "webApp": "app-"
+      },
+      "containers": {
+        "aksCluster": "aks-",
+        "aksSystemNodePool": "npsystem-",
+        "aksUserNodePool": "np-",
+        "containerApp": "ca-",
+        "containerAppsEnvironment": "cae-",
+        "containerRegistry": "cr",
+        "containerInstance": "ci",
+        "serviceFabricCluster": "sf-",
+        "serviceFabricManagedCluster": "sfmc-"
+      },
+      "databases": {
+        "cosmosDBDatabase": "cosmos-",
+        "cosmosDBApacheCassandra": "coscas-",
+        "cosmosDBMongoDB": "cosmon-",
+        "cosmosDBNoSQL": "cosno-",
+        "cosmosDBTable": "costab-",
+        "cosmosDBGremlin": "cosgrm-",
+        "cosmosDBPostgreSQL": "cospos-",
+        "cacheForRedis": "redis-",
+        "sqlDatabaseServer": "sql-",
+        "sqlDatabase": "sqldb-",
+        "sqlElasticJobAgent": "sqlja-",
+        "sqlElasticPool": "sqlep-",
+        "mariaDBServer": "maria-",
+        "mariaDBDatabase": "mariadb-",
+        "mySQLDatabase": "mysql-",
+        "postgreSQLDatabase": "psql-",
+        "sqlServerStretchDatabase": "sqlstrdb-",
+        "sqlManagedInstance": "sqlmi-"
+      },
+      "developerTools": {
+        "appConfigurationStore": "appcs-",
+        "mapsAccount": "map-",
+        "signalR": "sigr",
+        "webPubSub": "wps-"
+      },
+      "devOps": {
+        "managedGrafana": "amg-"
+      },
+      "integration": {
+        "apiManagementService": "apim-",
+        "apiCenter": "apic-",
+        "integrationAccount": "ia-",
+        "logicApp": "logic-",
+        "serviceBusNamespace": "sbns-",
+        "serviceBusQueue": "sbq-",
+        "serviceBusTopic": "sbt-",
+        "serviceBusTopicSubscription": "sbts-"
+      },
+      "managementGovernance": {
+        "automationAccount": "aa-",
+        "applicationInsights": "appi-",
+        "monitorActionGroup": "ag-",
+        "monitorDataCollectionRules": "dcr-",
+        "monitorAlertProcessingRule": "apr-",
+        "blueprint": "bp-",
+        "blueprintAssignment": "bpa-",
+        "dataCollectionEndpoint": "dce-",
+        "logAnalyticsWorkspace": "log-",
+        "logAnalyticsQueryPacks": "pack-",
+        "managementGroup": "mg-",
+        "purviewInstance": "pview-",
+        "resourceGroup": "rg-",
+        "templateSpecsName": "ts-"
+      },
+      "migration": {
+        "migrateProject": "migr-",
+        "databaseMigrationService": "dms-",
+        "recoveryServicesVault": "rsv-"
+      },
+      "networking": {
+        "applicationGateway": "agw-",
+        "applicationSecurityGroup": "asg-",
+        "cdnProfile": "cdnp-",
+        "cdnEndpoint": "cdne-",
+        "connections": "con-",
+        "dnsForwardingRuleset": "dnsfrs-",
+        "dnsPrivateResolver": "dnspr-",
+        "dnsPrivateResolverInboundEndpoint": "in-",
+        "dnsPrivateResolverOutboundEndpoint": "out-",
+        "firewall": "afw-",
+        "firewallPolicy": "afwp-",
+        "expressRouteCircuit": "erc-",
+        "expressRouteGateway": "ergw-",
+        "frontDoorProfile": "afd-",
+        "frontDoorEndpoint": "fde-",
+        "frontDoorFirewallPolicy": "fdfp-",
+        "ipGroups": "ipg-",
+        "loadBalancerInternal": "lbi-",
+        "loadBalancerExternal": "lbe-",
+        "loadBalancerRule": "rule-",
+        "localNetworkGateway": "lgw-",
+        "natGateway": "ng-",
+        "networkInterface": "nic-",
+        "networkSecurityGroup": "nsg-",
+        "networkSecurityGroupSecurityRules": "nsgsr-",
+        "networkWatcher": "nw-",
+        "privateLink": "pl-",
+        "privateEndpoint": "pep-",
+        "publicIPAddress": "pip-",
+        "publicIPAddressPrefix": "ippre-",
+        "routeFilter": "rf-",
+        "routeServer": "rtserv-",
+        "routeTable": "rt-",
+        "serviceEndpointPolicy": "se-",
+        "trafficManagerProfile": "traf-",
+        "userDefinedRoute": "udr-",
+        "virtualNetwork": "vnet-",
+        "virtualNetworkGateway": "vgw-",
+        "virtualNetworkManager": "vnm-",
+        "virtualNetworkPeering": "peer-",
+        "virtualNetworkSubnet": "snet-",
+        "virtualWAN": "vwan-",
+        "virtualWANHub": "vhub-"
+      },
+      "security": {
+        "bastion": "bas-",
+        "keyVault": "kv-",
+        "keyVaultManagedHSM": "kvmhsm-",
+        "managedIdentity": "id-",
+        "sshKey": "sshkey-",
+        "vpnGateway": "vpng-",
+        "vpnConnection": "vcn-",
+        "vpnSite": "vst-",
+        "webApplicationFirewallPolicy": "waf",
+        "webApplicationFirewallPolicyRuleGroup": "wafrg"
+      },
+      "storage": {
+        "storSimple": "ssimp",
+        "backupVault": "bvault-",
+        "backupVaultPolicy": "bkpol-",
+        "fileShare": "share-",
+        "storageAccount": "st",
+        "storageSyncService": "sss-"
+      },
+      "virtualDesktop": {
+        "labServicesPlan": "lp-",
+        "virtualDesktopHostPool": "vdpool-",
+        "virtualDesktopApplicationGroup": "vdag-",
+        "virtualDesktopWorkspace": "vdws-",
+        "virtualDesktopScalingPlan": "vdscaling-"
+      }
+    },
+    "abbrs": "[variables('$fxv#0')]",
+    "apiCenterName": "[format('{0}{1}', variables('abbrs').integration.apiCenter, parameters('solutionName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiCenter/services",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('apiCenterName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {},
+      "tags": {
+        "environment": "hackathon",
+        "purpose": "mcp-tool-catalog",
+        "workload": "agentic-ai"
+      }
+    },
+    {
+      "type": "Microsoft.ApiCenter/services/workspaces",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}', variables('apiCenterName'), 'default')]",
+      "properties": {
+        "title": "Default Workspace",
+        "description": "Default workspace for Agentic AI application APIs and MCP servers"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services', variables('apiCenterName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ApiCenter/services/workspaces/environments",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}', variables('apiCenterName'), 'default', 'production')]",
+      "properties": {
+        "title": "Production",
+        "description": "Production environment for Agentic AI application",
+        "kind": "production",
+        "server": {
+          "type": "Azure API Management",
+          "managementPortalUri": [
+            "[parameters('apimGatewayUrl')]"
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces', variables('apiCenterName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerHostname')))]",
+      "type": "Microsoft.ApiCenter/services/workspaces/apis",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}', variables('apiCenterName'), 'default', 'mcp-business-analytics')]",
+      "properties": {
+        "title": "Business Analytics MCP Server",
+        "description": "      Model Context Protocol (MCP) Server providing business analytics tools for AI agents.\n\n      Protocol Version: 2024-11-05\n      Category: Business Analytics\n\n      Available Tools (5):\n      - calculate_yoy_growth: Calculate year-over-year growth rates\n      - calculate_rfm_score: Customer segmentation using RFM analysis\n      - identify_slow_moving_inventory: Inventory analysis for slow-moving products\n      - compare_products: Compare multiple products across various metrics\n      - analyze_customer_segment: Detailed customer segment analysis\n    ",
+        "kind": "rest",
+        "termsOfService": {
+          "url": "https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai"
+        },
+        "contacts": [
+          {
+            "name": "Agentic AI Team",
+            "email": "hackathon@contoso.com"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces', variables('apiCenterName'), 'default')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerHostname')))]",
+      "type": "Microsoft.ApiCenter/services/workspaces/apis/versions",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}/{3}', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0')]",
+      "properties": {
+        "title": "Version 1.0",
+        "lifecycleStage": "production"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/apis', variables('apiCenterName'), 'default', 'mcp-business-analytics')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerHostname')))]",
+      "type": "Microsoft.ApiCenter/services/workspaces/apis/versions/definitions",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}/{3}/{4}', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
+      "properties": {
+        "title": "MCP JSON-RPC 2.0 Protocol",
+        "description": "Model Context Protocol using JSON-RPC 2.0 messaging format"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('mcpServerHostname')))]",
+      "type": "Microsoft.ApiCenter/services/workspaces/apis/deployments",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}/{3}', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'production-deployment')]",
+      "properties": {
+        "title": "Production Deployment",
+        "description": "MCP Server deployed via Azure Functions with API Management gateway",
+        "environmentId": "[resourceId('Microsoft.ApiCenter/services/workspaces/environments', variables('apiCenterName'), 'default', 'production')]",
+        "definitionId": "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions/definitions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
+        "state": "active",
+        "server": {
+          "runtimeUri": [
+            "[format('https://{0}/api/mcp', parameters('mcpServerHostname'))]",
+            "[if(not(empty(parameters('apimGatewayUrl'))), format('{0}/mcp', parameters('apimGatewayUrl')), '')]"
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/apis', variables('apiCenterName'), 'default', 'mcp-business-analytics')]",
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/apis/versions/definitions', variables('apiCenterName'), 'default', 'mcp-business-analytics', 'version-1-0', 'mcp-jsonrpc')]",
+        "[resourceId('Microsoft.ApiCenter/services/workspaces/environments', variables('apiCenterName'), 'default', 'production')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('apimGatewayUrl')))]",
+      "type": "Microsoft.ApiCenter/services/workspaces/apis",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}/{2}', variables('apiCenterName'), 'default', 'azure-openai')]",
+      "properties": {
+        "title": "Azure OpenAI API",
+        "description": "      Azure OpenAI Service endpoints proxied through API Management AI Gateway.\n\n      Features:\n      - Chat Completions (gpt-5, gpt-4o-mini)\n      - Embeddings (text-embedding-3-large, text-embedding-3-small)\n      - Managed Identity authentication\n      - Token usage metering\n    ",
+        "kind": "rest"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ApiCenter/services/workspaces', variables('apiCenterName'), 'default')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "apiCenterName": {
+      "type": "string",
+      "value": "[variables('apiCenterName')]"
+    },
+    "apiCenterId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ApiCenter/services', variables('apiCenterName'))]"
+    },
+    "apiCenterIdentityPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ApiCenter/services', variables('apiCenterName')), '2024-03-01', 'full').identity.principalId]"
+    },
+    "workspaceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ApiCenter/services/workspaces', variables('apiCenterName'), 'default')]"
+    },
+    "mcpServerApiId": {
+      "type": "string",
+      "value": "[if(not(empty(parameters('mcpServerHostname'))), resourceId('Microsoft.ApiCenter/services/workspaces/apis', variables('apiCenterName'), 'default', 'mcp-business-analytics'), '')]"
+    }
+  }
+}
