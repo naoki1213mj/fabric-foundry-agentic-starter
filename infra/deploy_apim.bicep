@@ -367,6 +367,16 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
     <!-- Authenticate with Azure OpenAI using Managed Identity -->
     <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
 
+    <!-- Fix duplicate /openai path issue: SDK sends /openai/deployments/... but APIM path is already /openai -->
+    <!-- Rewrite /openai/openai/... to /openai/... -->
+    <rewrite-uri template="@{
+      var path = context.Request.Url.Path;
+      if (path.StartsWith("/openai/openai/")) {
+        return path.Substring(7);
+      }
+      return path;
+    }" copy-unmatched-params="true" />
+
     <!-- Note: rate-limit-by-key not available in Consumption tier -->
     <!-- Rate limiting is handled by Azure OpenAI's built-in throttling -->
 
