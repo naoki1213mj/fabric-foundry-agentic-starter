@@ -120,6 +120,36 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* === Links in Assistant Messages (Markdown) === */
+.assistant-message a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.assistant-message a:hover {
+  color: var(--color-accent-primary-hover);
+  border-bottom-color: var(--color-accent-primary-hover);
+}
+
+.assistant-message a:visited {
+  color: var(--color-accent-secondary, #5c2d91);
+}
+
+[data-theme="dark"] .assistant-message a {
+  color: #60a5fa;
+}
+
+[data-theme="dark"] .assistant-message a:hover {
+  color: #93c5fd;
+  border-bottom-color: #93c5fd;
+}
+
+[data-theme="dark"] .assistant-message a:visited {
+  color: #a78bfa;
+}
+
 /* === Copy Button Styles === */
 .message-header {
   display: flex;

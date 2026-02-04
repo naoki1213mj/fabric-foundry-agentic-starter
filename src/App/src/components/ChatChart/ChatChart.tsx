@@ -11,6 +11,16 @@ const chartTypes = {
   doughNutChart: "doughnut",
   lineChart: "line",
 };
+
+// Get theme-aware colors for chart text
+const getChartColors = () => {
+  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+  return {
+    textColor: isDarkMode ? '#f8fafc' : '#1e293b',
+    gridColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+    legendColor: isDarkMode ? '#cbd5e1' : '#475569',
+  };
+};
 interface ChartProps {
   chartContent: {
     data: any;
@@ -69,6 +79,9 @@ useEffect(() => {
 
   ChartJS.register(...registerables);
 
+  // Get theme-aware colors
+  const colors = getChartColors();
+
   const chartConfigData = {
     type:
       chartContent.type === "horizontalBar"
@@ -84,6 +97,46 @@ useEffect(() => {
         chartContent.type === "horizontalBar"
           ? "y"
           : chartContent?.options?.indexAxis,
+      // Dark mode support for text colors
+      scales: {
+        ...chartContent?.options?.scales,
+        x: {
+          ...chartContent?.options?.scales?.x,
+          ticks: {
+            ...chartContent?.options?.scales?.x?.ticks,
+            color: colors.textColor,
+          },
+          grid: {
+            ...chartContent?.options?.scales?.x?.grid,
+            color: colors.gridColor,
+          },
+        },
+        y: {
+          ...chartContent?.options?.scales?.y,
+          ticks: {
+            ...chartContent?.options?.scales?.y?.ticks,
+            color: colors.textColor,
+          },
+          grid: {
+            ...chartContent?.options?.scales?.y?.grid,
+            color: colors.gridColor,
+          },
+        },
+      },
+      plugins: {
+        ...chartContent?.options?.plugins,
+        legend: {
+          ...chartContent?.options?.plugins?.legend,
+          labels: {
+            ...chartContent?.options?.plugins?.legend?.labels,
+            color: colors.legendColor,
+          },
+        },
+        title: {
+          ...chartContent?.options?.plugins?.title,
+          color: colors.textColor,
+        },
+      },
     },
   };
 
@@ -145,9 +198,19 @@ useEffect(() => {
       {validChart ? (
         <canvas ref={chartRef} />
       ) : (
-        <div style={{ padding: 16, color: "#b71c1c", background: "#fff3f3", borderRadius: 8 }}>
+        <div style={{
+          padding: 16,
+          color: 'var(--color-accent-error, #b71c1c)',
+          background: 'var(--color-accent-error-light, #fff3f3)',
+          borderRadius: 8
+        }}>
           <strong>Unable to render chart. Here is the raw response:</strong>
-          <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", marginTop: 8 }}>
+          <pre style={{
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            marginTop: 8,
+            color: 'var(--color-text-secondary, #666)'
+          }}>
             {JSON.stringify(chartContent, null, 2)}
           </pre>
         </div>
