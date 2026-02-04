@@ -319,11 +319,10 @@ export const ChatHistoryListItemCell: React.FC<
             {deleteLoading && (
               <Spinner
                 size={SpinnerSize.small}
-                  aria-label="Deleting conversation"
-                  styles={{ root: { marginLeft: "8px" } }}
-                />
-              )}
-            </Stack>
+                aria-label="Deleting conversation"
+                styles={{ root: { marginLeft: "8px" } }}
+              />
+            )}
             {!deleteLoading && (isHovered || isSelected) && (
               <Stack
                 horizontal
