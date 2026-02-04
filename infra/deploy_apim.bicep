@@ -434,17 +434,6 @@ resource foundryAgentApiPolicy 'Microsoft.ApiManagement/service/apis/policies@20
   <outbound>
     <base />
 
-    <!-- AI Gateway: Emit token metrics for agent responses -->
-    <choose>
-      <when condition="@(context.Response.StatusCode == 200)">
-        <llm-emit-token-metric namespace="FoundryAgents">
-          <dimension name="API" value="@(context.Api.Name)" />
-          <dimension name="Operation" value="@(context.Operation.Name)" />
-          <dimension name="Project" value="@(context.Request.MatchedParameters.GetValueOrDefault(&apos;projectId&apos;, &apos;unknown&apos;))" />
-        </llm-emit-token-metric>
-      </when>
-    </choose>
-
     <!-- Calculate latency -->
     <set-header name="x-gateway-latency-ms" exists-action="override">
       <value>@{
@@ -559,13 +548,15 @@ resource aoaiApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2024-05-01
 
     <!-- Fix duplicate /openai path issue: SDK sends /openai/deployments/... but APIM path is already /openai -->
     <!-- Rewrite /openai/openai/... to /openai/... -->
-    <rewrite-uri template="@{
+    <set-variable name="rewritten-path" value="@{
       var path = context.Request.Url.Path;
-      if (path.StartsWith("/openai/openai/")) {
+      var prefix = &quot;/openai/openai/&quot;;
+      if (path.StartsWith(prefix)) {
         return path.Substring(7);
       }
       return path;
-    }" copy-unmatched-params="true" />
+    }" />
+    <rewrite-uri template="@((string)context.Variables[&quot;rewritten-path&quot;])" copy-unmatched-params="true" />
 
     <!-- Token usage tracking header -->
     <set-header name="x-ms-gateway-timestamp" exists-action="override">
