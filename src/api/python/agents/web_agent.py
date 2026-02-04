@@ -21,6 +21,7 @@ Note: Web Search tool (preview) is recommended over Bing Grounding because:
 - Web Search tool supports all models including gpt-5
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -34,6 +35,10 @@ from azure.ai.projects.models import (
 from azure.identity import DefaultAzureCredential
 
 logger = logging.getLogger(__name__)
+
+# Timeout configuration for Web Search tool (preview)
+# Foundry Agent Service may take longer due to web search operations
+WEB_SEARCH_TIMEOUT_SECONDS = 60  # Total timeout for web search operation
 
 
 class WebAgentHandler:
@@ -134,11 +139,33 @@ class WebAgentHandler:
 
                 try:
                     # Use responses API (recommended pattern)
-                    response = openai_client.responses.create(
-                        input=f"Search the web for: {query}",
-                        tool_choice="required",  # Force the model to use web search
-                        extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+                    # Wrap in asyncio.to_thread with timeout to handle 408 errors
+                    logger.info(
+                        f"Calling responses.create with timeout={WEB_SEARCH_TIMEOUT_SECONDS}s"
                     )
+
+                    def _create_response():
+                        return openai_client.responses.create(
+                            input=f"Search the web for: {query}",
+                            tool_choice="required",  # Force the model to use web search
+                            extra_body={
+                                "agent": {"name": agent.name, "type": "agent_reference"}
+                            },
+                        )
+
+                    try:
+                        response = await asyncio.wait_for(
+                            asyncio.to_thread(_create_response),
+                            timeout=WEB_SEARCH_TIMEOUT_SECONDS,
+                        )
+                    except TimeoutError:
+                        logger.error(
+                            f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s"
+                        )
+                        raise TimeoutError(
+                            f"Web search operation timed out after "
+                            f"{WEB_SEARCH_TIMEOUT_SECONDS} seconds"
+                        )
 
                     # Extract answer text safely
                     answer_text = ""
@@ -230,6 +257,22 @@ class WebAgentHandler:
                     },
                     ensure_ascii=False,
                 )
+
+        except TimeoutError as te:
+            # Handle timeout specifically with user-friendly message
+            logger.error(f"Web Search timeout: {te}")
+            return json.dumps(
+                {
+                    "answer": f"[Web検索がタイムアウトしました] '{query}'についての情報は、"
+                    f"私の学習データに基づいて回答します。\n\n"
+                    f"Web検索サービスが混雑しているため、後でもう一度お試しください。",
+                    "citations": [],
+                    "fallback": True,
+                    "timeout": True,
+                    "note": f"Web search timed out after {WEB_SEARCH_TIMEOUT_SECONDS}s",
+                },
+                ensure_ascii=False,
+            )
 
         except Exception as e:
             logger.error(f"Web Search error: {e}", exc_info=True)
