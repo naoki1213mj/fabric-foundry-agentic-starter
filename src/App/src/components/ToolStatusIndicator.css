@@ -1,35 +1,74 @@
+/* ツール使用状況コンテナ */
 .tool-status-container {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    font-size: 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    background: var(--color-bg-tertiary, #f5f5f5);
+    border: 1px solid var(--color-border-light, #e0e0e0);
+    overflow: hidden;
 }
 
+/* サマリーモード（応答完了後） */
+.tool-status-summary {
+    background: transparent;
+    border: none;
+}
+
+/* 折りたたみヘッダー */
+.tool-status-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary, #666);
+    font-size: 12px;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.tool-status-header:hover {
+    background: var(--color-bg-hover, rgba(0, 0, 0, 0.04));
+}
+
+.tool-status-toggle-icon {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-tertiary, #999);
+}
+
+.tool-status-summary-text {
+    font-size: 12px;
+    color: var(--color-text-secondary, #666);
+}
+
+/* ツールリスト */
+.tool-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+}
+
+/* 個別ツールアイテム */
 .tool-status-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: 4px;
-    animation: fadeIn 0.2s ease-in;
-}
-
-.tool-status-active {
-    color: var(--primary-color, #0078d4);
-}
-
-.tool-status-completed {
-    color: var(--success-color, #107c10);
-    opacity: 0.8;
-}
-
-.tool-status-error {
-    color: var(--error-color, #d13438);
+    animation: toolFadeIn 0.2s ease-out;
 }
 
 .tool-icon {
-    font-size: 16px;
+    font-size: 14px;
     flex-shrink: 0;
+    width: 20px;
+    text-align: center;
 }
 
 .tool-label {
@@ -37,50 +76,167 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--color-text-primary, #333);
 }
 
-.tool-label-completed {
-    text-decoration: line-through;
-    opacity: 0.7;
+/* ステータスバッジ */
+.tool-status-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 500;
 }
 
+.tool-badge-active {
+    background: var(--color-accent-primary-light, #e6f2ff);
+    color: var(--color-accent-primary, #0078d4);
+    animation: toolPulse 1.5s ease-in-out infinite;
+}
+
+.tool-badge-error {
+    background: var(--color-accent-error-light, #fde7e9);
+    color: var(--color-accent-error, #d13438);
+}
+
+/* メッセージ（件数など） */
 .tool-message {
-    font-size: 12px;
-    color: var(--text-secondary, #666);
-    margin-left: 4px;
-}
-
-.tool-spinner {
+    font-size: 11px;
+    color: var(--color-text-tertiary, #888);
     flex-shrink: 0;
 }
 
-@keyframes fadeIn {
+/* アクティブ状態 */
+.tool-status-active {
+    background: var(--color-accent-primary-light, rgba(0, 120, 212, 0.08));
+}
+
+.tool-status-active .tool-label {
+    color: var(--color-accent-primary, #0078d4);
+    font-weight: 500;
+}
+
+/* 完了状態 - シンプルに */
+.tool-status-completed {
+    opacity: 0.85;
+}
+
+/* エラー状態 */
+.tool-status-error {
+    background: var(--color-accent-error-light, rgba(209, 52, 56, 0.08));
+}
+
+.tool-status-error .tool-label {
+    color: var(--color-accent-error, #d13438);
+}
+
+/* アニメーション */
+@keyframes toolFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-4px);
+        transform: translateX(-8px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
 }
 
-/* ダークモード対応 */
+@keyframes toolPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* ========== ダークモード対応 ========== */
+
+/* data-theme="dark" 対応 */
+[data-theme="dark"] .tool-status-container {
+    background: var(--color-bg-tertiary, #2d2d2d);
+    border-color: var(--color-border-light, #404040);
+}
+
+[data-theme="dark"] .tool-status-summary {
+    background: transparent;
+    border: none;
+}
+
+[data-theme="dark"] .tool-status-header {
+    color: var(--color-text-secondary, #b0b0b0);
+}
+
+[data-theme="dark"] .tool-status-header:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .tool-status-summary-text {
+    color: var(--color-text-secondary, #b0b0b0);
+}
+
+[data-theme="dark"] .tool-label {
+    color: var(--color-text-primary, #e0e0e0);
+}
+
+[data-theme="dark"] .tool-message {
+    color: var(--color-text-tertiary, #888);
+}
+
+[data-theme="dark"] .tool-status-active {
+    background: rgba(96, 165, 250, 0.15);
+}
+
+[data-theme="dark"] .tool-status-active .tool-label {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .tool-badge-active {
+    background: rgba(96, 165, 250, 0.2);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .tool-status-completed {
+    opacity: 0.8;
+}
+
+[data-theme="dark"] .tool-status-error {
+    background: rgba(248, 113, 113, 0.15);
+}
+
+[data-theme="dark"] .tool-status-error .tool-label {
+    color: #f87171;
+}
+
+[data-theme="dark"] .tool-badge-error {
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+/* prefers-color-scheme フォールバック */
 @media (prefers-color-scheme: dark) {
-    .tool-status-completed {
-        color: #6ccb5f;
+    .tool-status-container:not([data-theme="light"] *) {
+        background: #2d2d2d;
+        border-color: #404040;
     }
 
-    .tool-message {
-        color: #a0a0a0;
+    .tool-status-summary:not([data-theme="light"] *) {
+        background: transparent;
     }
-}
 
-/* Fluent UI Dark Theme 対応 */
-.ms-theme-dark .tool-status-completed {
-    color: #6ccb5f;
-}
+    .tool-status-header:not([data-theme="light"] *) {
+        color: #b0b0b0;
+    }
 
-.ms-theme-dark .tool-message {
-    color: #a0a0a0;
+    .tool-label:not([data-theme="light"] *) {
+        color: #e0e0e0;
+    }
+
+    .tool-status-active:not([data-theme="light"] *) {
+        background: rgba(96, 165, 250, 0.15);
+    }
+
+    .tool-status-active:not([data-theme="light"] *) .tool-label {
+        color: #60a5fa;
+    }
 }
