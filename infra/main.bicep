@@ -432,6 +432,19 @@ module apimRoleAssignment 'deploy_apim_role_assignment.bicep' = if (enableApimGa
   scope: resourceGroup(resourceGroup().name)
 }
 
+// ========== API Center (Private Tool Catalog for MCP Servers) ========== //
+// Enables discovery and governance of MCP tools in Microsoft Foundry
+module apiCenterModule 'deploy_api_center.bicep' = if (enableApimGateway && !empty(mcpServerEndpoint)) {
+  name: 'deploy_api_center'
+  params: {
+    location: solutionLocation
+    solutionName: solutionPrefix
+    mcpServerHostname: !empty(mcpServerEndpoint) ? replace(replace(mcpServerEndpoint, 'https://', ''), '/api/mcp', '') : ''
+    apimGatewayUrl: apimModule!.outputs.apimGatewayUrl
+  }
+  scope: resourceGroup(resourceGroup().name)
+}
+
 module frontend_docker 'deploy_frontend_docker.bicep' = {
   name: 'deploy_frontend_docker'
   params: {
@@ -512,3 +525,8 @@ output APIM_GATEWAY_URL string = enableApimGateway ? apimModule!.outputs.apimGat
 output APIM_OPENAI_PROXY_ENDPOINT string = enableApimGateway ? apimModule!.outputs.azureOpenAiProxyEndpoint : ''
 output APIM_NAME string = enableApimGateway ? apimModule!.outputs.apimName : ''
 output APIM_MCP_PROXY_ENDPOINT string = (enableApimGateway && !empty(mcpServerEndpoint)) ? apimModule!.outputs.mcpServerProxyEndpoint : ''
+
+// API Center Outputs (Private Tool Catalog)
+output API_CENTER_ENABLED bool = enableApimGateway && !empty(mcpServerEndpoint)
+output API_CENTER_NAME string = (enableApimGateway && !empty(mcpServerEndpoint)) ? apiCenterModule!.outputs.apiCenterName : ''
+output API_CENTER_ID string = (enableApimGateway && !empty(mcpServerEndpoint)) ? apiCenterModule!.outputs.apiCenterId : ''
