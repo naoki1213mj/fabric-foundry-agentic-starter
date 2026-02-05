@@ -1,6 +1,6 @@
 import { Stack } from '@fluentui/react';
 import { DismissRegular } from '@fluentui/react-icons';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -13,6 +13,15 @@ interface Props {
 
 const CitationPanel = memo(({ activeCitation }: Props) => {
     const dispatch = useAppDispatch();
+
+    // Custom link component to open external links in new tab
+    const markdownComponents = useMemo(() => ({
+      a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+        <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+          {children}
+        </a>
+      ),
+    }), []);
 
     const onCloseCitation = () => {
         dispatch(clearCitation());
@@ -60,6 +69,7 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
                 children={activeCitation?.content}
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
+                components={markdownComponents}
               />
             </Stack.Item>
         </div>)

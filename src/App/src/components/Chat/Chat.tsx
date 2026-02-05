@@ -135,6 +135,8 @@ const Chat: React.FC<ChatProps> = ({
   // Abort ongoing request when conversation changes (intentionally omit generatingResponse/isStreamingInProgress)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    // Clear tool events when switching conversations
+    setToolEvents([]);
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
       if (chatAPISignal) {

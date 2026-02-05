@@ -196,3 +196,21 @@ export const stripHtmlTags = (content: string): string => {
 export const containsHtml = (content: string): boolean => {
   return /<\/?[a-z][\s\S]*>/i.test(content);
 };
+
+/**
+ * Add target="_blank" and rel="noopener noreferrer" to all links in HTML content
+ * This ensures external links open in new tabs safely
+ */
+export const addTargetBlankToLinks = (html: string): string => {
+  // Match <a> tags and add target="_blank" rel="noopener noreferrer" if not present
+  return html.replace(
+    /<a\s+([^>]*?)>/gi,
+    (match, attributes) => {
+      // Skip if already has target
+      if (/target\s*=/i.test(attributes)) {
+        return match;
+      }
+      return `<a ${attributes} target="_blank" rel="noopener noreferrer">`;
+    }
+  );
+};
