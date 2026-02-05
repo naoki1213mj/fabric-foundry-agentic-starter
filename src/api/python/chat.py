@@ -35,15 +35,12 @@ from contextvars import ContextVar
 from datetime import UTC, datetime
 from typing import Annotated
 
-from agent_framework import (
+from agent_framework import (  # NOTE: HostedWebSearchTool requires OpenAI's web_search_preview tool type; which is not available in Azure OpenAI. Keeping import commented for future use.; HostedWebSearchTool,
     AgentRunUpdateEvent,
     ChatAgent,
     GroupChatRequestSentEvent,
     HandoffAgentUserRequest,
     HandoffBuilder,
-    # NOTE: HostedWebSearchTool requires OpenAI's web_search_preview tool type
-    # which is not available in Azure OpenAI. Keeping import commented for future use.
-    # HostedWebSearchTool,
     MagenticBuilder,
     MagenticOrchestratorEvent,
     RequestInfoEvent,
@@ -274,6 +271,10 @@ async def stream_with_tool_events(agent_stream):
 
     last_output_time = asyncio.get_event_loop().time()
 
+    # Track previous reasoning text to calculate delta
+    # Agent Framework SDK sends cumulative text in each chunk, not just the delta
+    previous_reasoning_text = ""
+
     async def keepalive_check():
         """Check if keepalive is needed and yield marker if so."""
         nonlocal last_output_time
@@ -322,18 +323,34 @@ async def stream_with_tool_events(agent_stream):
             # Handle reasoning content (GPT-5 thinking)
             # Responses API returns reasoning as output item with type="reasoning"
             # Agent framework SDK converts these to Content with type="text_reasoning"
-            # Each chunk contains delta text, so we yield each piece for streaming display
+            # IMPORTANT: SDK sends CUMULATIVE text in content.text, not just delta
+            # We need to calculate the actual delta by comparing with previous text
 
             # Process chunk.contents for reasoning - SINGLE CHECK to avoid duplicates
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
                     if is_reasoning_content(content) and content.text:
-                        # Yield reasoning delta as marker for frontend to parse
-                        reasoning_marker = f"__REASONING__{content.text}__END_REASONING__"
-                        yield reasoning_marker
-                        last_output_time = asyncio.get_event_loop().time()
-                        if chunk_count <= 10:  # Log first 10 reasoning chunks
-                            logger.info(f"[REASONING] #{chunk_count}: {content.text[:80]}...")
+                        # SDK sends cumulative text - calculate delta
+                        current_text = content.text
+                        if current_text.startswith(previous_reasoning_text):
+                            # Normal case: new text starts with previous text
+                            delta_text = current_text[len(previous_reasoning_text) :]
+                        else:
+                            # Edge case: completely new reasoning section
+                            delta_text = current_text
+
+                        # Update previous text for next comparison
+                        previous_reasoning_text = current_text
+
+                        # Only yield if there's actual new content
+                        if delta_text:
+                            reasoning_marker = f"__REASONING__{delta_text}__END_REASONING__"
+                            yield reasoning_marker
+                            last_output_time = asyncio.get_event_loop().time()
+                            if chunk_count <= 10:  # Log first 10 reasoning chunks
+                                logger.info(
+                                    f"[REASONING] #{chunk_count}: delta={delta_text[:50]}..."
+                                )
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
