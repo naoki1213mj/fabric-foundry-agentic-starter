@@ -120,11 +120,15 @@ const Chat: React.FC<ChatProps> = ({
 
   const throttledScrollChatToBottom = useMemo(
     () => throttle(() => {
-      if (chatMessageStreamEnd.current && autoScrollEnabled) {
+      if (!autoScrollEnabled) return;
+      // react-window の API を使用して正確にスクロール
+      if (listApiRef.current?.scrollToRow) {
+        listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "auto" });
+      } else if (chatMessageStreamEnd.current) {
         chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
       }
-    }, 500),
-    [autoScrollEnabled]
+    }, 200),
+    [autoScrollEnabled, scrollTargetIndex]
   );
 
   // Handle user scroll - disable auto-scroll when user scrolls up
@@ -324,6 +328,21 @@ const Chat: React.FC<ChatProps> = ({
       scrollChatToBottom();
     }
   }, [generatingResponse, scrollChatToBottom]);
+
+  // メッセージ追加時に最下部へスクロール（自動スクロール有効時のみ）
+  const prevMessagesLengthRef = useRef(messages.length);
+  useEffect(() => {
+    const prevLength = prevMessagesLengthRef.current;
+    prevMessagesLengthRef.current = messages.length;
+
+    // メッセージが増えた場合のみスクロール
+    if (messages.length > prevLength && autoScrollEnabledRef.current) {
+      // 少し遅延させて react-window の再レンダリング後にスクロール
+      requestAnimationFrame(() => {
+        throttledScrollChatToBottom();
+      });
+    }
+  }, [messages.length, throttledScrollChatToBottom]);
 
   const setUserMessage = useCallback((value: string) => {
     dispatch(setUserMessageAction(value));
