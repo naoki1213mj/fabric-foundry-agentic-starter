@@ -157,11 +157,25 @@ const Chat: React.FC<ChatProps> = ({
 
   // Effects
   // Abort ongoing request when conversation changes (intentionally omit generatingResponse/isStreamingInProgress)
+  // Track previous conversation ID to detect actual conversation switches vs. ID updates
+  const prevConversationIdRef = useRef<string | null>(null);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    // Clear tool events and reasoning content when switching conversations
-    setToolEvents([]);
-    setReasoningContent([]);
+    // Only clear tool events and reasoning content when switching to a DIFFERENT conversation
+    // Not when the ID is updated for the SAME conversation (e.g., after saveToDB assigns an ID)
+    const isActualConversationSwitch = prevConversationIdRef.current !== null &&
+      prevConversationIdRef.current !== selectedConversationId;
+
+    if (isActualConversationSwitch) {
+      // Clear tool events and reasoning content when switching conversations
+      setToolEvents([]);
+      setReasoningContent([]);
+    }
+
+    // Update the previous ID reference
+    prevConversationIdRef.current = selectedConversationId;
+
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
       if (chatAPISignal) {

@@ -292,7 +292,10 @@ async def stream_with_tool_events(agent_stream):
         yield KEEPALIVE_MARKER
         last_output_time = asyncio.get_event_loop().time()
 
+        chunk_count = 0
         async for chunk in agent_stream:
+            chunk_count += 1
+
             # First, drain any pending tool events
             events = await drain_tool_events(queue)
             for event in events:
@@ -303,6 +306,13 @@ async def stream_with_tool_events(agent_stream):
             keepalive = await keepalive_check()
             if keepalive:
                 yield keepalive
+
+            # Log chunk structure for debugging (first few chunks only)
+            if chunk_count <= 3:
+                chunk_attrs = [a for a in dir(chunk) if not a.startswith("_")]
+                logger.info(f"Chunk #{chunk_count} attrs: {chunk_attrs}")
+                if hasattr(chunk, "contents"):
+                    logger.info(f"Chunk #{chunk_count} contents: {chunk.contents}")
 
             # Handle reasoning content (GPT-5 thinking)
             # Agent framework Content objects have type="text_reasoning" for reasoning content
