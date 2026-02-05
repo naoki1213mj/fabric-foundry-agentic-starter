@@ -7,6 +7,7 @@ import { ChartDataResponse, ChatMessage as ChatMessageType } from '../../types/A
 import Citations from '../Citations/Citations';
 import { ChartLoadingSkeleton, StreamingChartIndicator } from './ChartMessage';
 import { CopyButton } from './CopyButton';
+import { MessageReactions } from './MessageReactions';
 import {
     containsHtml,
     extractChartsFromText,
@@ -178,6 +179,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
     <div className="assistant-message">
       <div className="message-header">
         <CopyButton text={plainTextForCopy} className="assistant-copy-button" />
+        <MessageReactions messageId={message.id} />
       </div>
 
       {hasHTML ? (

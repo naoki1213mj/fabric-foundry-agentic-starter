@@ -1,9 +1,9 @@
-import { Spinner, SpinnerSize } from "@fluentui/react";
 import { Body1, Subtitle2 } from "@fluentui/react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
+import { MessageSkeleton, ThinkingSkeleton } from "../SkeletonLoader";
 import { ToolStatusIndicator } from "../ToolStatusIndicator";
 
 interface ChatMessageListProps {
@@ -37,19 +37,12 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
   return (
     <div className="chat-messages">
-      {/* Loading spinner while fetching messages */}
+      {/* Loading skeleton while fetching messages */}
       {Boolean(isFetchingMessages) && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          minHeight: '300px'
-        }}>
-          <Spinner
-            size={SpinnerSize.medium}
-            aria-label={t("loading.fetchingMessages")}
-          />
+        <div className="loading-messages-skeleton">
+          <MessageSkeleton />
+          <MessageSkeleton isUser />
+          <MessageSkeleton />
         </div>
       )}
 
@@ -91,14 +84,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
       {/* Loading indicator for generating response or chart */}
       {((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) && (
-        <div className="assistant-message loading-indicator">
-          <div className="typing-indicator">
-            <span className="generating-text">{isChartLoading ? t("chat.generatingChart") : t("chat.generating")} </span>
-            <span className="dot"></span>
-            <span className="dot"></span>
-            <span className="dot"></span>
-          </div>
-        </div>
+        <ThinkingSkeleton />
       )}
 
       {/* Scroll anchor */}

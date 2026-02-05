@@ -110,6 +110,34 @@ body {
   height: 20px;
 }
 
+/* === Language Toggle Button === */
+.lang-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lang-toggle-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+.lang-toggle-btn:active {
+  transform: scale(0.95);
+}
+
 /* === Answer Disclaimer === */
 .answerDisclaimer {
   font-size: 11px;

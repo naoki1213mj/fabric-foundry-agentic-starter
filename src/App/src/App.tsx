@@ -14,6 +14,7 @@ import { ChatHistoryPanel } from "./components/ChatHistoryPanel/ChatHistoryPanel
 import CitationPanel from "./components/CitationPanel/CitationPanel";
 import CustomSpinner from "./components/CustomSpinner/CustomSpinner";
 import { AppLogo } from "./components/Svg/Svg";
+import { changeLanguage, getCurrentLanguage } from "./i18n";
 import { fetchUserInfo, setSelectedConversationId, startNewConversation } from "./store/appSlice";
 import {
     deleteAllConversations,
@@ -80,6 +81,11 @@ const Dashboard: React.FC = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
+  // Language state
+  const [currentLang, setCurrentLang] = useState<"ja" | "en">(() => {
+    return getCurrentLanguage() as "ja" | "en";
+  });
+
   const [panelShowStates, setPanelShowStates] = useState<
     Record<string, boolean>
   >({ ...defaultPanelShowStates });
@@ -105,6 +111,12 @@ const Dashboard: React.FC = () => {
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev);
+  };
+
+  const toggleLanguage = () => {
+    const newLang = currentLang === "ja" ? "en" : "ja";
+    changeLanguage(newLang);
+    setCurrentLang(newLang);
   };
 
   const getUserInfoList = async () => {
@@ -265,6 +277,14 @@ const Dashboard: React.FC = () => {
           <span className="version-badge">
             v{APP_VERSION}
           </span>
+          <button
+            className="lang-toggle-btn"
+            onClick={toggleLanguage}
+            title={currentLang === "ja" ? "Switch to English" : "日本語に切替"}
+            aria-label={currentLang === "ja" ? "Switch to English" : "Switch to Japanese"}
+          >
+            {currentLang === "ja" ? "EN" : "日本語"}
+          </button>
           <button
             className="theme-toggle-btn"
             onClick={toggleTheme}

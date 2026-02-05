@@ -141,6 +141,20 @@ export const en = {
       copied: "Copied",
     },
 
+    // Reaction
+    reaction: {
+      helpful: "Helpful",
+      notHelpful: "Not helpful",
+      thanks: "Thanks for your feedback",
+    },
+
+    // Keyboard shortcuts
+    shortcuts: {
+      send: "Send (Enter)",
+      newChat: "New Chat (Ctrl+K)",
+      stop: "Stop (Esc)",
+    },
+
     // Citation
     citation: {
       references: "References",

@@ -141,6 +141,20 @@ export const ja = {
       copied: "コピーしました",
     },
 
+    // リアクション
+    reaction: {
+      helpful: "役に立った",
+      notHelpful: "役に立たなかった",
+      thanks: "フィードバックありがとうございます",
+    },
+
+    // キーボードショートカット
+    shortcuts: {
+      send: "送信 (Enter)",
+      newChat: "新規チャット (Ctrl+K)",
+      stop: "停止 (Esc)",
+    },
+
     // 引用
     citation: {
       references: "参考資料",

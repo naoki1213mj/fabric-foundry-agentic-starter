@@ -93,7 +93,7 @@ const Chat: React.FC<ChatProps> = ({
   }, []);
 
   // Use the custom API hook
-  const { sendChatMessage } = useChatAPI({
+  const { sendChatMessage, abortCurrentRequest } = useChatAPI({
     agentMode,
     reasoningEffort,
     onToolEvents: handleToolEvents,
@@ -160,10 +160,34 @@ const Chat: React.FC<ChatProps> = ({
     scrollChatToBottom();
   }, [generatingResponse, scrollChatToBottom]);
 
+  const setUserMessage = useCallback((value: string) => {
+    dispatch(setUserMessageAction(value));
+  }, [dispatch]);
+
+  const onNewConversation = useCallback(() => {
+    dispatch(startNewConversation());
+    dispatch(clearChat());
+    dispatch(clearCitation());
+  }, [dispatch]);
+
   // Event handlers
+  // Keyboard shortcuts: Enter=send, Ctrl+Enter=send, Ctrl+K=new chat, Esc=stop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // Ctrl+K: New conversation
+    if (e.ctrlKey && e.key === "k") {
+      e.preventDefault();
+      onNewConversation();
+      return;
+    }
+    // Escape: Stop generating
+    if (e.key === "Escape" && generatingResponse) {
+      e.preventDefault();
+      abortCurrentRequest();
+      return;
+    }
+    // Enter or Ctrl+Enter: Send message
+    if ((e.key === "Enter" && !e.shiftKey) || (e.ctrlKey && e.key === "Enter")) {
       e.preventDefault();
       if (isInputDisabled) {
         return;
@@ -175,7 +199,7 @@ const Chat: React.FC<ChatProps> = ({
         questionInputRef?.current.focus();
       }
     }
-  }, [isInputDisabled, userMessage, currentConversationId, sendChatMessage]);
+  }, [isInputDisabled, userMessage, currentConversationId, sendChatMessage, generatingResponse, abortCurrentRequest, onNewConversation]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const onClickSend = useCallback(() => {
@@ -189,16 +213,6 @@ const Chat: React.FC<ChatProps> = ({
       questionInputRef?.current.focus();
     }
   }, [isInputDisabled, userMessage, currentConversationId, sendChatMessage]);
-
-  const setUserMessage = useCallback((value: string) => {
-    dispatch(setUserMessageAction(value));
-  }, [dispatch]);
-
-  const onNewConversation = useCallback(() => {
-    dispatch(startNewConversation());
-    dispatch(clearChat());
-    dispatch(clearCitation());
-  }, [dispatch]);
 
   const handleToggleHistory = useCallback(() => {
     onHandlePanelStates(panels.CHATHISTORY);

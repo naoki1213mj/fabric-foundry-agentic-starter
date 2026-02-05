@@ -752,3 +752,11 @@
     --text-area-font: 1rem;
   }
 }
+
+/* === Loading Messages Skeleton === */
+.loading-messages-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
