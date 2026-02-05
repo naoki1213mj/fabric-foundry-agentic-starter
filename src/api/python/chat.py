@@ -128,9 +128,7 @@ _current_web_citations: list = []
 # Context variables for reasoning effort and model parameters (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
 _model_var: ContextVar[str] = ContextVar("model", default="gpt-5")
-_model_reasoning_effort_var: ContextVar[str] = ContextVar(
-    "model_reasoning_effort", default="medium"
-)
+_model_reasoning_effort_var: ContextVar[str] = ContextVar("model_reasoning_effort", default="medium")
 _reasoning_summary_var: ContextVar[str] = ContextVar("reasoning_summary", default="auto")
 _temperature_var: ContextVar[float] = ContextVar("temperature", default=0.7)
 
@@ -256,12 +254,18 @@ async def drain_tool_events(queue: asyncio.Queue) -> list:
     return events
 
 
+# Keepalive interval for long-running requests (prevent 230s App Service timeout)
+KEEPALIVE_INTERVAL_SECONDS = 15
+KEEPALIVE_MARKER = "__KEEPALIVE__"
+
+
 async def stream_with_tool_events(agent_stream):
     """
     Wrapper generator that interleaves tool events with agent stream chunks.
 
     This enables real-time tool status updates in the UI while the agent is processing.
     Also handles GPT-5 reasoning content (TextReasoningContent) for thinking visualization.
+    Includes keepalive messages to prevent Azure App Service 230s timeout.
     """
     queue = asyncio.Queue(maxsize=100)  # Limit queue size
     set_tool_event_queue(queue)
@@ -275,12 +279,33 @@ async def stream_with_tool_events(agent_stream):
         has_reasoning_support = False
         TextReasoningContent = None
 
+    last_output_time = asyncio.get_event_loop().time()
+
+    async def keepalive_check():
+        """Check if keepalive is needed and yield marker if so."""
+        nonlocal last_output_time
+        current_time = asyncio.get_event_loop().time()
+        if current_time - last_output_time >= KEEPALIVE_INTERVAL_SECONDS:
+            last_output_time = current_time
+            return KEEPALIVE_MARKER
+        return None
+
     try:
+        # Send initial keepalive to confirm stream is active
+        yield KEEPALIVE_MARKER
+        last_output_time = asyncio.get_event_loop().time()
+
         async for chunk in agent_stream:
             # First, drain any pending tool events
             events = await drain_tool_events(queue)
             for event in events:
                 yield event
+                last_output_time = asyncio.get_event_loop().time()
+
+            # Check if keepalive needed before processing chunk
+            keepalive = await keepalive_check()
+            if keepalive:
+                yield keepalive
 
             # Handle reasoning content (GPT-5 thinking)
             if has_reasoning_support and hasattr(chunk, "contents") and chunk.contents:
@@ -289,10 +314,12 @@ async def stream_with_tool_events(agent_stream):
                         # Send reasoning as a special marker that frontend can parse
                         reasoning_marker = f"__REASONING__{content.text}__END_REASONING__"
                         yield reasoning_marker
+                        last_output_time = asyncio.get_event_loop().time()
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
                 yield chunk.text
+                last_output_time = asyncio.get_event_loop().time()
     finally:
         # Drain any remaining events and clear queue
         events = await drain_tool_events(queue)

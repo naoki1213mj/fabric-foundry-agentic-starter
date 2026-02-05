@@ -25,6 +25,9 @@ import { clearChat, setMessages } from "./store/chatSlice";
 import { clearCitation } from "./store/citationSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 
+// Preload Chart.js for faster chart rendering (non-blocking)
+import("chart.js").catch(() => { /* ignore preload errors */ });
+
 // Application version for display
 const APP_VERSION = "2.7.0";
 // Build info (reserved for future use)

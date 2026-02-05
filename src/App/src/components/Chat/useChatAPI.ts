@@ -2,37 +2,37 @@ import { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { generateUUIDv4 } from "../../configs/Utils";
 import {
-    setSelectedConversationId,
+  setSelectedConversationId,
 } from "../../store/appSlice";
 import {
-    addNewConversation,
-    updateConversation,
+  addNewConversation,
+  updateConversation,
 } from "../../store/chatHistorySlice";
 import {
-    addMessages,
-    sendMessage,
-    setGeneratingResponse,
-    setStreamingFlag,
-    setUserMessage as setUserMessageAction,
-    updateMessageById,
+  addMessages,
+  sendMessage,
+  setGeneratingResponse,
+  setStreamingFlag,
+  setUserMessage as setUserMessageAction,
+  updateMessageById,
 } from "../../store/chatSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-    type AgentMode,
-    type ChartDataResponse,
-    type ChatMessage,
-    type Conversation,
-    type ConversationRequest,
-    type ModelReasoningEffort,
-    type ModelType,
-    type ParsedChunk,
-    type ReasoningEffort,
-    type ReasoningSummary,
-    type ToolEvent,
+  type AgentMode,
+  type ChartDataResponse,
+  type ChatMessage,
+  type Conversation,
+  type ConversationRequest,
+  type ModelReasoningEffort,
+  type ModelType,
+  type ParsedChunk,
+  type ReasoningEffort,
+  type ReasoningSummary,
+  type ToolEvent,
 } from "../../types/AppTypes";
 import {
-    isMalformedChartJSON,
-    parseChartContent,
+  isMalformedChartJSON,
+  parseChartContent,
 } from "../../utils/jsonUtils";
 import { isChartQuery, parseReasoningContent, parseToolEvents } from "./chatUtils";
 
@@ -172,12 +172,19 @@ export const useChatAPI = ({
     runningText: { value: string }
   ): Promise<boolean> => {
     let isChartResponseReceived = false;
+    const KEEPALIVE_MARKER = "__KEEPALIVE__";
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
       let text = new TextDecoder("utf-8").decode(value);
+
+      // Filter out keepalive markers (used to prevent App Service timeout)
+      if (text.includes(KEEPALIVE_MARKER)) {
+        text = text.replaceAll(KEEPALIVE_MARKER, "");
+        if (!text.trim()) continue; // Skip if only keepalive
+      }
 
       // Parse and extract tool events from the stream
       const { events: newToolEvents, cleanedText } = parseToolEvents(text);
