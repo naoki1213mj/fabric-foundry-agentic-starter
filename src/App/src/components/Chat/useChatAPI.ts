@@ -84,12 +84,12 @@ export const useChatAPI = ({
   const saveToDB = useCallback(async (
     newMessages: ChatMessage[],
     convId: string,
-    reqType: string = "Text"
+    reqType: string = "Text",
+    isNewConversation: boolean = false
   ) => {
     if (!convId || !newMessages.length) {
       return;
     }
-    const isNewConversation = reqType !== "graph" ? !selectedConversationId : false;
 
     try {
       const result = await dispatch(updateConversation({
@@ -114,7 +114,7 @@ export const useChatAPI = ({
     } finally {
       dispatch(setGeneratingResponse(false));
     }
-  }, [selectedConversationId, messages, dispatch]);
+  }, [messages, dispatch]);
 
   // Helper function to create and dispatch a message
   const createAndDispatchMessage = useCallback((
@@ -403,7 +403,9 @@ export const useChatAPI = ({
       }
 
       if (updatedMessages.length > 0 && updatedMessages[updatedMessages.length - 1]?.role !== ERROR) {
-        saveToDB(updatedMessages, conversationId, isChatReq);
+        // 新規会話かどうかは呼び出し時点で判定（クロージャの問題を回避）
+        const isNewConv = isChatReq !== "graph" && !selectedConversationId;
+        saveToDB(updatedMessages, conversationId, isChatReq, isNewConv);
       }
     } catch (e) {
       if (abortController.signal.aborted) {
@@ -411,7 +413,8 @@ export const useChatAPI = ({
           ? [newMessage, streamMessage]
           : [newMessage];
 
-        saveToDB(updatedMessages, conversationId, "error");
+        const isNewConv = !selectedConversationId;
+        saveToDB(updatedMessages, conversationId, "error", isNewConv);
       } else {
         // Network error or other failure - display error in chat UI
         const errorText = e instanceof Error
@@ -435,6 +438,7 @@ export const useChatAPI = ({
     temperature,
     modelReasoningEffort,
     reasoningSummary,
+    selectedConversationId,
     dispatch,
     scrollChatToBottom,
     onChartLoadingChange,

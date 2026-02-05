@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import type { Conversation, ChatMessage } from "../types/AppTypes";
-import { historyList, historyRead, historyDeleteAll, historyDelete, historyUpdate, historyRename } from "../api/api";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { historyDelete, historyDeleteAll, historyList, historyRead, historyRename, historyUpdate } from "../api/api";
+import type { ChatMessage, Conversation } from "../types/AppTypes";
 
 export interface ChatHistoryState {
   list: Conversation[];
