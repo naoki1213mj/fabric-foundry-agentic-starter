@@ -92,15 +92,15 @@ const Chat: React.FC<ChatProps> = ({
   );
 
   const scrollTargetIndex = useMemo(() => {
+    // virtualItems: messages + thinking (conditional) + anchor
+    // reasoning/tool は仮想化リストの外なのでカウントしない
     let count = messages.length;
-    if (reasoningContent) count += 1;
-    if (toolEvents.length > 0) count += 1;
     if ((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) {
-      count += 1;
+      count += 1; // thinking skeleton
     }
     count += 1; // anchor row
     return Math.max(0, count - 1);
-  }, [messages.length, reasoningContent, toolEvents.length, generatingResponse, isStreamingInProgress, isChartLoading]);
+  }, [messages.length, generatingResponse, isStreamingInProgress, isChartLoading]);
 
   // Scroll helpers - respect user scroll position
   const scrollChatToBottom = useCallback(() => {
