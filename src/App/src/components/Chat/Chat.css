@@ -639,6 +639,7 @@
 /* Settings row: compact dropdowns at bottom */
 .footer-settings-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: var(--spacing-md, 16px);
 }
@@ -648,6 +649,7 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
+  min-width: 180px;
 }
 
 .setting-label {
@@ -793,6 +795,22 @@
 
   .footer-input-row {
     flex-wrap: wrap;
+  }
+
+  .footer-settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .setting-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .setting-item .fui-Dropdown {
+    flex: 1;
+    min-width: unset;
   }
 
   .agent-mode-selector {
