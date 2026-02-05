@@ -50,6 +50,7 @@ const Chat: React.FC<ChatProps> = ({
   const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>("medium");
   const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>("auto");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
+  const [reasoningContent, setReasoningContent] = useState<string[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -99,8 +100,13 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, []);
 
+  // Reasoning content handler (GPT-5 thinking)
+  const handleReasoningContent = useCallback((content: string) => {
+    setReasoningContent((prev) => [...prev, content]);
+  }, []);
+
   // Use the custom API hook
-  const { sendChatMessage, abortCurrentRequest } = useChatAPI({
+  const { sendChatMessage: sendChatMessageRaw, abortCurrentRequest } = useChatAPI({
     agentMode,
     reasoningEffort,
     modelType,
@@ -108,10 +114,17 @@ const Chat: React.FC<ChatProps> = ({
     modelReasoningEffort,
     reasoningSummary,
     onToolEvents: handleToolEvents,
+    onReasoningContent: handleReasoningContent,
     onChartLoadingChange: setIsChartLoading,
     scrollChatToBottom,
     throttledScrollChatToBottom,
   });
+
+  // Wrap sendChatMessage to clear reasoning content on new query
+  const sendChatMessage = useCallback((question: string, conversationId: string) => {
+    setReasoningContent([]);  // Clear previous reasoning content
+    return sendChatMessageRaw(question, conversationId);
+  }, [sendChatMessageRaw]);
 
   // Citation parser - handles both legacy and new formats
   const parseCitationFromMessage = useCallback((citations: any) => {
@@ -146,8 +159,9 @@ const Chat: React.FC<ChatProps> = ({
   // Abort ongoing request when conversation changes (intentionally omit generatingResponse/isStreamingInProgress)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    // Clear tool events when switching conversations
+    // Clear tool events and reasoning content when switching conversations
     setToolEvents([]);
+    setReasoningContent([]);
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
       if (chatAPISignal) {
@@ -182,6 +196,7 @@ const Chat: React.FC<ChatProps> = ({
     dispatch(clearChat());
     dispatch(clearCitation());
     setToolEvents([]);  // Clear tool events when starting new conversation
+    setReasoningContent([]);  // Clear reasoning content when starting new conversation
   }, [dispatch]);
 
   // Event handlers
@@ -246,6 +261,7 @@ const Chat: React.FC<ChatProps> = ({
         isStreamingInProgress={isStreamingInProgress}
         isChartLoading={isChartLoading}
         toolEvents={toolEvents}
+        reasoningContent={reasoningContent}
         parseCitationFromMessage={parseCitationFromMessage}
         chatMessageStreamEndRef={chatMessageStreamEnd}
         onSendMessage={(question) => {

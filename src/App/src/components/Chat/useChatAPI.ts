@@ -34,7 +34,7 @@ import {
     isMalformedChartJSON,
     parseChartContent,
 } from "../../utils/jsonUtils";
-import { isChartQuery, parseToolEvents } from "./chatUtils";
+import { isChartQuery, parseReasoningContent, parseToolEvents } from "./chatUtils";
 
 const [ASSISTANT, ERROR, USER] = ["assistant", "error", "user"];
 
@@ -46,6 +46,7 @@ export interface UseChatAPIOptions {
   modelReasoningEffort: ModelReasoningEffort;
   reasoningSummary: ReasoningSummary;
   onToolEvents: (events: ToolEvent[]) => void;
+  onReasoningContent: (content: string) => void;
   onChartLoadingChange: (loading: boolean) => void;
   scrollChatToBottom: () => void;
   throttledScrollChatToBottom: () => void;
@@ -68,6 +69,7 @@ export const useChatAPI = ({
   modelReasoningEffort,
   reasoningSummary,
   onToolEvents,
+  onReasoningContent,
   onChartLoadingChange,
   scrollChatToBottom,
   throttledScrollChatToBottom,
@@ -182,6 +184,13 @@ export const useChatAPI = ({
       if (newToolEvents.length > 0) {
         onToolEvents(newToolEvents);
         text = cleanedText;
+      }
+
+      // Parse and extract reasoning content from the stream (GPT-5 thinking)
+      const { reasoning, cleanedText: textAfterReasoning } = parseReasoningContent(text);
+      if (reasoning.length > 0) {
+        reasoning.forEach((r) => onReasoningContent(r));
+        text = textAfterReasoning;
       }
 
       try {
@@ -414,6 +423,7 @@ export const useChatAPI = ({
     scrollChatToBottom,
     onChartLoadingChange,
     onToolEvents,
+    onReasoningContent,
     createAndDispatchMessage,
     saveToDB,
     t

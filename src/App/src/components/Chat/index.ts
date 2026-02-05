@@ -3,5 +3,5 @@ export { default } from "./Chat";
 export { ChatHeader } from "./ChatHeader";
 export { ChatInput } from "./ChatInput";
 export { ChatMessageList } from "./ChatMessageList";
-export { isChartQuery, parseToolEvents, throttle } from "./chatUtils";
+export { isChartQuery, parseReasoningContent, parseToolEvents, throttle } from "./chatUtils";
 export { useChatAPI } from "./useChatAPI";

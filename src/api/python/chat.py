@@ -128,7 +128,9 @@ _current_web_citations: list = []
 # Context variables for reasoning effort and model parameters (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
 _model_var: ContextVar[str] = ContextVar("model", default="gpt-5")
-_model_reasoning_effort_var: ContextVar[str] = ContextVar("model_reasoning_effort", default="medium")
+_model_reasoning_effort_var: ContextVar[str] = ContextVar(
+    "model_reasoning_effort", default="medium"
+)
 _reasoning_summary_var: ContextVar[str] = ContextVar("reasoning_summary", default="auto")
 _temperature_var: ContextVar[float] = ContextVar("temperature", default=0.7)
 
@@ -259,9 +261,19 @@ async def stream_with_tool_events(agent_stream):
     Wrapper generator that interleaves tool events with agent stream chunks.
 
     This enables real-time tool status updates in the UI while the agent is processing.
+    Also handles GPT-5 reasoning content (TextReasoningContent) for thinking visualization.
     """
     queue = asyncio.Queue(maxsize=100)  # Limit queue size
     set_tool_event_queue(queue)
+
+    # Try to import TextReasoningContent for GPT-5 reasoning support
+    try:
+        from agent_framework import TextReasoningContent
+
+        has_reasoning_support = True
+    except ImportError:
+        has_reasoning_support = False
+        TextReasoningContent = None
 
     try:
         async for chunk in agent_stream:
@@ -270,7 +282,15 @@ async def stream_with_tool_events(agent_stream):
             for event in events:
                 yield event
 
-            # Then yield the agent chunk
+            # Handle reasoning content (GPT-5 thinking)
+            if has_reasoning_support and hasattr(chunk, "contents") and chunk.contents:
+                for content in chunk.contents:
+                    if isinstance(content, TextReasoningContent) and content.text:
+                        # Send reasoning as a special marker that frontend can parse
+                        reasoning_marker = f"__REASONING__{content.text}__END_REASONING__"
+                        yield reasoning_marker
+
+            # Then yield the agent chunk text
             if chunk and chunk.text:
                 yield chunk.text
     finally:
@@ -1025,10 +1045,25 @@ async def stream_single_agent_response(
         # 2. Can call multiple tools and INTEGRATE results
         # 3. Fast and flexible
         # プロンプトは prompts/unified_agent.py から読み込み
+
+        # Build reasoning options for GPT-5 models
+        model_params = get_model_params()
+        reasoning_options = {}
+        if model_params["model"] == "gpt-5":
+            reasoning_opts = {}
+            if model_params["model_reasoning_effort"]:
+                reasoning_opts["effort"] = model_params["model_reasoning_effort"]
+            if model_params["reasoning_summary"] and model_params["reasoning_summary"] != "off":
+                reasoning_opts["summary"] = model_params["reasoning_summary"]
+            if reasoning_opts:
+                reasoning_options["reasoning"] = reasoning_opts
+                logger.info(f"GPT-5 reasoning options: {reasoning_opts}")
+
         agent = client.as_agent(
             name="unified_assistant",
             instructions=UNIFIED_AGENT_PROMPT,
             tools=all_tools,
+            additional_chat_options=reasoning_options if reasoning_options else None,
         )
 
         # Build the full prompt with conversation history for multi-turn support
@@ -1139,12 +1174,26 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
                 api_version=api_version,
             )
 
+        # Build reasoning options for GPT-5 models
+        model_params = get_model_params()
+        reasoning_options = {}
+        if model_params["model"] == "gpt-5":
+            reasoning_opts = {}
+            if model_params["model_reasoning_effort"]:
+                reasoning_opts["effort"] = model_params["model_reasoning_effort"]
+            if model_params["reasoning_summary"] and model_params["reasoning_summary"] != "off":
+                reasoning_opts["summary"] = model_params["reasoning_summary"]
+            if reasoning_opts:
+                reasoning_options["reasoning"] = reasoning_opts
+                logger.info(f"SQL-only GPT-5 reasoning options: {reasoning_opts}")
+
         # SQL-only agent - fastest mode
         # プロンプトは prompts/sql_agent.py から読み込み（簡易版）
         agent = client.as_agent(
             name="sql_analyst",
             instructions=SQL_AGENT_PROMPT_MINIMAL,
             tools=[run_sql_query],
+            additional_chat_options=reasoning_options if reasoning_options else None,
         )
 
         # Build the full prompt with conversation history for multi-turn support

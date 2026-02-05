@@ -21,6 +21,9 @@ export const throttle = <T extends (...args: Parameters<T>) => void>(
 // Tool event parsing: Extract tool events from streaming text
 const TOOL_EVENT_REGEX = /__TOOL_EVENT__(.*?)__END_TOOL_EVENT__/g;
 
+// Reasoning content parsing: Extract GPT-5 thinking content from streaming text
+const REASONING_REGEX = /__REASONING__([\s\S]*?)__END_REASONING__/g;
+
 /**
  * Parse tool events from streaming text and return cleaned text
  * @param text Raw streaming text containing potential tool events
@@ -48,6 +51,28 @@ export const parseToolEvents = (
   }
 
   return { events, cleanedText };
+};
+
+/**
+ * Parse reasoning content from streaming text and return cleaned text
+ * @param text Raw streaming text containing potential reasoning markers
+ * @returns { reasoning: string[], cleanedText: string }
+ */
+export const parseReasoningContent = (
+  text: string
+): { reasoning: string[]; cleanedText: string } => {
+  const reasoning: string[] = [];
+  let cleanedText = text;
+
+  const matches = Array.from(text.matchAll(REASONING_REGEX));
+  for (const match of matches) {
+    if (match[1]) {
+      reasoning.push(match[1]);
+      cleanedText = cleanedText.replace(match[0], "");
+    }
+  }
+
+  return { reasoning, cleanedText };
 };
 
 /**

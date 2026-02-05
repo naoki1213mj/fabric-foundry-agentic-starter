@@ -3,6 +3,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
+import { ReasoningIndicator } from "../ReasoningIndicator";
 import { MessageSkeleton, ThinkingSkeleton } from "../SkeletonLoader";
 import { SuggestedQuestions } from "../SuggestedQuestions/SuggestedQuestions";
 import { ToolStatusIndicator } from "../ToolStatusIndicator";
@@ -15,6 +16,7 @@ interface ChatMessageListProps {
   isStreamingInProgress: boolean;
   isChartLoading: boolean;
   toolEvents: ToolEvent[];
+  reasoningContent: string[];
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
   onSendMessage?: (message: string) => void;
@@ -33,6 +35,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   isStreamingInProgress,
   isChartLoading,
   toolEvents,
+  reasoningContent,
   parseCitationFromMessage,
   chatMessageStreamEndRef,
   onSendMessage,
@@ -85,6 +88,16 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             </div>
           );
         })}
+
+      {/* Reasoning indicator - GPT-5 thinking process */}
+      {reasoningContent.length > 0 && (
+        <div className="reasoning-status-wrapper">
+          <ReasoningIndicator
+            reasoningContent={reasoningContent}
+            isGenerating={generatingResponse}
+          />
+        </div>
+      )}
 
       {/* Tool status indicator - show during and after generation */}
       {toolEvents.length > 0 && (

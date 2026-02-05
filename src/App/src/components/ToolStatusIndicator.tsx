@@ -29,15 +29,27 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
         return Array.from(eventMap.values());
     }, [toolEvents]);
 
-    // 完了したツールのみ表示（startedは完了後は表示しない）
-    // 生成中は進行中のツールも表示
+    // すべてのツールを表示（生成完了後も表示を維持）
+    // 生成中: started, completed, error すべて表示
+    // 生成完了後: started は「完了」として表示、completed, error はそのまま表示
     const allTools = React.useMemo(() => {
         const completedTools = latestEvents.filter((e) => e.status === "completed");
         const errorTools = latestEvents.filter((e) => e.status === "error");
-        const inProgressTools = isGenerating
-            ? latestEvents.filter((e) => e.status === "started")
-            : [];
-        return [...inProgressTools, ...completedTools, ...errorTools];
+        const startedTools = latestEvents.filter((e) => e.status === "started");
+
+        if (isGenerating) {
+            // 生成中は進行中のツールも表示
+            return [...startedTools, ...completedTools, ...errorTools];
+        } else {
+            // 生成完了後: startedのままのツールは「完了」として扱う（completedイベントが来なかった場合の救済）
+            // ただし、すでにcompletedがあるツールは除外
+            const completedToolNames = new Set(completedTools.map(t => t.tool));
+            const errorToolNames = new Set(errorTools.map(t => t.tool));
+            const remainingStarted = startedTools.filter(
+                t => !completedToolNames.has(t.tool) && !errorToolNames.has(t.tool)
+            );
+            return [...remainingStarted, ...completedTools, ...errorTools];
+        }
     }, [latestEvents, isGenerating]);
 
     // カテゴリ別にグループ化（Hookは早期リターンの前に配置）
@@ -89,7 +101,8 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
                                     label: event.tool,
                                 };
                                 const isError = event.status === "error";
-                                const isInProgress = event.status === "started";
+                                // 生成中は進行中として表示、生成完了後は進行中も「完了」として表示
+                                const isInProgress = isGenerating && event.status === "started";
                                 return (
                                     <div
                                         key={event.tool}
