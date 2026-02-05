@@ -17,6 +17,7 @@ import {
     updateMessageById,
 } from "../../store/chatSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { store } from "../../store/store";
 import {
     type AgentMode,
     type ChartDataResponse,
@@ -81,9 +82,11 @@ export const useChatAPI = ({
   const abortFuncs = useRef<AbortController[]>([]);
 
   // Save to database helper
+  // allMessages: 呼び出し時点のRedux messagesを引数で渡す（クロージャのstale state問題を回避）
   const saveToDB = useCallback(async (
     newMessages: ChatMessage[],
     convId: string,
+    allMessages: ChatMessage[],
     reqType: string = "Text",
     isNewConversation: boolean = false
   ) => {
@@ -102,7 +105,7 @@ export const useChatAPI = ({
         const newConversation: Conversation = {
           id: resolvedConversationId,
           title: result?.data?.title,
-          messages: messages,
+          messages: allMessages,
           date: result?.data?.date,
           updatedAt: result?.data?.date,
         };
@@ -114,7 +117,7 @@ export const useChatAPI = ({
     } finally {
       dispatch(setGeneratingResponse(false));
     }
-  }, [messages, dispatch]);
+  }, [dispatch]);
 
   // Helper function to create and dispatch a message
   const createAndDispatchMessage = useCallback((
@@ -405,7 +408,9 @@ export const useChatAPI = ({
       if (updatedMessages.length > 0 && updatedMessages[updatedMessages.length - 1]?.role !== ERROR) {
         // 新規会話かどうかは呼び出し時点で判定（クロージャの問題を回避）
         const isNewConv = isChatReq !== "graph" && !selectedConversationId;
-        saveToDB(updatedMessages, conversationId, isChatReq, isNewConv);
+        // 最新のmessagesをReduxから取得して渡す（stale closure回避）
+        const latestMessages = store.getState().chat.messages;
+        saveToDB(updatedMessages, conversationId, latestMessages, isChatReq, isNewConv);
       }
     } catch (e) {
       if (abortController.signal.aborted) {
@@ -414,7 +419,8 @@ export const useChatAPI = ({
           : [newMessage];
 
         const isNewConv = !selectedConversationId;
-        saveToDB(updatedMessages, conversationId, "error", isNewConv);
+        const latestMessages = [...messages, ...updatedMessages];
+        saveToDB(updatedMessages, conversationId, latestMessages, "error", isNewConv);
       } else {
         // Network error or other failure - display error in chat UI
         const errorText = e instanceof Error
@@ -429,6 +435,7 @@ export const useChatAPI = ({
       onChartLoadingChange(false);
       abortController.abort();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- messages is intentionally excluded; we use store.getState() for latest state
   }, [
     generatingResponse,
     userMessage,

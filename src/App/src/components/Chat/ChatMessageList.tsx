@@ -3,11 +3,11 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { useTranslation } from "react-i18next";
 import { AutoSizer } from "react-virtualized-auto-sizer";
 import {
-  List,
-  useDynamicRowHeight,
-  type DynamicRowHeight,
-  type ListImperativeAPI,
-  type RowComponentProps,
+    List,
+    useDynamicRowHeight,
+    type DynamicRowHeight,
+    type ListImperativeAPI,
+    type RowComponentProps,
 } from "react-window";
 import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
@@ -22,6 +22,8 @@ interface ChatMessageListProps {
   hasMessages: boolean;
   totalMessagesCount: number;
   searchTerm: string;
+  conversationId?: string | null;
+  isHistoryPanelOpen?: boolean;
   generatingResponse: boolean;
   isStreamingInProgress: boolean;
   isChartLoading: boolean;
@@ -149,6 +151,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   hasMessages,
   totalMessagesCount,
   searchTerm,
+  conversationId,
+  isHistoryPanelOpen = false,
   generatingResponse,
   isStreamingInProgress,
   isChartLoading,
@@ -168,7 +172,12 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
   const internalListApiRef = useRef<ListImperativeAPI | null>(null);
   const listApiRef = listApiRefProp ?? internalListApiRef;
-  const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 120, key: messages.length });
+  const rowHeightKey = useMemo(() => {
+    const firstId = messages[0]?.id ?? "none";
+    const lastId = messages[messages.length - 1]?.id ?? "none";
+    return `${conversationId ?? "new"}:${messages.length}:${firstId}:${lastId}:${isHistoryPanelOpen ? "panel" : "full"}`;
+  }, [conversationId, messages, isHistoryPanelOpen]);
+  const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 120, key: rowHeightKey });
 
   const lastAssistantIndex = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i -= 1) {
@@ -301,6 +310,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             if (!height || !width) return null;
             return (
               <List
+                key={`message-list-${conversationId ?? "new"}`}
                 className="chat-messages"
                 style={{ height, width }}
                 rowCount={virtualItems.length}

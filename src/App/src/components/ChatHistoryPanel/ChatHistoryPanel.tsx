@@ -141,8 +141,10 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
         aria-label="chat history panel content"
         style={{
           display: "flex",
-          height: "calc(100% - 3rem)",
+          flex: 1,
+          minHeight: 0,
           position: "relative",
+          overflow: "hidden",
         }}
       >
         {clearing && (

@@ -134,9 +134,11 @@ const chatHistorySlice = createSlice({
           // Replace list for initial fetch
           state.list = conversations || [];
         } else {
-          // Append for pagination
+          // Append for pagination (with deduplication)
           if (conversations) {
-            state.list.push(...conversations);
+            const existingIds = new Set(state.list.map((c) => c.id));
+            const uniqueConversations = conversations.filter((c: Conversation) => !existingIds.has(c.id));
+            state.list.push(...uniqueConversations);
           }
         }
       }

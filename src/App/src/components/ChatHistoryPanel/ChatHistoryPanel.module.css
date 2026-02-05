@@ -3,9 +3,11 @@
   border-radius: var(--radius-lg, 16px);
   height: 100%;
   box-shadow: var(--shadow-lg);
-  overflow-y: hidden;
+  overflow-y: auto;
   border: 1px solid var(--color-bg-tertiary, #e2e8f0);
   transition: background-color 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .historyPanelTopRightButtons {
@@ -13,7 +15,9 @@
 }
 
 .chatHistoryListContainer {
-  height: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .chatHistoryHeader {
