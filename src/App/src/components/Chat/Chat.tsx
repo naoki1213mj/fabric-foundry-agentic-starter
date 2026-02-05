@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ListImperativeAPI } from "react-window";
 import {
   setSelectedConversationId,
   startNewConversation,
@@ -57,6 +58,8 @@ const Chat: React.FC<ChatProps> = ({
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const autoScrollEnabledRef = useRef(true);
+  const listApiRef = useRef<ListImperativeAPI | null>(null);
 
   // Memoized computed values
   const currentConversationId = useMemo(() =>
@@ -88,14 +91,32 @@ const Chat: React.FC<ChatProps> = ({
     [generatingResponse, userMessage]
   );
 
+  const scrollTargetIndex = useMemo(() => {
+    let count = messages.length;
+    if (reasoningContent) count += 1;
+    if (toolEvents.length > 0) count += 1;
+    if ((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) {
+      count += 1;
+    }
+    count += 1; // anchor row
+    return Math.max(0, count - 1);
+  }, [messages.length, reasoningContent, toolEvents.length, generatingResponse, isStreamingInProgress, isChartLoading]);
+
   // Scroll helpers - respect user scroll position
   const scrollChatToBottom = useCallback(() => {
-    if (chatMessageStreamEnd.current && autoScrollEnabled) {
+    if (!autoScrollEnabled) return;
+
+    if (listApiRef.current?.scrollToRow) {
+      listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "smooth" });
+      return;
+    }
+
+    if (chatMessageStreamEnd.current) {
       setTimeout(() => {
         chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, [autoScrollEnabled]);
+  }, [autoScrollEnabled, scrollTargetIndex]);
 
   const throttledScrollChatToBottom = useMemo(
     () => throttle(() => {
@@ -111,11 +132,15 @@ const Chat: React.FC<ChatProps> = ({
     if (!chatContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
-    setAutoScrollEnabled(isAtBottom);
+    if (autoScrollEnabledRef.current !== isAtBottom) {
+      autoScrollEnabledRef.current = isAtBottom;
+      setAutoScrollEnabled(isAtBottom);
+    }
   }, []);
 
   // Re-enable auto-scroll when new message is sent
   const enableAutoScroll = useCallback(() => {
+    autoScrollEnabledRef.current = true;
     setAutoScrollEnabled(true);
   }, []);
 
@@ -222,13 +247,13 @@ const Chat: React.FC<ChatProps> = ({
     const conversationIdFromUrl = getConversationIdFromUrl();
     const activeConversationId = selectedConversationId || generatedConversationId;
 
-    if (activeConversationId && conversationIdFromUrl !== activeConversationId && messages.length > 0) {
+    if (activeConversationId && conversationIdFromUrl !== activeConversationId) {
       updateUrlWithConversationId(activeConversationId);
     } else if (!activeConversationId && conversationIdFromUrl) {
       // Clear URL when no conversation
       updateUrlWithConversationId(null);
     }
-  }, [selectedConversationId, generatedConversationId, messages.length, getConversationIdFromUrl, updateUrlWithConversationId]);
+  }, [selectedConversationId, generatedConversationId, getConversationIdFromUrl, updateUrlWithConversationId]);
 
   useEffect(() => {
     // Only clear tool events and reasoning content when switching to a DIFFERENT conversation
@@ -271,11 +296,17 @@ const Chat: React.FC<ChatProps> = ({
       !isFetchingConvMessages &&
       chatMessageStreamEnd.current
     ) {
-      setTimeout(() => {
-        chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" });
-      }, 100);
+      if (autoScrollEnabledRef.current) {
+        if (listApiRef.current?.scrollToRow) {
+          listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "auto" });
+        } else {
+          setTimeout(() => {
+            chatMessageStreamEnd.current?.scrollIntoView({ behavior: "auto" });
+          }, 100);
+        }
+      }
     }
-  }, [isFetchingConvMessages]);
+  }, [isFetchingConvMessages, scrollTargetIndex]);
 
   useEffect(() => {
     scrollChatToBottom();
@@ -291,7 +322,9 @@ const Chat: React.FC<ChatProps> = ({
     dispatch(clearCitation());
     setToolEvents([]);  // Clear tool events when starting new conversation
     setReasoningContent("");  // Clear reasoning content when starting new conversation
-  }, [dispatch]);
+    updateUrlWithConversationId(null);
+    enableAutoScroll();
+  }, [dispatch, updateUrlWithConversationId, enableAutoScroll]);
 
   const handleEditUserMessage = useCallback((content: string) => {
     if (generatingResponse) return;
@@ -404,6 +437,7 @@ const Chat: React.FC<ChatProps> = ({
         reasoningContent={reasoningContent}
         parseCitationFromMessage={parseCitationFromMessage}
         chatMessageStreamEndRef={chatMessageStreamEnd}
+        listApiRef={listApiRef}
         containerRef={chatContainerRef}
         onScroll={handleScroll}
         onEditUserMessage={handleEditUserMessage}

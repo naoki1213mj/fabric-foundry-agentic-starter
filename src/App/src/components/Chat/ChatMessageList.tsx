@@ -1,6 +1,14 @@
 import { Body1, Subtitle2 } from "@fluentui/react-components";
-import React from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { AutoSizer } from "react-virtualized-auto-sizer";
+import {
+  List,
+  useDynamicRowHeight,
+  type DynamicRowHeight,
+  type ListImperativeAPI,
+  type RowComponentProps,
+} from "react-window";
 import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import { ReasoningIndicator } from "../ReasoningIndicator";
@@ -21,13 +29,34 @@ interface ChatMessageListProps {
   reasoningContent: string;  // Concatenated reasoning text (streaming delta)
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.MutableRefObject<HTMLDivElement | null>;
+  listApiRef?: React.MutableRefObject<ListImperativeAPI | null>;
   onScroll?: () => void;
   onSendMessage?: (message: string) => void;
   onEditUserMessage?: (content: string) => void;
   onResendUserMessage?: (content: string) => void;
   disabled?: boolean;
 }
+
+type VirtualItem =
+  | { type: "message"; message: ChatMessage; messageIndex: number }
+  | { type: "reasoning" }
+  | { type: "tool" }
+  | { type: "thinking" }
+  | { type: "anchor" };
+
+type ChatRowProps = {
+  items: VirtualItem[];
+  lastAssistantIndex: number;
+  generatingResponse: boolean;
+  parseCitationFromMessage: (citations: any) => any[];
+  onEditUserMessage?: (content: string) => void;
+  onResendUserMessage?: (content: string) => void;
+  reasoningContent: string;
+  toolEvents: ToolEvent[];
+  dynamicRowHeight: DynamicRowHeight;
+  chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
+};
 
 /**
  * Chat message list component
@@ -47,6 +76,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   parseCitationFromMessage,
   chatMessageStreamEndRef,
   containerRef,
+  listApiRef: listApiRefProp,
   onScroll,
   onSendMessage,
   onEditUserMessage,
@@ -55,96 +85,201 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  return (
-    <div
-      className="chat-messages"
-      ref={containerRef}
-      onScroll={onScroll}
-    >
-      {/* Loading skeleton while fetching messages */}
-      {Boolean(isFetchingMessages) && (
-        <div className="loading-messages-skeleton">
-          <MessageSkeleton />
-          <MessageSkeleton isUser />
-          <MessageSkeleton />
-        </div>
-      )}
+  const internalListApiRef = useRef<ListImperativeAPI | null>(null);
+  const listApiRef = listApiRefProp ?? internalListApiRef;
+  const dynamicRowHeight = useDynamicRowHeight({ defaultRowHeight: 120, key: messages.length });
 
-      {/* Empty state with suggested questions */}
-      {!isFetchingMessages && !hasMessages && (
-        <div className="initial-msg">
-          <h2>✨</h2>
-          <Subtitle2>{t("chat.startChatting")}</Subtitle2>
-          <Body1 style={{ textAlign: "center" }}>
-            {t("chat.landingText")}
-          </Body1>
-          {onSendMessage && (
-            <SuggestedQuestions
-              onSelectQuestion={onSendMessage}
-              disabled={disabled}
-            />
+  const lastAssistantIndex = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      if (messages[i].role === "assistant") return i;
+    }
+    return -1;
+  }, [messages]);
+
+  const virtualItems = useMemo<VirtualItem[]>(() => {
+    const items: VirtualItem[] = messages.map((message, messageIndex) => ({
+      type: "message",
+      message,
+      messageIndex,
+    }));
+
+    if (reasoningContent) items.push({ type: "reasoning" });
+    if (toolEvents.length > 0) items.push({ type: "tool" });
+    if ((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) {
+      items.push({ type: "thinking" });
+    }
+    items.push({ type: "anchor" });
+
+    return items;
+  }, [messages, reasoningContent, toolEvents.length, generatingResponse, isStreamingInProgress, isChartLoading]);
+
+  useEffect(() => {
+    if (!containerRef) return;
+    containerRef.current = listApiRef.current?.element ?? null;
+  }, [containerRef, listApiRef, messages.length]);
+
+  const Row = ({ index, style, ariaAttributes, ...rowProps }: RowComponentProps<ChatRowProps>): React.ReactElement | null => {
+    const {
+      items,
+      lastAssistantIndex,
+      generatingResponse,
+      parseCitationFromMessage,
+      onEditUserMessage,
+      onResendUserMessage,
+      reasoningContent,
+      toolEvents,
+      dynamicRowHeight,
+      chatMessageStreamEndRef,
+    } = rowProps;
+
+    const item = items[index];
+    const rowRef = useRef<HTMLDivElement | null>(null);
+
+    useLayoutEffect(() => {
+      if (!rowRef.current) return;
+      return dynamicRowHeight.observeRowElements([rowRef.current]);
+    }, [dynamicRowHeight]);
+
+    if (!item) return null;
+
+    if (item.type === "message") {
+      const isLastAssistantMessage = item.messageIndex === lastAssistantIndex;
+      const isStreaming = isLastAssistantMessage && generatingResponse;
+
+      return (
+        <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
+          <div ref={rowRef}>
+            <div className={`chat-message ${item.message.role}`}>
+              <ChatMessageComponent
+                message={item.message}
+                index={item.messageIndex}
+                isLastAssistantMessage={isLastAssistantMessage}
+                generatingResponse={isStreaming}
+                parseCitationFromMessage={parseCitationFromMessage}
+                onEditUserMessage={onEditUserMessage}
+                onResendUserMessage={onResendUserMessage}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ ...style, width: "100%" }}>
+        <div ref={rowRef}>
+          {item.type === "reasoning" && (
+            <div className="reasoning-status-wrapper">
+              <ReasoningIndicator
+                reasoningContent={reasoningContent}
+                isGenerating={generatingResponse}
+              />
+            </div>
+          )}
+
+          {item.type === "tool" && (
+            <div className="tool-status-wrapper">
+              <ToolStatusIndicator
+                toolEvents={toolEvents}
+                isGenerating={generatingResponse}
+              />
+            </div>
+          )}
+
+          {item.type === "thinking" && (
+            <ThinkingSkeleton />
           )}
         </div>
-      )}
+      </div>
+    );
+  };
 
-      {/* No results state when searching */}
-      {!isFetchingMessages && totalMessagesCount > 0 && messages.length === 0 && searchTerm.trim() && (
+  const rowProps = useMemo<ChatRowProps>(() => ({
+    items: virtualItems,
+    lastAssistantIndex,
+    generatingResponse,
+    parseCitationFromMessage,
+    onEditUserMessage,
+    onResendUserMessage,
+    reasoningContent,
+    toolEvents,
+    dynamicRowHeight,
+    chatMessageStreamEndRef,
+  }), [virtualItems, lastAssistantIndex, generatingResponse, parseCitationFromMessage, onEditUserMessage, onResendUserMessage, reasoningContent, toolEvents, dynamicRowHeight, chatMessageStreamEndRef]);
+
+  if (!hasMessages) {
+    return (
+      <div
+        className="chat-messages"
+        ref={containerRef}
+        onScroll={onScroll}
+      >
+        {/* Loading skeleton while fetching messages */}
+        {Boolean(isFetchingMessages) && (
+          <div className="loading-messages-skeleton">
+            <MessageSkeleton />
+            <MessageSkeleton isUser />
+            <MessageSkeleton />
+          </div>
+        )}
+
+        {/* Empty state with suggested questions */}
+        {!isFetchingMessages && (
+          <div className="initial-msg">
+            <h2>✨</h2>
+            <Subtitle2>{t("chat.startChatting")}</Subtitle2>
+            <Body1 style={{ textAlign: "center" }}>
+              {t("chat.landingText")}
+            </Body1>
+            {onSendMessage && (
+              <SuggestedQuestions
+                onSelectQuestion={onSendMessage}
+                disabled={disabled}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (!isFetchingMessages && totalMessagesCount > 0 && messages.length === 0 && searchTerm.trim()) {
+    return (
+      <div
+        className="chat-messages"
+        ref={containerRef}
+        onScroll={onScroll}
+      >
         <div className="initial-msg">
           <Subtitle2>{t("chat.noSearchResultsTitle")}</Subtitle2>
           <Body1 style={{ textAlign: "center" }}>
             {t("chat.noSearchResultsBody", { query: searchTerm })}
           </Body1>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Message list */}
-      {!isFetchingMessages &&
-        messages.map((msg, index) => {
-          const isLastAssistantMessage =
-            msg.role === "assistant" && index === messages.length - 1;
-
+  return (
+    <div style={{ height: "100%", width: "100%" }}>
+      <AutoSizer
+        renderProp={({ height, width }) => {
+          if (!height || !width) return null;
           return (
-            <div key={msg.id || index} className={`chat-message ${msg.role}`}>
-              <ChatMessageComponent
-                message={msg}
-                index={index}
-                isLastAssistantMessage={isLastAssistantMessage}
-                generatingResponse={generatingResponse}
-                parseCitationFromMessage={parseCitationFromMessage}
-                onEditUserMessage={onEditUserMessage}
-                onResendUserMessage={onResendUserMessage}
-              />
-            </div>
+            <List
+              className="chat-messages"
+              style={{ height, width }}
+              rowCount={virtualItems.length}
+              rowHeight={dynamicRowHeight}
+              rowComponent={Row}
+              rowProps={rowProps}
+              listRef={listApiRef}
+              overscanCount={3}
+              onScroll={() => onScroll?.()}
+            />
           );
-        })}
-
-      {/* Reasoning indicator - GPT-5 thinking process */}
-      {reasoningContent && (
-        <div className="reasoning-status-wrapper">
-          <ReasoningIndicator
-            reasoningContent={reasoningContent}
-            isGenerating={generatingResponse}
-          />
-        </div>
-      )}
-
-      {/* Tool status indicator - show during and after generation */}
-      {toolEvents.length > 0 && (
-        <div className="tool-status-wrapper">
-          <ToolStatusIndicator
-            toolEvents={toolEvents}
-            isGenerating={generatingResponse}
-          />
-        </div>
-      )}
-
-      {/* Loading indicator for generating response or chart */}
-      {((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) && (
-        <ThinkingSkeleton />
-      )}
-
-      {/* Scroll anchor */}
-      <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
+        }}
+      />
     </div>
   );
 };
