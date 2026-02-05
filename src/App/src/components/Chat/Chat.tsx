@@ -161,13 +161,24 @@ const Chat: React.FC<ChatProps> = ({
   // Abort ongoing request when conversation changes (intentionally omit generatingResponse/isStreamingInProgress)
   // Track previous conversation ID to detect actual conversation switches vs. ID updates
   const prevConversationIdRef = useRef<string | null>(null);
+  const prevGeneratedConversationIdRef = useRef<string | null>(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Only clear tool events and reasoning content when switching to a DIFFERENT conversation
     // Not when the ID is updated for the SAME conversation (e.g., after saveToDB assigns an ID)
-    const isActualConversationSwitch = prevConversationIdRef.current !== null &&
-      prevConversationIdRef.current !== selectedConversationId;
+    const prevSelectedId = prevConversationIdRef.current;
+    const prevGeneratedId = prevGeneratedConversationIdRef.current;
+
+    const isIdPromotion =
+      prevSelectedId === "" &&
+      selectedConversationId !== "" &&
+      prevGeneratedId === generatedConversationId;
+
+    const isActualConversationSwitch =
+      prevSelectedId !== null &&
+      prevSelectedId !== selectedConversationId &&
+      !isIdPromotion;
 
     if (isActualConversationSwitch) {
       // Clear tool events and reasoning content when switching conversations
@@ -175,8 +186,9 @@ const Chat: React.FC<ChatProps> = ({
       setReasoningContent("");
     }
 
-    // Update the previous ID reference
+    // Update the previous ID references
     prevConversationIdRef.current = selectedConversationId;
+    prevGeneratedConversationIdRef.current = generatedConversationId;
 
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
@@ -186,7 +198,7 @@ const Chat: React.FC<ChatProps> = ({
         );
       }
     }
-  }, [selectedConversationId]);
+  }, [selectedConversationId, generatedConversationId]);
 
   useEffect(() => {
     if (

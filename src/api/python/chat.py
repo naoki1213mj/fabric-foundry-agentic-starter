@@ -347,8 +347,20 @@ async def stream_with_tool_events(agent_stream):
                     if is_reasoning_content(content) and content.text:
                         # Log before accumulation
                         before_len = len(accumulated_reasoning_text)
-                        # Accumulate delta text
-                        accumulated_reasoning_text += content.text
+
+                        # Handle both delta and cumulative payloads safely
+                        # - If SDK sends cumulative text, replace
+                        # - If SDK sends delta, append
+                        # - If duplicate delta arrives, ignore
+                        if accumulated_reasoning_text and content.text.startswith(
+                            accumulated_reasoning_text
+                        ):
+                            accumulated_reasoning_text = content.text
+                        elif accumulated_reasoning_text.endswith(content.text):
+                            pass
+                        else:
+                            accumulated_reasoning_text += content.text
+
                         after_len = len(accumulated_reasoning_text)
 
                         logger.info(
