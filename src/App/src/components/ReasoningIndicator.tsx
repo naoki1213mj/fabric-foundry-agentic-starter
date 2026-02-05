@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "./ReasoningIndicator.css";
 
 interface ReasoningIndicatorProps {
-    reasoningContent: string[];
+    reasoningContent: string;  // Concatenated reasoning text (streaming delta)
     className?: string;
     isGenerating?: boolean;
 }
@@ -20,18 +20,15 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
     const [isExpanded, setIsExpanded] = useState(false); // デフォルトは折りたたみ
 
     // 推論内容がない場合は何も表示しない
-    if (reasoningContent.length === 0) {
+    if (!reasoningContent) {
         return null;
     }
 
-    // 全ての推論内容を結合
-    const combinedReasoning = reasoningContent.join("\n\n");
-
     // 表示用に最初の部分を取得
     const previewLength = 100;
-    const preview = combinedReasoning.length > previewLength
-        ? combinedReasoning.substring(0, previewLength) + "..."
-        : combinedReasoning;
+    const preview = reasoningContent.length > previewLength
+        ? reasoningContent.substring(0, previewLength) + "..."
+        : reasoningContent;
 
     return (
         <div className={`reasoning-status-container ${className}`}>
@@ -57,7 +54,7 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
             {/* 推論内容（展開時のみ） */}
             {isExpanded && (
                 <div className="reasoning-content">
-                    <pre className="reasoning-text">{combinedReasoning}</pre>
+                    <pre className="reasoning-text">{reasoningContent}</pre>
                 </div>
             )}
         </div>

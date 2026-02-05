@@ -50,7 +50,7 @@ const Chat: React.FC<ChatProps> = ({
   const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>("medium");
   const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>("auto");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
-  const [reasoningContent, setReasoningContent] = useState<string[]>([]);
+  const [reasoningContent, setReasoningContent] = useState<string>("");
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -100,9 +100,9 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, []);
 
-  // Reasoning content handler (GPT-5 thinking)
+  // Reasoning content handler (GPT-5 thinking) - concatenate streaming deltas
   const handleReasoningContent = useCallback((content: string) => {
-    setReasoningContent((prev) => [...prev, content]);
+    setReasoningContent((prev) => prev + content);
   }, []);
 
   // Use the custom API hook
@@ -122,7 +122,7 @@ const Chat: React.FC<ChatProps> = ({
 
   // Wrap sendChatMessage to clear reasoning content on new query
   const sendChatMessage = useCallback((question: string, conversationId: string) => {
-    setReasoningContent([]);  // Clear previous reasoning content
+    setReasoningContent("");  // Clear previous reasoning content
     return sendChatMessageRaw(question, conversationId);
   }, [sendChatMessageRaw]);
 
@@ -170,7 +170,7 @@ const Chat: React.FC<ChatProps> = ({
     if (isActualConversationSwitch) {
       // Clear tool events and reasoning content when switching conversations
       setToolEvents([]);
-      setReasoningContent([]);
+      setReasoningContent("");
     }
 
     // Update the previous ID reference
@@ -210,7 +210,7 @@ const Chat: React.FC<ChatProps> = ({
     dispatch(clearChat());
     dispatch(clearCitation());
     setToolEvents([]);  // Clear tool events when starting new conversation
-    setReasoningContent([]);  // Clear reasoning content when starting new conversation
+    setReasoningContent("");  // Clear reasoning content when starting new conversation
   }, [dispatch]);
 
   // Event handlers

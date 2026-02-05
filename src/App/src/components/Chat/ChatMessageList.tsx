@@ -16,7 +16,7 @@ interface ChatMessageListProps {
   isStreamingInProgress: boolean;
   isChartLoading: boolean;
   toolEvents: ToolEvent[];
-  reasoningContent: string[];
+  reasoningContent: string;  // Concatenated reasoning text (streaming delta)
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
   onSendMessage?: (message: string) => void;
@@ -90,7 +90,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         })}
 
       {/* Reasoning indicator - GPT-5 thinking process */}
-      {reasoningContent.length > 0 && (
+      {reasoningContent && (
         <div className="reasoning-status-wrapper">
           <ReasoningIndicator
             reasoningContent={reasoningContent}
