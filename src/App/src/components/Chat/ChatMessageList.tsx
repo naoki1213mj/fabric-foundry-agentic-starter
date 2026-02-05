@@ -285,7 +285,15 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   const hasReasoningOrTool = Boolean(reasoningContent) || toolEvents.length > 0;
 
   return (
-    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        flex: 1,
+        minHeight: 0,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* 仮想化されたメッセージリスト */}
       <div style={{ flex: 1, minHeight: 0 }}>
         <AutoSizer

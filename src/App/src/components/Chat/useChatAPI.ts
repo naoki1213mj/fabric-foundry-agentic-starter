@@ -98,15 +98,16 @@ export const useChatAPI = ({
       })).unwrap();
 
       if (isNewConversation && result?.success) {
+        const resolvedConversationId = result?.data?.conversation_id || convId;
         const newConversation: Conversation = {
-          id: result?.data?.conversation_id,
+          id: resolvedConversationId,
           title: result?.data?.title,
           messages: messages,
           date: result?.data?.date,
           updatedAt: result?.data?.date,
         };
         dispatch(addNewConversation(newConversation));
-        dispatch(setSelectedConversationId(result?.data?.conversation_id));
+        dispatch(setSelectedConversationId(resolvedConversationId));
       }
     } catch {
       // Error saving data to database

@@ -84,7 +84,15 @@ const chatHistorySlice = createSlice({
       state.list.push(...action.payload);
     },
     addNewConversation: (state, action: PayloadAction<Conversation>) => {
-      state.list.unshift(action.payload);
+      const incoming = action.payload;
+      const existingIndex = state.list.findIndex((item) => item.id === incoming.id);
+      if (existingIndex > -1) {
+        const merged = { ...state.list[existingIndex], ...incoming };
+        state.list.splice(existingIndex, 1);
+        state.list.unshift(merged);
+        return;
+      }
+      state.list.unshift(incoming);
     },
     updateConversationTitle: (state, action: PayloadAction<{ id: string; newTitle: string }>) => {
       const index = state.list.findIndex((obj) => obj.id === action.payload.id);
