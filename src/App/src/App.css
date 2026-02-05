@@ -21,7 +21,7 @@
 .main-container > div {
   border-radius: var(--radius-lg, 16px);
   overflow: hidden;
-  flex-shrink: 0;
+  flex-shrink: 1;
   box-sizing: border-box;
   min-width: 0;
 }
