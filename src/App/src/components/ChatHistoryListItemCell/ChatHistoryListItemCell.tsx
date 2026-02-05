@@ -2,7 +2,6 @@ import {
     DefaultButton,
     Dialog,
     DialogFooter,
-    DialogType,
     IconButton,
     ITextField,
     PrimaryButton,
@@ -23,6 +22,12 @@ import { setCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { Conversation } from "../../types/AppTypes";
 import styles from "./ChatHistoryListItemCell.module.css";
+import {
+    deleteDialogContentProps,
+    deleteDialogModalProps,
+    formatTimestamp,
+    truncateTitle,
+} from "./chatHistoryUtils";
 
 interface ChatHistoryListItemCellProps {
   item?: Conversation;
@@ -50,19 +55,6 @@ export const ChatHistoryListItemCell: React.FC<
   const [textFieldFocused, setTextFieldFocused] = useState(false);
   const textFieldRef = useRef<ITextField | null>(null);
   const isSelected = item?.id === selectedConversationId;
-  const dialogContentProps = {
-    type: DialogType.close,
-    title: "Are you sure you want to delete this item?",
-    closeButtonAriaLabel: "Close",
-    subText: "The history of this chat session will be permanently removed.",
-  };
-
-  const modalProps = {
-    titleAriaId: "labelId",
-    subtitleAriaId: "subTextId",
-    isBlocking: true,
-    styles: { main: { maxWidth: 450 } },
-  };
 
   useEffect(() => {
     if (textFieldFocused && textFieldRef.current) {
@@ -119,27 +111,7 @@ export const ChatHistoryListItemCell: React.FC<
     }
   };
 
-  const truncatedTitle =
-    item?.title?.length > 28
-      ? `${item.title.substring(0, 28)} ...`
-      : item.title;
-
-  // フォーマット済みタイムスタンプ
-  const formatTimestamp = (dateStr?: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-
-    if (isToday) {
-      // 今日なら時刻のみ
-      return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
-    }
-    // それ以外は日付と時刻
-    return date.toLocaleDateString("ja-JP", { month: "short", day: "numeric" }) + " " +
-           date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
-  };
-
+  const truncatedTitleText = truncateTitle(item?.title);
   const timestamp = formatTimestamp(item?.updatedAt || item?.date);
 
   const handleSaveEdit = async (e: any) => {
@@ -308,7 +280,7 @@ export const ChatHistoryListItemCell: React.FC<
           >
             <Stack verticalAlign={"center"} style={{ flex: 1, minWidth: 0 }}>
               <div className={`${styles.chatTitle} ${isSelected ? styles.selectedTitle : ""}`}>
-                {truncatedTitle}
+                {truncatedTitleText}
               </div>
               {timestamp && (
                 <div className={`${styles.chatTimestamp} ${isSelected ? styles.selectedTimestamp : ""}`}>
@@ -364,8 +336,8 @@ export const ChatHistoryListItemCell: React.FC<
       <Dialog
         hidden={hideDeleteDialog}
         onDismiss={toggleDeleteDialog}
-        dialogContentProps={dialogContentProps}
-        modalProps={modalProps}
+        dialogContentProps={deleteDialogContentProps}
+        modalProps={deleteDialogModalProps}
       >
         <DialogFooter>
           <PrimaryButton onClick={onDelete} text="Delete" />
