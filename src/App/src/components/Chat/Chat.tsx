@@ -168,6 +168,7 @@ const Chat: React.FC<ChatProps> = ({
     dispatch(startNewConversation());
     dispatch(clearChat());
     dispatch(clearCitation());
+    setToolEvents([]);  // Clear tool events when starting new conversation
   }, [dispatch]);
 
   // Event handlers

@@ -42,6 +42,20 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
   // Cache remarkPlugins array to prevent re-creation on every render
   const remarkPlugins = useMemo(() => [remarkGfm, supersub], []);
 
+  // Custom link component to open external links in new tab
+  const markdownComponents = useMemo(() => ({
+    a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    ),
+  }), []);
+
   const isStreaming = generatingResponse && isLastAssistantMessage;
   const hasChartJson = looksLikeChartJson(content);
 
@@ -63,7 +77,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
           hasHTML ? (
             <div dangerouslySetInnerHTML={{ __html: availableText }} className="html-content" />
           ) : (
-            <ReactMarkdown remarkPlugins={remarkPlugins} children={availableText} />
+            <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={availableText} />
           )
         )}
 
@@ -138,7 +152,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
           hasHTML ? (
             <div dangerouslySetInnerHTML={{ __html: textPart }} className="html-content" />
           ) : (
-            <ReactMarkdown remarkPlugins={remarkPlugins} children={textPart} />
+            <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={textPart} />
           )
         )}
 
@@ -185,7 +199,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
       {hasHTML ? (
         <div dangerouslySetInnerHTML={{ __html: content }} className="html-content" />
       ) : (
-        <ReactMarkdown remarkPlugins={remarkPlugins} children={content} />
+        <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={content} />
       )}
 
       {isLastAssistantMessage && generatingResponse ? (
