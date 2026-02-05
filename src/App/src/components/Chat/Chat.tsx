@@ -4,8 +4,10 @@ import {
     setSelectedConversationId,
     startNewConversation,
 } from "../../store/appSlice";
+import { fetchConversationMessages } from "../../store/chatHistorySlice";
 import {
     clearChat,
+    setMessages,
     setUserMessage as setUserMessageAction,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
@@ -245,6 +247,18 @@ const Chat: React.FC<ChatProps> = ({
     const conversationIdFromUrl = getConversationIdFromUrl();
     if (conversationIdFromUrl && !selectedConversationId) {
       dispatch(setSelectedConversationId(conversationIdFromUrl));
+      // Also fetch the messages for this conversation
+      dispatch(fetchConversationMessages(conversationIdFromUrl))
+        .unwrap()
+        .then((result) => {
+          if (result?.messages) {
+            dispatch(setMessages(result.messages));
+          }
+        })
+        .catch(() => {
+          // Conversation not found - clear URL and start fresh
+          updateUrlWithConversationId(null);
+        });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- Only run on mount
 
