@@ -1659,6 +1659,11 @@ async def stream_chat_request(
                 stream_func = multi_tool_wrapper
 
             # Stream and accumulate response
+            # Regex to extract REASONING markers that should be sent separately
+            REASONING_PATTERN = re.compile(
+                r"__REASONING_REPLACE__[\s\S]*?__END_REASONING_REPLACE__"
+            )
+
             async for chunk in stream_func(conversation_id, query):
                 if chunk:
                     chunk_str = str(chunk)
@@ -1673,26 +1678,35 @@ async def stream_chat_request(
                             yield f"__TOOL_EVENT__{tool_event_json}__END_TOOL_EVENT__\n\n"
                         continue  # Don't add to assistant_content
 
+                    # Check if this chunk contains REASONING markers
+                    if "__REASONING_REPLACE__" in chunk_str:
+                        # Send REASONING markers directly (not accumulated in JSON)
+                        yield chunk_str + "\n\n"
+                        continue  # Don't add to assistant_content
+
                     # Regular text chunk - accumulate and send
-                    assistant_content += chunk_str
-                    # Include web citations in the response for UI display (Bing terms of use)
-                    citations_json = (
-                        json.dumps(_current_web_citations) if _current_web_citations else None
-                    )
-                    response = {
-                        "choices": [
-                            {
-                                "messages": [
-                                    {
-                                        "role": "assistant",
-                                        "content": assistant_content,
-                                        "citations": citations_json,
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                    yield json.dumps(response, ensure_ascii=False) + "\n\n"
+                    # Also strip any REASONING markers that might be embedded
+                    clean_chunk = REASONING_PATTERN.sub("", chunk_str)
+                    if clean_chunk:
+                        assistant_content += clean_chunk
+                        # Include web citations in the response for UI display (Bing terms of use)
+                        citations_json = (
+                            json.dumps(_current_web_citations) if _current_web_citations else None
+                        )
+                        response = {
+                            "choices": [
+                                {
+                                    "messages": [
+                                        {
+                                            "role": "assistant",
+                                            "content": assistant_content,
+                                            "citations": citations_json,
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                        yield json.dumps(response, ensure_ascii=False) + "\n\n"
 
             # Fallback if no response
             if not assistant_content:
