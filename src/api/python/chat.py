@@ -310,9 +310,7 @@ async def stream_with_tool_events(agent_stream):
             # Log chunk structure for debugging (first few chunks only)
             if chunk_count <= 5:
                 chunk_attrs = [a for a in dir(chunk) if not a.startswith("_")]
-                logger.info(
-                    f"[DEBUG] Chunk #{chunk_count} type={type(chunk).__name__}, attrs={chunk_attrs}"
-                )
+                logger.info(f"[DEBUG] Chunk #{chunk_count} type={type(chunk).__name__}, attrs={chunk_attrs}")
                 # Log all attribute values for deeper inspection
                 for attr in ["text", "contents", "type", "role", "summary", "reasoning", "output"]:
                     if hasattr(chunk, attr):
@@ -339,9 +337,7 @@ async def stream_with_tool_events(agent_stream):
 
             # 2. Check for chunk.summary (Responses API reasoning summary)
             if hasattr(chunk, "summary") and chunk.summary:
-                for summary_item in (
-                    chunk.summary if isinstance(chunk.summary, list) else [chunk.summary]
-                ):
+                for summary_item in (chunk.summary if isinstance(chunk.summary, list) else [chunk.summary]):
                     summary_text = getattr(summary_item, "text", None) or str(summary_item)
                     if summary_text:
                         reasoning_marker = f"__REASONING__{summary_text}__END_REASONING__"
@@ -1149,7 +1145,7 @@ async def stream_single_agent_response(
             name="unified_assistant",
             instructions=UNIFIED_AGENT_PROMPT,
             tools=all_tools,
-            additional_chat_options=reasoning_options if reasoning_options else None,
+            default_options=reasoning_options if reasoning_options else None,
         )
 
         # Build the full prompt with conversation history for multi-turn support
@@ -1279,7 +1275,7 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
             name="sql_analyst",
             instructions=SQL_AGENT_PROMPT_MINIMAL,
             tools=[run_sql_query],
-            additional_chat_options=reasoning_options if reasoning_options else None,
+            default_options=reasoning_options if reasoning_options else None,
         )
 
         # Build the full prompt with conversation history for multi-turn support
