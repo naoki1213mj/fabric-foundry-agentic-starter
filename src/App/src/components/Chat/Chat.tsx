@@ -11,8 +11,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
     type AgentMode,
     type ReasoningEffort,
-    type ToolEvent,
-    ToolMessageContent,
+    type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
@@ -103,19 +102,31 @@ const Chat: React.FC<ChatProps> = ({
     throttledScrollChatToBottom,
   });
 
-  // Citation parser
-  const parseCitationFromMessage = useCallback((message: string) => {
-    try {
-      message = "{" + message;
-      const toolMessage = JSON.parse(message as string) as ToolMessageContent;
+  // Citation parser - handles both legacy and new formats
+  const parseCitationFromMessage = useCallback((citations: any) => {
+    if (!citations) return [];
 
-      if (toolMessage?.citations?.length) {
-        return toolMessage.citations.filter(
-          (c) => c.url?.trim() || c.title?.trim()
-        );
+    try {
+      // If citations is already an array, use it directly
+      if (Array.isArray(citations)) {
+        return citations.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+      }
+
+      // If citations is a JSON string, parse it
+      if (typeof citations === "string") {
+        // Try parsing as a JSON array (new format: "[{...}, {...}]")
+        const parsed = JSON.parse(citations);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+        }
+
+        // Legacy format: "citations": [...] inside a larger object
+        if (parsed?.citations && Array.isArray(parsed.citations)) {
+          return parsed.citations.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+        }
       }
     } catch {
-      // Error parsing tool content
+      // Error parsing citations
     }
     return [];
   }, []);

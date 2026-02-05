@@ -14,7 +14,7 @@ interface ChatMessageListProps {
   isStreamingInProgress: boolean;
   isChartLoading: boolean;
   toolEvents: ToolEvent[];
-  parseCitationFromMessage: (message: string) => any[];
+  parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
 }
 
