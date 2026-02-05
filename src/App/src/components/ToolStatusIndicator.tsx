@@ -7,6 +7,8 @@ interface ToolStatusIndicatorProps {
     toolEvents: ToolEvent[];
     className?: string;
     isGenerating?: boolean;
+    isExpanded?: boolean;
+    onToggle?: (expanded: boolean) => void;
 }
 
 /**
@@ -17,8 +19,19 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
     toolEvents,
     className = "",
     isGenerating = false,
+    isExpanded,
+    onToggle,
 }) => {
-    const [isExpanded, setIsExpanded] = useState(false); // デフォルトは折りたたみ
+    const [internalExpanded, setInternalExpanded] = useState(false); // デフォルトは折りたたみ
+    const expanded = isExpanded ?? internalExpanded;
+    const toggleExpanded = () => {
+        const next = !expanded;
+        if (onToggle) {
+            onToggle(next);
+        } else {
+            setInternalExpanded(next);
+        }
+    };
 
     // 最新の状態を取得（同じツールは最新のイベントのみ表示）
     const latestEvents = React.useMemo(() => {
@@ -76,12 +89,12 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
             {/* ヘッダー（折りたたみトグル） */}
             <button
                 className="tool-status-header"
-                onClick={() => setIsExpanded(!isExpanded)}
-                aria-expanded={isExpanded}
-                aria-label={isExpanded ? "ツール使用状況を折りたたむ" : "ツール使用状況を展開"}
+                onClick={toggleExpanded}
+                aria-expanded={expanded}
+                aria-label={expanded ? "ツール使用状況を折りたたむ" : "ツール使用状況を展開"}
             >
                 <span className="tool-status-toggle-icon">
-                    {isExpanded ? <ChevronDown12Regular /> : <ChevronRight12Regular />}
+                    {expanded ? <ChevronDown12Regular /> : <ChevronRight12Regular />}
                 </span>
                 <span className="tool-status-summary-text">
                     🛠️ {allTools.length}個のツールを{isGenerating ? "実行中" : "使用"}
@@ -90,7 +103,7 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
             </button>
 
             {/* ツールリスト（展開時のみ） */}
-            {isExpanded && (
+            {expanded && (
                 <div className="tool-status-list">
                     {Array.from(toolsByCategory.entries()).map(([category, tools]) => (
                         <div key={category} className="tool-category-group">

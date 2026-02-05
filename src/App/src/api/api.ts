@@ -61,7 +61,8 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
 
   try {
     const response = await httpClient.get(endpoint, {
-      params: { id: convId }
+      params: { id: convId },
+      retry: { retries: 2, retryDelayMs: 400 }
     });
 
     if (!response.ok) {
@@ -110,7 +111,8 @@ export const historyList = async (
 
   try {
     const response = await httpClient.get(endpoint, {
-      params: { offset, limit }
+      params: { offset, limit },
+      retry: { retries: 2, retryDelayMs: 400 }
     });
 
     if (!response.ok) {
@@ -284,7 +286,9 @@ export const fetchCitationContent = async (body: any) => {
   const endpoint = `/api/fetch-azure-search-content`;
 
   try {
-    const response = await httpClient.post(endpoint, body);
+    const response = await httpClient.post(endpoint, body, {
+      retry: { retries: 2, retryDelayMs: 400 }
+    });
 
     if (!response.ok) {
       // Handle error with new system and throw (maintaining current behavior)

@@ -6,6 +6,8 @@ interface ReasoningIndicatorProps {
     reasoningContent: string;  // Concatenated reasoning text (streaming delta)
     className?: string;
     isGenerating?: boolean;
+    isExpanded?: boolean;
+    onToggle?: (expanded: boolean) => void;
 }
 
 /**
@@ -16,8 +18,19 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
     reasoningContent,
     className = "",
     isGenerating = false,
+    isExpanded,
+    onToggle,
 }) => {
-    const [isExpanded, setIsExpanded] = useState(false); // デフォルトは折りたたみ
+    const [internalExpanded, setInternalExpanded] = useState(false); // デフォルトは折りたたみ
+    const expanded = isExpanded ?? internalExpanded;
+    const toggleExpanded = () => {
+        const next = !expanded;
+        if (onToggle) {
+            onToggle(next);
+        } else {
+            setInternalExpanded(next);
+        }
+    };
 
     // 推論内容がない場合は何も表示しない
     if (!reasoningContent) {
@@ -35,24 +48,24 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
             {/* ヘッダー（折りたたみトグル） */}
             <button
                 className="reasoning-status-header"
-                onClick={() => setIsExpanded(!isExpanded)}
-                aria-expanded={isExpanded}
-                aria-label={isExpanded ? "推論内容を折りたたむ" : "推論内容を展開"}
+                onClick={toggleExpanded}
+                aria-expanded={expanded}
+                aria-label={expanded ? "推論内容を折りたたむ" : "推論内容を展開"}
             >
                 <span className="reasoning-status-toggle-icon">
-                    {isExpanded ? <ChevronDown12Regular /> : <ChevronRight12Regular />}
+                    {expanded ? <ChevronDown12Regular /> : <ChevronRight12Regular />}
                 </span>
                 <span className="reasoning-status-summary-text">
                     🧠 GPT-5 推論プロセス
                     {isGenerating && <span className="reasoning-spinner">⏳ 思考中...</span>}
-                    {!isGenerating && !isExpanded && (
+                    {!isGenerating && !expanded && (
                         <span className="reasoning-preview"> - {preview}</span>
                     )}
                 </span>
             </button>
 
             {/* 推論内容（展開時のみ） */}
-            {isExpanded && (
+            {expanded && (
                 <div className="reasoning-content">
                     <pre className="reasoning-text">{reasoningContent}</pre>
                 </div>

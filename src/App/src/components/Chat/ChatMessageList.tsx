@@ -1,5 +1,5 @@
 import { Body1, Subtitle2 } from "@fluentui/react-components";
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AutoSizer } from "react-virtualized-auto-sizer";
 import {
@@ -56,7 +56,110 @@ type ChatRowProps = {
   toolEvents: ToolEvent[];
   dynamicRowHeight: DynamicRowHeight;
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
+  isReasoningExpanded: boolean;
+  onReasoningToggle: (expanded: boolean) => void;
+  isToolExpanded: boolean;
+  onToolToggle: (expanded: boolean) => void;
 };
+
+const ChatMessageRow = ({
+  index,
+  style,
+  ariaAttributes,
+  ...rowProps
+}: RowComponentProps<ChatRowProps>): React.ReactElement | null => {
+  const {
+    items,
+    lastAssistantIndex,
+    generatingResponse,
+    parseCitationFromMessage,
+    onEditUserMessage,
+    onResendUserMessage,
+    reasoningContent,
+    toolEvents,
+    dynamicRowHeight,
+    chatMessageStreamEndRef,
+    isReasoningExpanded,
+    onReasoningToggle,
+    isToolExpanded,
+    onToolToggle,
+  } = rowProps;
+
+  const item = items[index];
+  const rowRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (!rowRef.current) return;
+    return dynamicRowHeight.observeRowElements([rowRef.current]);
+  }, [dynamicRowHeight]);
+
+  if (!item) return null;
+
+  if (item.type === "message") {
+    const isLastAssistantMessage = item.messageIndex === lastAssistantIndex;
+    const isStreaming = isLastAssistantMessage && generatingResponse;
+
+    return (
+      <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
+        <div ref={rowRef}>
+          <div className={`chat-message ${item.message.role} ${generatingResponse ? "no-animate" : ""}`.trim()}>
+            <ChatMessageComponent
+              message={item.message}
+              index={item.messageIndex}
+              isLastAssistantMessage={isLastAssistantMessage}
+              generatingResponse={isStreaming}
+              parseCitationFromMessage={parseCitationFromMessage}
+              onEditUserMessage={onEditUserMessage}
+              onResendUserMessage={onResendUserMessage}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
+      <div ref={rowRef}>
+        {item.type === "reasoning" && (
+          <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+            <ReasoningIndicator
+              reasoningContent={reasoningContent}
+              isGenerating={generatingResponse}
+              isExpanded={isReasoningExpanded}
+              onToggle={onReasoningToggle}
+            />
+          </div>
+        )}
+
+        {item.type === "tool" && (
+          <div className={`tool-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+            <ToolStatusIndicator
+              toolEvents={toolEvents}
+              isGenerating={generatingResponse}
+              isExpanded={isToolExpanded}
+              onToggle={onToolToggle}
+            />
+          </div>
+        )}
+
+        {item.type === "thinking" && (
+          <ThinkingSkeleton />
+        )}
+
+        {item.type === "anchor" && (
+          <div style={{ height: 1 }}>
+            <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const MemoizedChatMessageRow = React.memo(ChatMessageRow) as (
+  props: RowComponentProps<ChatRowProps>
+) => React.ReactElement | null;
 
 /**
  * Chat message list component
@@ -118,87 +221,16 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     containerRef.current = listApiRef.current?.element ?? null;
   }, [containerRef, listApiRef, messages.length]);
 
-  const Row = ({ index, style, ariaAttributes, ...rowProps }: RowComponentProps<ChatRowProps>): React.ReactElement | null => {
-    const {
-      items,
-      lastAssistantIndex,
-      generatingResponse,
-      parseCitationFromMessage,
-      onEditUserMessage,
-      onResendUserMessage,
-      reasoningContent,
-      toolEvents,
-      dynamicRowHeight,
-      chatMessageStreamEndRef,
-    } = rowProps;
+  const [isReasoningExpanded, setIsReasoningExpanded] = useState(false);
+  const [isToolExpanded, setIsToolExpanded] = useState(false);
 
-    const item = items[index];
-    const rowRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!reasoningContent) setIsReasoningExpanded(false);
+  }, [reasoningContent]);
 
-    useLayoutEffect(() => {
-      if (!rowRef.current) return;
-      return dynamicRowHeight.observeRowElements([rowRef.current]);
-    }, [dynamicRowHeight]);
-
-    if (!item) return null;
-
-    if (item.type === "message") {
-      const isLastAssistantMessage = item.messageIndex === lastAssistantIndex;
-      const isStreaming = isLastAssistantMessage && generatingResponse;
-
-      return (
-        <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
-          <div ref={rowRef}>
-            <div className={`chat-message ${item.message.role}`}>
-              <ChatMessageComponent
-                message={item.message}
-                index={item.messageIndex}
-                isLastAssistantMessage={isLastAssistantMessage}
-                generatingResponse={isStreaming}
-                parseCitationFromMessage={parseCitationFromMessage}
-                onEditUserMessage={onEditUserMessage}
-                onResendUserMessage={onResendUserMessage}
-              />
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
-        <div ref={rowRef}>
-          {item.type === "reasoning" && (
-            <div className="reasoning-status-wrapper">
-              <ReasoningIndicator
-                reasoningContent={reasoningContent}
-                isGenerating={generatingResponse}
-              />
-            </div>
-          )}
-
-          {item.type === "tool" && (
-            <div className="tool-status-wrapper">
-              <ToolStatusIndicator
-                toolEvents={toolEvents}
-                isGenerating={generatingResponse}
-              />
-            </div>
-          )}
-
-          {item.type === "thinking" && (
-            <ThinkingSkeleton />
-          )}
-
-          {item.type === "anchor" && (
-            <div style={{ height: 1 }}>
-              <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
+  useEffect(() => {
+    if (toolEvents.length === 0) setIsToolExpanded(false);
+  }, [toolEvents.length]);
 
   const rowProps = useMemo<ChatRowProps>(() => ({
     items: virtualItems,
@@ -211,7 +243,11 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     toolEvents,
     dynamicRowHeight,
     chatMessageStreamEndRef,
-  }), [virtualItems, lastAssistantIndex, generatingResponse, parseCitationFromMessage, onEditUserMessage, onResendUserMessage, reasoningContent, toolEvents, dynamicRowHeight, chatMessageStreamEndRef]);
+    isReasoningExpanded,
+    onReasoningToggle: setIsReasoningExpanded,
+    isToolExpanded,
+    onToolToggle: setIsToolExpanded,
+  }), [virtualItems, lastAssistantIndex, generatingResponse, parseCitationFromMessage, onEditUserMessage, onResendUserMessage, reasoningContent, toolEvents, dynamicRowHeight, chatMessageStreamEndRef, isReasoningExpanded, isToolExpanded]);
 
   if (!hasMessages) {
     return (
@@ -277,7 +313,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               style={{ height, width }}
               rowCount={virtualItems.length}
               rowHeight={dynamicRowHeight}
-              rowComponent={Row}
+              rowComponent={MemoizedChatMessageRow}
               rowProps={rowProps}
               listRef={listApiRef}
               overscanCount={3}

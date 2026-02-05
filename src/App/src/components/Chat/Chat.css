@@ -506,6 +506,26 @@
   padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
   margin-bottom: var(--spacing-sm, 8px);
   animation: messageSlideIn 0.3s ease-out;
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* === Reasoning Status Wrapper === */
+.reasoning-status-wrapper {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  margin-bottom: var(--spacing-sm, 8px);
+  animation: messageSlideIn 0.3s ease-out;
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* Disable animations during streaming to reduce flicker */
+.chat-message.no-animate,
+.tool-status-wrapper.no-animate,
+.reasoning-status-wrapper.no-animate {
+  animation: none;
 }
 
 /* === Loading Indicator === */

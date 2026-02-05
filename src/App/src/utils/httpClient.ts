@@ -9,6 +9,12 @@ export interface RequestConfig extends RequestInit {
   params?: Record<string, string | number>;
   timeout?: number;
   skipErrorHandling?: boolean;
+  retry?: {
+    retries: number;
+    retryDelayMs: number;
+    retryOnStatuses?: number[];
+    retryOnNetworkError?: boolean;
+  };
 }
 
 export interface ApiResponse<T = any> {
@@ -113,6 +119,7 @@ class HttpClient {
       timeout,
       skipErrorHandling = false,
       headers = {},
+      retry,
       ...restConfig
     } = config;
 
@@ -157,37 +164,58 @@ class HttpClient {
       }
     }
 
-    try {
-      const response = await fetch(url, {
-        ...requestConfig,
-        signal,
-      });
+    const retryConfig = retry ?? { retries: 0, retryDelayMs: 0 };
+    const retryStatuses = retryConfig.retryOnStatuses ?? [429, 502, 503, 504];
+    const shouldRetryNetworkError = retryConfig.retryOnNetworkError ?? true;
 
-      if (timeoutId) clearTimeout(timeoutId);
+    let attempt = 0;
+    while (true) {
+      try {
+        const response = await fetch(url, {
+          ...requestConfig,
+          signal,
+        });
 
-      // Apply response interceptors
-      const interceptedResponse = await this.applyResponseInterceptors(response);
+        if (timeoutId) clearTimeout(timeoutId);
 
-      // Handle errors if not skipped
-      if (!interceptedResponse.ok && !skipErrorHandling) {
-        await ApiErrorHandler.handleApiError(interceptedResponse, endpoint);
-      }
+        // Apply response interceptors
+        const interceptedResponse = await this.applyResponseInterceptors(response);
 
-      return interceptedResponse;
-    } catch (error: any) {
-      if (timeoutId) clearTimeout(timeoutId);
+        if (!interceptedResponse.ok && retryConfig.retries > 0 && retryStatuses.includes(interceptedResponse.status) && attempt < retryConfig.retries) {
+          attempt += 1;
+          const backoff = retryConfig.retryDelayMs * Math.pow(2, attempt - 1);
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+          continue;
+        }
 
-      // Don't log abort errors
-      if (error.name === 'AbortError') {
+        // Handle errors if not skipped
+        if (!interceptedResponse.ok && !skipErrorHandling) {
+          await ApiErrorHandler.handleApiError(interceptedResponse, endpoint);
+        }
+
+        return interceptedResponse;
+      } catch (error: any) {
+        if (timeoutId) clearTimeout(timeoutId);
+
+        // Don't log abort errors
+        if (error.name === 'AbortError') {
+          throw error;
+        }
+
+        if (retryConfig.retries > 0 && shouldRetryNetworkError && attempt < retryConfig.retries) {
+          attempt += 1;
+          const backoff = retryConfig.retryDelayMs * Math.pow(2, attempt - 1);
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+          continue;
+        }
+
+        // Handle network errors
+        if (!skipErrorHandling) {
+          ApiErrorHandler.handleNetworkError(error, endpoint);
+        }
+
         throw error;
       }
-
-      // Handle network errors
-      if (!skipErrorHandling) {
-        ApiErrorHandler.handleNetworkError(error, endpoint);
-      }
-
-      throw error;
     }
   }
 
