@@ -310,7 +310,9 @@ async def stream_with_tool_events(agent_stream):
             # Log chunk structure for debugging (first few chunks only)
             if chunk_count <= 5:
                 chunk_attrs = [a for a in dir(chunk) if not a.startswith("_")]
-                logger.info(f"[DEBUG] Chunk #{chunk_count} type={type(chunk).__name__}, attrs={chunk_attrs}")
+                logger.info(
+                    f"[DEBUG] Chunk #{chunk_count} type={type(chunk).__name__}, attrs={chunk_attrs}"
+                )
                 # Log all attribute values for deeper inspection
                 for attr in ["text", "contents", "type", "role", "summary", "reasoning", "output"]:
                     if hasattr(chunk, attr):
@@ -319,57 +321,19 @@ async def stream_with_tool_events(agent_stream):
 
             # Handle reasoning content (GPT-5 thinking)
             # Responses API returns reasoning as output item with type="reasoning"
-            # Agent framework may expose this via contents or dedicated attributes
+            # Agent framework SDK converts these to Content with type="text_reasoning"
+            # Each chunk contains delta text, so we yield each piece for streaming display
 
-            # Check for reasoning in various possible locations
-            # 1. Check chunk.contents for reasoning type
-            if hasattr(chunk, "contents") and chunk.contents:
-                for content in chunk.contents:
-                    content_type = getattr(content, "type", "unknown")
-                    # Check for various reasoning content types
-                    if content_type in ("text_reasoning", "reasoning", "reasoning_summary"):
-                        text = getattr(content, "text", None) or getattr(content, "summary", None)
-                        if text:
-                            reasoning_marker = f"__REASONING__{text}__END_REASONING__"
-                            yield reasoning_marker
-                            last_output_time = asyncio.get_event_loop().time()
-                            logger.info(f"[REASONING] Found via contents: {text[:100]}...")
-
-            # 2. Check for chunk.summary (Responses API reasoning summary)
-            if hasattr(chunk, "summary") and chunk.summary:
-                for summary_item in (chunk.summary if isinstance(chunk.summary, list) else [chunk.summary]):
-                    summary_text = getattr(summary_item, "text", None) or str(summary_item)
-                    if summary_text:
-                        reasoning_marker = f"__REASONING__{summary_text}__END_REASONING__"
-                        yield reasoning_marker
-                        last_output_time = asyncio.get_event_loop().time()
-                        logger.info(f"[REASONING] Found via summary: {summary_text[:100]}...")
-
-            # 3. Check for reasoning attribute directly
-            if hasattr(chunk, "reasoning") and chunk.reasoning:
-                reasoning_text = str(chunk.reasoning)
-                reasoning_marker = f"__REASONING__{reasoning_text}__END_REASONING__"
-                yield reasoning_marker
-                last_output_time = asyncio.get_event_loop().time()
-                logger.info(f"[REASONING] Found via reasoning attr: {reasoning_text[:100]}...")
-
-            # Log content types for first 10 chunks with contents (reduced logging)
-            if chunk_count <= 10 and hasattr(chunk, "contents") and chunk.contents:
-                for content in chunk.contents:
-                    content_type = getattr(content, "type", "unknown")
-                    has_text = bool(getattr(content, "text", None))
-                    if content_type not in ("function_call",):  # Skip noisy function_call logs
-                        logger.info(f"[DEBUG] Content: type={content_type}, has_text={has_text}")
-
-            # Legacy check for text_reasoning (keep for compatibility)
+            # Process chunk.contents for reasoning - SINGLE CHECK to avoid duplicates
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
                     if is_reasoning_content(content) and content.text:
-                        # Send reasoning as a special marker that frontend can parse
+                        # Yield reasoning delta as marker for frontend to parse
                         reasoning_marker = f"__REASONING__{content.text}__END_REASONING__"
                         yield reasoning_marker
                         last_output_time = asyncio.get_event_loop().time()
-                        logger.info(f"Sent reasoning content: {content.text[:100]}...")
+                        if chunk_count <= 10:  # Log first 10 reasoning chunks
+                            logger.info(f"[REASONING] #{chunk_count}: {content.text[:80]}...")
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
