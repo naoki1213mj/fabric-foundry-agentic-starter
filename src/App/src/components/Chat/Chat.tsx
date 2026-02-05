@@ -10,6 +10,7 @@ import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
     type AgentMode,
+    type ModelReasoningEffort,
     type ModelType,
     type ReasoningEffort,
     type ToolEvent
@@ -45,6 +46,7 @@ const Chat: React.FC<ChatProps> = ({
   const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
   const [modelType, setModelType] = useState<ModelType>("gpt-5");
   const [temperature, setTemperature] = useState<number>(0.7);
+  const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>("medium");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
@@ -101,6 +103,7 @@ const Chat: React.FC<ChatProps> = ({
     reasoningEffort,
     modelType,
     temperature,
+    modelReasoningEffort,
     onToolEvents: handleToolEvents,
     onChartLoadingChange: setIsChartLoading,
     scrollChatToBottom,
@@ -266,6 +269,8 @@ const Chat: React.FC<ChatProps> = ({
         onModelTypeChange={setModelType}
         temperature={temperature}
         onTemperatureChange={setTemperature}
+        modelReasoningEffort={modelReasoningEffort}
+        onModelReasoningEffortChange={setModelReasoningEffort}
       />
     </div>
   );

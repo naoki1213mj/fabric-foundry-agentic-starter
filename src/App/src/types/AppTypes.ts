@@ -38,7 +38,11 @@ export type ChatMessage = {
 
 export type AgentMode = "sql_only" | "multi_tool" | "handoff" | "magentic";
 
+// Reasoning effort for Doc Search (Foundry IQ Agentic Retrieval)
 export type ReasoningEffort = "minimal" | "low" | "medium";
+
+// Reasoning effort for GPT-5 model (o1系の推論深度)
+export type ModelReasoningEffort = "low" | "medium" | "high";
 
 // Model types available for selection
 export type ModelType = "gpt-5" | "gpt-4o-mini";
@@ -46,8 +50,8 @@ export type ModelType = "gpt-5" | "gpt-4o-mini";
 // Model parameters that can be adjusted via UI
 export interface ModelParameters {
   model: ModelType;
-  temperature?: number;        // 0.0-2.0, for gpt-4o-mini
-  reasoningEffort?: ReasoningEffort; // for gpt-5
+  temperature?: number;              // 0.0-2.0, for gpt-4o-mini
+  modelReasoningEffort?: ModelReasoningEffort; // for gpt-5
 }
 
 export type ConversationRequest = {
@@ -57,6 +61,7 @@ export type ConversationRequest = {
   reasoningEffort?: ReasoningEffort;
   model?: ModelType;
   temperature?: number;
+  modelReasoningEffort?: ModelReasoningEffort;
 };
 
 export type AskResponse = {
