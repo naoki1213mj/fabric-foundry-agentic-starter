@@ -13,8 +13,8 @@ const chartTypes = {
 };
 
 // Get theme-aware colors for chart text
-const getChartColors = () => {
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+const getChartColors = (themeMode: string) => {
+  const isDarkMode = themeMode === "dark";
   return {
     textColor: isDarkMode ? '#f8fafc' : '#1e293b',
     gridColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(0, 0, 0, 0.1)',
@@ -61,6 +61,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<ChartJS | null>(null);
   const validChart = isValidChartConfig(chartContent);
+  const themeMode = document.documentElement.getAttribute("data-theme") || "light";
 
   // Memoize the chart data signature to prevent unnecessary re-renders
   const chartSignature = useMemo(() => getChartDataSignature(chartContent), [chartContent]);
@@ -83,7 +84,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   ChartJS.register(...registerables);
 
   // Get theme-aware colors
-  const colors = getChartColors();
+  const colors = getChartColors(themeMode);
 
   // Apply theme colors to all scales dynamically
   const themedScales: Record<string, any> = {};
@@ -206,7 +207,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       }
     };
   // Use chartSignature as dependency - chart only re-creates when actual data changes
-  }, [chartSignature, validChart, chartContent]);
+  }, [chartSignature, validChart, chartContent, themeMode]);
 
   return (
     <div style={{ maxHeight: 350 }}>
