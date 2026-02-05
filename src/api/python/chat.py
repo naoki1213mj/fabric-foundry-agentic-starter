@@ -125,8 +125,12 @@ _agentic_retrieval_tool: AgenticRetrievalTool | None = None
 # Global storage for web citations (per-request, for demo purposes)
 _current_web_citations: list = []
 
-# Context variable for reasoning effort (thread-safe, per-request scoped)
+# Context variables for reasoning effort and model parameters (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
+_model_var: ContextVar[str] = ContextVar("model", default="gpt-5")
+_model_reasoning_effort_var: ContextVar[str] = ContextVar("model_reasoning_effort", default="medium")
+_reasoning_summary_var: ContextVar[str] = ContextVar("reasoning_summary", default="auto")
+_temperature_var: ContextVar[float] = ContextVar("temperature", default=0.7)
 
 
 def get_web_agent_handler() -> WebAgentHandler:
@@ -161,6 +165,24 @@ def set_reasoning_effort(effort: str):
 def get_reasoning_effort() -> str:
     """Get the current reasoning effort setting (thread-safe via ContextVar)."""
     return _reasoning_effort_var.get()
+
+
+def set_model_params(model: str, reasoning_effort: str, reasoning_summary: str, temperature: float):
+    """Set model parameters for the current request (thread-safe via ContextVar)."""
+    _model_var.set(model)
+    _model_reasoning_effort_var.set(reasoning_effort)
+    _reasoning_summary_var.set(reasoning_summary)
+    _temperature_var.set(temperature)
+
+
+def get_model_params() -> dict:
+    """Get the current model parameters (thread-safe via ContextVar)."""
+    return {
+        "model": _model_var.get(),
+        "model_reasoning_effort": _model_reasoning_effort_var.get(),
+        "reasoning_summary": _reasoning_summary_var.get(),
+        "temperature": _temperature_var.get(),
+    }
 
 
 # ============================================================================
@@ -1607,6 +1629,17 @@ async def conversation(request: Request):
             reasoning_effort = "low"
         set_reasoning_effort(reasoning_effort)
         logger.info(f"Reasoning effort set to: {reasoning_effort}")
+
+        # Set model parameters for GPT-5 / GPT-4o-mini
+        model = request_json.get("model", "gpt-5")
+        model_reasoning_effort = request_json.get("model_reasoning_effort", "medium")
+        reasoning_summary = request_json.get("reasoning_summary", "auto")
+        temperature = float(request_json.get("temperature", 0.7))
+        set_model_params(model, model_reasoning_effort, reasoning_summary, temperature)
+        logger.info(
+            f"Model params set: model={model}, reasoning_effort={model_reasoning_effort}, "
+            f"reasoning_summary={reasoning_summary}, temperature={temperature}"
+        )
 
         # stream_chat_request returns an async generator, so we need to wrap it in StreamingResponse
         stream_generator = await stream_chat_request(conversation_id, query, user_id, agent_mode)

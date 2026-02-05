@@ -27,6 +27,7 @@ import {
     type ModelType,
     type ParsedChunk,
     type ReasoningEffort,
+    type ReasoningSummary,
     type ToolEvent,
 } from "../../types/AppTypes";
 import {
@@ -43,6 +44,7 @@ export interface UseChatAPIOptions {
   modelType: ModelType;
   temperature: number;
   modelReasoningEffort: ModelReasoningEffort;
+  reasoningSummary: ReasoningSummary;
   onToolEvents: (events: ToolEvent[]) => void;
   onChartLoadingChange: (loading: boolean) => void;
   scrollChatToBottom: () => void;
@@ -64,6 +66,7 @@ export const useChatAPI = ({
   modelType,
   temperature,
   modelReasoningEffort,
+  reasoningSummary,
   onToolEvents,
   onChartLoadingChange,
   scrollChatToBottom,
@@ -317,13 +320,14 @@ export const useChatAPI = ({
     abortFuncs.current.unshift(abortController);
 
     const request: ConversationRequest = {
-      id: conversationId,
-      query: userMessage,
+      id: conversationId || generateUUIDv4(),
+      query: question,
       agentMode: agentMode,
       reasoningEffort: reasoningEffort,
       model: modelType,
       temperature: modelType === "gpt-4o-mini" ? temperature : undefined,
       modelReasoningEffort: modelType === "gpt-5" ? modelReasoningEffort : undefined,
+      reasoningSummary: modelType === "gpt-5" && reasoningSummary !== "off" ? reasoningSummary : undefined,
     };
 
     const streamMessage: ChatMessage = {

@@ -9,7 +9,7 @@ import {
 import { ChatAdd24Regular } from "@fluentui/react-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import type { AgentMode, ModelReasoningEffort, ModelType, ReasoningEffort } from "../../types/AppTypes";
+import type { AgentMode, ModelReasoningEffort, ModelType, ReasoningEffort, ReasoningSummary } from "../../types/AppTypes";
 
 interface ChatInputProps {
   userMessage: string;
@@ -32,6 +32,8 @@ interface ChatInputProps {
   onTemperatureChange: (temp: number) => void;
   modelReasoningEffort: ModelReasoningEffort;
   onModelReasoningEffortChange: (effort: ModelReasoningEffort) => void;
+  reasoningSummary: ReasoningSummary;
+  onReasoningSummaryChange: (summary: ReasoningSummary) => void;
 }
 
 // Agent mode options
@@ -62,6 +64,14 @@ const modelReasoningOptions: { value: ModelReasoningEffort; label: string; descr
   { value: "high", label: "High", description: "深い推論・最高品質" },
 ];
 
+// Reasoning summary options for GPT-5 (思考プロセス表示)
+const reasoningSummaryOptions: { value: ReasoningSummary; label: string; description: string }[] = [
+  { value: "off", label: "Off", description: "思考過程を非表示" },
+  { value: "auto", label: "Auto", description: "自動判定" },
+  { value: "concise", label: "Concise", description: "簡潔に表示" },
+  { value: "detailed", label: "Detailed", description: "詳細に表示" },
+];
+
 /**
  * Chat input component with message input and agent settings
  */
@@ -84,6 +94,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onTemperatureChange,
   modelReasoningEffort,
   onModelReasoningEffortChange,
+  reasoningSummary,
+  onReasoningSummaryChange,
 }) => {
   const { t } = useTranslation();
 
@@ -194,6 +206,29 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               title="GPT-5の推論深度"
             >
               {modelReasoningOptions.map((option) => (
+                <Option key={option.value} value={option.value} text={option.label}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span style={{ fontWeight: 500 }}>{option.label}</span>
+                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  </div>
+                </Option>
+              ))}
+            </Dropdown>
+          </div>
+        )}
+        {modelType === "gpt-5" && (
+          <div className="setting-item">
+            <span className="setting-label" title="GPT-5の思考プロセス表示">💭 思考表示:</span>
+            <Dropdown
+              placeholder="思考表示"
+              value={reasoningSummaryOptions.find(opt => opt.value === reasoningSummary)?.label || "Auto"}
+              selectedOptions={[reasoningSummary]}
+              onOptionSelect={(_, data) => onReasoningSummaryChange(data.optionValue as ReasoningSummary)}
+              disabled={isInputDisabled}
+              style={{ minWidth: "130px" }}
+              title="GPT-5の思考プロセス表示"
+            >
+              {reasoningSummaryOptions.map((option) => (
                 <Option key={option.value} value={option.value} text={option.label}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontWeight: 500 }}>{option.label}</span>

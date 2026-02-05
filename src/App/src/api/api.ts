@@ -195,7 +195,12 @@ export async function callConversationApi(
       query: options.query,
       user_id: getUserId() || "anonymous",
       agent_mode: options.agentMode,
-      reasoning_effort: options.reasoningEffort || "low"
+      reasoning_effort: options.reasoningEffort || "low",
+      // Model parameters
+      model: options.model,
+      temperature: options.temperature,
+      model_reasoning_effort: options.modelReasoningEffort,
+      reasoning_summary: options.reasoningSummary,
     }, {
       signal: abortSignal
     });

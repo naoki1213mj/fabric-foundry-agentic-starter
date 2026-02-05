@@ -13,6 +13,7 @@ import {
     type ModelReasoningEffort,
     type ModelType,
     type ReasoningEffort,
+    type ReasoningSummary,
     type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
@@ -47,6 +48,7 @@ const Chat: React.FC<ChatProps> = ({
   const [modelType, setModelType] = useState<ModelType>("gpt-5");
   const [temperature, setTemperature] = useState<number>(0.7);
   const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>("medium");
+  const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>("auto");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
@@ -104,6 +106,7 @@ const Chat: React.FC<ChatProps> = ({
     modelType,
     temperature,
     modelReasoningEffort,
+    reasoningSummary,
     onToolEvents: handleToolEvents,
     onChartLoadingChange: setIsChartLoading,
     scrollChatToBottom,
@@ -271,6 +274,8 @@ const Chat: React.FC<ChatProps> = ({
         onTemperatureChange={setTemperature}
         modelReasoningEffort={modelReasoningEffort}
         onModelReasoningEffortChange={setModelReasoningEffort}
+        reasoningSummary={reasoningSummary}
+        onReasoningSummaryChange={setReasoningSummary}
       />
     </div>
   );

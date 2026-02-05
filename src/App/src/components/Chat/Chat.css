@@ -561,6 +561,17 @@
   width: 100%;
 }
 
+.html-content a {
+  color: var(--color-accent-primary, #0078d4);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.html-content a:hover {
+  color: var(--color-accent-primary-dark, #005a9e);
+  text-decoration: underline;
+}
+
 .html-content table {
   border-collapse: collapse;
   width: 100%;

@@ -44,6 +44,9 @@ export type ReasoningEffort = "minimal" | "low" | "medium";
 // Reasoning effort for GPT-5 model (o1系の推論深度)
 export type ModelReasoningEffort = "low" | "medium" | "high";
 
+// Reasoning summary for GPT-5 (思考プロセス表示)
+export type ReasoningSummary = "off" | "auto" | "concise" | "detailed";
+
 // Model types available for selection
 export type ModelType = "gpt-5" | "gpt-4o-mini";
 
@@ -52,6 +55,7 @@ export interface ModelParameters {
   model: ModelType;
   temperature?: number;              // 0.0-2.0, for gpt-4o-mini
   modelReasoningEffort?: ModelReasoningEffort; // for gpt-5
+  reasoningSummary?: ReasoningSummary; // for gpt-5 thinking process
 }
 
 export type ConversationRequest = {
@@ -62,6 +66,7 @@ export type ConversationRequest = {
   model?: ModelType;
   temperature?: number;
   modelReasoningEffort?: ModelReasoningEffort;
+  reasoningSummary?: ReasoningSummary;
 };
 
 export type AskResponse = {
