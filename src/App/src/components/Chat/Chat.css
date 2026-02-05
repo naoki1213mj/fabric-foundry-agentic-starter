@@ -528,6 +528,36 @@
   animation: none;
 }
 
+/* === Reasoning/Tool Footer (outside virtualized list) === */
+.reasoning-tool-footer {
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-light, #e0e0e0);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.reasoning-tool-footer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reasoning-tool-footer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reasoning-tool-footer::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+[data-theme="dark"] .reasoning-tool-footer {
+  background: var(--color-bg-secondary);
+  border-top-color: var(--color-border-dark, #333);
+}
+
+[data-theme="dark"] .reasoning-tool-footer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* === Loading Indicator === */
 .loading-indicator {
   padding: var(--spacing-md, 16px);

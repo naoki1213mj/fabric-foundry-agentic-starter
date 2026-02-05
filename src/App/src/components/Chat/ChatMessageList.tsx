@@ -121,28 +121,6 @@ const ChatMessageRow = ({
   return (
     <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
       <div ref={rowRef}>
-        {item.type === "reasoning" && (
-          <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
-            <ReasoningIndicator
-              reasoningContent={reasoningContent}
-              isGenerating={generatingResponse}
-              isExpanded={isReasoningExpanded}
-              onToggle={onReasoningToggle}
-            />
-          </div>
-        )}
-
-        {item.type === "tool" && (
-          <div className={`tool-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
-            <ToolStatusIndicator
-              toolEvents={toolEvents}
-              isGenerating={generatingResponse}
-              isExpanded={isToolExpanded}
-              onToggle={onToolToggle}
-            />
-          </div>
-        )}
-
         {item.type === "thinking" && (
           <ThinkingSkeleton />
         )}
@@ -206,15 +184,14 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
       messageIndex,
     }));
 
-    if (reasoningContent) items.push({ type: "reasoning" });
-    if (toolEvents.length > 0) items.push({ type: "tool" });
+    // reasoning/tool は仮想化リストの外に配置するため、ここでは追加しない
     if ((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) {
       items.push({ type: "thinking" });
     }
     items.push({ type: "anchor" });
 
     return items;
-  }, [messages, reasoningContent, toolEvents.length, generatingResponse, isStreamingInProgress, isChartLoading]);
+  }, [messages, generatingResponse, isStreamingInProgress, isChartLoading]);
 
   useEffect(() => {
     if (!containerRef) return;
@@ -302,26 +279,59 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     );
   }
 
+  // 推論/ツールの高さを考慮した残り高さを計算
+  const hasReasoningOrTool = Boolean(reasoningContent) || toolEvents.length > 0;
+
   return (
-    <div style={{ height: "100%", width: "100%" }}>
-      <AutoSizer
-        renderProp={({ height, width }) => {
-          if (!height || !width) return null;
-          return (
-            <List
-              className="chat-messages"
-              style={{ height, width }}
-              rowCount={virtualItems.length}
-              rowHeight={dynamicRowHeight}
-              rowComponent={MemoizedChatMessageRow}
-              rowProps={rowProps}
-              listRef={listApiRef}
-              overscanCount={3}
-              onScroll={() => onScroll?.()}
-            />
-          );
-        }}
-      />
+    <div style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+      {/* 仮想化されたメッセージリスト */}
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <AutoSizer
+          renderProp={({ height, width }) => {
+            if (!height || !width) return null;
+            return (
+              <List
+                className="chat-messages"
+                style={{ height, width }}
+                rowCount={virtualItems.length}
+                rowHeight={dynamicRowHeight}
+                rowComponent={MemoizedChatMessageRow}
+                rowProps={rowProps}
+                listRef={listApiRef}
+                overscanCount={3}
+                onScroll={() => onScroll?.()}
+              />
+            );
+          }}
+        />
+      </div>
+
+      {/* 推論/ツール表示は仮想化リストの外に配置 (重なり・スクロール問題を回避) */}
+      {hasReasoningOrTool && (
+        <div className="reasoning-tool-footer" style={{ flexShrink: 0, maxHeight: isReasoningExpanded || isToolExpanded ? "40vh" : "auto", overflowY: "auto", padding: "8px 16px" }}>
+          {reasoningContent && (
+            <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+              <ReasoningIndicator
+                reasoningContent={reasoningContent}
+                isGenerating={generatingResponse}
+                isExpanded={isReasoningExpanded}
+                onToggle={setIsReasoningExpanded}
+              />
+            </div>
+          )}
+          {toolEvents.length > 0 && (
+            <div className={`tool-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+              <ToolStatusIndicator
+                toolEvents={toolEvents}
+                isGenerating={generatingResponse}
+                isExpanded={isToolExpanded}
+                onToggle={setIsToolExpanded}
+              />
+            </div>
+          )}
+          <div ref={chatMessageStreamEndRef} />
+        </div>
+      )}
     </div>
   );
 };

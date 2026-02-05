@@ -64,4 +64,3 @@ def test_reasoning_tool_toggle_ui_regression(login_logout):
     except Exception as e:
         log_test_failure(start_time, e)
         raise
-
