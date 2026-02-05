@@ -100,10 +100,11 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, []);
 
-  // Reasoning content handler (GPT-5 thinking) - REPLACE with cumulative text from SDK
-  // SDK sends cumulative text (not delta), so we replace the state entirely
+  // Reasoning content handler (GPT-5 thinking) - REPLACE with cumulative text from backend
+  // Backend accumulates delta text and sends full cumulative text with throttling
+  // We just replace state directly - no need for frontend throttle since backend handles it
   const handleReasoningContent = useCallback((content: string) => {
-    setReasoningContent(content);  // Replace, don't append
+    setReasoningContent(content);  // Replace with accumulated text from backend
   }, []);
 
   // Use the custom API hook

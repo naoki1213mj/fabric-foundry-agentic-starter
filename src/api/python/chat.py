@@ -271,6 +271,11 @@ async def stream_with_tool_events(agent_stream):
 
     last_output_time = asyncio.get_event_loop().time()
 
+    # Accumulate reasoning text on backend (SDK sends deltas, not cumulative)
+    accumulated_reasoning_text = ""
+    last_reasoning_send_time = 0.0
+    REASONING_THROTTLE_MS = 100  # Send reasoning updates at most every 100ms
+
     async def keepalive_check():
         """Check if keepalive is needed and yield marker if so."""
         nonlocal last_output_time
@@ -283,6 +288,15 @@ async def stream_with_tool_events(agent_stream):
     def is_reasoning_content(content):
         """Check if content is GPT-5 reasoning content (type='text_reasoning')."""
         return hasattr(content, "type") and content.type == "text_reasoning"
+
+    def should_send_reasoning() -> bool:
+        """Check if enough time has passed to send reasoning update (throttle)."""
+        nonlocal last_reasoning_send_time
+        current_time = asyncio.get_event_loop().time() * 1000  # Convert to ms
+        if current_time - last_reasoning_send_time >= REASONING_THROTTLE_MS:
+            last_reasoning_send_time = current_time
+            return True
+        return False
 
     try:
         # Send initial keepalive to confirm stream is active
@@ -305,7 +319,7 @@ async def stream_with_tool_events(agent_stream):
                 yield keepalive
 
             # Log chunk structure for debugging (first few chunks only)
-            if chunk_count <= 5:
+            if chunk_count <= 3:
                 chunk_attrs = [a for a in dir(chunk) if not a.startswith("_")]
                 logger.info(
                     f"[DEBUG] Chunk #{chunk_count} type={type(chunk).__name__}, attrs={chunk_attrs}"
@@ -317,34 +331,42 @@ async def stream_with_tool_events(agent_stream):
                         logger.info(f"[DEBUG] Chunk #{chunk_count}.{attr} = {repr(val)[:200]}")
 
             # Handle reasoning content (GPT-5 thinking)
-            # Responses API returns reasoning as output item with type="reasoning"
-            # Agent framework SDK converts these to Content with type="text_reasoning"
-            # IMPORTANT: SDK sends CUMULATIVE text in content.text, not just delta
-            # We need to calculate the actual delta by comparing with previous text
-
-            # Process chunk.contents for reasoning - SINGLE CHECK to avoid duplicates
+            # SDK sends TRUE DELTAS in content.text (verified from SDK source code)
+            # We accumulate on backend and send with REPLACE marker (throttled)
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
                     if is_reasoning_content(content) and content.text:
-                        # SDK sends CUMULATIVE text in content.text (not delta)
-                        # Send it with a REPLACE marker so frontend replaces instead of appends
-                        # This handles the case where cumulative text format doesn't allow
-                        # simple prefix-based delta calculation
-                        reasoning_marker = (
-                            f"__REASONING_REPLACE__{content.text}__END_REASONING_REPLACE__"
-                        )
-                        yield reasoning_marker
-                        last_output_time = asyncio.get_event_loop().time()
-                        if chunk_count <= 5:  # Log first 5 reasoning chunks
+                        # Accumulate delta text
+                        accumulated_reasoning_text += content.text
+
+                        # Throttle: only send every REASONING_THROTTLE_MS
+                        if should_send_reasoning():
+                            reasoning_marker = (
+                                f"__REASONING_REPLACE__{accumulated_reasoning_text}"
+                                f"__END_REASONING_REPLACE__"
+                            )
+                            yield reasoning_marker
+                            last_output_time = asyncio.get_event_loop().time()
+
+                        if chunk_count <= 3:  # Log first 3 reasoning chunks
                             logger.info(
-                                f"[REASONING] #{chunk_count}: len={len(content.text)}, "
-                                f"text={repr(content.text[:80])}..."
+                                f"[REASONING] #{chunk_count}: delta={repr(content.text[:50])}, "
+                                f"accumulated_len={len(accumulated_reasoning_text)}"
                             )
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
                 yield chunk.text
                 last_output_time = asyncio.get_event_loop().time()
+
+        # Send final accumulated reasoning text (in case throttle didn't send the last update)
+        if accumulated_reasoning_text:
+            reasoning_marker = (
+                f"__REASONING_REPLACE__{accumulated_reasoning_text}__END_REASONING_REPLACE__"
+            )
+            yield reasoning_marker
+            logger.info(f"[REASONING] Final: total_len={len(accumulated_reasoning_text)}")
+
     finally:
         # Drain any remaining events and clear queue
         events = await drain_tool_events(queue)
