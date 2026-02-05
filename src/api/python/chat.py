@@ -335,9 +335,25 @@ async def stream_with_tool_events(agent_stream):
             # We accumulate on backend and send with REPLACE marker (throttled)
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
+                    # Log all content types for debugging
+                    content_type = getattr(content, "type", "unknown")
+                    content_text = getattr(content, "text", None)
+                    if chunk_count <= 5:
+                        text_preview = repr(content_text[:30]) if content_text else None
+                        logger.info(
+                            f"[CONTENT] #{chunk_count}: type={content_type}, text={text_preview}"
+                        )
+
                     if is_reasoning_content(content) and content.text:
+                        # Log before accumulation
+                        before_len = len(accumulated_reasoning_text)
                         # Accumulate delta text
                         accumulated_reasoning_text += content.text
+                        after_len = len(accumulated_reasoning_text)
+
+                        logger.info(
+                            f"[REASONING-ACCUM] before={before_len}, delta={len(content.text)}, after={after_len}"
+                        )
 
                         # Throttle: only send every REASONING_THROTTLE_MS
                         if should_send_reasoning():
@@ -345,14 +361,11 @@ async def stream_with_tool_events(agent_stream):
                                 f"__REASONING_REPLACE__{accumulated_reasoning_text}"
                                 f"__END_REASONING_REPLACE__"
                             )
+                            logger.info(
+                                f"[REASONING-SEND] sending len={len(accumulated_reasoning_text)}"
+                            )
                             yield reasoning_marker
                             last_output_time = asyncio.get_event_loop().time()
-
-                        if chunk_count <= 3:  # Log first 3 reasoning chunks
-                            logger.info(
-                                f"[REASONING] #{chunk_count}: delta={repr(content.text[:50])}, "
-                                f"accumulated_len={len(accumulated_reasoning_text)}"
-                            )
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
