@@ -128,7 +128,9 @@ _current_web_citations: list = []
 # Context variables for reasoning effort and model parameters (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
 _model_var: ContextVar[str] = ContextVar("model", default="gpt-5")
-_model_reasoning_effort_var: ContextVar[str] = ContextVar("model_reasoning_effort", default="medium")
+_model_reasoning_effort_var: ContextVar[str] = ContextVar(
+    "model_reasoning_effort", default="medium"
+)
 _reasoning_summary_var: ContextVar[str] = ContextVar("reasoning_summary", default="auto")
 _temperature_var: ContextVar[float] = ContextVar("temperature", default=0.7)
 
@@ -264,20 +266,11 @@ async def stream_with_tool_events(agent_stream):
     Wrapper generator that interleaves tool events with agent stream chunks.
 
     This enables real-time tool status updates in the UI while the agent is processing.
-    Also handles GPT-5 reasoning content (TextReasoningContent) for thinking visualization.
+    Also handles GPT-5 reasoning content (type="text_reasoning") for thinking visualization.
     Includes keepalive messages to prevent Azure App Service 230s timeout.
     """
     queue = asyncio.Queue(maxsize=100)  # Limit queue size
     set_tool_event_queue(queue)
-
-    # Try to import TextReasoningContent for GPT-5 reasoning support
-    try:
-        from agent_framework import TextReasoningContent
-
-        has_reasoning_support = True
-    except ImportError:
-        has_reasoning_support = False
-        TextReasoningContent = None
 
     last_output_time = asyncio.get_event_loop().time()
 
@@ -289,6 +282,10 @@ async def stream_with_tool_events(agent_stream):
             last_output_time = current_time
             return KEEPALIVE_MARKER
         return None
+
+    def is_reasoning_content(content):
+        """Check if content is GPT-5 reasoning content (type='text_reasoning')."""
+        return hasattr(content, "type") and content.type == "text_reasoning"
 
     try:
         # Send initial keepalive to confirm stream is active
@@ -308,13 +305,20 @@ async def stream_with_tool_events(agent_stream):
                 yield keepalive
 
             # Handle reasoning content (GPT-5 thinking)
-            if has_reasoning_support and hasattr(chunk, "contents") and chunk.contents:
+            # Agent framework Content objects have type="text_reasoning" for reasoning content
+            if hasattr(chunk, "contents") and chunk.contents:
+                logger.info(f"Chunk has contents: {len(chunk.contents)} items")
                 for content in chunk.contents:
-                    if isinstance(content, TextReasoningContent) and content.text:
+                    content_type = getattr(content, "type", "unknown")
+                    logger.info(
+                        f"Content type: {content_type}, has text: {bool(getattr(content, 'text', None))}"
+                    )
+                    if is_reasoning_content(content) and content.text:
                         # Send reasoning as a special marker that frontend can parse
                         reasoning_marker = f"__REASONING__{content.text}__END_REASONING__"
                         yield reasoning_marker
                         last_output_time = asyncio.get_event_loop().time()
+                        logger.info(f"Sent reasoning content: {content.text[:100]}...")
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
