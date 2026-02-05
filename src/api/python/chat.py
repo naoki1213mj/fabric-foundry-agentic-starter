@@ -168,6 +168,7 @@ def get_reasoning_effort() -> str:
 # Send real-time tool status updates to the frontend
 # ============================================================================
 
+
 def create_tool_event(tool_name: str, status: str, message: str | None = None) -> str:
     """
     Create a JSON-formatted tool event for streaming to frontend.
@@ -403,7 +404,9 @@ async def run_sql_query(
         logger.info(f"SQL query executed successfully, returned {len(result)} rows")
 
         # Emit tool completion event
-        await emit_tool_event("run_sql_query", "completed", f"{len(result)}件のデータを取得しました")
+        await emit_tool_event(
+            "run_sql_query", "completed", f"{len(result)}件のデータを取得しました"
+        )
         return json.dumps(result, ensure_ascii=False)
 
     except Exception as e:

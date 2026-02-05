@@ -65,7 +65,7 @@ class HttpClient {
    */
   private buildURL(endpoint: string, params?: Record<string, string | number>): string {
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`;
-    
+
     if (!params || Object.keys(params).length === 0) {
       return url;
     }
@@ -100,8 +100,11 @@ class HttpClient {
 
   /**
    * Core request method
+   * @param endpoint - API endpoint path
+   * @param config - Request configuration
+   * @returns Response object (caller handles JSON parsing if needed)
    */
-  private async request<T = any>(
+  private async request(
     endpoint: string,
     config: RequestConfig = {}
   ): Promise<Response> {
@@ -131,7 +134,7 @@ class HttpClient {
     // Setup timeout if specified
     let timeoutId: NodeJS.Timeout | undefined;
     const controller = new AbortController();
-    
+
     if (timeout) {
       timeoutId = setTimeout(() => controller.abort(), timeout);
     }
@@ -176,8 +179,8 @@ class HttpClient {
   /**
    * GET request
    */
-  async get<T = any>(endpoint: string, config?: RequestConfig): Promise<Response> {
-    return this.request<T>(endpoint, {
+  async get(endpoint: string, config?: RequestConfig): Promise<Response> {
+    return this.request(endpoint, {
       ...config,
       method: 'GET',
     });
@@ -186,8 +189,8 @@ class HttpClient {
   /**
    * POST request
    */
-  async post<T = any>(endpoint: string, data?: any, config?: RequestConfig): Promise<Response> {
-    return this.request<T>(endpoint, {
+  async post(endpoint: string, data?: unknown, config?: RequestConfig): Promise<Response> {
+    return this.request(endpoint, {
       ...config,
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
@@ -197,8 +200,8 @@ class HttpClient {
   /**
    * PUT request
    */
-  async put<T = any>(endpoint: string, data?: any, config?: RequestConfig): Promise<Response> {
-    return this.request<T>(endpoint, {
+  async put(endpoint: string, data?: unknown, config?: RequestConfig): Promise<Response> {
+    return this.request(endpoint, {
       ...config,
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
@@ -208,8 +211,8 @@ class HttpClient {
   /**
    * PATCH request
    */
-  async patch<T = any>(endpoint: string, data?: any, config?: RequestConfig): Promise<Response> {
-    return this.request<T>(endpoint, {
+  async patch(endpoint: string, data?: unknown, config?: RequestConfig): Promise<Response> {
+    return this.request(endpoint, {
       ...config,
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
@@ -219,8 +222,8 @@ class HttpClient {
   /**
    * DELETE request
    */
-  async delete<T = any>(endpoint: string, config?: RequestConfig): Promise<Response> {
-    return this.request<T>(endpoint, {
+  async delete(endpoint: string, config?: RequestConfig): Promise<Response> {
+    return this.request(endpoint, {
       ...config,
       method: 'DELETE',
     });

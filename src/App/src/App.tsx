@@ -26,8 +26,9 @@ import { useAppDispatch, useAppSelector } from "./store/hooks";
 
 // Application version for display
 const APP_VERSION = "2.7.0";
-const BUILD_DATE = "2026-02-03";
-const BUILD_INFO = "Modern UI/UX refresh with dark mode";
+// Build info (reserved for future use)
+// const BUILD_DATE = "2026-02-03";
+// const BUILD_INFO = "Modern UI/UX refresh with dark mode";
 
 // Theme icons
 const SunIcon = () => (
@@ -71,7 +72,6 @@ const Dashboard: React.FC = () => {
   const { appConfig } = useAppSelector((state) => state.app.config);
   const showAppSpinner = useAppSelector((state) => state.app.showAppSpinner);
   const citation = useAppSelector((state) => state.citation);
-  const fetchingConversations = useAppSelector((state) => state.chatHistory.fetchingConversations);
 
   // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -86,13 +86,11 @@ const Dashboard: React.FC = () => {
   const [panelWidths, setPanelWidths] = useState<Record<string, number>>({
     ...defaultSingleColumnConfig,
   });
-  const [layoutWidthUpdated, setLayoutWidthUpdated] = useState<boolean>(false);
   const [showClearAllConfirmationDialog, setChowClearAllConfirmationDialog] =
     useState(false);
   const [clearing, setClearing] = React.useState(false);
   const [clearingError, setClearingError] = React.useState(false);
   const [isInitialAPItriggered, setIsInitialAPItriggered] = useState(false);
-  const [showAuthMessage, setShowAuthMessage] = useState<boolean | undefined>();
   const [offset, setOffset] = useState<number>(0);
   const OFFSET_INCREMENT = 25;
   const [hasMoreRecords, setHasMoreRecords] = useState<boolean>(true);
@@ -110,25 +108,15 @@ const Dashboard: React.FC = () => {
   };
 
   const getUserInfoList = async () => {
-    const result = await dispatch(fetchUserInfo());
-    if (fetchUserInfo.fulfilled.match(result)) {
-      const userInfoList = result.payload;
-      if (
-        userInfoList.length === 0 &&
-        window.location.hostname !== "localhost" &&
-        window.location.hostname !== "127.0.0.1"
-      ) {
-        setShowAuthMessage(true);
-      } else {
-        setShowAuthMessage(false);
-      }
-    }
+    await dispatch(fetchUserInfo());
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     getUserInfoList();
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     dispatch(fetchUserInfo()).unwrap().then((res) => {
       const name: string = res[0]?.user_claims?.find((claim: any) => claim.typ === 'name')?.val ?? ''
@@ -172,13 +160,13 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     updateLayoutWidths(panelShowStates);
   }, [appConfig]);
 
   const onHandlePanelStates = (panelName: string) => {
     dispatch(clearCitation());
-    setLayoutWidthUpdated((prevFlag) => !prevFlag);
     const newState = {
       ...panelShowStates,
       [panelName]: !panelShowStates[panelName],
@@ -226,6 +214,7 @@ const Dashboard: React.FC = () => {
     setIsInitialAPItriggered(true);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isInitialAPItriggered && !isInitialFetchStarted.current) {
       (async () => {

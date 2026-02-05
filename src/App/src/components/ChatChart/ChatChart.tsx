@@ -65,11 +65,15 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   // Memoize the chart data signature to prevent unnecessary re-renders
   const chartSignature = useMemo(() => getChartDataSignature(chartContent), [chartContent]);
 
-useEffect(() => {
-  // Skip if chart data hasn't actually changed
-  if (!validChart || !chartRef.current || !chartContent.data || !chartContent?.type) {
-    return;
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Copy ref to local variable for cleanup
+    const chartRefCurrent = chartRef.current;
+
+    // Skip if chart data hasn't actually changed
+    if (!validChart || !chartRefCurrent || !chartContent.data || !chartContent?.type) {
+      return;
+    }
 
   // Destroy existing chart before creating new one
   if (chartInstanceRef.current) {
@@ -177,28 +181,25 @@ useEffect(() => {
       }
     }
 
-    const myChart = new ChartJS(chartRef.current, chartConfigData);
+    const myChart = new ChartJS(chartRefCurrent, chartConfigData);
     chartInstanceRef.current = myChart;
 
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
-        if (chartRef?.current && myChart) {
+        if (chartRefCurrent && myChart) {
           myChart?.resize();
           myChart?.update();
         }
       });
     });
 
-    if (chartRef?.current?.parentElement !== null) {
-      resizeObserver.observe(chartRef.current.parentElement);
+    if (chartRefCurrent?.parentElement !== null) {
+      resizeObserver.observe(chartRefCurrent.parentElement);
     }
 
     return () => {
-      if (
-        chartRef?.current !== null &&
-        chartRef?.current?.parentElement !== null
-      ) {
-        resizeObserver.unobserve(chartRef?.current?.parentElement);
+      if (chartRefCurrent?.parentElement !== null) {
+        resizeObserver.unobserve(chartRefCurrent.parentElement);
       }
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
@@ -206,7 +207,7 @@ useEffect(() => {
       }
     };
   // Use chartSignature as dependency - chart only re-creates when actual data changes
-}, [chartSignature, validChart]);
+  }, [chartSignature, validChart]);
 
   return (
     <div style={{ maxHeight: 350 }}>

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, memo } from 'react';
+import React, { Suspense, lazy, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -38,6 +38,9 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
   const timestamp = formatTimestamp(message.date);
   const content = message.content as string;
 
+  // Cache remarkPlugins array to prevent re-creation on every render
+  const remarkPlugins = useMemo(() => [remarkGfm, supersub], []);
+
   const isStreaming = generatingResponse && isLastAssistantMessage;
   const hasChartJson = looksLikeChartJson(content);
 
@@ -59,7 +62,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
           hasHTML ? (
             <div dangerouslySetInnerHTML={{ __html: availableText }} className="html-content" />
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm, supersub]} children={availableText} />
+            <ReactMarkdown remarkPlugins={remarkPlugins} children={availableText} />
           )
         )}
 
@@ -134,7 +137,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
           hasHTML ? (
             <div dangerouslySetInnerHTML={{ __html: textPart }} className="html-content" />
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm, supersub]} children={textPart} />
+            <ReactMarkdown remarkPlugins={remarkPlugins} children={textPart} />
           )
         )}
 
@@ -180,7 +183,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
       {hasHTML ? (
         <div dangerouslySetInnerHTML={{ __html: content }} className="html-content" />
       ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm, supersub]} children={content} />
+        <ReactMarkdown remarkPlugins={remarkPlugins} children={content} />
       )}
 
       {isLastAssistantMessage && generatingResponse ? (

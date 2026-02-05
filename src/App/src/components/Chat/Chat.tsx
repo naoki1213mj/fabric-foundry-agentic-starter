@@ -2,44 +2,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { generateUUIDv4 } from "../../configs/Utils";
 import {
-  setSelectedConversationId,
-  startNewConversation,
+    setSelectedConversationId,
+    startNewConversation,
 } from "../../store/appSlice";
 import {
-  addNewConversation,
-  updateConversation,
+    addNewConversation,
+    updateConversation,
 } from "../../store/chatHistorySlice";
 import {
-  addMessages,
-  clearChat,
-  sendMessage,
-  setGeneratingResponse,
-  setStreamingFlag,
-  setUserMessage as setUserMessageAction,
-  updateMessageById,
+    addMessages,
+    clearChat,
+    sendMessage,
+    setGeneratingResponse,
+    setStreamingFlag,
+    setUserMessage as setUserMessageAction,
+    updateMessageById,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  type AgentMode,
-  type ChartDataResponse,
-  type ChatMessage,
-  type Conversation,
-  type ConversationRequest,
-  type ParsedChunk,
-  type ReasoningEffort,
-  type ToolEvent,
-  ToolMessageContent,
+    type AgentMode,
+    type ChartDataResponse,
+    type ChatMessage,
+    type Conversation,
+    type ConversationRequest,
+    type ParsedChunk,
+    type ReasoningEffort,
+    type ToolEvent,
+    ToolMessageContent,
 } from "../../types/AppTypes";
 import {
-  isMalformedChartJSON,
-  parseChartContent,
+    isMalformedChartJSON,
+    parseChartContent,
 } from "../../utils/jsonUtils";
+import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
 import { ChatInput } from "./ChatInput";
 import { ChatMessageList } from "./ChatMessageList";
 import { isChartQuery, parseToolEvents, throttle } from "./chatUtils";
-import "./Chat.css";
 
 // Last updated: 2025-02-05 - Refactored into sub-components
 
@@ -196,6 +196,8 @@ const Chat: React.FC<ChatProps> = ({
   }, []);
 
   // Effects
+  // Abort ongoing request when conversation changes (intentionally omit generatingResponse/isStreamingInProgress)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
@@ -221,113 +223,6 @@ const Chat: React.FC<ChatProps> = ({
   useEffect(() => {
     scrollChatToBottom();
   }, [generatingResponse, scrollChatToBottom]);
-
-  // API request for chart
-  const makeApiRequestForChart = async (
-    question: string,
-    conversationId: string
-  ) => {
-    if (generatingResponse || !question.trim()) return;
-
-    const newMessage: ChatMessage = {
-      id: generateUUIDv4(),
-      role: USER,
-      content: question,
-      date: new Date().toISOString()
-    };
-
-    dispatch(setGeneratingResponse(true));
-    dispatch(addMessages([newMessage]));
-    dispatch(setUserMessageAction(questionInputRef?.current?.value || ""));
-    scrollChatToBottom();
-
-    const abortController = new AbortController();
-    abortFuncs.current.unshift(abortController);
-
-    const request: ConversationRequest = {
-      id: conversationId,
-      query: question,
-      agentMode: agentMode,
-      reasoningEffort: reasoningEffort
-    };
-
-    let updatedMessages: ChatMessage[] = [];
-
-    try {
-      const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
-      if (!sendMessage.fulfilled.match(result)) {
-        throw new Error("Failed to send message");
-      }
-      const response = result.payload;
-
-      if (response?.body) {
-        const reader = response.body.getReader();
-        let runningText = "";
-        let hasError = false;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = new TextDecoder("utf-8").decode(value);
-          try {
-            const textObj = JSON.parse(text);
-            if (textObj?.object?.data) {
-              runningText = text;
-            }
-            if (textObj?.error) {
-              hasError = true;
-              runningText = text;
-            }
-          } catch {
-            // Non-JSON chunk, continue
-          }
-        }
-
-        if (hasError) {
-          const errorMsg = JSON.parse(runningText).error;
-          const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
-          updatedMessages = [newMessage, errorMessage];
-        } else if (isChartQuery(question)) {
-          try {
-            const parsedResponse = JSON.parse(runningText);
-
-            if ((parsedResponse?.object?.type || parsedResponse?.object?.chartType) && parsedResponse?.object?.data) {
-              const chartMessage = createAndDispatchMessage(
-                ASSISTANT,
-                parsedResponse.object as unknown as ChartDataResponse
-              );
-              updatedMessages = [newMessage, chartMessage];
-            } else if (parsedResponse.error || parsedResponse?.object?.message) {
-              const errorMsg = parsedResponse.error || parsedResponse.object.message;
-              const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
-              updatedMessages = [newMessage, errorMessage];
-            }
-          } catch {
-            // Error parsing chart response
-          }
-        }
-      }
-
-      if (updatedMessages.length > 0) {
-        saveToDB(updatedMessages, conversationId, "graph");
-      }
-    } catch (e) {
-      if (abortController.signal.aborted) {
-        updatedMessages = [newMessage];
-        saveToDB(updatedMessages, conversationId, "graph");
-      } else if (e instanceof Error) {
-        alert(e.message);
-      } else {
-        alert(t("error.tryAgainLater") + " " + t("error.contactAdmin"));
-      }
-    } finally {
-      dispatch(setGeneratingResponse(false));
-      dispatch(setStreamingFlag(false));
-      setIsChartLoading(false);
-      abortController.abort();
-    }
-  };
 
   // Main API request
   const makeApiRequestWithCosmosDB = async (
@@ -418,6 +313,7 @@ const Chat: React.FC<ChatProps> = ({
           if (!isChartResponseReceived) {
             const objects = text.split("\n").filter((val) => val !== "");
 
+            // eslint-disable-next-line no-loop-func
             objects.forEach((textValue) => {
               if (!textValue || textValue === "{}") return;
 
@@ -539,6 +435,7 @@ const Chat: React.FC<ChatProps> = ({
   };
 
   // Event handlers
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -554,6 +451,7 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [isInputDisabled, userMessage, currentConversationId]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onClickSend = useCallback(() => {
     if (isInputDisabled) {
       return;

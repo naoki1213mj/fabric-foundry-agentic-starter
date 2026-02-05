@@ -95,9 +95,7 @@ class AgenticRetrievalTool:
         try:
             reasoning_effort = ReasoningEffort(reasoning_effort_str)
         except ValueError:
-            logger.warning(
-                f"Invalid reasoning effort '{reasoning_effort_str}', using 'low'"
-            )
+            logger.warning(f"Invalid reasoning effort '{reasoning_effort_str}', using 'low'")
             reasoning_effort = ReasoningEffort.LOW
 
         logger.info(
@@ -192,17 +190,13 @@ class AgenticRetrievalTool:
                 f"Agentic retrieval: kb={self.knowledge_base_name}, "
                 f"query='{query[:50]}...', effort={effort.value}"
             )
-            async with session.post(
-                self.retrieve_url, json=request_body
-            ) as response:
+            async with session.post(self.retrieve_url, json=request_body) as response:
                 if response.status == 200:
                     result = await response.json()
                     return self._parse_retrieve_response(result, effort)
                 else:
                     error_text = await response.text()
-                    logger.error(
-                        f"Retrieve request failed: {response.status} - {error_text}"
-                    )
+                    logger.error(f"Retrieve request failed: {response.status} - {error_text}")
                     return {"error": f"Retrieve failed: {response.status}"}
 
         except aiohttp.ClientError as e:
@@ -212,9 +206,7 @@ class AgenticRetrievalTool:
             logger.error(f"Unexpected error during retrieve request: {e}")
             return {"error": str(e)}
 
-    def _parse_retrieve_response(
-        self, response: dict, effort: ReasoningEffort
-    ) -> dict[str, Any]:
+    def _parse_retrieve_response(self, response: dict, effort: ReasoningEffort) -> dict[str, Any]:
         """
         Parse agentic retrieval response into a structured format.
 

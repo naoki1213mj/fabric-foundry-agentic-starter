@@ -59,10 +59,14 @@ export const ChatHistoryListItemGroups: React.FC<
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (initialCall.current) {
       return;
     }
+    // Copy ref to local variable for cleanup
+    const observerTargetCurrent = observerTarget.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -74,12 +78,12 @@ export const ChatHistoryListItemGroups: React.FC<
       { threshold: 1 }
     );
 
-    if (observerTarget.current) observer.observe(observerTarget.current);
+    if (observerTargetCurrent) observer.observe(observerTargetCurrent);
 
     return () => {
-      if (observerTarget.current) observer.unobserve(observerTarget.current);
+      if (observerTargetCurrent) observer.unobserve(observerTargetCurrent);
     };
-  }, [observerTarget.current, chatHistory?.fetchingConversations]);
+  }, [chatHistory?.fetchingConversations]);
 
   const allConversationsLength = groupedChatHistory.reduce(
     (previousValue, currentValue) =>

@@ -1,11 +1,11 @@
-import React, { useMemo, useState, memo } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Stack } from '@fluentui/react';
 import { DismissRegular } from '@fluentui/react-icons';
-import remarkGfm from "remark-gfm";
+import { memo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
-import { useAppDispatch } from '../../store/hooks';
+import remarkGfm from "remark-gfm";
 import { clearCitation } from '../../store/citationSlice';
+import { useAppDispatch } from '../../store/hooks';
 import "./CitationPanel.css";
 interface Props {
     activeCitation: any
@@ -13,7 +13,7 @@ interface Props {
 
 const CitationPanel = memo(({ activeCitation }: Props) => {
     const dispatch = useAppDispatch();
-  
+
     const onCloseCitation = () => {
         dispatch(clearCitation());
     }
@@ -21,7 +21,7 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
         <div className='citationPanel'>
 
             <Stack.Item
-            
+
             >
                 <Stack
                     horizontal
@@ -51,11 +51,11 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
                     />
                 </Stack>
                 <h5
-                  
+
                 >
                     {activeCitation.title}
                 </h5>
-              
+
                 <ReactMarkdown
                 children={activeCitation?.content}
                 remarkPlugins={[remarkGfm]}

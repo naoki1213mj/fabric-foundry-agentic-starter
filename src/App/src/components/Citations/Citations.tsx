@@ -1,9 +1,9 @@
-import React, { useMemo, useCallback, memo } from 'react';
-import { parseAnswer } from './AnswerParser';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { memo, useCallback, useMemo } from 'react';
 import { fetchCitationContent } from '../../store/citationSlice';
-import "./Citations.css";
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { AskResponse, Citation } from '../../types/AppTypes';
+import { parseAnswer } from './AnswerParser';
+import "./Citations.css";
 
 interface Props {
     answer: AskResponse;
@@ -13,11 +13,10 @@ interface Props {
 }
 
 const Citations = memo(({ answer, index }: Props) => {
-    
+
     const dispatch = useAppDispatch();
     const selectedConversationId = useAppSelector((state) => state.app.selectedConversationId);
     const parsedAnswer = useMemo(() => parseAnswer(answer), [answer]);
-    const filePathTruncationLimit = 50;
     const createCitationFilepath = (
         citation: Citation,
         index: number,
@@ -62,7 +61,7 @@ const Citations = memo(({ answer, index }: Props) => {
                      className={"citationContainer"}
                     >
                         <div
-                             className={"citation"} 
+                             className={"citation"}
                             key={idx}>
                             {idx}
                         </div>
