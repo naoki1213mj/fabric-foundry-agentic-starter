@@ -1,9 +1,9 @@
 import React, { memo } from "react";
 import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
-import { UserMessage } from "./UserMessage";
-import { ErrorMessage } from "./ErrorMessage";
-import { ChartMessage } from "./ChartMessage";
 import { AssistantMessage } from "./AssistantMessage";
+import { ChartMessage } from "./ChartMessage";
+import { ErrorMessage } from "./ErrorMessage";
+import { UserMessage } from "./UserMessage";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -24,9 +24,9 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
   if (message.role === "user" && typeof message.content === "string") {
     if (message.content === "show in a graph by default") return null;
     return (
-      <UserMessage 
-        content={message.content} 
-        timestamp={message.date} 
+      <UserMessage
+        content={message.content}
+        timestamp={message.date}
       />
     );
   }
@@ -37,15 +37,15 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
     if (("type" in content || "chartType" in content) && "data" in content) {
       try {
         return (
-          <ChartMessage 
-            chartContent={content as ChartDataResponse} 
+          <ChartMessage
+            chartContent={content as ChartDataResponse}
             timestamp={message.date}
           />
         );
       } catch {
         return (
-          <ChartMessage 
-            chartContent={{} as ChartDataResponse} 
+          <ChartMessage
+            chartContent={{} as ChartDataResponse}
             errorMode={true}
           />
         );
@@ -56,8 +56,8 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
   // Handle error messages
   if (message.role === "error" && typeof message.content === "string") {
     return (
-      <ErrorMessage 
-        content={message.content} 
+      <ErrorMessage
+        content={message.content}
         timestamp={message.date}
       />
     );

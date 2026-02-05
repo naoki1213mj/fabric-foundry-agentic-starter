@@ -1,12 +1,11 @@
-import React, { memo } from 'react';
+import React, { Suspense, lazy, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import supersub from 'remark-supersub';
 import { ChartDataResponse, ChatMessage as ChatMessageType } from '../../types/AppTypes';
-import ChatChart from '../ChatChart/ChatChart';
 import Citations from '../Citations/Citations';
-import { StreamingChartIndicator } from './ChartMessage';
+import { ChartLoadingSkeleton, StreamingChartIndicator } from './ChartMessage';
 import { CopyButton } from './CopyButton';
 import {
     containsHtml,
@@ -16,6 +15,9 @@ import {
     looksLikeChartJson,
     stripHtmlTags
 } from './messageUtils';
+
+// Lazy load ChatChart component (includes heavy Chart.js library)
+const ChatChart = lazy(() => import('../ChatChart/ChatChart'));
 
 export interface AssistantMessageProps {
   message: ChatMessageType;
@@ -95,7 +97,9 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
       try {
         return (
           <div className="assistant-message chart-message">
-            <ChatChart chartContent={chartData as ChartDataResponse} />
+            <Suspense fallback={<ChartLoadingSkeleton />}>
+              <ChatChart chartContent={chartData as ChartDataResponse} />
+            </Suspense>
             <div className="answerDisclaimerContainer">
               <span className="answerDisclaimer">{t("message.aiDisclaimer")}</span>
             </div>
@@ -140,7 +144,9 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
             className="chart-section"
             style={{ marginTop: chartIndex === 0 && textPart ? '16px' : '12px' }}
           >
-            <ChatChart chartContent={chartData} />
+            <Suspense fallback={<ChartLoadingSkeleton />}>
+              <ChatChart chartContent={chartData} />
+            </Suspense>
           </div>
         ))}
 
