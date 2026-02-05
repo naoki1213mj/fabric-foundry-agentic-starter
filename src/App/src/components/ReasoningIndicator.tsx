@@ -44,10 +44,11 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
         : reasoningContent;
 
     return (
-        <div className={`reasoning-status-container ${className}`}>
+        <div className={`reasoning-status-container ${className}`} data-testid="reasoning-status-container">
             {/* ヘッダー（折りたたみトグル） */}
             <button
                 className="reasoning-status-header"
+                data-testid="reasoning-toggle"
                 onClick={toggleExpanded}
                 aria-expanded={expanded}
                 aria-label={expanded ? "推論内容を折りたたむ" : "推論内容を展開"}
@@ -66,7 +67,7 @@ export const ReasoningIndicator: React.FC<ReasoningIndicatorProps> = ({
 
             {/* 推論内容（展開時のみ） */}
             {expanded && (
-                <div className="reasoning-content">
+                <div className="reasoning-content" data-testid="reasoning-content">
                     <pre className="reasoning-text">{reasoningContent}</pre>
                 </div>
             )}

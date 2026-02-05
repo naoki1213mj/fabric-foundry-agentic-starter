@@ -85,10 +85,11 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
     }
 
     return (
-        <div className={`tool-status-container tool-status-summary ${className}`}>
+        <div className={`tool-status-container tool-status-summary ${className}`} data-testid="tool-status-container">
             {/* ヘッダー（折りたたみトグル） */}
             <button
                 className="tool-status-header"
+                data-testid="tool-status-toggle"
                 onClick={toggleExpanded}
                 aria-expanded={expanded}
                 aria-label={expanded ? "ツール使用状況を折りたたむ" : "ツール使用状況を展開"}
@@ -104,7 +105,7 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
 
             {/* ツールリスト（展開時のみ） */}
             {expanded && (
-                <div className="tool-status-list">
+                <div className="tool-status-list" data-testid="tool-status-list">
                     {Array.from(toolsByCategory.entries()).map(([category, tools]) => (
                         <div key={category} className="tool-category-group">
                             <span className="tool-category-label">{category}</span>

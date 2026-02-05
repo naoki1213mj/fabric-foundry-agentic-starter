@@ -78,6 +78,7 @@
     padding: 3px 6px;
     border-radius: 4px;
     margin-left: 8px;
+    min-width: 0;
 }
 
 .tool-icon {
@@ -94,6 +95,7 @@
     text-overflow: ellipsis;
     color: var(--color-text-secondary, #555);
     font-size: 12px;
+    min-width: 0;
 }
 
 /* メッセージ（件数など） */
@@ -101,6 +103,10 @@
     font-size: 11px;
     color: var(--color-text-tertiary, #888);
     flex-shrink: 0;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* ステータスバッジ */
