@@ -411,10 +411,13 @@ export const useChatAPI = ({
           : [newMessage];
 
         saveToDB(updatedMessages, conversationId, "error");
-      } else if (e instanceof Error) {
-        alert(e.message);
       } else {
-        alert(t("error.tryAgainLater") + " " + t("error.contactAdmin"));
+        // Network error or other failure - display error in chat UI
+        const errorText = e instanceof Error
+          ? e.message
+          : t("error.tryAgainLater") + " " + t("error.contactAdmin");
+        const errorMessage = createAndDispatchMessage(ERROR, errorText);
+        updatedMessages = [newMessage, errorMessage];
       }
     } finally {
       dispatch(setGeneratingResponse(false));

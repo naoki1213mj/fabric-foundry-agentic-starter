@@ -13,6 +13,7 @@ import Chat from "./components/Chat/Chat";
 import { ChatHistoryPanel } from "./components/ChatHistoryPanel/ChatHistoryPanel";
 import CitationPanel from "./components/CitationPanel/CitationPanel";
 import CustomSpinner from "./components/CustomSpinner/CustomSpinner";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppLogo } from "./components/Svg/Svg";
 import { changeLanguage, getCurrentLanguage } from "./i18n";
 import { fetchUserInfo, setSelectedConversationId, startNewConversation } from "./store/appSlice";
@@ -291,12 +292,13 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="main-container">
-        {/* LEFT PANEL:  CHAT */}
-        {panelShowStates?.[panels.CHAT] && (
-          <div
-            style={{
-              width: `${panelWidths[panels.CHAT]}%`,
+      <ErrorBoundary>
+        <div className="main-container">
+          {/* LEFT PANEL:  CHAT */}
+          {panelShowStates?.[panels.CHAT] && (
+            <div
+              style={{
+                width: `${panelWidths[panels.CHAT]}%`,
             }}
           >
             <Chat
@@ -340,7 +342,8 @@ const Dashboard: React.FC = () => {
             useAppContext?.state.isCosmosDBAvailable?.status !== CosmosDBStatus.NotConfigured && <ChatHistoryPanel />} */}
             </div>
           )}
-      </div>
+        </div>
+      </ErrorBoundary>
     </FluentProvider>
   );
 };
