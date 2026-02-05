@@ -198,6 +198,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     containerRef.current = listApiRef.current?.element ?? null;
   }, [containerRef, listApiRef, messages.length]);
 
+  // 推論/ツール全体の折りたたみ状態
+  const [isFooterCollapsed, setIsFooterCollapsed] = useState(false);
   const [isReasoningExpanded, setIsReasoningExpanded] = useState(false);
   const [isToolExpanded, setIsToolExpanded] = useState(false);
 
@@ -306,27 +308,61 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         />
       </div>
 
-      {/* 推論/ツール表示は仮想化リストの外に配置 (重なり・スクロール問題を回避) */}
+      {/* 推論/ツール表示は仮想化リストの外に配置 - 全体をトグル可能 */}
       {hasReasoningOrTool && (
-        <div className="reasoning-tool-footer" style={{ flexShrink: 0, maxHeight: isReasoningExpanded || isToolExpanded ? "40vh" : "auto", overflowY: "auto", padding: "8px 16px" }}>
-          {reasoningContent && (
-            <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
-              <ReasoningIndicator
-                reasoningContent={reasoningContent}
-                isGenerating={generatingResponse}
-                isExpanded={isReasoningExpanded}
-                onToggle={setIsReasoningExpanded}
-              />
-            </div>
-          )}
-          {toolEvents.length > 0 && (
-            <div className={`tool-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
-              <ToolStatusIndicator
-                toolEvents={toolEvents}
-                isGenerating={generatingResponse}
-                isExpanded={isToolExpanded}
-                onToggle={setIsToolExpanded}
-              />
+        <div className="reasoning-tool-footer" style={{ flexShrink: 0 }}>
+          {/* 折りたたみヘッダー */}
+          <button
+            className="footer-collapse-toggle"
+            onClick={() => setIsFooterCollapsed(!isFooterCollapsed)}
+            aria-expanded={!isFooterCollapsed}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              width: "100%",
+              padding: "8px 16px",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "inherit",
+              fontSize: "13px",
+              fontWeight: 500,
+            }}
+          >
+            <span style={{ transition: "transform 0.2s", transform: isFooterCollapsed ? "rotate(-90deg)" : "rotate(0)" }}>
+              ▼
+            </span>
+            <span>
+              {generatingResponse ? "処理中..." : "処理詳細"}
+              {reasoningContent && " (推論)"}
+              {toolEvents.length > 0 && ` (ツール: ${toolEvents.length}件)`}
+            </span>
+          </button>
+
+          {/* 折りたたみコンテンツ */}
+          {!isFooterCollapsed && (
+            <div style={{ maxHeight: isReasoningExpanded || isToolExpanded ? "40vh" : "auto", overflowY: "auto", padding: "0 16px 8px" }}>
+              {reasoningContent && (
+                <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+                  <ReasoningIndicator
+                    reasoningContent={reasoningContent}
+                    isGenerating={generatingResponse}
+                    isExpanded={isReasoningExpanded}
+                    onToggle={setIsReasoningExpanded}
+                  />
+                </div>
+              )}
+              {toolEvents.length > 0 && (
+                <div className={`tool-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
+                  <ToolStatusIndicator
+                    toolEvents={toolEvents}
+                    isGenerating={generatingResponse}
+                    isExpanded={isToolExpanded}
+                    onToggle={setIsToolExpanded}
+                  />
+                </div>
+              )}
             </div>
           )}
           <div ref={chatMessageStreamEndRef} />

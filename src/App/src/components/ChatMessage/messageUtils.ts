@@ -1,5 +1,5 @@
 /**
- * Format timestamp for display
+ * Format timestamp for display in Japan timezone
  */
 export const formatTimestamp = (dateString: string | undefined): string => {
   if (!dateString) return '';
@@ -8,7 +8,8 @@ export const formatTimestamp = (dateString: string | undefined): string => {
     if (isNaN(date.getTime())) return '';
     return date.toLocaleTimeString('ja-JP', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'Asia/Tokyo'
     });
   } catch {
     return '';
