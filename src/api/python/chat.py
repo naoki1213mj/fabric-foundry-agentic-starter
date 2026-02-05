@@ -330,14 +330,28 @@ async def stream_with_tool_events(agent_stream):
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
                     if is_reasoning_content(content) and content.text:
+                        # Log raw content for debugging
+                        logger.info(
+                            f"[REASONING-RAW] #{chunk_count}: "
+                            f"prev_len={len(previous_reasoning_text)}, "
+                            f"curr_len={len(content.text)}, "
+                            f"curr={repr(content.text[:100])}"
+                        )
+
                         # SDK sends cumulative text - calculate delta
                         current_text = content.text
-                        if current_text.startswith(previous_reasoning_text):
+                        if previous_reasoning_text and current_text.startswith(
+                            previous_reasoning_text
+                        ):
                             # Normal case: new text starts with previous text
                             delta_text = current_text[len(previous_reasoning_text) :]
                         else:
-                            # Edge case: completely new reasoning section
+                            # First chunk or new reasoning section
                             delta_text = current_text
+
+                        logger.info(
+                            f"[REASONING-DELTA] #{chunk_count}: delta={repr(delta_text[:50]) if delta_text else 'EMPTY'}"
+                        )
 
                         # Update previous text for next comparison
                         previous_reasoning_text = current_text
@@ -347,10 +361,6 @@ async def stream_with_tool_events(agent_stream):
                             reasoning_marker = f"__REASONING__{delta_text}__END_REASONING__"
                             yield reasoning_marker
                             last_output_time = asyncio.get_event_loop().time()
-                            if chunk_count <= 10:  # Log first 10 reasoning chunks
-                                logger.info(
-                                    f"[REASONING] #{chunk_count}: delta={delta_text[:50]}..."
-                                )
 
             # Then yield the agent chunk text
             if chunk and chunk.text:
