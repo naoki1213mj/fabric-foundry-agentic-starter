@@ -22,7 +22,9 @@ export const throttle = <T extends (...args: Parameters<T>) => void>(
 const TOOL_EVENT_REGEX = /__TOOL_EVENT__(.*?)__END_TOOL_EVENT__/g;
 
 // Reasoning content parsing: Extract GPT-5 thinking content from streaming text
-const REASONING_REGEX = /__REASONING__([\s\S]*?)__END_REASONING__/g;
+// REPLACE marker indicates cumulative text that should replace (not append)
+const REASONING_REPLACE_REGEX =
+  /__REASONING_REPLACE__([\s\S]*?)__END_REASONING_REPLACE__/g;
 
 /**
  * Parse tool events from streaming text and return cleaned text
@@ -55,24 +57,28 @@ export const parseToolEvents = (
 
 /**
  * Parse reasoning content from streaming text and return cleaned text
+ * SDK sends cumulative text, so we use REPLACE mode to replace (not append)
  * @param text Raw streaming text containing potential reasoning markers
- * @returns { reasoning: string[], cleanedText: string }
+ * @returns { reasoningReplace: string | null, cleanedText: string }
+ *          reasoningReplace is the full cumulative text to replace current state
  */
 export const parseReasoningContent = (
   text: string
-): { reasoning: string[]; cleanedText: string } => {
-  const reasoning: string[] = [];
+): { reasoningReplace: string | null; cleanedText: string } => {
+  let reasoningReplace: string | null = null;
   let cleanedText = text;
 
-  const matches = Array.from(text.matchAll(REASONING_REGEX));
+  // Use REPLACE regex - SDK sends cumulative text that should replace state
+  const matches = Array.from(text.matchAll(REASONING_REPLACE_REGEX));
   for (const match of matches) {
     if (match[1]) {
-      reasoning.push(match[1]);
+      // Take the last match as the most up-to-date cumulative text
+      reasoningReplace = match[1];
       cleanedText = cleanedText.replace(match[0], "");
     }
   }
 
-  return { reasoning, cleanedText };
+  return { reasoningReplace, cleanedText };
 };
 
 /**

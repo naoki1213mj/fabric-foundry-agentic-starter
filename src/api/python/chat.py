@@ -271,10 +271,6 @@ async def stream_with_tool_events(agent_stream):
 
     last_output_time = asyncio.get_event_loop().time()
 
-    # Track previous reasoning text to calculate delta
-    # Agent Framework SDK sends cumulative text in each chunk, not just the delta
-    previous_reasoning_text = ""
-
     async def keepalive_check():
         """Check if keepalive is needed and yield marker if so."""
         nonlocal last_output_time
@@ -330,37 +326,20 @@ async def stream_with_tool_events(agent_stream):
             if hasattr(chunk, "contents") and chunk.contents:
                 for content in chunk.contents:
                     if is_reasoning_content(content) and content.text:
-                        # Log raw content for debugging
-                        logger.info(
-                            f"[REASONING-RAW] #{chunk_count}: "
-                            f"prev_len={len(previous_reasoning_text)}, "
-                            f"curr_len={len(content.text)}, "
-                            f"curr={repr(content.text[:100])}"
+                        # SDK sends CUMULATIVE text in content.text (not delta)
+                        # Send it with a REPLACE marker so frontend replaces instead of appends
+                        # This handles the case where cumulative text format doesn't allow
+                        # simple prefix-based delta calculation
+                        reasoning_marker = (
+                            f"__REASONING_REPLACE__{content.text}__END_REASONING_REPLACE__"
                         )
-
-                        # SDK sends cumulative text - calculate delta
-                        current_text = content.text
-                        if previous_reasoning_text and current_text.startswith(
-                            previous_reasoning_text
-                        ):
-                            # Normal case: new text starts with previous text
-                            delta_text = current_text[len(previous_reasoning_text) :]
-                        else:
-                            # First chunk or new reasoning section
-                            delta_text = current_text
-
-                        logger.info(
-                            f"[REASONING-DELTA] #{chunk_count}: delta={repr(delta_text[:50]) if delta_text else 'EMPTY'}"
-                        )
-
-                        # Update previous text for next comparison
-                        previous_reasoning_text = current_text
-
-                        # Only yield if there's actual new content
-                        if delta_text:
-                            reasoning_marker = f"__REASONING__{delta_text}__END_REASONING__"
-                            yield reasoning_marker
-                            last_output_time = asyncio.get_event_loop().time()
+                        yield reasoning_marker
+                        last_output_time = asyncio.get_event_loop().time()
+                        if chunk_count <= 5:  # Log first 5 reasoning chunks
+                            logger.info(
+                                f"[REASONING] #{chunk_count}: len={len(content.text)}, "
+                                f"text={repr(content.text[:80])}..."
+                            )
 
             # Then yield the agent chunk text
             if chunk and chunk.text:

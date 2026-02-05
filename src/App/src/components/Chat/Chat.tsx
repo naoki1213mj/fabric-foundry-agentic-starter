@@ -100,9 +100,10 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, []);
 
-  // Reasoning content handler (GPT-5 thinking) - concatenate streaming deltas
+  // Reasoning content handler (GPT-5 thinking) - REPLACE with cumulative text from SDK
+  // SDK sends cumulative text (not delta), so we replace the state entirely
   const handleReasoningContent = useCallback((content: string) => {
-    setReasoningContent((prev) => prev + content);
+    setReasoningContent(content);  // Replace, don't append
   }, []);
 
   // Use the custom API hook

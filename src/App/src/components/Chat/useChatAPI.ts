@@ -2,37 +2,37 @@ import { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { generateUUIDv4 } from "../../configs/Utils";
 import {
-  setSelectedConversationId,
+    setSelectedConversationId,
 } from "../../store/appSlice";
 import {
-  addNewConversation,
-  updateConversation,
+    addNewConversation,
+    updateConversation,
 } from "../../store/chatHistorySlice";
 import {
-  addMessages,
-  sendMessage,
-  setGeneratingResponse,
-  setStreamingFlag,
-  setUserMessage as setUserMessageAction,
-  updateMessageById,
+    addMessages,
+    sendMessage,
+    setGeneratingResponse,
+    setStreamingFlag,
+    setUserMessage as setUserMessageAction,
+    updateMessageById,
 } from "../../store/chatSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  type AgentMode,
-  type ChartDataResponse,
-  type ChatMessage,
-  type Conversation,
-  type ConversationRequest,
-  type ModelReasoningEffort,
-  type ModelType,
-  type ParsedChunk,
-  type ReasoningEffort,
-  type ReasoningSummary,
-  type ToolEvent,
+    type AgentMode,
+    type ChartDataResponse,
+    type ChatMessage,
+    type Conversation,
+    type ConversationRequest,
+    type ModelReasoningEffort,
+    type ModelType,
+    type ParsedChunk,
+    type ReasoningEffort,
+    type ReasoningSummary,
+    type ToolEvent,
 } from "../../types/AppTypes";
 import {
-  isMalformedChartJSON,
-  parseChartContent,
+    isMalformedChartJSON,
+    parseChartContent,
 } from "../../utils/jsonUtils";
 import { isChartQuery, parseReasoningContent, parseToolEvents } from "./chatUtils";
 
@@ -194,9 +194,11 @@ export const useChatAPI = ({
       }
 
       // Parse and extract reasoning content from the stream (GPT-5 thinking)
-      const { reasoning, cleanedText: textAfterReasoning } = parseReasoningContent(text);
-      if (reasoning.length > 0) {
-        reasoning.forEach((r) => onReasoningContent(r));
+      // SDK sends cumulative text, so we REPLACE the state instead of appending
+      const { reasoningReplace, cleanedText: textAfterReasoning } =
+        parseReasoningContent(text);
+      if (reasoningReplace !== null) {
+        onReasoningContent(reasoningReplace);
         text = textAfterReasoning;
       }
 
