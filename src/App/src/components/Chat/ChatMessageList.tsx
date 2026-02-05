@@ -336,7 +336,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
             <span>
               {generatingResponse ? "処理中..." : "処理詳細"}
               {reasoningContent && " (推論)"}
-              {toolEvents.length > 0 && ` (ツール: ${toolEvents.length}件)`}
+              {toolEvents.length > 0 && ` (ツール: ${new Set(toolEvents.map(e => e.tool)).size}種類)`}
             </span>
           </button>
 

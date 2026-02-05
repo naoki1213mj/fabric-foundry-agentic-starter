@@ -14,11 +14,13 @@
   padding: var(--spacing-md, 16px);
   background-color: var(--color-bg-primary);
   transition: background-color var(--transition-normal);
+  overflow: hidden;
 }
 
 .main-container > div {
   border-radius: var(--radius-lg, 16px);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 body {

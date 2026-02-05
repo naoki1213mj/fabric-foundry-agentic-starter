@@ -152,6 +152,7 @@ class WebAgentHandler:
                         answer_text = response.output_text
 
                     citations = []
+                    annotations_with_position = []
                     if hasattr(response, "output") and response.output:
                         for item in response.output:
                             if not hasattr(item, "content") or item.content is None:
@@ -160,12 +161,20 @@ class WebAgentHandler:
                                 if hasattr(content, "annotations") and content.annotations:
                                     for annotation in content.annotations:
                                         if getattr(annotation, "type", "") == "url_citation":
-                                            citations.append(
-                                                {
-                                                    "url": getattr(annotation, "url", ""),
-                                                    "title": getattr(annotation, "title", ""),
-                                                }
-                                            )
+                                            url = getattr(annotation, "url", "")
+                                            title = getattr(annotation, "title", "")
+                                            start_idx = getattr(annotation, "start_index", None)
+                                            end_idx = getattr(annotation, "end_index", None)
+                                            citations.append({"url": url, "title": title})
+                                            if start_idx is not None and end_idx is not None:
+                                                annotations_with_position.append(
+                                                    {
+                                                        "url": url,
+                                                        "title": title,
+                                                        "start": start_idx,
+                                                        "end": end_idx,
+                                                    }
+                                                )
 
                     logger.info(
                         f"Bing response: len={len(answer_text)}, citations={len(citations)}"
@@ -181,6 +190,37 @@ class WebAgentHandler:
                         logger.warning(f"Failed to delete agent: {cleanup_error}")
 
             if answer_text:
+                # Insert inline citation markers into the answer text
+                # Sort annotations by start position in reverse to avoid index shifting
+                if annotations_with_position:
+                    # Create URL to index mapping
+                    url_to_idx: dict[str, int] = {}
+                    for i, cit in enumerate(citations):
+                        url = cit.get("url", "")
+                        if url and url not in url_to_idx:
+                            url_to_idx[url] = i + 1
+
+                    # Sort by end position descending to insert from back to front
+                    sorted_annotations = sorted(
+                        annotations_with_position,
+                        key=lambda x: x["end"],
+                        reverse=True,
+                    )
+
+                    # Insert inline citations at annotation positions
+                    for ann in sorted_annotations:
+                        url = ann.get("url", "")
+                        end_pos = ann.get("end", 0)
+                        if url in url_to_idx and end_pos <= len(answer_text):
+                            idx = url_to_idx[url]
+                            # Insert markdown link reference after the cited text
+                            citation_link = f" [[{idx}]]({url})"
+                            answer_text = (
+                                answer_text[:end_pos] + citation_link + answer_text[end_pos:]
+                            )
+
+                    logger.info(f"Inserted {len(sorted_annotations)} inline citations")
+
                 formatted_citations = []
                 for i, cit in enumerate(citations):
                     formatted_citations.append(
