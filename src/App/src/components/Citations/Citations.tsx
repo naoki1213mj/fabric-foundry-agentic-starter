@@ -53,7 +53,18 @@ const Citations = memo(({ answer, index }: Props) => {
         return null;
     }
 
-    const citationCount = parsedAnswer.citations.length;
+    // Deduplicate citations by URL or filepath
+    const seenUrls = new Set<string>();
+    const uniqueCitations = parsedAnswer.citations.filter(citation => {
+        const key = citation.url || citation.filepath || citation.title || '';
+        if (!key || seenUrls.has(key)) {
+            return false;
+        }
+        seenUrls.add(key);
+        return true;
+    });
+
+    const citationCount = uniqueCitations.length;
 
     return (
         <div className="citations-wrapper">
@@ -76,7 +87,7 @@ const Citations = memo(({ answer, index }: Props) => {
                     id={`citations-list-${index}`}
                     className="citations-list"
                 >
-                    {parsedAnswer.citations.map((citation, idx) => {
+                    {uniqueCitations.map((citation, idx) => {
                         const displayIdx = idx + 1;
                         const hasUrl = !!citation.url;
 

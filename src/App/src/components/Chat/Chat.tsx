@@ -129,8 +129,10 @@ const Chat: React.FC<ChatProps> = ({
 
   // Handle user scroll - disable auto-scroll when user scrolls up
   const handleScroll = useCallback(() => {
-    if (!chatContainerRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    // react-window の List 要素からスクロール位置を取得
+    const element = listApiRef.current?.element ?? chatContainerRef.current;
+    if (!element) return;
+    const { scrollTop, scrollHeight, clientHeight } = element;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
     if (autoScrollEnabledRef.current !== isAtBottom) {
       autoScrollEnabledRef.current = isAtBottom;

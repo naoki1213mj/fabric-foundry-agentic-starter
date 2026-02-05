@@ -196,6 +196,19 @@ class WebAgentHandler:
                         }
                     )
 
+                # Add inline source links at the end of the answer for web search results
+                if citations:
+                    source_links = "\n\n**情報源:**\n"
+                    seen_urls = set()
+                    for i, cit in enumerate(citations):
+                        url = cit.get("url", "")
+                        title = cit.get("title") or f"Web Source {i + 1}"
+                        if url and url not in seen_urls:
+                            seen_urls.add(url)
+                            source_links += f"- [{title}]({url})\n"
+                    if seen_urls:
+                        answer_text = answer_text.rstrip() + source_links
+
                 return json.dumps(
                     {
                         "answer": answer_text,

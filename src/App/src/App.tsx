@@ -63,7 +63,13 @@ const panels = {
 
 const defaultSingleColumnConfig: Record<string, number> = {
   [panels.CHAT]: 100,
-  [panels.CHATHISTORY]: 30,
+  [panels.CHATHISTORY]: 25,
+};
+
+// 2カラム時のデフォルト幅（履歴パネル表示時）
+const defaultTwoColumnConfig: Record<string, number> = {
+  [panels.CHAT]: 75,
+  [panels.CHATHISTORY]: 25,
 };
 
 const defaultPanelShowStates = {
@@ -138,35 +144,32 @@ const Dashboard: React.FC = () => {
 
   const updateLayoutWidths = useCallback((newState: Record<string, boolean>) => {
     const noOfWidgetsOpen = Object.values(newState).filter((val) => val).length;
-    if (appConfig === null) {
+
+    // 1パネルのみ表示の場合
+    if (noOfWidgetsOpen === 1 || (noOfWidgetsOpen === 2 && !newState[panels.CHAT])) {
+      setPanelWidths(defaultSingleColumnConfig);
       return;
     }
 
-    if (
-      noOfWidgetsOpen === 1 ||
-      (noOfWidgetsOpen === 2 && !newState[panels.CHAT])
-    ) {
-      setPanelWidths(defaultSingleColumnConfig);
-    } else if (noOfWidgetsOpen === 2 && newState[panels.CHAT]) {
-      const panelsInOpenState = Object.keys(newState).filter(
-        (key) => newState[key]
-      );
-      const twoColLayouts = Object.keys(appConfig.TWO_COLUMN) as string[];
-      for (let i = 0; i < twoColLayouts.length; i++) {
-        const key = twoColLayouts[i] as string;
-        const panelNames = key.split("_");
-        const isMatched = panelsInOpenState.every((val) =>
-          panelNames.includes(val)
-        );
-        const TWO_COLUMN = appConfig.TWO_COLUMN as Record<
-          string,
-          Record<string, number>
-        >;
-        if (isMatched) {
-          setPanelWidths({ ...TWO_COLUMN[key] });
-          break;
+    // 2パネル表示（CHAT + CHATHISTORY）の場合
+    if (noOfWidgetsOpen === 2 && newState[panels.CHAT] && newState[panels.CHATHISTORY]) {
+      // appConfigにTWO_COLUMN設定があれば使用、なければデフォルト
+      if (appConfig?.TWO_COLUMN) {
+        const panelsInOpenState = Object.keys(newState).filter((key) => newState[key]);
+        const twoColLayouts = Object.keys(appConfig.TWO_COLUMN) as string[];
+        for (let i = 0; i < twoColLayouts.length; i++) {
+          const key = twoColLayouts[i] as string;
+          const panelNames = key.split("_");
+          const isMatched = panelsInOpenState.every((val) => panelNames.includes(val));
+          const TWO_COLUMN = appConfig.TWO_COLUMN as Record<string, Record<string, number>>;
+          if (isMatched) {
+            setPanelWidths({ ...TWO_COLUMN[key] });
+            return;
+          }
         }
       }
+      // デフォルトの2カラム設定を使用
+      setPanelWidths(defaultTwoColumnConfig);
     }
   }, [appConfig]);
 

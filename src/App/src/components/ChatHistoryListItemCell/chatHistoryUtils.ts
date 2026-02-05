@@ -31,7 +31,7 @@ export const truncateTitle = (title: string | undefined, maxLength = 28): string
 };
 
 /**
- * Format timestamp for display
+ * Format timestamp for display in Japan timezone
  * - Today: Show time only (e.g., "14:30")
  * - Other days: Show date and time (e.g., "1月 15日 14:30")
  */
@@ -40,15 +40,32 @@ export const formatTimestamp = (dateStr?: string): string => {
 
   const date = new Date(dateStr);
   const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
+
+  // 日本時間で比較するためのオプション
+  const japanOptions: Intl.DateTimeFormatOptions = { timeZone: "Asia/Tokyo" };
+  const dateInJapan = date.toLocaleDateString("ja-JP", japanOptions);
+  const nowInJapan = now.toLocaleDateString("ja-JP", japanOptions);
+  const isToday = dateInJapan === nowInJapan;
 
   if (isToday) {
-    return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("ja-JP", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Tokyo"
+    });
   }
 
   return (
-    date.toLocaleDateString("ja-JP", { month: "short", day: "numeric" }) +
+    date.toLocaleDateString("ja-JP", {
+      month: "short",
+      day: "numeric",
+      timeZone: "Asia/Tokyo"
+    }) +
     " " +
-    date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" })
+    date.toLocaleTimeString("ja-JP", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Tokyo"
+    })
   );
 };
