@@ -40,11 +40,23 @@ export type AgentMode = "sql_only" | "multi_tool" | "handoff" | "magentic";
 
 export type ReasoningEffort = "minimal" | "low" | "medium";
 
+// Model types available for selection
+export type ModelType = "gpt-5" | "gpt-4o-mini";
+
+// Model parameters that can be adjusted via UI
+export interface ModelParameters {
+  model: ModelType;
+  temperature?: number;        // 0.0-2.0, for gpt-4o-mini
+  reasoningEffort?: ReasoningEffort; // for gpt-5
+}
+
 export type ConversationRequest = {
   id?: string;
   query: string;
   agentMode?: AgentMode;
   reasoningEffort?: ReasoningEffort;
+  model?: ModelType;
+  temperature?: number;
 };
 
 export type AskResponse = {

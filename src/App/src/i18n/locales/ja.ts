@@ -160,5 +160,23 @@ export const ja = {
       references: "参考資料",
       source: "出典",
     },
+
+    // 質問サジェスト
+    suggestions: {
+      title: "試してみてください",
+      salesAnalysis: "売上トップ10製品を表示",
+      customerInsights: "顧客セグメント分析",
+      trendAnalysis: "売上トレンドを分析",
+      productSpecs: "製品仕様を検索",
+    },
+
+    // モデル選択
+    model: {
+      title: "モデル",
+      gpt5: "GPT-5 (高精度)",
+      gpt4oMini: "GPT-4o-mini (高速)",
+      temperature: "創造性",
+      reasoningEffort: "推論深度",
+    },
   },
 };

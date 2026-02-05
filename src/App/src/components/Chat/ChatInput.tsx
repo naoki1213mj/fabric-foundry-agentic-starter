@@ -3,12 +3,13 @@ import {
     Button,
     Dropdown,
     Option,
+    Slider,
     Textarea,
 } from "@fluentui/react-components";
 import { ChatAdd24Regular } from "@fluentui/react-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import type { AgentMode, ReasoningEffort } from "../../types/AppTypes";
+import type { AgentMode, ModelType, ReasoningEffort } from "../../types/AppTypes";
 
 interface ChatInputProps {
   userMessage: string;
@@ -24,6 +25,11 @@ interface ChatInputProps {
   onAgentModeChange: (mode: AgentMode) => void;
   reasoningEffort: ReasoningEffort;
   onReasoningEffortChange: (effort: ReasoningEffort) => void;
+  // Model settings
+  modelType: ModelType;
+  onModelTypeChange: (model: ModelType) => void;
+  temperature: number;
+  onTemperatureChange: (temp: number) => void;
 }
 
 // Agent mode options
@@ -39,6 +45,12 @@ const reasoningEffortOptions: { value: ReasoningEffort; label: string; descripti
   { value: "minimal", label: "Minimal", description: "高速・直接検索（LLMなし）" },
   { value: "low", label: "Low (推奨)", description: "シングルパス・バランス型" },
   { value: "medium", label: "Medium", description: "反復検索・最高品質" },
+];
+
+// Model options
+const modelOptions: { value: ModelType; label: string; description: string }[] = [
+  { value: "gpt-5", label: "GPT-5", description: "高精度・推論重視" },
+  { value: "gpt-4o-mini", label: "GPT-4o-mini", description: "高速・コスト効率" },
 ];
 
 /**
@@ -57,6 +69,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onAgentModeChange,
   reasoningEffort,
   onReasoningEffortChange,
+  modelType,
+  onModelTypeChange,
+  temperature,
+  onTemperatureChange,
 }) => {
   const { t } = useTranslation();
 
@@ -116,6 +132,44 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             ))}
           </Dropdown>
         </div>
+        <div className="setting-item">
+          <span className="setting-label" title="使用するAIモデル">🧠 {t("model.title")}:</span>
+          <Dropdown
+            placeholder="Model"
+            value={modelOptions.find(opt => opt.value === modelType)?.label || "GPT-5"}
+            selectedOptions={[modelType]}
+            onOptionSelect={(_, data) => onModelTypeChange(data.optionValue as ModelType)}
+            disabled={isInputDisabled}
+            style={{ minWidth: "140px" }}
+            title="使用するAIモデル"
+          >
+            {modelOptions.map((option) => (
+              <Option key={option.value} value={option.value} text={option.label}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span style={{ fontWeight: 500 }}>{option.label}</span>
+                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                </div>
+              </Option>
+            ))}
+          </Dropdown>
+        </div>
+        {modelType === "gpt-4o-mini" && (
+          <div className="setting-item">
+            <span className="setting-label" title="回答の創造性 (0=正確, 2=創造的)">🎨 {t("model.temperature")}:</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: "120px" }}>
+              <Slider
+                min={0}
+                max={2}
+                step={0.1}
+                value={temperature}
+                onChange={(_, data) => onTemperatureChange(data.value)}
+                disabled={isInputDisabled}
+                style={{ flex: 1 }}
+              />
+              <span style={{ fontSize: "12px", minWidth: "28px" }}>{temperature.toFixed(1)}</span>
+            </div>
+          </div>
+        )}
         <div className="setting-item">
           <span className="setting-label" title="ドキュメント検索の推論レベル (Foundry IQ)">🔍 Doc Search:</span>
           <Dropdown

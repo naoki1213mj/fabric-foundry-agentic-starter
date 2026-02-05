@@ -160,5 +160,23 @@ export const en = {
       references: "References",
       source: "Source",
     },
+
+    // Suggested Questions
+    suggestions: {
+      title: "Try asking",
+      salesAnalysis: "Show top 10 products",
+      customerInsights: "Customer segment analysis",
+      trendAnalysis: "Analyze sales trends",
+      productSpecs: "Search product specs",
+    },
+
+    // Model Selection
+    model: {
+      title: "Model",
+      gpt5: "GPT-5 (High Quality)",
+      gpt4oMini: "GPT-4o-mini (Fast)",
+      temperature: "Creativity",
+      reasoningEffort: "Reasoning Effort",
+    },
   },
 };

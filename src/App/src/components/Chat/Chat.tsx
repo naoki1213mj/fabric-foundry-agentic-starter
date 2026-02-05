@@ -10,6 +10,7 @@ import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
     type AgentMode,
+    type ModelType,
     type ReasoningEffort,
     type ToolEvent
 } from "../../types/AppTypes";
@@ -42,6 +43,8 @@ const Chat: React.FC<ChatProps> = ({
   const [isChartLoading, setIsChartLoading] = useState(false);
   const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
   const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
+  const [modelType, setModelType] = useState<ModelType>("gpt-5");
+  const [temperature, setTemperature] = useState<number>(0.7);
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
@@ -96,6 +99,8 @@ const Chat: React.FC<ChatProps> = ({
   const { sendChatMessage, abortCurrentRequest } = useChatAPI({
     agentMode,
     reasoningEffort,
+    modelType,
+    temperature,
     onToolEvents: handleToolEvents,
     onChartLoadingChange: setIsChartLoading,
     scrollChatToBottom,
@@ -237,6 +242,12 @@ const Chat: React.FC<ChatProps> = ({
         toolEvents={toolEvents}
         parseCitationFromMessage={parseCitationFromMessage}
         chatMessageStreamEndRef={chatMessageStreamEnd}
+        onSendMessage={(question) => {
+          if (!isInputDisabled && question) {
+            sendChatMessage(question, currentConversationId);
+          }
+        }}
+        disabled={isInputDisabled}
       />
       <ChatInput
         userMessage={userMessage}
@@ -251,6 +262,10 @@ const Chat: React.FC<ChatProps> = ({
         onAgentModeChange={setAgentMode}
         reasoningEffort={reasoningEffort}
         onReasoningEffortChange={setReasoningEffort}
+        modelType={modelType}
+        onModelTypeChange={setModelType}
+        temperature={temperature}
+        onTemperatureChange={setTemperature}
       />
     </div>
   );

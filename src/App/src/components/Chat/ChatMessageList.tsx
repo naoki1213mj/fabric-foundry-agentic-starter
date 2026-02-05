@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import { MessageSkeleton, ThinkingSkeleton } from "../SkeletonLoader";
+import { SuggestedQuestions } from "../SuggestedQuestions/SuggestedQuestions";
 import { ToolStatusIndicator } from "../ToolStatusIndicator";
 
 interface ChatMessageListProps {
@@ -16,6 +17,8 @@ interface ChatMessageListProps {
   toolEvents: ToolEvent[];
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
+  onSendMessage?: (message: string) => void;
+  disabled?: boolean;
 }
 
 /**
@@ -32,6 +35,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   toolEvents,
   parseCitationFromMessage,
   chatMessageStreamEndRef,
+  onSendMessage,
+  disabled = false,
 }) => {
   const { t } = useTranslation();
 
@@ -46,7 +51,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty state with suggested questions */}
       {!isFetchingMessages && !hasMessages && (
         <div className="initial-msg">
           <h2>✨</h2>
@@ -54,6 +59,12 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
           <Body1 style={{ textAlign: "center" }}>
             {t("chat.landingText")}
           </Body1>
+          {onSendMessage && (
+            <SuggestedQuestions
+              onSelectQuestion={onSendMessage}
+              disabled={disabled}
+            />
+          )}
         </div>
       )}
 
@@ -75,10 +86,13 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
           );
         })}
 
-      {/* Tool status indicator - show only after response completion */}
-      {!generatingResponse && toolEvents.length > 0 && (
+      {/* Tool status indicator - show during and after generation */}
+      {toolEvents.length > 0 && (
         <div className="tool-status-wrapper">
-          <ToolStatusIndicator toolEvents={toolEvents} />
+          <ToolStatusIndicator
+            toolEvents={toolEvents}
+            isGenerating={generatingResponse}
+          />
         </div>
       )}
 

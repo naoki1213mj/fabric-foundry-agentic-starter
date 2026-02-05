@@ -116,6 +116,39 @@
     color: var(--color-accent-error, #d13438);
 }
 
+.tool-badge-progress {
+    background: var(--color-accent-primary-light, #e6f2ff);
+    color: var(--color-accent-primary, #0078d4);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* 進行中状態 */
+.tool-status-in-progress {
+    opacity: 1;
+}
+
+.tool-status-in-progress .tool-label {
+    color: var(--color-accent-primary, #0078d4);
+    font-weight: 500;
+}
+
+/* スピナー */
+.tool-spinner {
+    display: inline-block;
+    margin-left: 4px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
 /* 完了状態 - 控えめに */
 /* 完了状態 - 控えめに */
 .tool-status-completed {
@@ -170,6 +203,15 @@
 [data-theme="dark"] .tool-badge-error {
     background: rgba(248, 113, 113, 0.2);
     color: #f87171;
+}
+
+[data-theme="dark"] .tool-badge-progress {
+    background: rgba(96, 165, 250, 0.2);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .tool-status-in-progress .tool-label {
+    color: #60a5fa;
 }
 
 /* prefers-color-scheme フォールバック */

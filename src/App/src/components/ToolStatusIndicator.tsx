@@ -6,6 +6,7 @@ import "./ToolStatusIndicator.css";
 interface ToolStatusIndicatorProps {
     toolEvents: ToolEvent[];
     className?: string;
+    isGenerating?: boolean;
 }
 
 /**
@@ -15,6 +16,7 @@ interface ToolStatusIndicatorProps {
 export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
     toolEvents,
     className = "",
+    isGenerating = false,
 }) => {
     const [isExpanded, setIsExpanded] = useState(false); // デフォルトは折りたたみ
 
@@ -28,11 +30,15 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
     }, [toolEvents]);
 
     // 完了したツールのみ表示（startedは完了後は表示しない）
+    // 生成中は進行中のツールも表示
     const allTools = React.useMemo(() => {
         const completedTools = latestEvents.filter((e) => e.status === "completed");
         const errorTools = latestEvents.filter((e) => e.status === "error");
-        return [...completedTools, ...errorTools];
-    }, [latestEvents]);
+        const inProgressTools = isGenerating
+            ? latestEvents.filter((e) => e.status === "started")
+            : [];
+        return [...inProgressTools, ...completedTools, ...errorTools];
+    }, [latestEvents, isGenerating]);
 
     // カテゴリ別にグループ化（Hookは早期リターンの前に配置）
     const toolsByCategory = React.useMemo(() => {
@@ -66,7 +72,8 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
                     {isExpanded ? <ChevronDown12Regular /> : <ChevronRight12Regular />}
                 </span>
                 <span className="tool-status-summary-text">
-                    🛠️ {allTools.length}個のツールを使用
+                    🛠️ {allTools.length}個のツールを{isGenerating ? "実行中" : "使用"}
+                    {isGenerating && <span className="tool-spinner">⏳</span>}
                 </span>
             </button>
 
@@ -82,15 +89,19 @@ export const ToolStatusIndicator: React.FC<ToolStatusIndicatorProps> = ({
                                     label: event.tool,
                                 };
                                 const isError = event.status === "error";
+                                const isInProgress = event.status === "started";
                                 return (
                                     <div
                                         key={event.tool}
-                                        className={`tool-status-item ${isError ? "tool-status-error" : "tool-status-completed"}`}
+                                        className={`tool-status-item ${isError ? "tool-status-error" : isInProgress ? "tool-status-in-progress" : "tool-status-completed"}`}
                                     >
                                         <span className="tool-icon">{config.icon}</span>
                                         <span className="tool-label">{config.label}</span>
                                         {event.message && (
                                             <span className="tool-message">{event.message}</span>
+                                        )}
+                                        {isInProgress && (
+                                            <span className="tool-status-badge tool-badge-progress">実行中...</span>
                                         )}
                                         {isError && (
                                             <span className="tool-status-badge tool-badge-error">エラー</span>

@@ -23,6 +23,7 @@ import {
     type ChatMessage,
     type Conversation,
     type ConversationRequest,
+    type ModelType,
     type ParsedChunk,
     type ReasoningEffort,
     type ToolEvent,
@@ -38,6 +39,8 @@ const [ASSISTANT, ERROR, USER] = ["assistant", "error", "user"];
 export interface UseChatAPIOptions {
   agentMode: AgentMode;
   reasoningEffort: ReasoningEffort;
+  modelType: ModelType;
+  temperature: number;
   onToolEvents: (events: ToolEvent[]) => void;
   onChartLoadingChange: (loading: boolean) => void;
   scrollChatToBottom: () => void;
@@ -56,6 +59,8 @@ export interface UseChatAPIReturn {
 export const useChatAPI = ({
   agentMode,
   reasoningEffort,
+  modelType,
+  temperature,
   onToolEvents,
   onChartLoadingChange,
   scrollChatToBottom,
@@ -312,7 +317,9 @@ export const useChatAPI = ({
       id: conversationId,
       query: userMessage,
       agentMode: agentMode,
-      reasoningEffort: reasoningEffort
+      reasoningEffort: reasoningEffort,
+      model: modelType,
+      temperature: modelType === "gpt-4o-mini" ? temperature : undefined,
     };
 
     const streamMessage: ChatMessage = {
