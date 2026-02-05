@@ -293,11 +293,14 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [selectedConversationId, generatedConversationId, generatingResponse, isStreamingInProgress]);
 
+  // 会話読み込み完了時のみスクロール（ユーザー操作時は発動しない）
+  const prevIsFetchingRef = useRef(isFetchingConvMessages);
   useEffect(() => {
-    if (
-      !isFetchingConvMessages &&
-      chatMessageStreamEnd.current
-    ) {
+    // 読み込み中→完了への遷移時のみスクロール
+    const wasLoading = prevIsFetchingRef.current;
+    prevIsFetchingRef.current = isFetchingConvMessages;
+
+    if (wasLoading && !isFetchingConvMessages && chatMessageStreamEnd.current) {
       if (autoScrollEnabledRef.current) {
         if (listApiRef.current?.scrollToRow) {
           listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "auto" });
@@ -311,7 +314,10 @@ const Chat: React.FC<ChatProps> = ({
   }, [isFetchingConvMessages, scrollTargetIndex]);
 
   useEffect(() => {
-    scrollChatToBottom();
+    // 応答生成中のみスクロール（生成終了時は発動しない）
+    if (generatingResponse) {
+      scrollChatToBottom();
+    }
   }, [generatingResponse, scrollChatToBottom]);
 
   const setUserMessage = useCallback((value: string) => {
