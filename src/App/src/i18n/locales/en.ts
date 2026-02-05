@@ -161,6 +161,13 @@ export const en = {
       source: "Source",
     },
 
+    // Citations (toggle)
+    citations: {
+      references: "References ({{count}})",
+      showReferences: "Show references",
+      hideReferences: "Hide references",
+    },
+
     // Suggested Questions
     suggestions: {
       title: "Try asking",

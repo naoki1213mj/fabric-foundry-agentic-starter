@@ -161,6 +161,13 @@ export const ja = {
       source: "出典",
     },
 
+    // 参考リンク
+    citations: {
+      references: "参考リンク ({{count}}件)",
+      showReferences: "参考リンクを表示",
+      hideReferences: "参考リンクを非表示",
+    },
+
     // 質問サジェスト
     suggestions: {
       title: "試してみてください",

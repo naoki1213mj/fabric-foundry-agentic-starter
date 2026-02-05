@@ -1,3 +1,63 @@
+/* Citations wrapper with toggle */
+.citations-wrapper {
+    margin-top: 12px;
+    max-width: 100%;
+}
+
+.citations-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: var(--color-bg-secondary, #f5f5f5);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary, #666);
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.citations-toggle:hover {
+    background-color: var(--color-bg-hover, #ebebeb);
+    border-color: var(--color-accent-primary, #0078d4);
+    color: var(--color-accent-primary, #0078d4);
+}
+
+.citations-toggle-icon {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.citations-toggle-text {
+    user-select: none;
+}
+
+.citations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    padding-left: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .citationContainer {
     margin-left: 10px;
     font-family: "Segoe UI";
@@ -16,12 +76,36 @@
     border-radius: 4px;
     background-color: var(--color-bg-secondary, transparent);
     transition: color 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+    text-decoration: none;
 }
 
 .citationContainer:hover {
     text-decoration: underline;
     cursor: pointer;
     background-color: var(--color-bg-hover, rgba(0, 0, 0, 0.05));
+}
+
+/* Link-specific styles for citations with URL */
+.citationLink {
+    cursor: pointer !important;
+}
+
+.citationLink:hover {
+    color: var(--color-accent-primary-dark, #0062a3);
+    border-color: var(--color-accent-primary, #0078d4);
+}
+
+.citation-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.citation-external-icon {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 4px;
 }
 
 .citation {

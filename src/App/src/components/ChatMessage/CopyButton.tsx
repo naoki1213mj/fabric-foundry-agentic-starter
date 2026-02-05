@@ -7,24 +7,67 @@ interface CopyButtonProps {
 }
 
 /**
+ * Copy text to clipboard using multiple fallback methods
+ */
+const copyToClipboard = async (text: string): Promise<boolean> => {
+  // Method 1: Clipboard API (modern browsers, requires HTTPS)
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // Fall through to fallback
+    }
+  }
+
+  // Method 2: execCommand fallback (legacy, works in HTTP)
+  try {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "-9999px";
+    textArea.style.opacity = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    const successful = document.execCommand("copy");
+    document.body.removeChild(textArea);
+    return successful;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Reusable copy to clipboard button
  */
 export const CopyButton: React.FC<CopyButtonProps> = ({ text, className = "" }) => {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
 
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text);
+  const handleCopy = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!text || text.trim() === "") {
+      console.warn("CopyButton: No text to copy");
+      return;
+    }
+
+    const success = await copyToClipboard(text);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
+    } else {
+      console.error("Failed to copy text to clipboard");
     }
   }, [text]);
 
   return (
     <button
+      type="button"
       onClick={handleCopy}
       className={`copy-button ${className} ${copied ? "copied" : ""}`}
       title={copied ? t("message.copied") || "コピーしました" : t("message.copy") || "コピー"}
