@@ -21,6 +21,8 @@ interface ChatMessageListProps {
   reasoningContent: string;  // Concatenated reasoning text (streaming delta)
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement>;
+  onScroll?: () => void;
   onSendMessage?: (message: string) => void;
   onEditUserMessage?: (content: string) => void;
   onResendUserMessage?: (content: string) => void;
@@ -44,6 +46,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   reasoningContent,
   parseCitationFromMessage,
   chatMessageStreamEndRef,
+  containerRef,
+  onScroll,
   onSendMessage,
   onEditUserMessage,
   onResendUserMessage,
@@ -52,7 +56,11 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="chat-messages">
+    <div
+      className="chat-messages"
+      ref={containerRef}
+      onScroll={onScroll}
+    >
       {/* Loading skeleton while fetching messages */}
       {Boolean(isFetchingMessages) && (
         <div className="loading-messages-skeleton">

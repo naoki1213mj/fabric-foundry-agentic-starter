@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  setSelectedConversationId,
   startNewConversation,
 } from "../../store/appSlice";
 import {
@@ -54,6 +55,8 @@ const Chat: React.FC<ChatProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
   // Memoized computed values
   const currentConversationId = useMemo(() =>
@@ -85,23 +88,36 @@ const Chat: React.FC<ChatProps> = ({
     [generatingResponse, userMessage]
   );
 
-  // Scroll helpers
+  // Scroll helpers - respect user scroll position
   const scrollChatToBottom = useCallback(() => {
-    if (chatMessageStreamEnd.current) {
+    if (chatMessageStreamEnd.current && autoScrollEnabled) {
       setTimeout(() => {
         chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, []);
+  }, [autoScrollEnabled]);
 
   const throttledScrollChatToBottom = useMemo(
     () => throttle(() => {
-      if (chatMessageStreamEnd.current) {
+      if (chatMessageStreamEnd.current && autoScrollEnabled) {
         chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
       }
     }, 500),
-    []
+    [autoScrollEnabled]
   );
+
+  // Handle user scroll - disable auto-scroll when user scrolls up
+  const handleScroll = useCallback(() => {
+    if (!chatContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
+    setAutoScrollEnabled(isAtBottom);
+  }, []);
+
+  // Re-enable auto-scroll when new message is sent
+  const enableAutoScroll = useCallback(() => {
+    setAutoScrollEnabled(true);
+  }, []);
 
   // Tool events handler
   const handleToolEvents = useCallback((events: ToolEvent[]) => {
@@ -137,8 +153,9 @@ const Chat: React.FC<ChatProps> = ({
   // Wrap sendChatMessage to clear reasoning content on new query
   const sendChatMessage = useCallback((question: string, conversationId: string) => {
     setReasoningContent("");  // Clear previous reasoning content
+    enableAutoScroll();  // Re-enable auto-scroll when sending new message
     return sendChatMessageRaw(question, conversationId);
-  }, [sendChatMessageRaw]);
+  }, [sendChatMessageRaw, enableAutoScroll]);
 
   // Citation parser - handles both legacy and new formats
   const parseCitationFromMessage = useCallback((citations: any) => {
@@ -174,6 +191,44 @@ const Chat: React.FC<ChatProps> = ({
   // Track previous conversation ID to detect actual conversation switches vs. ID updates
   const prevConversationIdRef = useRef<string | null>(null);
   const prevGeneratedConversationIdRef = useRef<string | null>(null);
+
+  // Helper to get conversation ID from URL
+  const getConversationIdFromUrl = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("conversation");
+  }, []);
+
+  // Helper to update URL with conversation ID
+  const updateUrlWithConversationId = useCallback((conversationId: string | null) => {
+    const url = new URL(window.location.href);
+    if (conversationId) {
+      url.searchParams.set("conversation", conversationId);
+    } else {
+      url.searchParams.delete("conversation");
+    }
+    window.history.replaceState({}, "", url.toString());
+  }, []);
+
+  // URL persistence - restore conversation from URL on mount
+  useEffect(() => {
+    const conversationIdFromUrl = getConversationIdFromUrl();
+    if (conversationIdFromUrl && !selectedConversationId) {
+      dispatch(setSelectedConversationId(conversationIdFromUrl));
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- Only run on mount
+
+  // URL persistence - update URL when conversation changes
+  useEffect(() => {
+    const conversationIdFromUrl = getConversationIdFromUrl();
+    const activeConversationId = selectedConversationId || generatedConversationId;
+
+    if (activeConversationId && conversationIdFromUrl !== activeConversationId && messages.length > 0) {
+      updateUrlWithConversationId(activeConversationId);
+    } else if (!activeConversationId && conversationIdFromUrl) {
+      // Clear URL when no conversation
+      updateUrlWithConversationId(null);
+    }
+  }, [selectedConversationId, generatedConversationId, messages.length, getConversationIdFromUrl, updateUrlWithConversationId]);
 
   useEffect(() => {
     // Only clear tool events and reasoning content when switching to a DIFFERENT conversation
@@ -349,6 +404,8 @@ const Chat: React.FC<ChatProps> = ({
         reasoningContent={reasoningContent}
         parseCitationFromMessage={parseCitationFromMessage}
         chatMessageStreamEndRef={chatMessageStreamEnd}
+        containerRef={chatContainerRef}
+        onScroll={handleScroll}
         onEditUserMessage={handleEditUserMessage}
         onResendUserMessage={handleResendUserMessage}
         onSendMessage={(question) => {
