@@ -13,10 +13,6 @@ if [ ! -f "$CONFIG_FILE" ]; then
     exit 1
 fi
 
-# Debug: Print the content of config.json
-echo "Content of config.json:"
-cat "$CONFIG_FILE"
-
 # Extract default environment name
 DEFAULT_ENV=$(grep -o '"defaultEnvironment"\s*:\s*"[^\"]*"' "$CONFIG_FILE" | sed -E 's/.*"defaultEnvironment"\s*:\s*"([^"]*)".*/\1/')
 
@@ -61,7 +57,7 @@ echo "Successfully updated REACT_APP_API_BASE_URL in $ENV_FILE"
 # Restoring backend Python packages
 echo "Restoring backend Python packages..."
 cd api
-python -m pip install -r requirements.txt || { echo "Failed to restore backend Python packages"; exit 1; }
+uv pip install -r requirements.txt || { echo "Failed to restore backend Python packages"; exit 1; }
 cd ..
 
 # Restoring frontend npm packages

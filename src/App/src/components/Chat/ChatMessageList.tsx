@@ -12,6 +12,8 @@ interface ChatMessageListProps {
   messages: ChatMessage[];
   isFetchingMessages: boolean;
   hasMessages: boolean;
+  totalMessagesCount: number;
+  searchTerm: string;
   generatingResponse: boolean;
   isStreamingInProgress: boolean;
   isChartLoading: boolean;
@@ -20,6 +22,8 @@ interface ChatMessageListProps {
   parseCitationFromMessage: (citations: any) => any[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
   onSendMessage?: (message: string) => void;
+  onEditUserMessage?: (content: string) => void;
+  onResendUserMessage?: (content: string) => void;
   disabled?: boolean;
 }
 
@@ -31,6 +35,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   messages,
   isFetchingMessages,
   hasMessages,
+  totalMessagesCount,
+  searchTerm,
   generatingResponse,
   isStreamingInProgress,
   isChartLoading,
@@ -39,6 +45,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
   parseCitationFromMessage,
   chatMessageStreamEndRef,
   onSendMessage,
+  onEditUserMessage,
+  onResendUserMessage,
   disabled = false,
 }) => {
   const { t } = useTranslation();
@@ -71,10 +79,21 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         </div>
       )}
 
+      {/* No results state when searching */}
+      {!isFetchingMessages && totalMessagesCount > 0 && messages.length === 0 && searchTerm.trim() && (
+        <div className="initial-msg">
+          <Subtitle2>{t("chat.noSearchResultsTitle")}</Subtitle2>
+          <Body1 style={{ textAlign: "center" }}>
+            {t("chat.noSearchResultsBody", { query: searchTerm })}
+          </Body1>
+        </div>
+      )}
+
       {/* Message list */}
       {!isFetchingMessages &&
         messages.map((msg, index) => {
-          const isLastAssistantMessage = msg.role === "assistant" && index === messages.length - 1;
+          const isLastAssistantMessage =
+            msg.role === "assistant" && index === messages.length - 1;
 
           return (
             <div key={msg.id || index} className={`chat-message ${msg.role}`}>
@@ -84,6 +103,8 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
                 isLastAssistantMessage={isLastAssistantMessage}
                 generatingResponse={generatingResponse}
                 parseCitationFromMessage={parseCitationFromMessage}
+                onEditUserMessage={onEditUserMessage}
+                onResendUserMessage={onResendUserMessage}
               />
             </div>
           );

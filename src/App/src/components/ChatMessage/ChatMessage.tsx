@@ -11,6 +11,8 @@ interface ChatMessageProps {
   isLastAssistantMessage: boolean;
   generatingResponse: boolean;
   parseCitationFromMessage: (citations: any) => any[];
+  onEditUserMessage?: (content: string) => void;
+  onResendUserMessage?: (content: string) => void;
 }
 
 const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
@@ -18,7 +20,9 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
   index,
   isLastAssistantMessage,
   generatingResponse,
-  parseCitationFromMessage
+  parseCitationFromMessage,
+  onEditUserMessage,
+  onResendUserMessage
 }) => {
   // Handle user messages
   if (message.role === "user" && typeof message.content === "string") {
@@ -27,6 +31,8 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
       <UserMessage
         content={message.content}
         timestamp={message.date}
+        onEdit={onEditUserMessage}
+        onResend={onResendUserMessage}
       />
     );
   }

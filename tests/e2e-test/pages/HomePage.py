@@ -54,6 +54,23 @@ class HomePage(BasePage):
     LINE_CHART = "//canvas[contains(@aria-label, 'Line chart')]"
     DONUT_CHART = "//canvas[contains(@aria-label, 'Donut chart')]"
 
+    # Chat search and export - bilingual
+    CHAT_SEARCH_INPUT = (
+        "//input[@placeholder='Search in conversation…' or @placeholder='会話内を検索…']"
+    )
+    CHAT_SEARCH_CLEAR = "//button[normalize-space()='Clear' or normalize-space()='クリア']"
+    CHAT_NO_RESULTS = (
+        "//span[normalize-space()='No results' or normalize-space()='検索結果がありません']"
+    )
+    CHAT_EXPORT_MD = (
+        "//button[normalize-space()='Export Markdown' or normalize-space()='Markdown出力']"
+    )
+    CHAT_EXPORT_JSON = "//button[normalize-space()='Export JSON' or normalize-space()='JSON出力']"
+
+    # User message actions - bilingual
+    USER_EDIT_BUTTON = "//button[normalize-space()='Edit' or normalize-space()='編集']"
+    USER_RESEND_BUTTON = "//button[normalize-space()='Resend' or normalize-space()='再送信']"
+
     # New chat and edit - bilingual
     NEW_CHAT_BUTTON = "//button[@title='Create new Conversation' or @title='新しい会話を作成']"
     CHAT_EDIT_ICON = "//i[@data-icon-name='Edit']"

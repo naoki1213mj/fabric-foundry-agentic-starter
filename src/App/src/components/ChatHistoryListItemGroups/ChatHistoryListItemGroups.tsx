@@ -59,7 +59,6 @@ export const ChatHistoryListItemGroups: React.FC<
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (initialCall.current) {
       return;
@@ -83,7 +82,7 @@ export const ChatHistoryListItemGroups: React.FC<
     return () => {
       if (observerTargetCurrent) observer.unobserve(observerTargetCurrent);
     };
-  }, [chatHistory?.fetchingConversations]);
+  }, [chatHistory?.fetchingConversations, handleFetchHistory]);
 
   const allConversationsLength = groupedChatHistory.reduce(
     (previousValue, currentValue) =>

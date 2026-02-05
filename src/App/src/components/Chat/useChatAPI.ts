@@ -165,7 +165,7 @@ export const useChatAPI = ({
   }, []);
 
   // Process streaming response
-  const processStreamResponse = async (
+  const processStreamResponse = useCallback(async (
     reader: ReadableStreamDefaultReader<Uint8Array>,
     streamMessage: ChatMessage,
     hasError: { value: boolean },
@@ -255,10 +255,10 @@ export const useChatAPI = ({
     }
 
     return isChartResponseReceived;
-  };
+  }, [dispatch, onReasoningContent, onToolEvents, throttledScrollChatToBottom]);
 
   // Process chart response
-  const processChartResponse = (
+  const processChartResponse = useCallback((
     runningText: string,
     newMessage: ChatMessage
   ): ChatMessage[] => {
@@ -306,7 +306,7 @@ export const useChatAPI = ({
       // Error parsing chart response
     }
     return [];
-  };
+  }, [createAndDispatchMessage, extractChartData]);
 
   // Main API request function
   const sendChatMessage = useCallback(async (
@@ -422,18 +422,22 @@ export const useChatAPI = ({
       onChartLoadingChange(false);
       abortController.abort();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     generatingResponse,
     userMessage,
     agentMode,
     reasoningEffort,
+    modelType,
+    temperature,
+    modelReasoningEffort,
+    reasoningSummary,
     dispatch,
     scrollChatToBottom,
     onChartLoadingChange,
     onToolEvents,
-    onReasoningContent,
     createAndDispatchMessage,
+    processChartResponse,
+    processStreamResponse,
     saveToDB,
     t
   ]);

@@ -139,8 +139,23 @@ class HttpClient {
       timeoutId = setTimeout(() => controller.abort(), timeout);
     }
 
-    // Merge abort signals
-    const signal = requestConfig.signal || controller.signal;
+    // Merge abort signals (keep timeout working even with caller-provided signal)
+    let signal = controller.signal;
+    if (requestConfig.signal) {
+      const abortSignalAny = (AbortSignal as unknown as {
+        any?: (signals: AbortSignal[]) => AbortSignal;
+      }).any;
+      if (abortSignalAny) {
+        signal = abortSignalAny([requestConfig.signal, controller.signal]);
+      } else {
+        requestConfig.signal.addEventListener(
+          "abort",
+          () => controller.abort(),
+          { once: true }
+        );
+        signal = controller.signal;
+      }
+    }
 
     try {
       const response = await fetch(url, {

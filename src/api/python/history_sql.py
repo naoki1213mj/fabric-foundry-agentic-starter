@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -172,19 +173,26 @@ async def run_nonquery_params(sql_query, params: tuple[Any, ...] = ()):
         bool: True if the operation was successful, False otherwise.
     """
     conn = await get_fabric_db_connection()
-    cursor = None
-    try:
-        cursor = conn.cursor()
-        cursor.execute(sql_query, params)
-        conn.commit()
-        return True
-    except Exception as e:
-        logging.error("Error executing SQL query: %s", e)
+    if not conn:
+        logging.error("Error executing SQL query: DB connection not available")
         return False
-    finally:
-        if cursor:
-            cursor.close()
-        conn.close()
+
+    def _execute_nonquery() -> bool:
+        cursor = None
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql_query, params)
+            conn.commit()
+            return True
+        except Exception as e:
+            logging.error("Error executing SQL query: %s", e)
+            return False
+        finally:
+            if cursor:
+                cursor.close()
+            conn.close()
+
+    return await asyncio.to_thread(_execute_nonquery)
 
 
 async def run_query_params(sql_query, params: tuple[Any, ...] = ()):
@@ -200,31 +208,38 @@ async def run_query_params(sql_query, params: tuple[Any, ...] = ()):
     """
     # Connect to the database
     conn = await get_fabric_db_connection()
-    cursor = None
-    try:
-        cursor = conn.cursor()
-        cursor.execute(sql_query, params)
-        columns = [desc[0] for desc in cursor.description]
-        result = []
-        for row in cursor.fetchall():
-            row_dict = {}
-            for col_name, value in zip(columns, row, strict=False):
-                if isinstance(value, (datetime, date)):
-                    row_dict[col_name] = value.isoformat()
-                elif isinstance(value, Decimal):
-                    row_dict[col_name] = float(value)
-                else:
-                    row_dict[col_name] = value
-            result.append(row_dict)
-
-        return result
-    except Exception as e:
-        logging.error("Error executing SQL query: %s", e)
+    if not conn:
+        logging.error("Error executing SQL query: DB connection not available")
         return None
-    finally:
-        if cursor:
-            cursor.close()
-        conn.close()
+
+    def _execute_query() -> list[dict[str, Any]] | None:
+        cursor = None
+        try:
+            cursor = conn.cursor()
+            cursor.execute(sql_query, params)
+            columns = [desc[0] for desc in cursor.description]
+            result = []
+            for row in cursor.fetchall():
+                row_dict = {}
+                for col_name, value in zip(columns, row, strict=False):
+                    if isinstance(value, (datetime, date)):
+                        row_dict[col_name] = value.isoformat()
+                    elif isinstance(value, Decimal):
+                        row_dict[col_name] = float(value)
+                    else:
+                        row_dict[col_name] = value
+                result.append(row_dict)
+
+            return result
+        except Exception as e:
+            logging.error("Error executing SQL query: %s", e)
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+            conn.close()
+
+    return await asyncio.to_thread(_execute_query)
 
 
 # Global connection cache for SqlQueryTool

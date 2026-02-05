@@ -65,13 +65,15 @@ export const getGridStyles = (
           .trim();
       }
       if (isWidthExists) {
-        chartsList.sort((a, b) => a?.layout?.column - b?.layout?.column);
-        const value = chartsList.reduce(
+        const sortedCharts = [...chartsList].sort(
+          (a, b) => a?.layout?.column - b?.layout?.column
+        );
+        const value = sortedCharts.reduce(
           (acc, current) =>
             acc +
             " " +
             getCustomWidgetsWidth(
-              chartsList.length,
+              sortedCharts.length,
               widgetsGapInPercentage,
               current?.layout?.width
             ) +
@@ -181,6 +183,9 @@ export async function loadConfig() {
 }
 
 export const generateUUIDv4 = () => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
       v = c === "x" ? r : (r & 0x3) | 0x8;

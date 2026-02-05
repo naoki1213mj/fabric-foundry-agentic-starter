@@ -101,6 +101,9 @@ MULTI_AGENT_MODE = os.getenv("MULTI_AGENT_MODE", "false").lower() == "true"
 APIM_GATEWAY_URL = os.getenv("APIM_GATEWAY_URL")
 USE_APIM_GATEWAY = bool(APIM_GATEWAY_URL)
 
+# Demo mode (fallback responses for demos)
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+
 # Foundry API (Responses API v1) Configuration
 # Format: https://<apim>.azure-api.net/foundry-openai/openai/v1/
 # Used by AzureOpenAIResponsesClient for native APIM Foundry API integration
@@ -119,8 +122,8 @@ _web_agent_handler: WebAgentHandler | None = None
 _knowledge_base_tool: KnowledgeBaseTool | None = None
 _agentic_retrieval_tool: AgenticRetrievalTool | None = None
 
-# Global storage for web citations (per-request, for demo purposes)
-_current_web_citations: list = []
+# Per-request storage for web citations (ContextVar)
+_web_citations_var: ContextVar[list | None] = ContextVar("web_citations", default=None)
 
 # Context variables for reasoning effort and model parameters (thread-safe, per-request scoped)
 _reasoning_effort_var: ContextVar[str] = ContextVar("reasoning_effort", default="low")
@@ -182,6 +185,20 @@ def get_model_params() -> dict:
         "reasoning_summary": _reasoning_summary_var.get(),
         "temperature": _temperature_var.get(),
     }
+
+
+def set_web_citations(citations: list):
+    """Set per-request web citations list."""
+    _web_citations_var.set(citations)
+
+
+def get_web_citations() -> list:
+    """Get per-request web citations list."""
+    citations = _web_citations_var.get()
+    if citations is None:
+        citations = []
+        _web_citations_var.set(citations)
+    return citations
 
 
 # ============================================================================
@@ -574,8 +591,6 @@ async def search_web(
     Returns:
         JSON string with search results or error message.
     """
-    global _current_web_citations
-
     # Emit tool start event
     await emit_tool_event("search_web", "started", "Web検索を実行中...")
 
@@ -588,8 +603,12 @@ async def search_web(
         try:
             result_data = json.loads(result)
             if "citations" in result_data and result_data["citations"]:
-                _current_web_citations.extend(result_data["citations"])
-                logger.info(f"Stored {len(result_data['citations'])} web citations for UI display")
+                citations = get_web_citations()
+                citations.extend(result_data["citations"])
+                logger.info(
+                    "Stored %s web citations for UI display",
+                    len(result_data["citations"]),
+                )
         except json.JSONDecodeError:
             pass
 
@@ -1601,6 +1620,109 @@ def select_agent_mode(query: str) -> str:
     return "multi_tool"
 
 
+def is_chart_request(query: str) -> bool:
+    """Basic chart query detection for DEMO_MODE fallback."""
+    query_lower = query.lower()
+    chart_keywords = [
+        "chart",
+        "graph",
+        "visualize",
+        "plot",
+        "グラフ",
+        "チャート",
+        "可視化",
+        "図",
+        "棒グラフ",
+        "円グラフ",
+        "折れ線",
+        "折れ線グラフ",
+    ]
+    return any(k in query_lower for k in chart_keywords)
+
+
+def get_demo_response(query: str) -> tuple[str, list[str], str | None]:
+    """Return demo response text, tool events, and optional reasoning text."""
+    query_lower = query.lower()
+
+    reasoning_text = (
+        "**Preparing data for analysis**\n\n"
+        "I will retrieve sales data, validate product specs, and add external context."
+    )
+
+    tool_events: list[str] = []
+    response_text = (
+        "今月のトップ3製品は以下です。\n"
+        "1. Adventure Works Touring Bike: ¥2,850,000（156台）\n"
+        "2. Mountain-200 Black: ¥1,980,000（89台）\n"
+        "3. Road-150 Red: ¥1,650,000（72台）\n\n"
+        "前月比では Touring Bike が23%増加しています。"
+    )
+
+    if is_chart_request(query):
+        chart_json = {
+            "type": "bar",
+            "data": {
+                "labels": [
+                    "Adventure Works Touring Bike",
+                    "Mountain-200 Black",
+                    "Road-150 Red",
+                ],
+                "datasets": [
+                    {
+                        "label": "売上（円）",
+                        "data": [2850000, 1980000, 1650000],
+                        "backgroundColor": ["#6576F9", "#B2BBFC", "#FF749B"],
+                    }
+                ],
+            },
+        }
+        response_text = json.dumps(chart_json, ensure_ascii=False)
+        tool_events.extend(
+            [
+                create_tool_event("run_sql_query", "started", "SQLクエリを実行中..."),
+                create_tool_event("run_sql_query", "completed", "3件のデータを取得しました"),
+            ]
+        )
+        return response_text, tool_events, reasoning_text
+
+    if any(k in query_lower for k in ["仕様", "spec", "スペック"]):
+        tool_events.extend(
+            [
+                create_tool_event("search_documents", "started", "製品仕様書を検索中..."),
+                create_tool_event("search_documents", "completed", "検索結果を取得しました"),
+            ]
+        )
+        response_text = (
+            "Adventure Works Touring Bike の仕様です：\n\n"
+            "- フレーム: アルミニウム合金 6061-T6\n"
+            "- 重量: 11.2kg\n"
+            "- 変速: Shimano Deore XT 12速\n"
+            "- 用途: ロングツーリング、通勤、週末ライド"
+        )
+    elif any(k in query_lower for k in ["トレンド", "trend", "最新"]):
+        tool_events.extend(
+            [
+                create_tool_event("search_web", "started", "Web検索を実行中..."),
+                create_tool_event("search_web", "completed", "検索結果を取得しました"),
+            ]
+        )
+        response_text = (
+            "自転車業界の2025年トレンドです：\n\n"
+            "- E-Bike の急成長（前年比35%増）\n"
+            "- サステナブル素材の採用拡大\n"
+            "- スマート連携機能の標準化"
+        )
+    else:
+        tool_events.extend(
+            [
+                create_tool_event("run_sql_query", "started", "SQLクエリを実行中..."),
+                create_tool_event("run_sql_query", "completed", "3件のデータを取得しました"),
+            ]
+        )
+
+    return response_text, tool_events, reasoning_text
+
+
 async def stream_chat_request(
     conversation_id: str,
     query: str,
@@ -1620,12 +1742,36 @@ async def stream_chat_request(
     TOOL_EVENT_PATTERN = re.compile(r"__TOOL_EVENT__(.*?)__END_TOOL_EVENT__")
 
     async def generate():
-        global _current_web_citations
         # Clear any previous citations at the start of each request
-        _current_web_citations = []
+        set_web_citations([])
 
         try:
             assistant_content = ""
+
+            # DEMO_MODE: return predefined responses without calling external services
+            if DEMO_MODE:
+                demo_text, demo_events, demo_reasoning = get_demo_response(query)
+                if demo_reasoning:
+                    reasoning_marker = (
+                        f"__REASONING_REPLACE__{demo_reasoning}__END_REASONING_REPLACE__"
+                    )
+                    yield reasoning_marker + "\n\n"
+                for event in demo_events:
+                    yield event + "\n\n"
+                response = {
+                    "choices": [
+                        {
+                            "messages": [
+                                {
+                                    "role": "assistant",
+                                    "content": demo_text,
+                                }
+                            ]
+                        }
+                    ]
+                }
+                yield json.dumps(response, ensure_ascii=False) + "\n\n"
+                return
 
             # Use request agent_mode if provided, otherwise auto-select
             if agent_mode and agent_mode in [
@@ -1702,8 +1848,9 @@ async def stream_chat_request(
                     if clean_chunk:
                         assistant_content += clean_chunk
                         # Include web citations in the response for UI display (Bing terms of use)
+                        current_citations = get_web_citations()
                         citations_json = (
-                            json.dumps(_current_web_citations) if _current_web_citations else None
+                            json.dumps(current_citations) if current_citations else None
                         )
                         response = {
                             "choices": [

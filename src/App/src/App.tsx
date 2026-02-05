@@ -6,7 +6,7 @@ import {
     webDarkTheme,
     webLightTheme
 } from "@fluentui/react-components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./App.css";
 import Chat from "./components/Chat/Chat";
@@ -18,8 +18,8 @@ import { changeLanguage, getCurrentLanguage } from "./i18n";
 import { fetchUserInfo, setSelectedConversationId, startNewConversation } from "./store/appSlice";
 import {
     deleteAllConversations,
-    fetchChatHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fetchConversationMessages, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fetchChatHistory,
+    fetchConversationMessages,
 } from "./store/chatHistorySlice";
 import { clearChat, setMessages } from "./store/chatSlice";
 import { clearCitation } from "./store/citationSlice";
@@ -122,26 +122,20 @@ const Dashboard: React.FC = () => {
     setCurrentLang(newLang);
   };
 
-  const getUserInfoList = async () => {
-    await dispatch(fetchUserInfo());
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    getUserInfoList();
-  }, []);
+    dispatch(fetchUserInfo())
+      .unwrap()
+      .then((res) => {
+        const displayName: string =
+          res[0]?.user_claims?.find((claim: any) => claim.typ === "name")?.val ?? "";
+        setName(displayName);
+      })
+      .catch(() => {
+        // Error fetching user info - silent fail
+      });
+  }, [dispatch]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    dispatch(fetchUserInfo()).unwrap().then((res) => {
-      const name: string = res[0]?.user_claims?.find((claim: any) => claim.typ === 'name')?.val ?? ''
-      setName(name)
-    }).catch(() => {
-      // Error fetching user info - silent fail
-    })
-  }, [])
-
-  const updateLayoutWidths = (newState: Record<string, boolean>) => {
+  const updateLayoutWidths = useCallback((newState: Record<string, boolean>) => {
     const noOfWidgetsOpen = Object.values(newState).filter((val) => val).length;
     if (appConfig === null) {
       return;
@@ -173,12 +167,11 @@ const Dashboard: React.FC = () => {
         }
       }
     }
-  };
+  }, [appConfig]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     updateLayoutWidths(panelShowStates);
-  }, [appConfig]);
+  }, [appConfig, panelShowStates, updateLayoutWidths]);
 
   const onHandlePanelStates = (panelName: string) => {
     dispatch(clearCitation());
@@ -190,7 +183,7 @@ const Dashboard: React.FC = () => {
     setPanelShowStates(newState);
   };
 
-  const getHistoryListData = async () => {
+  const getHistoryListData = useCallback(async () => {
     if (!hasMoreRecords) {
       return;
     }
@@ -206,7 +199,7 @@ const Dashboard: React.FC = () => {
         setHasMoreRecords(false);
       }
     }
-  };
+  }, [dispatch, hasMoreRecords, offset, OFFSET_INCREMENT]);
 
   const onClearAllChatHistory = async () => {
     setChowClearAllConfirmationDialog(false);
@@ -229,14 +222,11 @@ const Dashboard: React.FC = () => {
     setIsInitialAPItriggered(true);
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (isInitialAPItriggered && !isInitialFetchStarted.current) {
-      (async () => {
-        getHistoryListData();
-      })();
+      getHistoryListData();
     }
-  }, [isInitialAPItriggered]);
+  }, [getHistoryListData, isInitialAPItriggered]);
 
   const onSelectConversation = async (id: string) => {
     if (!id) return;

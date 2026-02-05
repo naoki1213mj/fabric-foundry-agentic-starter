@@ -14,6 +14,14 @@ export const ja = {
     // チャット
     chat: {
       title: "チャット",
+      searchPlaceholder: "会話内を検索…",
+      clearSearch: "クリア",
+      noSearchResultsTitle: "検索結果がありません",
+      noSearchResultsBody: "\"{{query}}\" に一致するメッセージが見つかりませんでした。",
+      editMessage: "編集",
+      resendMessage: "再送信",
+      exportMarkdown: "Markdown出力",
+      exportJson: "JSON出力",
       placeholder: "質問を入力してください...",
       send: "送信",
       stop: "停止",

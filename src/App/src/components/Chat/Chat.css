@@ -157,6 +157,23 @@
   margin-bottom: 8px;
 }
 
+.message-action-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm, 6px);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+  margin-left: 6px;
+  transition: all var(--transition-fast);
+}
+
+.message-action-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
 .copy-button {
   background: transparent;
   border: none;
@@ -359,6 +376,19 @@
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-bg-tertiary);
   transition: all var(--transition-normal);
+}
+
+.chat-search-input {
+  min-width: 220px;
+  margin-right: 12px;
+}
+
+.chat-search-clear {
+  font-size: 0.75rem;
+}
+
+.chat-export-button {
+  margin-right: 8px;
 }
 
 /* === Initial Message (Empty State) === */

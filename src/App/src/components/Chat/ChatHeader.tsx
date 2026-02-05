@@ -1,10 +1,16 @@
-import { Button, Subtitle2 } from "@fluentui/react-components";
+import { Button, Input, Subtitle2 } from "@fluentui/react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
 interface ChatHeaderProps {
   onToggleHistory: () => void;
   isHistoryVisible: boolean;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onClearSearch: () => void;
+  onExportJson: () => void;
+  onExportMarkdown: () => void;
+  exportDisabled: boolean;
 }
 
 /**
@@ -13,6 +19,12 @@ interface ChatHeaderProps {
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onToggleHistory,
   isHistoryVisible,
+  searchTerm,
+  onSearchChange,
+  onClearSearch,
+  onExportJson,
+  onExportMarkdown,
+  exportDisabled,
 }) => {
   const { t } = useTranslation();
 
@@ -20,6 +32,44 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     <div className="chat-header">
       <Subtitle2>{t("chat.title")}</Subtitle2>
       <span>
+        <Input
+          className="chat-search-input"
+          placeholder={t("chat.searchPlaceholder")}
+          aria-label={t("chat.searchPlaceholder")}
+          value={searchTerm}
+          onChange={(_, data) => onSearchChange(data.value)}
+          size="small"
+          contentAfter={
+            searchTerm ? (
+              <Button
+                appearance="subtle"
+                size="small"
+                onClick={onClearSearch}
+                className="chat-search-clear"
+              >
+                {t("chat.clearSearch")}
+              </Button>
+            ) : null
+          }
+        />
+        <Button
+          appearance="subtle"
+          onClick={onExportMarkdown}
+          disabled={exportDisabled}
+          className="chat-export-button"
+          aria-label={t("chat.exportMarkdown")}
+        >
+          {t("chat.exportMarkdown")}
+        </Button>
+        <Button
+          appearance="subtle"
+          onClick={onExportJson}
+          disabled={exportDisabled}
+          className="chat-export-button"
+          aria-label={t("chat.exportJson")}
+        >
+          {t("chat.exportJson")}
+        </Button>
         <Button
           appearance="outline"
           onClick={onToggleHistory}

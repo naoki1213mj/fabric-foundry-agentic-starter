@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-    startNewConversation,
+  startNewConversation,
 } from "../../store/appSlice";
 import {
-    clearChat,
-    setUserMessage as setUserMessageAction,
+  clearChat,
+  setUserMessage as setUserMessageAction,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-    type AgentMode,
-    type ModelReasoningEffort,
-    type ModelType,
-    type ReasoningEffort,
-    type ReasoningSummary,
-    type ToolEvent
+  type AgentMode,
+  type ModelReasoningEffort,
+  type ModelType,
+  type ReasoningEffort,
+  type ReasoningSummary,
+  type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
@@ -51,6 +51,7 @@ const Chat: React.FC<ChatProps> = ({
   const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>("auto");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const [reasoningContent, setReasoningContent] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
 
@@ -61,6 +62,18 @@ const Chat: React.FC<ChatProps> = ({
   );
 
   const hasMessages = useMemo(() => messages.length > 0, [messages.length]);
+
+  const filteredMessages = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return messages;
+
+    return messages.filter((msg) => {
+      if (typeof msg.content === "string") {
+        return msg.content.toLowerCase().includes(term);
+      }
+      return false;
+    });
+  }, [messages, searchTerm]);
 
   const isInputDisabled = useMemo(() =>
     generatingResponse,
@@ -81,7 +94,6 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const throttledScrollChatToBottom = useMemo(
     () => throttle(() => {
       if (chatMessageStreamEnd.current) {
@@ -163,7 +175,6 @@ const Chat: React.FC<ChatProps> = ({
   const prevConversationIdRef = useRef<string | null>(null);
   const prevGeneratedConversationIdRef = useRef<string | null>(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Only clear tool events and reasoning content when switching to a DIFFERENT conversation
     // Not when the ID is updated for the SAME conversation (e.g., after saveToDB assigns an ID)
@@ -190,7 +201,7 @@ const Chat: React.FC<ChatProps> = ({
     prevConversationIdRef.current = selectedConversationId;
     prevGeneratedConversationIdRef.current = generatedConversationId;
 
-    if (generatingResponse || isStreamingInProgress) {
+    if (isActualConversationSwitch && (generatingResponse || isStreamingInProgress)) {
       const chatAPISignal = abortFuncs.current.shift();
       if (chatAPISignal) {
         chatAPISignal.abort(
@@ -198,7 +209,7 @@ const Chat: React.FC<ChatProps> = ({
         );
       }
     }
-  }, [selectedConversationId, generatedConversationId]);
+  }, [selectedConversationId, generatedConversationId, generatingResponse, isStreamingInProgress]);
 
   useEffect(() => {
     if (
@@ -227,9 +238,48 @@ const Chat: React.FC<ChatProps> = ({
     setReasoningContent("");  // Clear reasoning content when starting new conversation
   }, [dispatch]);
 
+  const handleEditUserMessage = useCallback((content: string) => {
+    if (generatingResponse) return;
+    dispatch(setUserMessageAction(content));
+    questionInputRef.current?.focus();
+  }, [dispatch, generatingResponse]);
+
+  const handleResendUserMessage = useCallback((content: string) => {
+    if (generatingResponse || !content.trim()) return;
+    sendChatMessage(content, currentConversationId);
+  }, [generatingResponse, sendChatMessage, currentConversationId]);
+
+  const downloadTextFile = useCallback((filename: string, content: string) => {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const exportChatAsJson = useCallback(() => {
+    if (messages.length === 0) return;
+    const filename = `conversation-${currentConversationId || "new"}.json`;
+    downloadTextFile(filename, JSON.stringify(messages, null, 2));
+  }, [messages, currentConversationId, downloadTextFile]);
+
+  const exportChatAsMarkdown = useCallback(() => {
+    if (messages.length === 0) return;
+    const filename = `conversation-${currentConversationId || "new"}.md`;
+    const md = messages.map((msg) => {
+      const role = msg.role === "assistant" ? "Assistant" : msg.role === "user" ? "User" : "System";
+      const content = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content, null, 2);
+      return `## ${role}\n\n${content}\n`;
+    }).join("\n");
+    downloadTextFile(filename, md);
+  }, [messages, currentConversationId, downloadTextFile]);
+
   // Event handlers
   // Keyboard shortcuts: Enter=send, Ctrl+Enter=send, Ctrl+K=new chat, Esc=stop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Ctrl+K: New conversation
     if (e.ctrlKey && e.key === "k") {
@@ -258,7 +308,6 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [isInputDisabled, userMessage, currentConversationId, sendChatMessage, generatingResponse, abortCurrentRequest, onNewConversation]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onClickSend = useCallback(() => {
     if (isInputDisabled) {
       return;
@@ -280,11 +329,19 @@ const Chat: React.FC<ChatProps> = ({
       <ChatHeader
         onToggleHistory={handleToggleHistory}
         isHistoryVisible={panelShowStates?.[panels.CHATHISTORY]}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onClearSearch={() => setSearchTerm("")}
+        onExportJson={exportChatAsJson}
+        onExportMarkdown={exportChatAsMarkdown}
+        exportDisabled={messages.length === 0}
       />
       <ChatMessageList
-        messages={messages}
+        messages={filteredMessages}
         isFetchingMessages={isFetchingConvMessages}
         hasMessages={hasMessages}
+        totalMessagesCount={messages.length}
+        searchTerm={searchTerm}
         generatingResponse={generatingResponse}
         isStreamingInProgress={isStreamingInProgress}
         isChartLoading={isChartLoading}
@@ -292,6 +349,8 @@ const Chat: React.FC<ChatProps> = ({
         reasoningContent={reasoningContent}
         parseCitationFromMessage={parseCitationFromMessage}
         chatMessageStreamEndRef={chatMessageStreamEnd}
+        onEditUserMessage={handleEditUserMessage}
+        onResendUserMessage={handleResendUserMessage}
         onSendMessage={(question) => {
           if (!isInputDisabled && question) {
             sendChatMessage(question, currentConversationId);

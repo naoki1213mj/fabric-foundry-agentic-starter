@@ -65,7 +65,6 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   // Memoize the chart data signature to prevent unnecessary re-renders
   const chartSignature = useMemo(() => getChartDataSignature(chartContent), [chartContent]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     // Copy ref to local variable for cleanup
     const chartRefCurrent = chartRef.current;
@@ -207,7 +206,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       }
     };
   // Use chartSignature as dependency - chart only re-creates when actual data changes
-  }, [chartSignature, validChart]);
+  }, [chartSignature, validChart, chartContent]);
 
   return (
     <div style={{ maxHeight: 350 }}>
