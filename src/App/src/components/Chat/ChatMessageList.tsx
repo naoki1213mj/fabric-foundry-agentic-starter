@@ -166,7 +166,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     }
 
     return (
-      <div style={{ ...style, width: "100%" }}>
+      <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
         <div ref={rowRef}>
           {item.type === "reasoning" && (
             <div className="reasoning-status-wrapper">
@@ -188,6 +188,12 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
           {item.type === "thinking" && (
             <ThinkingSkeleton />
+          )}
+
+          {item.type === "anchor" && (
+            <div style={{ height: 1 }}>
+              <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
+            </div>
           )}
         </div>
       </div>
