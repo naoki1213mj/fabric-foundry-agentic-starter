@@ -1,108 +1,55 @@
-import { DefaultButton, Spinner, SpinnerSize } from "@fluentui/react";
-import {
-    Body1,
-    Button,
-    Dropdown,
-    Option,
-    Subtitle2,
-    Textarea,
-} from "@fluentui/react-components";
-import { ChatAdd24Regular } from "@fluentui/react-icons";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getChatLandingText } from "../../config";
 import { generateUUIDv4 } from "../../configs/Utils";
 import {
-    setSelectedConversationId,
-    startNewConversation,
+  setSelectedConversationId,
+  startNewConversation,
 } from "../../store/appSlice";
 import {
-    addNewConversation,
-    updateConversation, // eslint-disable-line @typescript-eslint/no-unused-vars
+  addNewConversation,
+  updateConversation,
 } from "../../store/chatHistorySlice";
 import {
-    addMessages,
-    clearChat,
-    sendMessage,
-    setGeneratingResponse,
-    setStreamingFlag,
-    setUserMessage as setUserMessageAction,
-    updateMessageById,
+  addMessages,
+  clearChat,
+  sendMessage,
+  setGeneratingResponse,
+  setStreamingFlag,
+  setUserMessage as setUserMessageAction,
+  updateMessageById,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-    type AgentMode,
-    type ChartDataResponse,
-    type ChatMessage,
-    type Conversation,
-    type ConversationRequest,
-    type ParsedChunk,
-    type ReasoningEffort,
-    type ToolEvent,
-    ToolMessageContent,
+  type AgentMode,
+  type ChartDataResponse,
+  type ChatMessage,
+  type Conversation,
+  type ConversationRequest,
+  type ParsedChunk,
+  type ReasoningEffort,
+  type ToolEvent,
+  ToolMessageContent,
 } from "../../types/AppTypes";
 import {
-    isMalformedChartJSON,
-    parseChartContent,
+  isMalformedChartJSON,
+  parseChartContent,
 } from "../../utils/jsonUtils";
-import ChatMessageComponent from "../ChatMessage/ChatMessage";
-import { ToolStatusIndicator } from "../ToolStatusIndicator";
+import { ChatHeader } from "./ChatHeader";
+import { ChatInput } from "./ChatInput";
+import { ChatMessageList } from "./ChatMessageList";
+import { isChartQuery, parseToolEvents, throttle } from "./chatUtils";
 import "./Chat.css";
 
-// Last updated: 2025-02-04 - Added Reasoning Effort UI for Agentic Retrieval (Foundry IQ)
+// Last updated: 2025-02-05 - Refactored into sub-components
 
-// Throttle utility for scroll during streaming
-const throttle = <T extends (...args: Parameters<T>) => void>(fn: T, delay: number) => {
-  let lastCall = 0;
-  return (...args: Parameters<T>) => {
-    const now = Date.now();
-    if (now - lastCall >= delay) {
-      lastCall = now;
-      fn(...args);
-    }
-  };
-};
-
-// Tool event parsing: Extract tool events from streaming text
-const TOOL_EVENT_REGEX = /__TOOL_EVENT__(.*?)__END_TOOL_EVENT__/g;
-
-/**
- * Parse tool events from streaming text and return cleaned text
- * @param text Raw streaming text containing potential tool events
- * @returns { events: ToolEvent[], cleanedText: string }
- */
-const parseToolEvents = (text: string): { events: ToolEvent[]; cleanedText: string } => {
-  const events: ToolEvent[] = [];
-  let cleanedText = text;
-
-  // Use Array.from for ES5 compatibility (matchAll returns IterableIterator)
-  const matches = Array.from(text.matchAll(TOOL_EVENT_REGEX));
-  for (const match of matches) {
-    try {
-      const eventJson = match[1];
-      const event = JSON.parse(eventJson) as ToolEvent;
-      events.push(event);
-      // Remove the tool event marker from the text
-      cleanedText = cleanedText.replace(match[0], "");
-    } catch (e) {
-      // Skip malformed tool events
-      console.warn("Failed to parse tool event:", e);
-    }
-  }
-
-  return { events, cleanedText };
-};
+const [ASSISTANT, ERROR, USER] = ["assistant", "error", "user"];
 
 type ChatProps = {
   onHandlePanelStates: (name: string) => void;
   panels: Record<string, string>;
   panelShowStates: Record<string, boolean>;
 };
-
-const [ASSISTANT, ERROR, USER] = ["assistant", "error", "user"];
-
-const chatLandingText = getChatLandingText();
 
 const Chat: React.FC<ChatProps> = ({
   onHandlePanelStates,
@@ -116,27 +63,12 @@ const Chat: React.FC<ChatProps> = ({
   const generatedConversationId = useAppSelector((state) => state.app.generatedConversationId);
   const { isFetchingConvMessages } = useAppSelector((state) => state.chatHistory);
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
-  const [isChartLoading, setIsChartLoading] = useState(false)
+  const [isChartLoading, setIsChartLoading] = useState(false);
   const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
   const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const abortFuncs = useRef([] as AbortController[]);
   const chatMessageStreamEnd = useRef<HTMLDivElement | null>(null);
-
-  // Agent mode options
-  const agentModeOptions: { value: AgentMode; label: string; description: string }[] = [
-    { value: "sql_only", label: "SQL Only", description: "高速・SQLクエリのみ" },
-    { value: "multi_tool", label: "Multi Tool (推奨)", description: "全ツール使用・バランス型" },
-    { value: "handoff", label: "Handoff", description: "専門家エージェント委譲" },
-    { value: "magentic", label: "Magentic", description: "複雑な計画・マネージャー型" },
-  ];
-
-  // Reasoning effort options for Agentic Retrieval (Foundry IQ)
-  const reasoningEffortOptions: { value: ReasoningEffort; label: string; description: string }[] = [
-    { value: "minimal", label: "Minimal", description: "高速・直接検索（LLMなし）" },
-    { value: "low", label: "Low (推奨)", description: "シングルパス・バランス型" },
-    { value: "medium", label: "Medium", description: "反復検索・最高品質" },
-  ];
 
   // Memoized computed values
   const currentConversationId = useMemo(() =>
@@ -146,8 +78,6 @@ const Chat: React.FC<ChatProps> = ({
 
   const hasMessages = useMemo(() => messages.length > 0, [messages.length]);
 
-  // UX改善: DB保存中も入力を許可（ストリーミング完了後すぐに次の質問を入力可能に）
-  // isHistoryUpdateAPIPending は入力ブロックの条件から除外
   const isInputDisabled = useMemo(() =>
     generatingResponse,
     [generatingResponse]
@@ -158,19 +88,31 @@ const Chat: React.FC<ChatProps> = ({
     [generatingResponse, userMessage]
   );
 
-  const saveToDB = useCallback(async (newMessages: ChatMessage[], convId: string, reqType: string = 'Text') => {
+  // Scroll helpers
+  const scrollChatToBottom = useCallback(() => {
+    if (chatMessageStreamEnd.current) {
+      setTimeout(() => {
+        chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, []);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const throttledScrollChatToBottom = useMemo(
+    () => throttle(() => {
+      if (chatMessageStreamEnd.current) {
+        chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
+      }
+    }, 500),
+    []
+  );
+
+  // Save to database helper
+  const saveToDB = useCallback(async (newMessages: ChatMessage[], convId: string, reqType: string = "Text") => {
     if (!convId || !newMessages.length) {
       return;
     }
-    const isNewConversation = reqType !== 'graph' ? !selectedConversationId : false;
-
-    if (false) {  // Disabled: chart display default
-      setIsChartLoading(true);
-      setTimeout(()=>{
-        makeApiRequestForChart('show in a graph by default', convId)
-      },5000)
-
-    }
+    const isNewConversation = reqType !== "graph" ? !selectedConversationId : false;
 
     try {
       const result = await dispatch(updateConversation({ conversationId: convId, messages: newMessages })).unwrap();
@@ -192,51 +134,68 @@ const Chat: React.FC<ChatProps> = ({
       dispatch(setGeneratingResponse(false));
     }
   }, [selectedConversationId, messages, dispatch]);
+
+  // Citation parser
   const parseCitationFromMessage = useCallback((message: string) => {
-  try {
-    message = '{' + message;
-    const toolMessage = JSON.parse(message as string) as ToolMessageContent;
+    try {
+      message = "{" + message;
+      const toolMessage = JSON.parse(message as string) as ToolMessageContent;
 
-    if (toolMessage?.citations?.length) {
-      return toolMessage.citations.filter(
-        (c) => c.url?.trim() || c.title?.trim()
-      );
-    }
-  } catch {
-    // Error parsing tool content
-  }
-  return [];
-}, []);
-
-  const isChartQuery = useCallback((query: string) => {
-    const chartKeywords = [
-      "chart",
-      "graph",
-      "visualize",
-      "plot",
-      "グラフ",
-      "チャート",
-      "可視化",
-      "図",
-      "棒グラフ",
-      "円グラフ",
-      "折れ線",
-      "折れ線グラフ",
-    ];
-
-    // Convert to lowercase for case-insensitive matching
-    const lowerCaseQuery = query.toLowerCase();
-
-    // Use word boundary regex to match whole words only
-    return chartKeywords.some((keyword) => {
-      // 英語は単語境界、日本語は部分一致
-      if (/^[a-z]+$/i.test(keyword)) {
-        return new RegExp(`\\b${keyword}\\b`).test(lowerCaseQuery);
+      if (toolMessage?.citations?.length) {
+        return toolMessage.citations.filter(
+          (c) => c.url?.trim() || c.title?.trim()
+        );
       }
-      return lowerCaseQuery.includes(keyword);
-    });
+    } catch {
+      // Error parsing tool content
+    }
+    return [];
   }, []);
 
+  // Helper function to create and dispatch a message
+  const createAndDispatchMessage = useCallback((role: string, content: string | ChartDataResponse, shouldScroll: boolean = true): ChatMessage => {
+    const message: ChatMessage = {
+      id: generateUUIDv4(),
+      role,
+      content,
+      date: new Date().toISOString(),
+    };
+
+    dispatch(addMessages([message]));
+
+    if (shouldScroll) scrollChatToBottom();
+
+    return message;
+  }, [dispatch, scrollChatToBottom]);
+
+  // Helper function to extract chart data from response
+  const extractChartData = useCallback((chartResponse: ChartDataResponse | string): ChartDataResponse | string => {
+    if (typeof chartResponse === "object" && "answer" in chartResponse) {
+      return !chartResponse.answer ||
+             (typeof chartResponse.answer === "object" && Object.keys(chartResponse.answer).length === 0)
+        ? "Chart can not be generated, please try again."
+        : chartResponse.answer;
+    }
+
+    if (typeof chartResponse === "string") {
+      try {
+        const parsed = JSON.parse(chartResponse);
+        if (parsed && typeof parsed === "object" && "answer" in parsed) {
+          return !parsed.answer ||
+                 (typeof parsed.answer === "object" && Object.keys(parsed.answer).length === 0)
+            ? "Chart can not be generated, please try again."
+            : parsed.answer;
+        }
+      } catch {
+        // Fall through to default
+      }
+      return "Chart can not be generated, please try again.";
+    }
+
+    return chartResponse;
+  }, []);
+
+  // Effects
   useEffect(() => {
     if (generatingResponse || isStreamingInProgress) {
       const chatAPISignal = abortFuncs.current.shift();
@@ -259,72 +218,11 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [isFetchingConvMessages]);
 
-  const scrollChatToBottom = useCallback(() => {
-    if (chatMessageStreamEnd.current) {
-      setTimeout(() => {
-        chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, []);
-
-  // Throttled version for streaming - only scroll every 500ms to prevent flickering
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const throttledScrollChatToBottom = useMemo(
-    () => throttle(() => {
-      if (chatMessageStreamEnd.current) {
-        chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
-      }
-    }, 500),
-    []
-  );
-
   useEffect(() => {
     scrollChatToBottom();
   }, [generatingResponse, scrollChatToBottom]);
 
-  // Helper function to create and dispatch a message
-  const createAndDispatchMessage = useCallback((role: string, content: string | ChartDataResponse, shouldScroll: boolean = true): ChatMessage => {
-    const message: ChatMessage = {
-      id: generateUUIDv4(),
-      role,
-      content,
-      date: new Date().toISOString(),
-    };
-
-    dispatch(addMessages([message]));
-
-    if (shouldScroll) scrollChatToBottom();
-
-    return message;
-  }, [dispatch, scrollChatToBottom]);
-
-  // Helper function to extract chart data from response
-  const extractChartData = useCallback((chartResponse: ChartDataResponse | string): ChartDataResponse | string => {
-    if (typeof chartResponse === 'object' && 'answer' in chartResponse) {
-      return !chartResponse.answer ||
-             (typeof chartResponse.answer === "object" && Object.keys(chartResponse.answer).length === 0)
-        ? "Chart can't be generated, please try again."
-        : chartResponse.answer;
-    }
-
-    if (typeof chartResponse === 'string') {
-      try {
-        const parsed = JSON.parse(chartResponse);
-        if (parsed && typeof parsed === 'object' && 'answer' in parsed) {
-          return !parsed.answer ||
-                 (typeof parsed.answer === "object" && Object.keys(parsed.answer).length === 0)
-            ? "Chart can't be generated, please try again."
-            : parsed.answer;
-        }
-      } catch {
-        // Fall through to default
-      }
-      return "Chart can't be generated, please try again.";
-    }
-
-    return chartResponse;
-  }, []);
-
+  // API request for chart
   const makeApiRequestForChart = async (
     question: string,
     conversationId: string
@@ -339,11 +237,8 @@ const Chat: React.FC<ChatProps> = ({
     };
 
     dispatch(setGeneratingResponse(true));
-
     dispatch(addMessages([newMessage]));
-
     dispatch(setUserMessageAction(questionInputRef?.current?.value || ""));
-
     scrollChatToBottom();
 
     const abortController = new AbortController();
@@ -361,7 +256,7 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
       const response = result.payload;
 
@@ -370,7 +265,6 @@ const Chat: React.FC<ChatProps> = ({
         let runningText = "";
         let hasError = false;
 
-        // Read stream
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -385,12 +279,11 @@ const Chat: React.FC<ChatProps> = ({
               hasError = true;
               runningText = text;
             }
-          } catch (e) {
+          } catch {
             // Non-JSON chunk, continue
           }
         }
 
-        // Process response
         if (hasError) {
           const errorMsg = JSON.parse(runningText).error;
           const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
@@ -417,14 +310,12 @@ const Chat: React.FC<ChatProps> = ({
       }
 
       if (updatedMessages.length > 0) {
-        saveToDB(updatedMessages, conversationId, 'graph');
+        saveToDB(updatedMessages, conversationId, "graph");
       }
     } catch (e) {
-      // Error in chart API request
-
       if (abortController.signal.aborted) {
         updatedMessages = [newMessage];
-        saveToDB(updatedMessages, conversationId, 'graph');
+        saveToDB(updatedMessages, conversationId, "graph");
       } else if (e instanceof Error) {
         alert(e.message);
       } else {
@@ -438,6 +329,7 @@ const Chat: React.FC<ChatProps> = ({
     }
   };
 
+  // Main API request
   const makeApiRequestWithCosmosDB = async (
     question: string,
     conversationId: string
@@ -454,17 +346,13 @@ const Chat: React.FC<ChatProps> = ({
     };
 
     dispatch(setGeneratingResponse(true));
-    // Set chart loading state for graph queries to show loading indicator
     if (isChart) {
       setIsChartLoading(true);
     }
-    // Clear tool events for new message
     setToolEvents([]);
 
     dispatch(addMessages([newMessage]));
-
     dispatch(setUserMessageAction(""));
-
     scrollChatToBottom();
 
     const abortController = new AbortController();
@@ -490,7 +378,7 @@ const Chat: React.FC<ChatProps> = ({
     try {
       const result = await dispatch(sendMessage({ request, abortSignal: abortController.signal }));
       if (!sendMessage.fulfilled.match(result)) {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
       const response = result.payload;
 
@@ -500,7 +388,6 @@ const Chat: React.FC<ChatProps> = ({
         let runningText = "";
         let hasError = false;
 
-        // Read and process stream
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -511,7 +398,7 @@ const Chat: React.FC<ChatProps> = ({
           const { events: newToolEvents, cleanedText } = parseToolEvents(text);
           if (newToolEvents.length > 0) {
             setToolEvents((prev) => [...prev, ...newToolEvents]);
-            text = cleanedText; // Use cleaned text without tool event markers
+            text = cleanedText;
           }
 
           try {
@@ -524,12 +411,11 @@ const Chat: React.FC<ChatProps> = ({
               hasError = true;
               runningText = text;
             }
-          } catch (e) {
+          } catch {
             // Not JSON, continue processing as stream
           }
 
           if (!isChartResponseReceived) {
-            // Text-based streaming response
             const objects = text.split("\n").filter((val) => val !== "");
 
             objects.forEach((textValue) => {
@@ -546,25 +432,19 @@ const Chat: React.FC<ChatProps> = ({
                   const responseCitations = parsed?.choices?.[0]?.messages?.[0]?.citations;
 
                   if (responseContent) {
-                    // Backend sends accumulated content, so we use it directly
-                    // Create a new object to ensure Redux detects the change
                     streamMessage.content = responseContent;
                     streamMessage.role = parsed?.choices?.[0]?.messages?.[0]?.role || ASSISTANT;
 
-                    // Handle citations (Bing terms compliance)
                     if (responseCitations) {
                       streamMessage.citations = responseCitations;
                     }
 
-                    // Dispatch with a new object reference to trigger re-render
                     dispatch(updateMessageById({ ...streamMessage }));
-                    // Use throttled scroll during streaming to prevent flickering
                     throttledScrollChatToBottom();
-                    // Keep latest content for fallback parsing if needed
                     runningText = responseContent;
                   }
                 }
-              } catch (e) {
+              } catch {
                 // Skip malformed chunks
               }
             });
@@ -573,7 +453,7 @@ const Chat: React.FC<ChatProps> = ({
           }
         }
 
-        // END OF STREAMING - Process final response
+        // Process final response
         if (hasError) {
           const parsedError = JSON.parse(runningText);
           const errorMsg = parsedError.error === "Attempted to access streaming response content, without having called `read()`."
@@ -586,21 +466,18 @@ const Chat: React.FC<ChatProps> = ({
           if (streamMessage.content) {
             updatedMessages = [newMessage, streamMessage];
           } else {
-            // Fallback: attempt to parse chart-only responses
             try {
               const splitRunningText = runningText.split("}{");
               const parsedChartResponse = JSON.parse("{" + splitRunningText[splitRunningText.length - 1]);
 
               const rawChartContent = parsedChartResponse?.choices[0]?.messages[0]?.content;
 
-              // **OPTIMIZED: Use helper function for parsing**
               let chartResponse = typeof rawChartContent === "string"
                 ? parseChartContent(rawChartContent)
-                : rawChartContent || "Chart can't be generated, please try again.";
+                : rawChartContent || "Chart can not be generated, please try again.";
 
               chartResponse = extractChartData(chartResponse);
 
-              // Validate and create chart message
               if ((chartResponse?.type || chartResponse?.chartType) && chartResponse?.data) {
                 const chartMessage = createAndDispatchMessage(
                   ASSISTANT,
@@ -642,14 +519,12 @@ const Chat: React.FC<ChatProps> = ({
         saveToDB(updatedMessages, conversationId, isChatReq);
       }
     } catch (e) {
-      // Error in API request
-
       if (abortController.signal.aborted) {
         updatedMessages = streamMessage.content
           ? [newMessage, streamMessage]
           : [newMessage];
 
-        saveToDB(updatedMessages, conversationId, 'error');
+        saveToDB(updatedMessages, conversationId, "error");
       } else if (e instanceof Error) {
         alert(e.message);
       } else {
@@ -663,6 +538,7 @@ const Chat: React.FC<ChatProps> = ({
     }
   };
 
+  // Event handlers
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -699,160 +575,42 @@ const Chat: React.FC<ChatProps> = ({
     dispatch(clearChat());
     dispatch(clearCitation());
   }, [dispatch]);
+
+  const handleToggleHistory = useCallback(() => {
+    onHandlePanelStates(panels.CHATHISTORY);
+  }, [onHandlePanelStates, panels.CHATHISTORY]);
+
   return (
     <div className="chat-container">
-      <div className="chat-header">
-        <Subtitle2>{t("chat.title")}</Subtitle2>
-        <span>
-          <Button
-            appearance="outline"
-            onClick={() => onHandlePanelStates(panels.CHATHISTORY)}
-            className="hide-chat-history"
-          >
-            {panelShowStates?.[panels.CHATHISTORY] ? t("chat.hideHistory") : t("chat.showHistory")}
-          </Button>
-        </span>
-      </div>
-      <div className="chat-messages">
-        {Boolean(isFetchingConvMessages) && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            minHeight: '300px'
-          }}>
-            <Spinner
-              size={SpinnerSize.medium}
-              aria-label={t("loading.fetchingMessages")}
-            />
-          </div>
-        )}
-        {!isFetchingConvMessages && !hasMessages && (
-          <div className="initial-msg">
-            <h2>✨</h2>
-            <Subtitle2>{t("chat.startChatting")}</Subtitle2>
-            <Body1 style={{ textAlign: "center" }}>
-              {t("chat.landingText")}
-            </Body1>
-          </div>
-        )}
-        {!isFetchingConvMessages &&
-          messages.map((msg, index) => {
-            const isLastAssistantMessage = msg.role === "assistant" && index === messages.length - 1;
-
-            return (
-              <div key={msg.id || index} className={`chat-message ${msg.role}`}>
-                <ChatMessageComponent
-                  message={msg}
-                  index={index}
-                  isLastAssistantMessage={isLastAssistantMessage}
-                  generatingResponse={generatingResponse}
-                  parseCitationFromMessage={parseCitationFromMessage}
-                />
-              </div>
-            );
-          })}
-        {/* Tool status indicator - show only after response completion */}
-        {!generatingResponse && toolEvents.length > 0 && (
-          <div className="tool-status-wrapper">
-            <ToolStatusIndicator toolEvents={toolEvents} />
-          </div>
-        )}
-        {/* Show loading indicator:
-            - "回答を生成中" when waiting for response (generatingResponse && !isStreamingInProgress && !isChartLoading)
-            - "チャート生成中" when chart is loading AND not streaming (to avoid duplicate with ChatMessage)
-        */}
-        {((generatingResponse && !isStreamingInProgress && !isChartLoading) || (isChartLoading && !isStreamingInProgress)) && (
-          <div className="assistant-message loading-indicator">
-            <div className="typing-indicator">
-              <span className="generating-text">{isChartLoading ? t("chat.generatingChart") : t("chat.generating")} </span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </div>
-          </div>
-        )}
-        <div data-testid="streamendref-id" ref={chatMessageStreamEnd} />
-      </div>
-      <div className="chat-footer">
-        <div className="footer-input-row">
-          <Button
-            className="btn-create-conv"
-            shape="circular"
-            appearance="subtle"
-            icon={<ChatAdd24Regular />}
-            onClick={onNewConversation}
-            title={t("chat.createNewConversation")}
-            disabled={isInputDisabled}
-          />
-          <div className="text-area-container">
-            <Textarea
-              className="textarea-field"
-              value={userMessage}
-              onChange={(e, data) => setUserMessage(data.value || "")}
-              placeholder={t("chat.placeholder")}
-              onKeyDown={handleKeyDown}
-              ref={questionInputRef}
-              rows={2}
-              style={{ resize: "none" }}
-              appearance="outline"
-            />
-            <DefaultButton
-              iconProps={{ iconName: "Send" }}
-              role="button"
-              onClick={onClickSend}
-              disabled={isSendDisabled}
-              className="send-button"
-              aria-disabled={isSendDisabled}
-              title={t("chat.sendQuestion")}
-            />
-          </div>
-        </div>
-        <div className="footer-settings-row">
-          <div className="setting-item">
-            <span className="setting-label" title="エージェントの動作モード">🤖 Agent Mode:</span>
-            <Dropdown
-              placeholder="Agent Mode"
-              value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
-              selectedOptions={[agentMode]}
-              onOptionSelect={(_, data) => setAgentMode(data.optionValue as AgentMode)}
-              disabled={isInputDisabled}
-              style={{ minWidth: "160px" }}
-            >
-              {agentModeOptions.map((option) => (
-                <Option key={option.value} value={option.value} text={option.label}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: 500 }}>{option.label}</span>
-                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
-                  </div>
-                </Option>
-              ))}
-            </Dropdown>
-          </div>
-          <div className="setting-item">
-            <span className="setting-label" title="ドキュメント検索の推論レベル (Foundry IQ)">🔍 Doc Search:</span>
-            <Dropdown
-              placeholder="Reasoning Effort"
-              value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
-              selectedOptions={[reasoningEffort]}
-              onOptionSelect={(_, data) => setReasoningEffort(data.optionValue as ReasoningEffort)}
-              disabled={isInputDisabled}
-              style={{ minWidth: "140px" }}
-              title="ドキュメント検索の推論レベル (Foundry IQ)"
-            >
-              {reasoningEffortOptions.map((option) => (
-                <Option key={option.value} value={option.value} text={option.label}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span style={{ fontWeight: 500 }}>{option.label}</span>
-                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
-                  </div>
-                </Option>
-              ))}
-            </Dropdown>
-          </div>
-        </div>
-      </div>
+      <ChatHeader
+        onToggleHistory={handleToggleHistory}
+        isHistoryVisible={panelShowStates?.[panels.CHATHISTORY]}
+      />
+      <ChatMessageList
+        messages={messages}
+        isFetchingMessages={isFetchingConvMessages}
+        hasMessages={hasMessages}
+        generatingResponse={generatingResponse}
+        isStreamingInProgress={isStreamingInProgress}
+        isChartLoading={isChartLoading}
+        toolEvents={toolEvents}
+        parseCitationFromMessage={parseCitationFromMessage}
+        chatMessageStreamEndRef={chatMessageStreamEnd}
+      />
+      <ChatInput
+        userMessage={userMessage}
+        onUserMessageChange={setUserMessage}
+        onSend={onClickSend}
+        onKeyDown={handleKeyDown}
+        onNewConversation={onNewConversation}
+        isInputDisabled={isInputDisabled}
+        isSendDisabled={isSendDisabled}
+        questionInputRef={questionInputRef}
+        agentMode={agentMode}
+        onAgentModeChange={setAgentMode}
+        reasoningEffort={reasoningEffort}
+        onReasoningEffortChange={setReasoningEffort}
+      />
     </div>
   );
 };
