@@ -177,7 +177,7 @@ class WebAgentHandler:
                                                 )
 
                     logger.info(
-                        f"Bing response: len={len(answer_text)}, citations={len(citations)}"
+                        f"Bing response: len={len(answer_text)}, citations={len(citations)}, with_position={len(annotations_with_position)}"
                     )
 
                 finally:
@@ -220,6 +220,20 @@ class WebAgentHandler:
                             )
 
                     logger.info(f"Inserted {len(sorted_annotations)} inline citations")
+                elif citations:
+                    # Fallback: Bing API does not provide start_index/end_index
+                    # Add reference numbers at the end of each paragraph
+                    logger.info("No position data from Bing API, using fallback inline citation")
+                    # Add reference superscripts at the end of answer
+                    # Create a simple reference list inline
+                    ref_markers = ", ".join(
+                        [
+                            f"[[{i + 1}]]({cit.get('url', '')})"
+                            for i, cit in enumerate(citations[:5])
+                        ]
+                    )
+                    if ref_markers:
+                        answer_text = answer_text.rstrip() + f"\n\n*参照: {ref_markers}*"
 
                 formatted_citations = []
                 for i, cit in enumerate(citations):

@@ -296,7 +296,8 @@ const Dashboard: React.FC = () => {
           {panelShowStates?.[panels.CHAT] && (
             <div
               style={{
-                width: `${panelWidths[panels.CHAT]}%`,
+                flex: `0 0 ${panelWidths[panels.CHAT]}%`,
+                maxWidth: `${panelWidths[panels.CHAT]}%`,
             }}
           >
             <Chat
@@ -309,9 +310,8 @@ const Dashboard: React.FC = () => {
         {citation.showCitation && citation.currentConversationIdForCitation !== "" && (
           <div
             style={{
-              // width: `${panelWidths[panels.DASHBOARD]}%`,
-              width: `${panelWidths[panels.CHATHISTORY] || 17}%`,
-              // minWidth: '30%'
+              flex: `0 0 ${panelWidths[panels.CHATHISTORY] || 17}%`,
+              maxWidth: `${panelWidths[panels.CHATHISTORY] || 17}%`,
             }}
           >
             <CitationPanel activeCitation={citation.activeCitation}  />
@@ -323,7 +323,8 @@ const Dashboard: React.FC = () => {
           panelShowStates?.[panels.CHATHISTORY] && (
             <div
               style={{
-                width: `${panelWidths[panels.CHATHISTORY]}%`,
+                flex: `0 0 ${panelWidths[panels.CHATHISTORY]}%`,
+                maxWidth: `${panelWidths[panels.CHATHISTORY]}%`,
               }}
             >
               <ChatHistoryPanel

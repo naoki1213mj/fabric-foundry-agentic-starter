@@ -313,9 +313,14 @@ const Chat: React.FC<ChatProps> = ({
     }
   }, [isFetchingConvMessages, scrollTargetIndex]);
 
+  // 応答生成開始時のみスクロール（生成中・終了時は発動しない）
+  const prevGeneratingRef = useRef(generatingResponse);
   useEffect(() => {
-    // 応答生成中のみスクロール（生成終了時は発動しない）
-    if (generatingResponse) {
+    const wasNotGenerating = !prevGeneratingRef.current;
+    prevGeneratingRef.current = generatingResponse;
+
+    // 生成開始時（false→true）のみスクロール
+    if (wasNotGenerating && generatingResponse && autoScrollEnabledRef.current) {
       scrollChatToBottom();
     }
   }, [generatingResponse, scrollChatToBottom]);
