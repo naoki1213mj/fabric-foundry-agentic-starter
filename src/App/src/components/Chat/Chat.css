@@ -332,6 +332,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   box-shadow: var(--shadow-md);
+  flex-shrink: 0;
 }
 
 .send-button:hover:not(:disabled) {
@@ -348,6 +349,43 @@
   background: var(--color-bg-tertiary);
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* === Stop Button - Red Style === */
+.stop-button {
+  padding: 0;
+  border: none;
+  min-width: 44px !important;
+  height: 44px !important;
+  background: var(--color-accent-error) !important;
+  border-radius: var(--radius-full) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+  animation: pulse-stop 1.5s infinite;
+}
+
+.stop-button:hover {
+  background: #b91c1c !important;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.stop-button:active {
+  transform: scale(0.95);
+}
+
+@keyframes pulse-stop {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+  }
 }
 
 .send-button > span > i {

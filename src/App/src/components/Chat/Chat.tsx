@@ -1,22 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ListImperativeAPI } from "react-window";
 import {
-  setSelectedConversationId,
-  startNewConversation,
+    setSelectedConversationId,
+    startNewConversation,
 } from "../../store/appSlice";
 import {
-  clearChat,
-  setUserMessage as setUserMessageAction,
+    clearChat,
+    setUserMessage as setUserMessageAction,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  type AgentMode,
-  type ModelReasoningEffort,
-  type ModelType,
-  type ReasoningEffort,
-  type ReasoningSummary,
-  type ToolEvent
+    type AgentMode,
+    type ModelReasoningEffort,
+    type ModelType,
+    type ReasoningEffort,
+    type ReasoningSummary,
+    type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
@@ -466,10 +466,12 @@ const Chat: React.FC<ChatProps> = ({
         userMessage={userMessage}
         onUserMessageChange={setUserMessage}
         onSend={onClickSend}
+        onStop={abortCurrentRequest}
         onKeyDown={handleKeyDown}
         onNewConversation={onNewConversation}
         isInputDisabled={isInputDisabled}
         isSendDisabled={isSendDisabled}
+        isGenerating={generatingResponse}
         questionInputRef={questionInputRef}
         agentMode={agentMode}
         onAgentModeChange={setAgentMode}

@@ -6,8 +6,8 @@ import {
     Slider,
     Textarea,
 } from "@fluentui/react-components";
-import { ChatAdd24Regular } from "@fluentui/react-icons";
-import React from "react";
+import { ChatAdd24Regular, Stop24Regular } from "@fluentui/react-icons";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { AgentMode, ModelReasoningEffort, ModelType, ReasoningEffort, ReasoningSummary } from "../../types/AppTypes";
 
@@ -15,10 +15,12 @@ interface ChatInputProps {
   userMessage: string;
   onUserMessageChange: (value: string) => void;
   onSend: () => void;
+  onStop: () => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onNewConversation: () => void;
   isInputDisabled: boolean;
   isSendDisabled: boolean;
+  isGenerating: boolean;
   questionInputRef: React.RefObject<HTMLTextAreaElement>;
   // Agent settings
   agentMode: AgentMode;
@@ -79,10 +81,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   userMessage,
   onUserMessageChange,
   onSend,
+  onStop,
   onKeyDown,
   onNewConversation,
   isInputDisabled,
   isSendDisabled,
+  isGenerating,
   questionInputRef,
   agentMode,
   onAgentModeChange,
@@ -98,6 +102,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onReasoningSummaryChange,
 }) => {
   const { t } = useTranslation();
+  const textareaContainerRef = useRef<HTMLDivElement>(null);
+
+  // テキストエリアの自動拡張
+  const adjustTextareaHeight = useCallback(() => {
+    const textarea = questionInputRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      const newHeight = Math.min(textarea.scrollHeight, 200); // 最大200px
+      textarea.style.height = `${newHeight}px`;
+    }
+  }, [questionInputRef]);
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [userMessage, adjustTextareaHeight]);
 
   return (
     <div className="chat-footer">
@@ -111,7 +130,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           title={t("chat.createNewConversation")}
           disabled={isInputDisabled}
         />
-        <div className="text-area-container">
+        <div className="text-area-container" ref={textareaContainerRef}>
           <Textarea
             className="textarea-field"
             value={userMessage}
@@ -119,19 +138,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             placeholder={t("chat.placeholder")}
             onKeyDown={onKeyDown}
             ref={questionInputRef}
-            rows={2}
-            style={{ resize: "none" }}
+            rows={1}
+            style={{ resize: "vertical", minHeight: "44px", maxHeight: "200px", overflow: "auto" }}
             appearance="outline"
           />
-          <DefaultButton
-            iconProps={{ iconName: "Send" }}
-            role="button"
-            onClick={onSend}
-            disabled={isSendDisabled}
-            className="send-button"
-            aria-disabled={isSendDisabled}
-            title={t("chat.sendQuestion")}
-          />
+          {isGenerating ? (
+            <Button
+              icon={<Stop24Regular />}
+              onClick={onStop}
+              className="stop-button"
+              appearance="primary"
+              title={t("chat.stopGenerating")}
+              aria-label={t("chat.stopGenerating")}
+            />
+          ) : (
+            <DefaultButton
+              iconProps={{ iconName: "Send" }}
+              role="button"
+              onClick={onSend}
+              disabled={isSendDisabled}
+              className="send-button"
+              aria-disabled={isSendDisabled}
+              title={t("chat.sendQuestion")}
+            />
+          )}
         </div>
       </div>
       <div className="footer-settings-row">
