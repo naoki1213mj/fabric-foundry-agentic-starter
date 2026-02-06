@@ -3,6 +3,7 @@ import { DismissRegular } from '@fluentui/react-icons';
 import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { clearCitation } from '../../store/citationSlice';
 import { useAppDispatch } from '../../store/hooks';
@@ -63,13 +64,13 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
                 <h5
 
                 >
-                    {activeCitation.title}
+                    {activeCitation?.title}
                 </h5>
 
                 <ReactMarkdown
                 children={activeCitation?.content}
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw]}
+                rehypePlugins={[rehypeRaw, rehypeSanitize]}
                 components={markdownComponents}
               />
             </Stack.Item>

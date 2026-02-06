@@ -76,6 +76,10 @@ const backgroundPlugin: Plugin = {
     }
   },
 };
+
+// Register Chart.js components once at module level (idempotent but avoids per-render overhead)
+ChartJS.register(...registerables, backgroundPlugin);
+
 interface ChartProps {
   chartContent: {
     data: any;
@@ -135,8 +139,6 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
     chartInstanceRef.current.destroy();
     chartInstanceRef.current = null;
   }
-
-  ChartJS.register(...registerables, backgroundPlugin);
 
   // Get theme-aware colors
   const colors = getChartColors(themeMode);
@@ -258,12 +260,12 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       });
     });
 
-    if (chartRefCurrent?.parentElement !== null) {
+    if (chartRefCurrent?.parentElement) {
       resizeObserver.observe(chartRefCurrent.parentElement);
     }
 
     return () => {
-      if (chartRefCurrent?.parentElement !== null) {
+      if (chartRefCurrent?.parentElement) {
         resizeObserver.unobserve(chartRefCurrent.parentElement);
       }
       if (chartInstanceRef.current) {

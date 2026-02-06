@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 /**
  * Format timestamp for display in Japan timezone
  */
@@ -214,4 +216,17 @@ export const addTargetBlankToLinks = (html: string): string => {
       return `<a ${attributes} target="_blank" rel="noopener noreferrer">`;
     }
   );
+};
+
+/**
+ * Sanitize HTML content to prevent XSS attacks, then add target="_blank" to links.
+ * Uses DOMPurify to remove dangerous elements (script, event handlers, etc.)
+ * while preserving safe formatting tags.
+ */
+export const sanitizeAndProcessLinks = (html: string): string => {
+  const clean = DOMPurify.sanitize(html, {
+    ADD_ATTR: ['target', 'rel'],
+    ADD_TAGS: ['table', 'thead', 'tbody', 'tr', 'th', 'td'],
+  });
+  return addTargetBlankToLinks(clean);
 };

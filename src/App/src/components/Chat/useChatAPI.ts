@@ -112,8 +112,9 @@ export const useChatAPI = ({
         dispatch(addNewConversation(newConversation));
         dispatch(setSelectedConversationId(resolvedConversationId));
       }
-    } catch {
-      // Error saving data to database
+    } catch (dbError) {
+      // Log database save failures for debugging
+      console.error('[useChatAPI] Failed to save conversation to database:', dbError);
     } finally {
       dispatch(setGeneratingResponse(false));
     }
@@ -177,12 +178,15 @@ export const useChatAPI = ({
   ): Promise<boolean> => {
     let isChartResponseReceived = false;
     const KEEPALIVE_MARKER = "__KEEPALIVE__";
+    // Reuse a single TextDecoder to correctly handle
+    // multi-byte characters (Japanese) split across chunk boundaries
+    const decoder = new TextDecoder("utf-8");
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      let text = new TextDecoder("utf-8").decode(value);
+      let text = decoder.decode(value, { stream: true });
 
       // Filter out keepalive markers (used to prevent App Service timeout)
       if (text.includes(KEEPALIVE_MARKER)) {
@@ -387,10 +391,15 @@ export const useChatAPI = ({
 
         // Process final response
         if (hasError.value) {
-          const parsedError = JSON.parse(runningText.value);
-          const errorMsg = parsedError.error === "Attempted to access streaming response content, without having called `read()`."
-            ? "An error occurred. Please try again later."
-            : parsedError.error;
+          let errorMsg: string;
+          try {
+            const parsedError = JSON.parse(runningText.value);
+            errorMsg = parsedError.error === "Attempted to access streaming response content, without having called `read()`."
+              ? "An error occurred. Please try again later."
+              : parsedError.error;
+          } catch {
+            errorMsg = runningText.value || "An error occurred. Please try again later.";
+          }
 
           const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
           updatedMessages = [newMessage, errorMessage];
@@ -433,6 +442,9 @@ export const useChatAPI = ({
       dispatch(setGeneratingResponse(false));
       dispatch(setStreamingFlag(false));
       onChartLoadingChange(false);
+      // Remove this controller from the array to prevent accumulation
+      const idx = abortFuncs.current.indexOf(abortController);
+      if (idx !== -1) abortFuncs.current.splice(idx, 1);
       abortController.abort();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- messages is intentionally excluded; we use store.getState() for latest state

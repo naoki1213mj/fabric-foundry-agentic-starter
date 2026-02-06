@@ -9,12 +9,12 @@ import { ChartLoadingSkeleton, StreamingChartIndicator } from './ChartMessage';
 import { CopyButton } from './CopyButton';
 import { MessageReactions } from './MessageReactions';
 import {
-    addTargetBlankToLinks,
     containsHtml,
     extractChartsFromText,
     extractTextExcludingChart,
     formatTimestamp,
     looksLikeChartJson,
+    sanitizeAndProcessLinks,
     stripHtmlTags
 } from './messageUtils';
 
@@ -76,7 +76,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
 
         {availableText && (
           hasHTML ? (
-            <div dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(availableText) }} className="html-content" />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeAndProcessLinks(availableText) }} className="html-content" />
           ) : (
             <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={availableText} />
           )
@@ -151,7 +151,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
 
         {textPart && (
           hasHTML ? (
-            <div dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(textPart) }} className="html-content" />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeAndProcessLinks(textPart) }} className="html-content" />
           ) : (
             <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={textPart} />
           )
@@ -198,7 +198,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
       </div>
 
       {hasHTML ? (
-        <div dangerouslySetInnerHTML={{ __html: addTargetBlankToLinks(content) }} className="html-content" />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeAndProcessLinks(content) }} className="html-content" />
       ) : (
         <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents} children={content} />
       )}
