@@ -1,24 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ListImperativeAPI } from "react-window";
 import {
-    setSelectedConversationId,
-    startNewConversation,
+  setSelectedConversationId,
+  startNewConversation,
 } from "../../store/appSlice";
 import { fetchConversationMessages } from "../../store/chatHistorySlice";
 import {
-    clearChat,
-    setMessages,
-    setUserMessage as setUserMessageAction,
+  clearChat,
+  setMessages,
+  setUserMessage as setUserMessageAction,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-    type AgentMode,
-    type ModelReasoningEffort,
-    type ModelType,
-    type ReasoningEffort,
-    type ReasoningSummary,
-    type ToolEvent
+  type AgentMode,
+  type ModelReasoningEffort,
+  type ModelType,
+  type ReasoningEffort,
+  type ReasoningSummary,
+  type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
@@ -61,6 +61,7 @@ const Chat: React.FC<ChatProps> = ({
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
   const autoScrollEnabledRef = useRef(true);
+  const isStreamingRef = useRef(false);
   const listApiRef = useRef<ListImperativeAPI | null>(null);
 
   // Memoized computed values
@@ -144,6 +145,17 @@ const Chat: React.FC<ChatProps> = ({
     const { scrollTop, scrollHeight, clientHeight } = element;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     const isAtBottom = distanceFromBottom < 150; // 150px threshold
+
+    if (isStreamingRef.current) {
+      // ストリーミング中: ユーザーが上にスクロールした場合のみ auto-scroll を無効化
+      // 底に到達しても再有効化しない（scrollToRow の位置ジャンプを防止）
+      if (!isAtBottom && autoScrollEnabledRef.current) {
+        autoScrollEnabledRef.current = false;
+        setAutoScrollEnabled(false);
+      }
+      return;
+    }
+
     if (autoScrollEnabledRef.current !== isAtBottom) {
       autoScrollEnabledRef.current = isAtBottom;
       setAutoScrollEnabled(isAtBottom);
@@ -351,6 +363,26 @@ const Chat: React.FC<ChatProps> = ({
       });
     }
   }, [generatingResponse, scrollChatToBottom]);
+
+  // ストリーミング状態を ref に同期（handleScroll コールバックから参照）
+  useEffect(() => {
+    isStreamingRef.current = isStreamingInProgress;
+  }, [isStreamingInProgress]);
+
+  // 応答生成完了時: ユーザーが底にいれば auto-scroll を再有効化
+  useEffect(() => {
+    if (!generatingResponse && !isStreamingInProgress) {
+      const element = listApiRef.current?.element ?? chatContainerRef.current;
+      if (element) {
+        const { scrollTop, scrollHeight, clientHeight } = element;
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+        if (distanceFromBottom < 150) {
+          autoScrollEnabledRef.current = true;
+          setAutoScrollEnabled(true);
+        }
+      }
+    }
+  }, [generatingResponse, isStreamingInProgress]);
 
   // メッセージ追加時に最下部へスクロール（自動スクロール有効時のみ）
   const prevMessagesLengthRef = useRef(messages.length);

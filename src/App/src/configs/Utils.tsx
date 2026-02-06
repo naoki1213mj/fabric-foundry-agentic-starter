@@ -131,11 +131,19 @@ export const segregateItems = (items: Conversation[]) => {
   };
 
   items.forEach((item) => {
-    const itemDate = new Date(item.updatedAt ? item.updatedAt : new Date());
-    const itemDateOnly = itemDate.toDateString();
-    if (itemDateOnly === today.toDateString()) {
+    const rawDate = item.updatedAt ? item.updatedAt : new Date().toISOString();
+    // Backend stores UTC without 'Z' suffix - treat as UTC
+    const dateStr = typeof rawDate === 'string' && !/Z|[+-]\d{2}:\d{2}$/.test(rawDate)
+      ? rawDate + 'Z' : rawDate;
+    const itemDate = new Date(typeof dateStr === 'string' ? dateStr : dateStr);
+    // Compare dates in Asia/Tokyo timezone for consistency
+    const japanOptions: Intl.DateTimeFormatOptions = { timeZone: "Asia/Tokyo" };
+    const itemDateOnly = itemDate.toLocaleDateString("ja-JP", japanOptions);
+    const todayStr = today.toLocaleDateString("ja-JP", japanOptions);
+    const yesterdayStr = yesterday.toLocaleDateString("ja-JP", japanOptions);
+    if (itemDateOnly === todayStr) {
       groupedItems.Today.push(item);
-    } else if (itemDateOnly === yesterday.toDateString()) {
+    } else if (itemDateOnly === yesterdayStr) {
       groupedItems.Yesterday.push(item);
     } else if (isLastSevenDaysRange(itemDate)) {
       groupedItems.Last7Days.push(item);

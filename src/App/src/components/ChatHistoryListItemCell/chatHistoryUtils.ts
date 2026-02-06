@@ -38,7 +38,10 @@ export const truncateTitle = (title: string | undefined, maxLength = 28): string
 export const formatTimestamp = (dateStr?: string): string => {
   if (!dateStr) return "";
 
-  const date = new Date(dateStr);
+  // Backend stores UTC via datetime.utcnow().isoformat() without 'Z' suffix,
+  // so we need to treat no-TZ strings as UTC
+  const dateStrFixed = /Z|[+-]\d{2}:\d{2}$/.test(dateStr) ? dateStr : dateStr + 'Z';
+  const date = new Date(dateStrFixed);
   const now = new Date();
 
   // 日本時間で比較するためのオプション

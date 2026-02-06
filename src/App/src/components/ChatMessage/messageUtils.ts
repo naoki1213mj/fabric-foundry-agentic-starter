@@ -1,12 +1,26 @@
 import DOMPurify from 'dompurify';
 
 /**
+ * Ensure a date string is treated as UTC.
+ * Backend stores UTC via datetime.utcnow().isoformat() without 'Z' suffix,
+ * so JavaScript's Date constructor would treat it as local time.
+ */
+const parseAsUTC = (dateString: string): Date => {
+  // If already has timezone info (Z, +, -offset), parse as-is
+  if (/Z|[+-]\d{2}:\d{2}$/.test(dateString)) {
+    return new Date(dateString);
+  }
+  // Append 'Z' to treat as UTC
+  return new Date(dateString + 'Z');
+};
+
+/**
  * Format timestamp for display in Japan timezone
  */
 export const formatTimestamp = (dateString: string | undefined): string => {
   if (!dateString) return '';
   try {
-    const date = new Date(dateString);
+    const date = parseAsUTC(dateString);
     if (isNaN(date.getTime())) return '';
     return date.toLocaleTimeString('ja-JP', {
       hour: '2-digit',
@@ -207,6 +221,28 @@ export const containsHtml = (content: string): boolean => {
 export const convertLegacyCitationMarkers = (text: string): string => {
   // [[N]](url) → [N](url)
   return text.replace(/\[\[(\d+)\]\]\(([^)]+)\)/g, '[$1]($2)');
+};
+
+/**
+ * Convert inline [N] plain-text citation markers to clickable markdown links
+ * using the citations array. This ensures inline numbers match the Citations UI.
+ *
+ * Matches [N] not already followed by ( (which would be [N](url)), and not
+ * preceded by [ (which would be [[N]]).
+ */
+export const linkInlineCitations = (text: string, citations: any[]): string => {
+  if (!citations || citations.length === 0) return text;
+
+  return text.replace(/(?<!\[)\[(\d+)\](?!\(|\])/g, (match, numStr) => {
+    const num = parseInt(numStr, 10);
+    if (num >= 1 && num <= citations.length) {
+      const citation = citations[num - 1];
+      if (citation?.url) {
+        return `[${num}](${citation.url})`;
+      }
+    }
+    return match;
+  });
 };
 
 /**

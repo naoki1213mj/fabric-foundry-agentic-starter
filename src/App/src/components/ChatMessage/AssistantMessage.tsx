@@ -14,6 +14,7 @@ import {
   extractChartsFromText,
   extractTextExcludingChart,
   formatTimestamp,
+  linkInlineCitations,
   looksLikeChartJson,
   sanitizeAndProcessLinks,
   stripHtmlTags
@@ -39,7 +40,19 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
 }) => {
   const { t } = useTranslation();
   const timestamp = formatTimestamp(message.date);
-  const content = convertLegacyCitationMarkers(message.content as string);
+
+  // Parse citations first so we can use them for inline linking
+  const citationsList = useMemo(() =>
+    message.role === "assistant" ? parseCitationFromMessage(message.citations) : [],
+    [message.role, message.citations, parseCitationFromMessage]
+  );
+
+  // Process content: legacy markers → inline citation links
+  const content = useMemo(() => {
+    let text = convertLegacyCitationMarkers(message.content as string);
+    text = linkInlineCitations(text, citationsList);
+    return text;
+  }, [message.content, citationsList]);
 
   // Cache remarkPlugins array to prevent re-creation on every render
   const remarkPlugins = useMemo(() => [remarkGfm, supersub], []);
@@ -174,7 +187,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
           <Citations
             answer={{
               answer: textPart || content,
-              citations: message.role === "assistant" ? parseCitationFromMessage(message.citations) : [],
+              citations: citationsList,
             }}
             index={index}
           />
@@ -214,7 +227,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
         <Citations
           answer={{
             answer: content,
-            citations: message.role === "assistant" ? parseCitationFromMessage(message.citations) : [],
+            citations: citationsList,
           }}
           index={index}
         />
