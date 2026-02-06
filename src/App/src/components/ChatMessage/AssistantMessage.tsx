@@ -112,9 +112,19 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
   // If parsed successfully and it's a chart object
   if (parsedContent && typeof parsedContent === "object") {
     let chartData = null;
+    let multiCharts: any[] | null = null;
 
+    // Multiple charts wrapper {"charts": [{type, data}, ...]}
+    if ("charts" in parsedContent && Array.isArray(parsedContent.charts)) {
+      const validCharts = parsedContent.charts.filter(
+        (c: any) => c && typeof c === "object" && ("type" in c || "chartType" in c) && "data" in c
+      );
+      if (validCharts.length > 0) {
+        multiCharts = validCharts;
+      }
+    }
     // Direct chart object {type, data, options}
-    if (("type" in parsedContent || "chartType" in parsedContent) && "data" in parsedContent) {
+    else if (("type" in parsedContent || "chartType" in parsedContent) && "data" in parsedContent) {
       chartData = parsedContent;
     }
     // Wrapped chart {"answer": {type, data, options}}
@@ -125,7 +135,33 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
       }
     }
 
-    // Render chart if valid chartData was found
+    // Render multiple charts
+    if (multiCharts && multiCharts.length > 0) {
+      try {
+        return (
+          <div className="assistant-message chart-message">
+            {multiCharts.map((chart, idx) => (
+              <div key={idx} className="chart-section" style={{ marginTop: idx > 0 ? '12px' : undefined }}>
+                <Suspense fallback={<ChartLoadingSkeleton />}>
+                  <ChatChart chartContent={chart as ChartDataResponse} />
+                </Suspense>
+              </div>
+            ))}
+            <div className="answerDisclaimerContainer">
+              <span className="answerDisclaimer">{t("message.aiDisclaimer")}</span>
+            </div>
+          </div>
+        );
+      } catch {
+        return (
+          <div className="assistant-message error-message">
+            ⚠️ {t("error.chartDisplay")}
+          </div>
+        );
+      }
+    }
+
+    // Render single chart if valid chartData was found
     if (chartData && ("type" in chartData || "chartType" in chartData) && "data" in chartData) {
       try {
         return (

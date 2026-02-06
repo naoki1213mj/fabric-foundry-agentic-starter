@@ -214,9 +214,7 @@ class WebAgentHandler:
                         }
                     )
 
-                logger.info(
-                    f"Prepared {len(formatted_citations)} citations for UI display"
-                )
+                logger.info(f"Prepared {len(formatted_citations)} citations for UI display")
 
                 return json.dumps(
                     {

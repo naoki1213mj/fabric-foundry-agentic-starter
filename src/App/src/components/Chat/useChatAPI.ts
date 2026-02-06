@@ -143,22 +143,34 @@ export const useChatAPI = ({
   // Helper function to extract chart data from response
   const extractChartData = useCallback((
     chartResponse: ChartDataResponse | string
-  ): ChartDataResponse | string => {
-    if (typeof chartResponse === "object" && "answer" in chartResponse) {
-      return !chartResponse.answer ||
-             (typeof chartResponse.answer === "object" && Object.keys(chartResponse.answer).length === 0)
-        ? "Chart can not be generated, please try again."
-        : chartResponse.answer;
+  ): ChartDataResponse | string | { charts: any[] } => {
+    if (typeof chartResponse === "object" && chartResponse !== null) {
+      // Handle {"charts": [...]} wrapper - pass through as-is
+      if ("charts" in chartResponse && Array.isArray((chartResponse as any).charts)) {
+        return chartResponse;
+      }
+      if ("answer" in chartResponse) {
+        return !chartResponse.answer ||
+               (typeof chartResponse.answer === "object" && Object.keys(chartResponse.answer).length === 0)
+          ? "Chart can not be generated, please try again."
+          : chartResponse.answer;
+      }
     }
 
     if (typeof chartResponse === "string") {
       try {
         const parsed = JSON.parse(chartResponse);
-        if (parsed && typeof parsed === "object" && "answer" in parsed) {
-          return !parsed.answer ||
-                 (typeof parsed.answer === "object" && Object.keys(parsed.answer).length === 0)
-            ? "Chart can not be generated, please try again."
-            : parsed.answer;
+        if (parsed && typeof parsed === "object") {
+          // Handle {"charts": [...]} wrapper
+          if ("charts" in parsed && Array.isArray(parsed.charts)) {
+            return parsed;
+          }
+          if ("answer" in parsed) {
+            return !parsed.answer ||
+                   (typeof parsed.answer === "object" && Object.keys(parsed.answer).length === 0)
+              ? "Chart can not be generated, please try again."
+              : parsed.answer;
+          }
         }
       } catch {
         // Fall through to default
@@ -281,6 +293,15 @@ export const useChatAPI = ({
         : rawChartContent || "Chart can not be generated, please try again.";
 
       chartResponse = extractChartData(chartResponse);
+
+      // Handle {"charts": [...]} array - keep as string for AssistantMessage to render
+      if (typeof chartResponse === "object" && chartResponse !== null && "charts" in chartResponse && Array.isArray((chartResponse as any).charts)) {
+        const textMessage = createAndDispatchMessage(
+          ASSISTANT,
+          JSON.stringify(chartResponse) as unknown as ChartDataResponse
+        );
+        return [newMessage, textMessage];
+      }
 
       if ((chartResponse?.type || chartResponse?.chartType) && chartResponse?.data) {
         const chartMessage = createAndDispatchMessage(

@@ -12,6 +12,7 @@ chat.pyからプロンプトを分離し、保守性と再利用性を向上さ�
     doc_prompt = get_doc_agent_prompt()
 """
 
+from .chart_instructions import CHART_INSTRUCTIONS
 from .doc_agent import DOC_AGENT_DESCRIPTION, DOC_AGENT_PROMPT
 from .manager_agent import MANAGER_AGENT_DESCRIPTION, MANAGER_AGENT_PROMPT
 from .sql_agent import SQL_AGENT_DESCRIPTION, SQL_AGENT_PROMPT, SQL_AGENT_PROMPT_MINIMAL
@@ -20,6 +21,8 @@ from .unified_agent import UNIFIED_AGENT_PROMPT
 from .web_agent import WEB_AGENT_DESCRIPTION, WEB_AGENT_PROMPT
 
 __all__ = [
+    # Chart Instructions (shared)
+    "CHART_INSTRUCTIONS",
     # SQL Agent
     "SQL_AGENT_PROMPT",
     "SQL_AGENT_DESCRIPTION",

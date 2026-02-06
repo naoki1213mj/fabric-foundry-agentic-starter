@@ -196,8 +196,17 @@ ORDER BY TotalSales DESC
 
 **重要**:
 - Vega-Lite形式は禁止（Chart.js JSON形式のみ）
-- グラフは回答の最後に1つだけ出力
-- 複数グラフが必要な場合は、最も重要な1つを選択
+- 分析内容に応じて1つまたは複数のグラフを出力可能
+- 複数グラフ時は `{"charts": [...]}` 形式で出力
+- 各グラフには `id` フィールドを付与（例: `"id": "sales_by_category"`）
+
+### 複数グラフの出力形式
+```json
+{"charts": [
+  {"id": "chart_1", "type": "bar", "data": {...}, "options": {...}},
+  {"id": "chart_2", "type": "pie", "data": {...}, "options": {...}}
+]}
+```
 
 ---
 
@@ -207,7 +216,7 @@ ORDER BY TotalSales DESC
 2. **TOP句を活用**: 大量データにはTOP 10, TOP 20等
 3. **完了注文のみ**: `WHERE o.OrderStatus = 'Completed'`
 4. **1クエリ完結**: 追加クエリは行わない
-5. **日本語で回答**: 自然で分かりやすく
+5. **ユーザーの言語に合わせて回答**
 """
 
 # Handoffモード・SQL-onlyモード用の短縮版
@@ -216,8 +225,9 @@ SQL_AGENT_PROMPT_MINIMAL = """あなたはFabric SQLデータベースを使っ�
 ## タスク
 1. run_sql_query ツールでデータ取得
 2. 結果を**人間が読みやすいMarkdown形式**に変換（生JSONは禁止）
-3. グラフ要求時は Chart.js JSON を最後に1つ追加
-4. **完全な回答を提供**
+3. グラフ要求時は Chart.js JSON を回答末尾に出力（1つまたは複数可）
+4. 複数グラフ時は `{"charts": [...]}` 形式
+5. **完全な回答を提供**
 
 ## 主要テーブル
 - orders: OrderId, CustomerId, OrderDate, OrderStatus, OrderTotal, PaymentMethod
@@ -242,4 +252,5 @@ ORDER BY TotalSales DESC
 - T-SQL構文使用
 - 生JSONデータは禁止（必ずMarkdownに変換）
 - グラフはChart.js形式（Vega-Lite禁止）
+- ユーザーの言語に合わせて回答
 """

@@ -110,11 +110,74 @@ export const extractTextExcludingChart = (content: string): string => {
 };
 
 /**
+ * Unwrap {"charts": [...]} wrapper into individual chart objects.
+ * Also handles nested wrappers inside code blocks or raw JSON.
+ */
+const unwrapChartsArray = (jsonStr: string): any[] | null => {
+  try {
+    const parsed = JSON.parse(jsonStr);
+    if (parsed && typeof parsed === 'object' && 'charts' in parsed && Array.isArray(parsed.charts)) {
+      return parsed.charts.filter(
+        (c: any) => c && typeof c === 'object' && ('type' in c || 'chartType' in c) && 'data' in c
+      );
+    }
+  } catch {
+    // Not valid JSON or not a charts wrapper
+  }
+  return null;
+};
+
+/**
  * Extract Chart.js JSON(s) from mixed text/JSON content
  */
 export const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
   const charts: any[] = [];
   let textPart = content;
+
+  // STEP 0: Try to detect {"charts": [...]} wrapper in code blocks or raw JSON
+  const chartsWrapperCodeBlock = /```json\s*([\s\S]*?"charts"\s*:\s*\[[\s\S]*?)```/g;
+  let wrapperMatch;
+  while ((wrapperMatch = chartsWrapperCodeBlock.exec(content)) !== null) {
+    const unwrapped = unwrapChartsArray(wrapperMatch[1].trim());
+    if (unwrapped && unwrapped.length > 0) {
+      charts.push(...unwrapped);
+      textPart = textPart.substring(0, wrapperMatch.index) + textPart.substring(wrapperMatch.index + wrapperMatch[0].length);
+    }
+  }
+
+  // Also try raw JSON {"charts": ...} without code blocks
+  if (charts.length === 0) {
+    const chartsKeyPattern = /\{\s*"charts"\s*:\s*\[/g;
+    let rawMatch;
+    const wrapperPositions: { start: number; end: number; charts: any[] }[] = [];
+    while ((rawMatch = chartsKeyPattern.exec(content)) !== null) {
+      let braceCount = 0;
+      let endIndex = -1;
+      for (let i = rawMatch.index; i < content.length; i++) {
+        if (content[i] === '{') braceCount++;
+        else if (content[i] === '}') {
+          braceCount--;
+          if (braceCount === 0) { endIndex = i; break; }
+        }
+      }
+      if (endIndex !== -1) {
+        const unwrapped = unwrapChartsArray(content.substring(rawMatch.index, endIndex + 1));
+        if (unwrapped && unwrapped.length > 0) {
+          wrapperPositions.push({ start: rawMatch.index, end: endIndex + 1, charts: unwrapped });
+        }
+      }
+    }
+    for (let i = wrapperPositions.length - 1; i >= 0; i--) {
+      charts.unshift(...wrapperPositions[i].charts);
+      textPart = textPart.substring(0, wrapperPositions[i].start) + textPart.substring(wrapperPositions[i].end);
+    }
+  }
+
+  if (charts.length > 0) {
+    textPart = textPart.replace(/Chart\.js[（(][^）)]*[）)][^\n]*/g, '').trim();
+    textPart = textPart.replace(/\n{3,}/g, '\n\n');
+    return { textPart, charts: deduplicateCharts(charts) };
+  }
 
   // STEP 1: First try to extract from Markdown code blocks (```json ... ```)
   const codeBlockPattern = /```json\s*([\s\S]*?)```/g;
@@ -137,7 +200,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
     }
   }
 
-  // If found in code blocks, use those
+  // If found in code blocks, also try unwrapping {"charts": [...]} inside each
   if (codeBlockPositions.length > 0) {
     for (let i = codeBlockPositions.length - 1; i >= 0; i--) {
       const pos = codeBlockPositions[i];
