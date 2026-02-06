@@ -106,7 +106,7 @@ const Chat: React.FC<ChatProps> = ({
 
   // Scroll helpers - respect user scroll position
   const scrollChatToBottom = useCallback(() => {
-    if (!autoScrollEnabled) return;
+    if (!autoScrollEnabledRef.current) return;
 
     if (listApiRef.current?.scrollToRow) {
       listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "smooth" });
@@ -118,11 +118,11 @@ const Chat: React.FC<ChatProps> = ({
         chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, [autoScrollEnabled, scrollTargetIndex]);
+  }, [scrollTargetIndex]);
 
   const throttledScrollChatToBottom = useMemo(
     () => throttle(() => {
-      if (!autoScrollEnabled) return;
+      if (!autoScrollEnabledRef.current) return;
       // react-window の API を使用して正確にスクロール
       if (listApiRef.current?.scrollToRow) {
         listApiRef.current.scrollToRow({ index: scrollTargetIndex, align: "end", behavior: "auto" });
@@ -130,16 +130,20 @@ const Chat: React.FC<ChatProps> = ({
         chatMessageStreamEnd.current.scrollIntoView({ behavior: "auto" });
       }
     }, 200),
-    [autoScrollEnabled, scrollTargetIndex]
+    [scrollTargetIndex]
   );
 
   // Handle user scroll - disable auto-scroll when user scrolls up
+  const programmaticScrollRef = useRef(false);
   const handleScroll = useCallback(() => {
+    // Ignore scroll events triggered by programmatic scrollToRow
+    if (programmaticScrollRef.current) return;
     // react-window の List 要素からスクロール位置を取得
     const element = listApiRef.current?.element ?? chatContainerRef.current;
     if (!element) return;
     const { scrollTop, scrollHeight, clientHeight } = element;
-    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100; // 100px threshold
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    const isAtBottom = distanceFromBottom < 150; // 150px threshold
     if (autoScrollEnabledRef.current !== isAtBottom) {
       autoScrollEnabledRef.current = isAtBottom;
       setAutoScrollEnabled(isAtBottom);
@@ -339,7 +343,12 @@ const Chat: React.FC<ChatProps> = ({
 
     // 生成開始時（false→true）のみスクロール
     if (wasNotGenerating && generatingResponse && autoScrollEnabledRef.current) {
+      // Mark as programmatic scroll so handleScroll ignores it
+      programmaticScrollRef.current = true;
       scrollChatToBottom();
+      requestAnimationFrame(() => {
+        programmaticScrollRef.current = false;
+      });
     }
   }, [generatingResponse, scrollChatToBottom]);
 
@@ -352,8 +361,13 @@ const Chat: React.FC<ChatProps> = ({
     // メッセージが増えた場合のみスクロール
     if (messages.length > prevLength && autoScrollEnabledRef.current) {
       // 少し遅延させて react-window の再レンダリング後にスクロール
+      programmaticScrollRef.current = true;
       requestAnimationFrame(() => {
         throttledScrollChatToBottom();
+        // 少し遅延して programmatic フラグをリセット
+        setTimeout(() => {
+          programmaticScrollRef.current = false;
+        }, 50);
       });
     }
   }, [messages.length, throttledScrollChatToBottom]);

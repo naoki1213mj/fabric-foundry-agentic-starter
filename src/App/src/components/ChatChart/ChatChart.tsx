@@ -1,15 +1,37 @@
 import {
     Chart as ChartJS,
     type ChartTypeRegistry,
+    type Plugin,
     registerables,
 } from "chart.js";
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
 const chartTypes = {
   barChart: "bar",
   pieChart: "pie",
   doughNutChart: "doughnut",
   lineChart: "line",
+};
+
+// Hook to reactively detect theme changes via MutationObserver
+const useThemeMode = (): string => {
+  const [theme, setTheme] = useState(
+    () => document.documentElement.getAttribute("data-theme") || "light"
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const current = document.documentElement.getAttribute("data-theme") || "light";
+      setTheme(current);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return theme;
 };
 
 // Get theme-aware colors for chart text
@@ -19,7 +41,40 @@ const getChartColors = (themeMode: string) => {
     textColor: isDarkMode ? '#f8fafc' : '#1e293b',
     gridColor: isDarkMode ? 'rgba(148, 163, 184, 0.2)' : 'rgba(0, 0, 0, 0.1)',
     legendColor: isDarkMode ? '#cbd5e1' : '#475569',
+    backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
+    tooltipBg: isDarkMode ? '#334155' : '#ffffff',
+    tooltipText: isDarkMode ? '#f1f5f9' : '#1e293b',
+    tooltipBorder: isDarkMode ? '#475569' : '#e2e8f0',
   };
+};
+
+// Chart.js plugin to draw background color on canvas
+const backgroundPlugin: Plugin = {
+  id: 'customCanvasBackground',
+  beforeDraw: (chart) => {
+    const ctx = chart.ctx;
+    const { width, height } = chart;
+    const bgColor = (chart.config.options as any)?._bgColor;
+    if (bgColor) {
+      ctx.save();
+      ctx.fillStyle = bgColor;
+      // Use rounded rectangle for consistency with UI
+      const radius = 10;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(width - radius, 0);
+      ctx.quadraticCurveTo(width, 0, width, radius);
+      ctx.lineTo(width, height - radius);
+      ctx.quadraticCurveTo(width, height, width - radius, height);
+      ctx.lineTo(radius, height);
+      ctx.quadraticCurveTo(0, height, 0, height - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  },
 };
 interface ChartProps {
   chartContent: {
@@ -61,7 +116,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<ChartJS | null>(null);
   const validChart = isValidChartConfig(chartContent);
-  const themeMode = document.documentElement.getAttribute("data-theme") || "light";
+  const themeMode = useThemeMode();
 
   // Memoize the chart data signature to prevent unnecessary re-renders
   const chartSignature = useMemo(() => getChartDataSignature(chartContent), [chartContent]);
@@ -81,7 +136,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
     chartInstanceRef.current = null;
   }
 
-  ChartJS.register(...registerables);
+  ChartJS.register(...registerables, backgroundPlugin);
 
   // Get theme-aware colors
   const colors = getChartColors(themeMode);
@@ -136,6 +191,8 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       responsive: false,
       // Disable animations to prevent flickering during streaming
       animation: false,
+      // Store background color for plugin
+      _bgColor: colors.backgroundColor,
       indexAxis:
         chartContent.type === "horizontalBar"
           ? "y"
@@ -154,6 +211,14 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
         title: {
           ...chartContent?.options?.plugins?.title,
           color: colors.textColor,
+        },
+        tooltip: {
+          ...chartContent?.options?.plugins?.tooltip,
+          backgroundColor: colors.tooltipBg,
+          titleColor: colors.tooltipText,
+          bodyColor: colors.tooltipText,
+          borderColor: colors.tooltipBorder,
+          borderWidth: 1,
         },
       },
     },
@@ -210,7 +275,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   }, [chartSignature, validChart, chartContent, themeMode]);
 
   return (
-    <div style={{ maxHeight: 350 }}>
+    <div style={{ maxHeight: 350, borderRadius: 'var(--radius-md, 10px)', overflow: 'hidden' }}>
       {validChart ? (
         <canvas ref={chartRef} />
       ) : (
