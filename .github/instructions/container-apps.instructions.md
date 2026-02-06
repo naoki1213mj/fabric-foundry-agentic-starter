@@ -2,14 +2,16 @@
 applyTo: "src/api/**/*.{py,cs},src/web/**/*.{ts,tsx,js}"
 ---
 
-# Azure Container Apps Guidelines
+# Azure App Service Guidelines
 
 ## 構成
 
-Solution Accelerator では以下の Container Apps を使用：
+> **Note**: このプロジェクトでは Container Apps ではなく **App Service** を使用しています。
 
-- `ca-{project}-api`: Backend API (Python/FastAPI)
-- `ca-{project}-web`: Frontend (React/TypeScript)
+Solution Accelerator では以下の App Service を使用：
+
+- `api-daj6dri4yf3k3z`: Backend API (Python/FastAPI) - Linux Container
+- `app-daj6dri4yf3k3z`: Frontend (React/TypeScript) - Linux Container
 
 ## Python API パターン
 
@@ -37,8 +39,8 @@ async def chat(request: ChatRequest):
 ## 環境変数
 
 ```bash
-AZURE_OPENAI_ENDPOINT=https://oai-xxx.openai.azure.com/
-AZURE_OPENAI_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/
+AZURE_OPENAI_DEPLOYMENT=gpt-5
 FABRIC_CONNECTION_STRING=...
 DEMO_MODE=false
 ```

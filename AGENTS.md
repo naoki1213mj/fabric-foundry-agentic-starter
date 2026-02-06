@@ -122,17 +122,18 @@ git push
 | `.\scripts\test.ps1 -TestOnly` | テストのみ |
 | `.\scripts\test.ps1 -TestOnly -Coverage` | カバレッジ付き |
 
-### テストファイルの場所
+### テストファイルの場所（37テスト / 4ファイル）
 
 ```
 src/api/python/
 ├── tests/
-│   ├── conftest.py       # 共通フィクスチャ
-│   ├── test_app.py       # app.py のテスト
-│   ├── test_history_sql.py  # DB操作テスト
-│   └── test_utils.py     # ユーティリティテスト
-├── pyproject.toml        # pytest設定
-└── requirements-test.txt # テスト用パッケージ
+│   ├── conftest.py         # 共通フィクスチャ・モック
+│   ├── test_app.py         # FastAPI アプリテスト (8件)
+│   ├── test_history_sql.py # Fabric SQL テスト (10件)
+│   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
+│   └── test_utils.py       # ユーティリティテスト (11件)
+├── pyproject.toml          # pytest/ruff 設定
+└── requirements-test.txt   # テスト用パッケージ
 ```
 
 ### 新機能追加時のテスト
@@ -198,15 +199,20 @@ if DEMO_MODE:
 ### Agent Tool
 
 ```python
-from agent_framework import ai_function
+from agent_framework import tool
+from typing import Annotated
 
-@ai_function
-async def my_tool(param: str) -> str:
+@tool(approval_mode="never_require")
+async def my_tool(
+    param: Annotated[str, "パラメータの説明"],
+) -> str:
     """ツールの説明"""
     if DEMO_MODE:
         return json.dumps({"demo": True})
     return json.dumps(result)
 ```
+
+> **Note**: `@ai_function` は `@tool` に改名されました（agent-framework-core 1.0.0b260128 breaking change）
 
 ## やってはいけないこと
 
@@ -284,7 +290,30 @@ python <script.py>
 
 ---
 
-## 🌐 Azure 実機環境情報（2026/2/5 更新）
+## 🔧 技術バージョン情報（2026/2/6 更新）
+
+| コンポーネント | バージョン | 備考 |
+|---------------|-----------|------|
+| Chat API | 2.11.0 | BUILD_DATE: 2026-02-04 |
+| Agent Framework | 1.0.0b260130 | Public Preview (GA: Q1 2026) |
+| FastAPI | 0.119.0 | |
+| Python | 3.12.12 | |
+| React | ^18.3.1 | |
+| TypeScript | ^4.9.5 | |
+| Node.js | 20.x | CI/CD 環境 |
+
+### 最近の重要な変更
+
+- **`@ai_function` → `@tool`** (b260128 breaking change)
+- **Web検索出典**: インライン `[[N]](url)` 削除 → Citations UI コンポーネントに一本化
+- **XSS対策**: DOMPurify 導入 (`sanitizeAndProcessLinks()`)
+- **後方互換**: `convertLegacyCitationMarkers()` で旧会話履歴の `[[N]]` をリンクに変換
+- **GPT-5 推論コンテンツ**: `__REASONING_REPLACE__` マーカーでストリーミング表示
+- **Keepalive**: 15秒間隔で Azure App Service 230秒タイムアウト回避
+
+---
+
+## 🌐 Azure 実機環境情報（2026/2/6 更新）
 
 ### リソース一覧
 

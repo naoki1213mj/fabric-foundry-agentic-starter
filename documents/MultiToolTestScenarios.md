@@ -122,7 +122,7 @@ INFO:chat:SQL query executed successfully
 | 1 | 「先月の売上トップ10製品を教えてください」 | `run_sql_query` |
 | 2 | 「1位の製品の仕様を教えてください」 | `search_documents` |
 | 3 | 「この製品カテゴリの市場動向を調べてください」 | `search_web` |
-| 4 | 「前年同月比を計算してください」 | `mcp_yoy_growth_analysis` |
+| 4 | "前年同月比を計算してください」 | `analyze_yoy_performance` |
 | 5 | 「すべての情報を統合してエグゼクティブサマリーを作成してください」 | LLMによる統合分析 |
 
 **ログ検証ポイント**:
@@ -130,7 +130,7 @@ INFO:chat:SQL query executed successfully
 INFO:agent_framework:Function name: run_sql_query
 INFO:agent_framework:Function name: search_documents
 INFO:agent_framework:Function name: search_web
-INFO:agent_framework:Function name: mcp_yoy_growth_analysis
+INFO:agent_framework:Function name: analyze_yoy_performance
 ```
 
 ---
@@ -170,7 +170,7 @@ Get-Content ".debug_logs/test_logs_$ts/LogFiles/*docker.log" |
 |--------|----------|----------|
 | SQL | `SQL query executed successfully, returned X rows` | `SQL query failed` |
 | Doc Search | `Search returned X documents` | `AI_SEARCH_* not configured` |
-| Web Search | `Web search completed` | `Web search timed out after 60s` |
+| Web Search | `Web search completed` | `Web search timed out after 90s` |
 | MCP | `MCP tool xxx executed successfully` | `MCP server connection failed` |
 
 ---
@@ -213,7 +213,7 @@ Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
 
 ## 📝 備考
 
-- **Web Search タイムアウト**: 現在60秒に設定。タイムアウトした場合は「検索結果を取得できませんでした」と回答
+- **Web Search タイムアウト**: 現在90秒に設定。タイムアウトした場合は「検索結果を取得できませんでした」と回答
 - **SQL 0件返却**: データが存在しない場合でもツール呼び出しは成功扱い
 - **AI Search 認証**: Managed Identity を使用
 

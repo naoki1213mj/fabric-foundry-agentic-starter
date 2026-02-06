@@ -108,9 +108,13 @@ async def query_database(query: str) -> str:
 
 **データスキーマ**:
 
-- `SalesData` - 売上データ
-- `Products` - 製品マスタ  
-- `Customers` - 顧客マスタ
+- `customer` - 顧客マスタ
+- `product` - 製品マスタ
+- `orders` - 注文ヘッダ
+- `orderline` - 注文明細
+- `location` - 顧客所在地
+- `customerrelationshiptype` - 顧客セグメント
+- `invoice` / `payment` - 会計系
 
 ### Web Agent (BingGroundingAgentTool)
 
@@ -128,7 +132,10 @@ bing_tool = BingGroundingAgentTool(
 tools = [bing_tool]
 ```
 
-**出力**: 検索結果 + 引用情報（citations）
+**出力**: 検索結果 + 構造化引用情報（citations）
+
+> **Citation表示**: インライン `[[N]](url)` は廃止。構造化 `formatted_citations` を Citations UI コンポーネントで表示。
+> `convertLegacyCitationMarkers()` で旧会話履歴の `[[N]]` を後方互換変換。
 
 ### Doc Agent (Foundry IQ)
 

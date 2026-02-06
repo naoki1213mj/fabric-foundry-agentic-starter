@@ -17,11 +17,9 @@ applyTo: "**/.github/workflows/*.yml,**/azure.yaml,**/*.bicep"
 
 ```
 .github/workflows/
-├── ci.yml              # PRチェック（lint, test, build）
-├── deploy.yml          # dev環境デプロイ（mainブランチ）
-├── deploy-prod.yml     # prod環境デプロイ（手動/タグ）
-├── security-scan.yml   # セキュリティスキャン
-└── e2e-test.yml        # E2Eテスト
+├── test.yml                # PRチェック（lint, test）
+├── deploy-app-service.yml  # App Serviceデプロイ（mainブランチ）
+└── security-scan.yml       # セキュリティスキャン
 ```
 
 ## OIDC認証の設定
@@ -104,33 +102,21 @@ az role assignment create \
 
 ## ワークフロートリガー
 
-### ci.yml
+### test.yml
 ```yaml
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   push:
-    branches: [develop]
+    branches: [main]
 ```
 
-### deploy.yml (dev)
+### deploy-app-service.yml
 ```yaml
 on:
   push:
     branches: [main]
   workflow_dispatch:
-```
-
-### deploy-prod.yml
-```yaml
-on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      environment: [staging, prod]
-      confirm: "deploy"  # prod requires confirmation
 ```
 
 ## GitHub Environments の設定

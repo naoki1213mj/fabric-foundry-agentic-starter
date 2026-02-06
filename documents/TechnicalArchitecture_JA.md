@@ -4,6 +4,8 @@
 
 このセクションでは、統合データ分析プラットフォームを支えるコンポーネントとインタラクションについて説明します。このアーキテクチャは、顧客情報、製品詳細、取引履歴を取り込み、インタラクティブな Web エクスペリエンスを通じてインサイトを提供します。
 
+> **カスタマイズ情報**: 本リポジトリでの追加カスタマイズ（Agent Mode, APIM AI Gateway, MCP Server, Guardrails, GPT-5 等）の詳細は [Agent-Architecture.md](./Agent-Architecture.md), [Implementation-Overview.md](./Implementation-Overview.md), [アーキテクチャ図](../ARCHITECTURE.md) を参照してください。
+
 #### オプション 1: Microsoft Fabric と Microsoft Copilot Studio を使用したアーキテクチャ
 
 ![image](./Images/ReadMe/solution-architecture-cps.png)
@@ -21,7 +23,7 @@
 Fabric Data Agent は Microsoft Copilot Studio のエージェントに接続され、Microsoft Teams のチャネルとして公開されます。
 
 ### Microsoft Teams
-ユーザーは Microsoft Teams 内で直接、コールインサイトの探索、トレンドの可視化、自然言語での質問ができます。
+ユーザーは Microsoft Teams 内で直接、データインサイトの探索、トレンドの可視化、自然言語での質問ができます。
 
 
 #### オプション 2: Microsoft Fabric と Microsoft Foundry を使用したアーキテクチャ
@@ -47,4 +49,4 @@ AI サービスとストレージレイヤーとインターフェースする W
 ホスティング環境で使用するコンテナ化されたデプロイメントを保存します。
 
 ### Web フロントエンド
-ユーザーがコールインサイトを探索し、トレンドを可視化し、自然言語で質問し、チャートを生成できるインタラクティブな UI です。リアルタイムインタラクションのために SQL Database in Fabric と App Service に直接接続します。
+ユーザーがデータインサイトを探索し、トレンドを可視化し、自然言語で質問し、チャートを生成できるインタラクティブな UI です。リアルタイムインタラクションのために SQL Database in Fabric と App Service に直接接続します。

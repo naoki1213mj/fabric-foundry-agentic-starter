@@ -6,33 +6,18 @@ applyTo: "azure.yaml,infra/**/*.bicep,.azure/**/*"
 
 ## azure.yaml 構造
 
+> **重要**: azure.yaml に `services` セクションはありません。
+> デプロイは GitHub Actions (`deploy-app-service.yml`) で実施します。
+> `azd provision` でインフラのみデプロイ可能です。
+
 ```yaml
-name: agentic-unified-data-foundation
+name: agentic-applications-for-unified-data-foundation
 metadata:
   template: microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator
 
-services:
-  api:
-    project: src/api
-    host: containerapp
-    language: python
-    docker:
-      path: ./Dockerfile
-      context: .
-      remoteBuild: true
-    config:
-      container:
-        resources:
-          cpu: "1"
-          memory: 2Gi
-        scale:
-          minReplicas: 0
-          maxReplicas: 10
-  
-  web:
-    project: src/web
-    host: containerapp
-    language: typescript
+# Note: services セクションはなし。
+# デプロイは GitHub Actions（deploy-app-service.yml）で実施。
+# azd provision でインフラのみデプロイ可能。
 
 infra:
   provider: bicep
@@ -51,10 +36,10 @@ azd env new dev
 azd env select dev
 
 # デプロイ
-azd up                    # 全て（provision + deploy）
+ azd up                    # 全て（provision + deploy）
 azd provision             # インフラのみ
-azd deploy                # アプリのみ
-azd deploy --service api  # 特定サービスのみ
+# azd deploy は services セクションがないため使用不可。
+# アプリデプロイは git push → GitHub Actions で自動実行されます。
 
 # 確認
 azd show                  # リソース一覧

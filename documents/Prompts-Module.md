@@ -152,8 +152,8 @@ agent = ChatAgent(
 from prompts import SQL_AGENT_PROMPT
 
 def test_sql_prompt_contains_schema():
-    assert "SalesData" in SQL_AGENT_PROMPT
-    assert "Products" in SQL_AGENT_PROMPT
+    assert "orders" in SQL_AGENT_PROMPT
+    assert "product" in SQL_AGENT_PROMPT
 ```
 
 ## 6. カスタマイズ

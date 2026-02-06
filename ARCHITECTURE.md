@@ -1,6 +1,6 @@
 # ARCHITECTURE.md - 技術アーキテクチャ
 
-> **最終更新**: 2026年2月5日 - **Azure 実機環境を確認して**更新
+> **最終更新**: 2026年2月6日 - **Azure 実機環境を確認して**更新
 
 ## Azure 実機環境サマリー
 
@@ -159,7 +159,7 @@
 │  ┌─────────────────────────────────────────────────────────────────────────────────────┐    │
 │  │  Agent Framework Tool Registry                                                      │    │
 │  │                                                                                      │    │
-│  │  @ai_function decorated tools:                                                      │    │
+│  │  @tool decorated tools:                                                              │    │
 │  │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐         │    │
 │  │  │  SQL Tool           │  │  Doc Tool           │  │  Web Tool           │         │    │
 │  │  │  sql_agent.py       │  │  agentic_retrieval  │  │  web_agent.py       │         │    │

@@ -4,7 +4,7 @@
 >
 > **Base**: [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
 >
-> **Last Updated**: 2026/2/4
+> **Last Updated**: 2026/2/6
 
 ---
 
@@ -235,26 +235,12 @@ azd down
 ### azure.yaml 構造
 
 ```yaml
-name: agentic-unified-data-foundation
+name: agentic-applications-for-unified-data-foundation
 metadata:
   template: microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator
 
-services:
-  api:
-    project: src/api
-    host: containerapp
-    language: python
-    docker:
-      path: ./Dockerfile
-      context: .
-
-  web:
-    project: src/web
-    host: containerapp
-    language: typescript
-    docker:
-      path: ./Dockerfile
-      context: .
+# Note: services セクションはなし。デプロイは GitHub Actions（deploy-app-service.yml）で実施。
+# azd provision でインフラのみデプロイ可能。
 
 infra:
   provider: bicep
@@ -364,22 +350,31 @@ guardrails_config = {
 ### 2. Agent Tool のカスタマイズ
 
 ```python
-from agent_framework import ChatAgent, ai_function
+from agent_framework import ChatAgent, tool
+from typing import Annotated
 
 class CustomSalesAgent(ChatAgent):
-    @ai_function
-    async def query_sales_data(self, query: str) -> str:
+    @tool(approval_mode="never_require")
+    async def query_sales_data(
+        self,
+        query: Annotated[str, "売上データのSQLクエリ"],
+    ) -> str:
         """売上データをクエリする"""
         # Fabric SQL Database への接続
         result = await self.fabric_client.execute_sql(query)
         return result
 
-    @ai_function
-    async def get_customer_insights(self, customer_id: str) -> str:
+    @tool(approval_mode="never_require")
+    async def get_customer_insights(
+        self,
+        customer_id: Annotated[str, "顧客ID"],
+    ) -> str:
         """顧客インサイトを取得する"""
         # カスタムロジック
         return insights
 ```
+
+> **Note**: `@ai_function` は `@tool` に改名されました（agent-framework-core 1.0.0b260128 breaking change）
 
 ### 3. Guardrails のカスタマイズ
 
@@ -499,9 +494,10 @@ frontend_lint: optional    # ESLint (warning only)
 src/api/python/
 ├── tests/
 │   ├── conftest.py         # 共通フィクスチャ・モック
-│   ├── test_app.py         # FastAPI アプリテスト
-│   ├── test_history_sql.py # Fabric SQL テスト
-│   └── test_utils.py       # ユーティリティテスト
+│   ├── test_app.py         # FastAPI アプリテスト (8件)
+│   ├── test_history_sql.py # Fabric SQL テスト (10件)
+│   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
+│   └── test_utils.py       # ユーティリティテスト (11件)
 ├── pyproject.toml          # pytest/ruff 設定
 └── requirements-test.txt   # テスト依存パッケージ
 ```

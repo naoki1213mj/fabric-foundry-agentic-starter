@@ -175,7 +175,7 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 ```dockerfile
 # src/api/python/ApiApp.Dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt

@@ -13,7 +13,7 @@ from azure.identity import DefaultAzureCredential
 
 class SalesAnalystAgent(ChatAgent):
     """売上分析を行うエージェント"""
-    
+
     def __init__(self):
         super().__init__(
             name="SalesAnalyst",
@@ -24,14 +24,14 @@ class SalesAnalystAgent(ChatAgent):
             """,
             model="gpt-4o"
         )
-    
+
     @ai_function
     async def query_sales(self, query: str) -> str:
         """Fabricの売上データをクエリする"""
         # SQL Database in Fabric への接続
         result = await self.execute_fabric_query(query)
         return result
-    
+
     @ai_function
     async def get_top_products(self, limit: int = 10) -> str:
         """トップ製品を取得する"""
@@ -39,23 +39,20 @@ class SalesAnalystAgent(ChatAgent):
         return await self.execute_fabric_query(sql)
 ```
 
-## Tool定義（@ai_function）
+## Tool定義（@tool）
+
+> **Note**: `@ai_function` は `@tool` に改名されました（agent-framework-core 1.0.0b260128 breaking change）
 
 ```python
-from agent_framework import ai_function
+from agent_framework import tool
+from typing import Annotated
 
-@ai_function
-async def search_documents(query: str, top_k: int = 5) -> str:
-    """
-    ドキュメントを検索する
-    
-    Args:
-        query: 検索クエリ
-        top_k: 返す結果の数
-    
-    Returns:
-        検索結果のJSON文字列
-    """
+@tool(approval_mode="never_require")
+async def search_documents(
+    query: Annotated[str, "検索クエリ"],
+    top_k: Annotated[int, "返す結果の数"] = 5,
+) -> str:
+    """ドキュメントを検索する"""
     # 実装
     return json.dumps(results)
 ```

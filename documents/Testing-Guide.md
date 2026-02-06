@@ -145,11 +145,12 @@ PRを作成すると、以下が自動実行されます：
 src/api/python/
 ├── tests/
 │   ├── __init__.py
-│   ├── conftest.py       # 共通のフィクスチャ
-│   ├── test_app.py       # app.py のテスト
-│   ├── test_history_sql.py  # history_sql.py のテスト
-│   └── test_utils.py     # ユーティリティのテスト
-├── app.py
+│   ├── conftest.py         # 共通のフィクスチャ
+│   ├── test_app.py         # app.py のテスト (8件)
+│   ├── test_history_sql.py # history_sql.py のテスト (10件)
+│   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
+│   └── test_utils.py       # ユーティリティのテスト (11件)
+├── app.py                  # 合計: 37テスト / 4ファイル
 ├── chat.py
 └── history_sql.py
 ```

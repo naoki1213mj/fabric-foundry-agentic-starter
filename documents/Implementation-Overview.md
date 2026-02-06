@@ -136,9 +136,10 @@ hackathon-project/
 
 | 変数名 | 説明 | 例 |
 |--------|------|-----|
-| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI エンドポイント | `https://xxx.openai.azure.com/` |
-| `AZURE_OPENAI_DEPLOYMENT` | デプロイメント名 | `gpt-4o` |
-| `FABRIC_SQL_CONNECTION_STRING` | Fabric SQL 接続文字列 | `Server=xxx.datawarehouse.fabric.microsoft.com;...` |
+| `AZURE_OPENAI_ENDPOINT` | Foundry AI Services エンドポイント | `https://aisa-*.services.ai.azure.com/` |
+| `AZURE_OPENAI_DEPLOYMENT_MODEL` | デプロイメント名 | `gpt-5` |
+| `FABRIC_SQL_SERVER` | Fabric SQL サーバー | `*.database.fabric.microsoft.com,1433` |
+| `FABRIC_SQL_DATABASE` | Fabric SQL データベース名 | `retail_sqldatabase_*` |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | Application Insights | `InstrumentationKey=xxx;...` |
 
 ### オプション環境変数
@@ -198,4 +199,4 @@ git push  # 自動でAzureにデプロイ
 - [Current-Deployment.md](./Current-Deployment.md) - 現在のデプロイ設定
 
 ---
-*最終更新: 2025年1月*
+*最終更新: 2026年2月*

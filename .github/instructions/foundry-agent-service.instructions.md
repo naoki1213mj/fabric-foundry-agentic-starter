@@ -11,8 +11,8 @@ applyTo: "src/**/*agent*.{py,cs},infra/**/*foundry*.bicep"
 name: sales-analyst
 description: 売上データを分析するエージェント
 model:
-  name: gpt-4o
-  deployment: gpt-4o
+  name: gpt-5
+  deployment: gpt-5
 instructions: |
   あなたは売上データ分析の専門家です。
   Fabricのデータを使って質問に回答してください。
@@ -42,7 +42,7 @@ client = AIProjectClient(
 
 # エージェント作成
 agent = client.agents.create_agent(
-    model="gpt-4o",
+    model="gpt-5",
     name="SalesAnalyst",
     instructions="売上分析の専門家として回答してください",
     tools=[
@@ -100,7 +100,7 @@ guardrails = {
 }
 
 agent = client.agents.create_agent(
-    model="gpt-4o",
+    model="gpt-5",
     guardrails=guardrails,
     ...
 )

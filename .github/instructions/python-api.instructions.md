@@ -25,7 +25,8 @@ app.add_middleware(
 )
 
 # 環境変数
-AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")  # Foundry AI Services
+AZURE_OPENAI_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DEPLOYMENT_MODEL", "gpt-5")
 DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() == "true"
 
 # 認証
@@ -87,10 +88,7 @@ async def query_data(query: str):
 このプロジェクトでは **uv** を使用してPython仮想環境を管理します。
 
 ```bash
-# 仮想環境の作成
-uv venv
-
-# 仮想環境の有効化 (PowerShell)
+# 仮想環境の有効化（既存の .venv を使用） (PowerShell)
 .\.venv\Scripts\Activate.ps1
 
 # 依存関係のインストール
@@ -108,7 +106,7 @@ uv pip sync requirements.txt
 ## Dockerfile
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
