@@ -38,6 +38,11 @@ export const ja = {
       landingText: "売上データ、商品情報、注文履歴について自然言語で質問できます。\n\n💡 例: 「今月の売上トップ10の製品は？」",
       createNewConversation: "新しい会話を作成",
       sendQuestion: "質問を送信",
+      processing: "処理中...",
+      processingDetails: "処理詳細",
+      reasoning: "推論",
+      toolCount: "ツール: {{count}}種類",
+      stopGenerating: "生成を停止",
     },
 
     // エージェント
@@ -48,6 +53,41 @@ export const ja = {
       salesAnalystDesc: "売上データの分析と洞察を提供します",
       capabilities: "機能",
       tools: "利用可能なツール",
+    },
+
+    // エージェントモード
+    agentMode: {
+      label: "エージェントの動作モード",
+      sqlOnly: "高速・SQLクエリのみ",
+      multiTool: "全ツール使用・バランス型",
+      handoff: "専門家エージェント委譲",
+      magentic: "複雑な計画・マネージャー型",
+    },
+
+    // ドキュメント検索
+    docSearch: {
+      label: "ドキュメント検索の推論レベル (Foundry IQ)",
+      minimal: "高速・直接検索（LLMなし）",
+      low: "シングルパス・バランス型",
+      medium: "反復検索・最高品質",
+    },
+
+    // モデル設定
+    modelSettings: {
+      label: "使用するAIモデル",
+      gpt5Desc: "高精度・推論重視",
+      gpt4oMiniDesc: "高速・コスト効率",
+      temperatureLabel: "回答の創造性 (0=正確, 2=創造的)",
+      reasoningLabel: "GPT-5の推論深度 (high=深い思考)",
+      reasoningLow: "高速・簡易推論",
+      reasoningMedium: "バランス型",
+      reasoningHigh: "深い推論・最高品質",
+      summaryLabel: "GPT-5の思考プロセス表示",
+      summaryOff: "思考過程を非表示",
+      summaryAuto: "自動判定",
+      summaryConcise: "簡潔に表示",
+      summaryDetailed: "詳細に表示",
+      thinkingDisplay: "思考表示",
     },
 
     // チャット履歴
@@ -124,6 +164,7 @@ export const ja = {
       submit: "送信",
       reset: "リセット",
       clearAll: "すべてクリア",
+      recommended: "推奨",
     },
 
     // 日付フォーマット

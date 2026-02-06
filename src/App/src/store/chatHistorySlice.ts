@@ -118,9 +118,6 @@ const chatHistorySlice = createSlice({
     clearAll: (state) => {
       state.list = [];
     },
-    clearConversationList: (state) => {
-      state.list = [];
-    },
   },
   extraReducers: (builder) => {
     // Fetch Chat History
@@ -203,8 +200,8 @@ export const {
   showConversationMessages,
   setFetchingConversations,
   setFetchingConvMessages,
+  setHistoryUpdateAPIPending,
   clearAll,
-  clearConversationList,
 } = chatHistorySlice.actions;
 
 export default chatHistorySlice.reducer;

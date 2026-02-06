@@ -7,7 +7,7 @@ import {
     Textarea,
 } from "@fluentui/react-components";
 import { ChatAdd24Regular, Stop24Regular } from "@fluentui/react-icons";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { AgentMode, ModelReasoningEffort, ModelType, ReasoningEffort, ReasoningSummary } from "../../types/AppTypes";
 
@@ -38,42 +38,6 @@ interface ChatInputProps {
   onReasoningSummaryChange: (summary: ReasoningSummary) => void;
 }
 
-// Agent mode options
-const agentModeOptions: { value: AgentMode; label: string; description: string }[] = [
-  { value: "sql_only", label: "SQL Only", description: "高速・SQLクエリのみ" },
-  { value: "multi_tool", label: "Multi Tool (推奨)", description: "全ツール使用・バランス型" },
-  { value: "handoff", label: "Handoff", description: "専門家エージェント委譲" },
-  { value: "magentic", label: "Magentic", description: "複雑な計画・マネージャー型" },
-];
-
-// Reasoning effort options for Agentic Retrieval (Foundry IQ)
-const reasoningEffortOptions: { value: ReasoningEffort; label: string; description: string }[] = [
-  { value: "minimal", label: "Minimal", description: "高速・直接検索（LLMなし）" },
-  { value: "low", label: "Low (推奨)", description: "シングルパス・バランス型" },
-  { value: "medium", label: "Medium", description: "反復検索・最高品質" },
-];
-
-// Model options
-const modelOptions: { value: ModelType; label: string; description: string }[] = [
-  { value: "gpt-5", label: "GPT-5", description: "高精度・推論重視" },
-  { value: "gpt-4o-mini", label: "GPT-4o-mini", description: "高速・コスト効率" },
-];
-
-// Model reasoning effort options for GPT-5
-const modelReasoningOptions: { value: ModelReasoningEffort; label: string; description: string }[] = [
-  { value: "low", label: "Low", description: "高速・簡易推論" },
-  { value: "medium", label: "Medium (推奨)", description: "バランス型" },
-  { value: "high", label: "High", description: "深い推論・最高品質" },
-];
-
-// Reasoning summary options for GPT-5 (思考プロセス表示)
-const reasoningSummaryOptions: { value: ReasoningSummary; label: string; description: string }[] = [
-  { value: "off", label: "Off", description: "思考過程を非表示" },
-  { value: "auto", label: "Auto", description: "自動判定" },
-  { value: "concise", label: "Concise", description: "簡潔に表示" },
-  { value: "detailed", label: "Detailed", description: "詳細に表示" },
-];
-
 /**
  * Chat input component with message input and agent settings
  */
@@ -103,6 +67,42 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const { t } = useTranslation();
   const textareaContainerRef = useRef<HTMLDivElement>(null);
+
+  // Agent mode options (i18n)
+  const agentModeOptions = useMemo(() => [
+    { value: "sql_only" as AgentMode, label: "SQL Only", description: t("agentMode.sqlOnly") },
+    { value: "multi_tool" as AgentMode, label: `Multi Tool (${t("common.recommended") || "推奨"})`, description: t("agentMode.multiTool") },
+    { value: "handoff" as AgentMode, label: "Handoff", description: t("agentMode.handoff") },
+    { value: "magentic" as AgentMode, label: "Magentic", description: t("agentMode.magentic") },
+  ], [t]);
+
+  // Reasoning effort options for Agentic Retrieval (Foundry IQ)
+  const reasoningEffortOptions = useMemo(() => [
+    { value: "minimal" as ReasoningEffort, label: "Minimal", description: t("docSearch.minimal") },
+    { value: "low" as ReasoningEffort, label: `Low (${t("common.recommended") || "推奨"})`, description: t("docSearch.low") },
+    { value: "medium" as ReasoningEffort, label: "Medium", description: t("docSearch.medium") },
+  ], [t]);
+
+  // Model options
+  const modelOptions = useMemo(() => [
+    { value: "gpt-5" as ModelType, label: "GPT-5", description: t("modelSettings.gpt5Desc") },
+    { value: "gpt-4o-mini" as ModelType, label: "GPT-4o-mini", description: t("modelSettings.gpt4oMiniDesc") },
+  ], [t]);
+
+  // Model reasoning effort options for GPT-5
+  const modelReasoningOptions = useMemo(() => [
+    { value: "low" as ModelReasoningEffort, label: "Low", description: t("modelSettings.reasoningLow") },
+    { value: "medium" as ModelReasoningEffort, label: `Medium (${t("common.recommended") || "推奨"})`, description: t("modelSettings.reasoningMedium") },
+    { value: "high" as ModelReasoningEffort, label: "High", description: t("modelSettings.reasoningHigh") },
+  ], [t]);
+
+  // Reasoning summary options for GPT-5 (思考プロセス表示)
+  const reasoningSummaryOptions = useMemo(() => [
+    { value: "off" as ReasoningSummary, label: "Off", description: t("modelSettings.summaryOff") },
+    { value: "auto" as ReasoningSummary, label: "Auto", description: t("modelSettings.summaryAuto") },
+    { value: "concise" as ReasoningSummary, label: "Concise", description: t("modelSettings.summaryConcise") },
+    { value: "detailed" as ReasoningSummary, label: "Detailed", description: t("modelSettings.summaryDetailed") },
+  ], [t]);
 
   // テキストエリアの自動拡張
   const adjustTextareaHeight = useCallback(() => {
@@ -166,7 +166,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       </div>
       <div className="footer-settings-row">
         <div className="setting-item">
-          <span className="setting-label" title="エージェントの動作モード">🤖 Agent Mode:</span>
+          <span className="setting-label" title={t("agentMode.label")}>🤖 Agent Mode:</span>
           <Dropdown
             placeholder="Agent Mode"
             value={agentModeOptions.find(opt => opt.value === agentMode)?.label || "Multi Tool"}
@@ -179,14 +179,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               <Option key={option.value} value={option.value} text={option.label}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span style={{ fontWeight: 500 }}>{option.label}</span>
-                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>{option.description}</span>
                 </div>
               </Option>
             ))}
           </Dropdown>
         </div>
         <div className="setting-item">
-          <span className="setting-label" title="使用するAIモデル">🧠 {t("model.title")}:</span>
+          <span className="setting-label" title={t("modelSettings.label")}>🧠 {t("model.title")}:</span>
           <Dropdown
             placeholder="Model"
             value={modelOptions.find(opt => opt.value === modelType)?.label || "GPT-5"}
@@ -194,13 +194,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onOptionSelect={(_, data) => onModelTypeChange(data.optionValue as ModelType)}
             disabled={isInputDisabled}
             style={{ minWidth: "140px" }}
-            title="使用するAIモデル"
+            title={t("modelSettings.label")}
           >
             {modelOptions.map((option) => (
               <Option key={option.value} value={option.value} text={option.label}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span style={{ fontWeight: 500 }}>{option.label}</span>
-                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>{option.description}</span>
                 </div>
               </Option>
             ))}
@@ -208,7 +208,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         </div>
         {modelType === "gpt-4o-mini" && (
           <div className="setting-item">
-            <span className="setting-label" title="回答の創造性 (0=正確, 2=創造的)">🎨 {t("model.temperature")}:</span>
+            <span className="setting-label" title={t("modelSettings.temperatureLabel")}>🎨 {t("model.temperature")}:</span>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: "120px" }}>
               <Slider
                 min={0}
@@ -225,7 +225,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
         {modelType === "gpt-5" && (
           <div className="setting-item">
-            <span className="setting-label" title="GPT-5の推論深度 (high=深い思考)">🧠 {t("model.reasoningEffort")}:</span>
+            <span className="setting-label" title={t("modelSettings.reasoningLabel")}>🧠 {t("model.reasoningEffort")}:</span>
             <Dropdown
               placeholder="Reasoning"
               value={modelReasoningOptions.find(opt => opt.value === modelReasoningEffort)?.label || "Medium"}
@@ -233,13 +233,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onOptionSelect={(_, data) => onModelReasoningEffortChange(data.optionValue as ModelReasoningEffort)}
               disabled={isInputDisabled}
               style={{ minWidth: "130px" }}
-              title="GPT-5の推論深度"
+              title={t("modelSettings.reasoningLabel")}
             >
               {modelReasoningOptions.map((option) => (
                 <Option key={option.value} value={option.value} text={option.label}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontWeight: 500 }}>{option.label}</span>
-                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                    <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>{option.description}</span>
                   </div>
                 </Option>
               ))}
@@ -248,21 +248,21 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         )}
         {modelType === "gpt-5" && (
           <div className="setting-item">
-            <span className="setting-label" title="GPT-5の思考プロセス表示">💭 思考表示:</span>
+            <span className="setting-label" title={t("modelSettings.summaryLabel")}>💭 {t("modelSettings.thinkingDisplay")}:</span>
             <Dropdown
-              placeholder="思考表示"
+              placeholder={t("modelSettings.thinkingDisplay")}
               value={reasoningSummaryOptions.find(opt => opt.value === reasoningSummary)?.label || "Auto"}
               selectedOptions={[reasoningSummary]}
               onOptionSelect={(_, data) => onReasoningSummaryChange(data.optionValue as ReasoningSummary)}
               disabled={isInputDisabled}
               style={{ minWidth: "130px" }}
-              title="GPT-5の思考プロセス表示"
+              title={t("modelSettings.summaryLabel")}
             >
               {reasoningSummaryOptions.map((option) => (
                 <Option key={option.value} value={option.value} text={option.label}>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontWeight: 500 }}>{option.label}</span>
-                    <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                    <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>{option.description}</span>
                   </div>
                 </Option>
               ))}
@@ -270,7 +270,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         )}
         <div className="setting-item">
-          <span className="setting-label" title="ドキュメント検索の推論レベル (Foundry IQ)">🔍 Doc Search:</span>
+          <span className="setting-label" title={t("docSearch.label")}>🔍 Doc Search:</span>
           <Dropdown
             placeholder="Reasoning Effort"
             value={reasoningEffortOptions.find(opt => opt.value === reasoningEffort)?.label || "Low"}
@@ -278,13 +278,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             onOptionSelect={(_, data) => onReasoningEffortChange(data.optionValue as ReasoningEffort)}
             disabled={isInputDisabled}
             style={{ minWidth: "140px" }}
-            title="ドキュメント検索の推論レベル (Foundry IQ)"
+            title={t("docSearch.label")}
           >
             {reasoningEffortOptions.map((option) => (
               <Option key={option.value} value={option.value} text={option.label}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <span style={{ fontWeight: 500 }}>{option.label}</span>
-                  <span style={{ fontSize: "11px", color: "#666" }}>{option.description}</span>
+                  <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>{option.description}</span>
                 </div>
               </Option>
             ))}

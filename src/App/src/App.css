@@ -197,6 +197,30 @@ body {
   }
 }
 
+/* Tablet screens (769px - 991px) */
+@media (min-width: 769px) and (max-width: 991px) {
+  .main-container {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+
+  .header {
+    padding: 0 var(--spacing-md);
+  }
+
+  .header-title {
+    font-size: 0.85rem;
+  }
+
+  .header-right-section {
+    gap: var(--spacing-sm, 8px);
+  }
+
+  .version-badge {
+    display: none;
+  }
+}
+
 /* Large screens (≥992px) */
 @media (min-width: 992px) {
   .header-title {

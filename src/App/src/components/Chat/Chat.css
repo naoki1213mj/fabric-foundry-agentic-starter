@@ -765,6 +765,33 @@
 }
 
 /* === Responsive Design === */
+
+/* Tablet screens (769px - 991px) */
+@media (min-width: 769px) and (max-width: 991px) {
+  .footer-settings-row {
+    gap: var(--spacing-sm, 8px);
+  }
+
+  .setting-item {
+    min-width: 150px;
+  }
+
+  .setting-label {
+    font-size: 12px;
+  }
+
+  .setting-item .fui-Dropdown {
+    min-width: 110px;
+    font-size: 11px;
+  }
+
+  .user-message,
+  .assistant-message {
+    max-width: 85%;
+  }
+}
+
+/* Mobile screens */
 @media (max-width: 768px) {
   .chat-messages {
     padding: var(--spacing-md);

@@ -1,3 +1,4 @@
+import i18n from "../i18n";
 import { Conversation } from "../types/AppTypes";
 
 export const colors: { [key: string]: string } = {
@@ -144,17 +145,17 @@ export const segregateItems = (items: Conversation[]) => {
   });
 
   const finalResult = [
-    { title: `今日`, entries: groupedItems.Today },
+    { title: i18n.t("history.today"), entries: groupedItems.Today },
     {
-      title: `昨日`,
+      title: i18n.t("history.yesterday"),
       entries: groupedItems.Yesterday,
     },
     {
-      title: `過去7日間`,
+      title: i18n.t("history.last7Days"),
       entries: groupedItems.Last7Days,
     },
     {
-      title: `それ以前`,
+      title: i18n.t("history.older"),
       entries: groupedItems.Older,
     },
   ];

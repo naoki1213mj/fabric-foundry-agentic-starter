@@ -66,6 +66,21 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
+
+  /* Z-Index Scale */
+  --z-dropdown: 100;
+  --z-panel: 200;
+  --z-overlay: 500;
+  --z-modal: 1000;
+  --z-spinner: 9999;
+
+  /* Borders */
+  --color-border: #e2e8f0;
+  --color-border-light: #e0e0e0;
+  --color-border-dark: #cbd5e1;
+
+  /* Overlay */
+  --color-overlay: rgba(255, 255, 255, 0.8);
 }
 
 /* === Dark Mode === */
@@ -94,6 +109,14 @@
   --color-accent-error-light: #450a0a;
   --color-accent-success-light: #14532d;
   --color-accent-warning-light: #422006;
+
+  --color-accent-secondary: #a78bfa;
+
+  --color-border: #334155;
+  --color-border-light: #334155;
+  --color-border-dark: #475569;
+
+  --color-overlay: rgba(15, 23, 42, 0.8);
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -137,6 +160,14 @@ code {
 }
 
 /* === Scrollbar Styling === */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-tertiary) var(--color-bg-tertiary);
+}
+
+/* Webkit (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -186,5 +217,5 @@ a:visited {
 }
 
 [data-theme="dark"] a:visited {
-  color: #a78bfa;
+  color: var(--color-accent-secondary);
 }

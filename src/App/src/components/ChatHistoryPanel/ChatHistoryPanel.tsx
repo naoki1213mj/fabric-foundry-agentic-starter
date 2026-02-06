@@ -158,8 +158,8 @@ export const ChatHistoryPanel: React.FC<ChatHistoryPanelProps> = (props) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-              zIndex: 1000,
+              backgroundColor: "var(--color-overlay)",
+              zIndex: "var(--z-modal)" as unknown as number,
             }}
           >
           <Spinner

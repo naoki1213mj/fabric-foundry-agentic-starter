@@ -37,6 +37,11 @@ export const en = {
       exportMarkdown: "Export Markdown",
       exportJson: "Export JSON",
       sendQuestion: "Send Question",
+      processing: "Processing...",
+      processingDetails: "Processing Details",
+      reasoning: "Reasoning",
+      toolCount: "Tools: {{count}}",
+      stopGenerating: "Stop Generating",
     },
 
     // Agent
@@ -47,6 +52,41 @@ export const en = {
       salesAnalystDesc: "Provides sales data analysis and insights",
       capabilities: "Capabilities",
       tools: "Available Tools",
+    },
+
+    // Agent Mode
+    agentMode: {
+      label: "Agent Mode",
+      sqlOnly: "Fast, SQL queries only",
+      multiTool: "All tools, balanced",
+      handoff: "Expert agent delegation",
+      magentic: "Complex planning, manager",
+    },
+
+    // Doc Search
+    docSearch: {
+      label: "Doc Search Reasoning (Foundry IQ)",
+      minimal: "Fast, direct search (no LLM)",
+      low: "Single pass, balanced",
+      medium: "Iterative search, best quality",
+    },
+
+    // Model Settings
+    modelSettings: {
+      label: "AI Model",
+      gpt5Desc: "High accuracy, reasoning",
+      gpt4oMiniDesc: "Fast, cost effective",
+      temperatureLabel: "Creativity (0=precise, 2=creative)",
+      reasoningLabel: "GPT-5 reasoning depth",
+      reasoningLow: "Fast, simple reasoning",
+      reasoningMedium: "Balanced",
+      reasoningHigh: "Deep reasoning, best quality",
+      summaryLabel: "GPT-5 thinking display",
+      summaryOff: "Hide thinking",
+      summaryAuto: "Auto",
+      summaryConcise: "Concise",
+      summaryDetailed: "Detailed",
+      thinkingDisplay: "Thinking Display",
     },
 
     // Chat History
@@ -123,6 +163,7 @@ export const en = {
       submit: "Submit",
       reset: "Reset",
       clearAll: "Clear All",
+      recommended: "Recommended",
     },
 
     // Date Format

@@ -352,15 +352,15 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
               ▼
             </span>
             <span>
-              {generatingResponse ? "処理中..." : "処理詳細"}
-              {reasoningContent && " (推論)"}
-              {toolEvents.length > 0 && ` (ツール: ${new Set(toolEvents.map(e => e.tool)).size}種類)`}
+              {generatingResponse ? t("chat.processing") : t("chat.processingDetails")}
+              {reasoningContent && ` (${t("chat.reasoning")})`}
+              {toolEvents.length > 0 && ` (${t("chat.toolCount", { count: new Set(toolEvents.map(e => e.tool)).size })})`}
             </span>
           </button>
 
           {/* 折りたたみコンテンツ */}
           {!isFooterCollapsed && (
-            <div style={{ maxHeight: isReasoningExpanded || isToolExpanded ? "40vh" : "auto", overflowY: "auto", padding: "0 16px 8px" }}>
+            <div style={{ maxHeight: isReasoningExpanded || isToolExpanded ? "25vh" : "auto", overflowY: "auto", padding: "0 16px 8px" }}>
               {reasoningContent && (
                 <div className={`reasoning-status-wrapper ${generatingResponse ? "no-animate" : ""}`.trim()}>
                   <ReasoningIndicator
