@@ -27,7 +27,7 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
         dispatch(clearCitation());
     }
     return (
-        <div className='citationPanel'>
+        <div className='citationPanel' role="complementary" aria-label="Citations">
 
             <Stack.Item
 
@@ -50,11 +50,12 @@ const CitationPanel = memo(({ activeCitation }: Props) => {
                     </div>
                     <DismissRegular
                         role="button"
-                        onKeyDown={(e) =>
-                            e.key === " " || e.key === "Enter"
-                                ? onCloseCitation()
-                                : () => { }
-                        }
+                        aria-label="Close citations panel"
+                        onKeyDown={(e) => {
+                            if (e.key === " " || e.key === "Enter" || e.key === "Escape") {
+                                onCloseCitation();
+                            }
+                        }}
                         tabIndex={0}
                         onClick={onCloseCitation}
                     />

@@ -55,6 +55,7 @@ export const SuggestedQuestions: React.FC<SuggestedQuestionsProps> = ({
             onClick={() => onSelectQuestion(item.question)}
             disabled={disabled}
             title={item.question}
+            aria-label={t(item.labelKey) || item.question}
           >
             <span className="suggestion-icon">{item.icon}</span>
             <span className="suggestion-text">

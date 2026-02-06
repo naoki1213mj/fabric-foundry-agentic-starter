@@ -6,7 +6,7 @@
     border-radius: var(--radius-lg, 16px);
     padding: var(--spacing-lg, 16px);
     background: var(--color-bg-secondary, #ffffff);
-    height: 93%;
+    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     box-shadow: var(--shadow-lg);
@@ -43,7 +43,7 @@
   }
 
   /* Styling the file path link */
-  h5 {
+  .citationPanel h5 {
     word-break: break-all;
     margin: 12px 0;
     font-size: 14px;
@@ -51,12 +51,12 @@
     transition: color 0.25s ease;
   }
 
-  h5 a {
+  .citationPanel h5 a {
     color: var(--color-accent-primary, #0078d4);
     text-decoration: none;
   }
 
-  h5 a:hover {
+  .citationPanel h5 a:hover {
     text-decoration: underline;
   }
 

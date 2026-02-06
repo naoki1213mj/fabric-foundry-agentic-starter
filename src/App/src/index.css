@@ -33,6 +33,20 @@
   --color-accent-error: #d13438;
   --color-accent-error-light: #fde7e9;
 
+  /* Link colors */
+  --color-link: #0078d4;
+  --color-link-hover: #005a9e;
+  --color-link-visited: #5c2d91;
+
+  /* Danger / Stop colors */
+  --color-danger-hover: #b91c1c;
+
+  /* On-accent text (white text on colored backgrounds) */
+  --color-text-on-accent: rgba(255, 255, 255, 0.8);
+  --color-text-on-accent-muted: rgba(255, 255, 255, 0.7);
+  --color-bg-on-accent-hover: rgba(255, 255, 255, 0.2);
+  --color-text-on-accent-strong: rgba(255, 255, 255, 0.9);
+
   /* Message Colors */
   --color-msg-user-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --color-msg-user-text: #ffffff;
@@ -111,6 +125,20 @@
   --color-accent-warning-light: #422006;
 
   --color-accent-secondary: #a78bfa;
+
+  /* Link colors for dark mode */
+  --color-link: #60a5fa;
+  --color-link-hover: #93c5fd;
+  --color-link-visited: #a78bfa;
+
+  /* Danger / Stop colors */
+  --color-danger-hover: #b91c1c;
+
+  /* On-accent text (white text on colored backgrounds) */
+  --color-text-on-accent: rgba(255, 255, 255, 0.8);
+  --color-text-on-accent-muted: rgba(255, 255, 255, 0.7);
+  --color-bg-on-accent-hover: rgba(255, 255, 255, 0.2);
+  --color-text-on-accent-strong: rgba(255, 255, 255, 0.9);
 
   --color-border: #334155;
   --color-border-light: #334155;

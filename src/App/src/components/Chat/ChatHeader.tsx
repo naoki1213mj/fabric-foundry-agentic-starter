@@ -31,7 +31,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   return (
     <div className="chat-header">
       <Subtitle2>{t("chat.title")}</Subtitle2>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div className="chat-header-actions">
         <Input
           className="chat-search-input"
           placeholder={t("chat.searchPlaceholder")}
@@ -46,6 +46,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 size="small"
                 onClick={onClearSearch}
                 className="chat-search-clear"
+                aria-label={t("chat.clearSearch")}
               >
                 {t("chat.clearSearch")}
               </Button>
@@ -74,6 +75,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           appearance="outline"
           onClick={onToggleHistory}
           className="hide-chat-history"
+          aria-label={isHistoryVisible ? t("chat.hideHistory") : t("chat.showHistory")}
+          aria-expanded={isHistoryVisible}
         >
           {isHistoryVisible ? t("chat.hideHistory") : t("chat.showHistory")}
         </Button>

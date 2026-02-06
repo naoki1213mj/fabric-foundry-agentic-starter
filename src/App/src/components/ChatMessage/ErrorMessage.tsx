@@ -12,7 +12,7 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = memo(({ content, timest
   const { t } = useTranslation();
 
   return (
-    <div className="assistant-message error-message">
+    <div className="assistant-message error-message" role="alert">
       <div className="error-icon">⚠️</div>
       <div className="error-content">
         <p className="error-text">{content}</p>

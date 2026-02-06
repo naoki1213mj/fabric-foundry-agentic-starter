@@ -207,6 +207,18 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     containerRef.current = listApiRef.current?.element ?? null;
   }, [containerRef, listApiRef, messages.length]);
 
+  // 履歴パネル開閉後、AutoSizer再マウント完了後にスクロール位置を復元
+  useEffect(() => {
+    // AutoSizer key変更による再マウント後、少し遅延させてスクロール
+    const timer = setTimeout(() => {
+      if (listApiRef.current?.scrollToRow && messages.length > 0) {
+        const lastIdx = virtualItems.length - 1;
+        listApiRef.current.scrollToRow({ index: Math.max(0, lastIdx), align: "end", behavior: "auto" });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [isHistoryPanelOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // 推論/ツール全体の折りたたみ状態
   const [isFooterCollapsed, setIsFooterCollapsed] = useState(false);
   const [isReasoningExpanded, setIsReasoningExpanded] = useState(false);
@@ -243,6 +255,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         className="chat-messages"
         ref={containerRef}
         onScroll={onScroll}
+        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
       >
         {/* Loading skeleton while fetching messages */}
         {Boolean(isFetchingMessages) && (
@@ -304,8 +317,9 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
       }}
     >
       {/* 仮想化されたメッセージリスト */}
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
         <AutoSizer
+          key={`autosizer-${isHistoryPanelOpen ? "panel" : "full"}`}
           renderProp={({ height, width }) => {
             if (!height || !width) return null;
             return (
