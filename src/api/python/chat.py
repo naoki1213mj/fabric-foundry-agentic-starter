@@ -1867,38 +1867,8 @@ async def stream_chat_request(
                         }
                         yield json.dumps(response, ensure_ascii=False) + "\n\n"
 
-            # Streaming完了後: Web引用があるのに本文に参照が無い場合は末尾に追加
-            current_citations = get_web_citations()
-            if assistant_content and current_citations:
-                has_inline_refs = re.search(r"\[\[\d+\]\]\(", assistant_content)
-                has_sources_section = "情報源:" in assistant_content or "参照:" in assistant_content
-                if not has_inline_refs and not has_sources_section:
-                    ref_markers = ", ".join(
-                        [
-                            f"[[{i + 1}]]({cit.get('url', '')})"
-                            for i, cit in enumerate(current_citations[:5])
-                            if cit.get("url")
-                        ]
-                    )
-                    if ref_markers:
-                        assistant_content = (
-                            assistant_content.rstrip() + f"\n\n*参照: {ref_markers}*"
-                        )
-                        citations_json = json.dumps(current_citations)
-                        response = {
-                            "choices": [
-                                {
-                                    "messages": [
-                                        {
-                                            "role": "assistant",
-                                            "content": assistant_content,
-                                            "citations": citations_json,
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                        yield json.dumps(response, ensure_ascii=False) + "\n\n"
+            # Streaming完了後: Web引用の末尾追加は不要
+            # (Citations UIコンポーネントが structured citations を表示する)
 
             # Fallback if no response
             if not assistant_content:

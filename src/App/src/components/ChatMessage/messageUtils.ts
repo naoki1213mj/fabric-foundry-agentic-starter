@@ -201,6 +201,15 @@ export const containsHtml = (content: string): boolean => {
 };
 
 /**
+ * Convert legacy [[N]](url) citation markers to standard markdown [N](url)
+ * for backward compatibility with past conversation history.
+ */
+export const convertLegacyCitationMarkers = (text: string): string => {
+  // [[N]](url) → [N](url)
+  return text.replace(/\[\[(\d+)\]\]\(([^)]+)\)/g, '[$1]($2)');
+};
+
+/**
  * Add target="_blank" and rel="noopener noreferrer" to all links in HTML content
  * This ensures external links open in new tabs safely
  */

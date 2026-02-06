@@ -9,13 +9,14 @@ import { ChartLoadingSkeleton, StreamingChartIndicator } from './ChartMessage';
 import { CopyButton } from './CopyButton';
 import { MessageReactions } from './MessageReactions';
 import {
-    containsHtml,
-    extractChartsFromText,
-    extractTextExcludingChart,
-    formatTimestamp,
-    looksLikeChartJson,
-    sanitizeAndProcessLinks,
-    stripHtmlTags
+  containsHtml,
+  convertLegacyCitationMarkers,
+  extractChartsFromText,
+  extractTextExcludingChart,
+  formatTimestamp,
+  looksLikeChartJson,
+  sanitizeAndProcessLinks,
+  stripHtmlTags
 } from './messageUtils';
 
 // Lazy load ChatChart component (includes heavy Chart.js library)
@@ -38,7 +39,7 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
 }) => {
   const { t } = useTranslation();
   const timestamp = formatTimestamp(message.date);
-  const content = message.content as string;
+  const content = convertLegacyCitationMarkers(message.content as string);
 
   // Cache remarkPlugins array to prevent re-creation on every render
   const remarkPlugins = useMemo(() => [remarkGfm, supersub], []);

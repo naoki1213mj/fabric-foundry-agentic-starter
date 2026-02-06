@@ -190,59 +190,23 @@ class WebAgentHandler:
                         logger.warning(f"Failed to delete agent: {cleanup_error}")
 
             if answer_text:
-                # Insert inline citation markers into the answer text
-                # Sort annotations by start position in reverse to avoid index shifting
-                if annotations_with_position:
-                    # Create URL to index mapping
-                    url_to_idx: dict[str, int] = {}
-                    for i, cit in enumerate(citations):
-                        url = cit.get("url", "")
-                        if url and url not in url_to_idx:
-                            url_to_idx[url] = i + 1
-
-                    # Sort by end position descending to insert from back to front
-                    sorted_annotations = sorted(
-                        annotations_with_position,
-                        key=lambda x: x["end"],
-                        reverse=True,
-                    )
-
-                    # Insert inline citations at annotation positions
-                    for ann in sorted_annotations:
-                        url = ann.get("url", "")
-                        end_pos = ann.get("end", 0)
-                        if url in url_to_idx and end_pos <= len(answer_text):
-                            idx = url_to_idx[url]
-                            # Insert markdown link reference after the cited text
-                            citation_link = f" [[{idx}]]({url})"
-                            answer_text = (
-                                answer_text[:end_pos] + citation_link + answer_text[end_pos:]
-                            )
-
-                    logger.info(f"Inserted {len(sorted_annotations)} inline citations")
-                elif citations:
-                    # Fallback: Bing API does not provide start_index/end_index
-                    # Add reference numbers at the end of each paragraph
-                    logger.info("No position data from Bing API, using fallback inline citation")
-                    # Add reference superscripts at the end of answer
-                    # Create a simple reference list inline
-                    ref_markers = ", ".join(
-                        [
-                            f"[[{i + 1}]]({cit.get('url', '')})"
-                            for i, cit in enumerate(citations[:5])
-                        ]
-                    )
-                    if ref_markers:
-                        answer_text = answer_text.rstrip() + f"\n\n*参照: {ref_markers}*"
-
+                # Build structured citations for UI display
+                # (inline markers removed - Citations UI component handles display)
                 formatted_citations = []
+                seen_urls: set[str] = set()
                 for i, cit in enumerate(citations):
+                    url = cit.get("url", "")
+                    # Deduplicate by URL
+                    if url and url in seen_urls:
+                        continue
+                    if url:
+                        seen_urls.add(url)
                     formatted_citations.append(
                         {
                             "id": f"web-{i + 1}",
                             "title": cit.get("title") or f"Web Source {i + 1}",
-                            "url": cit.get("url", ""),
-                            "filepath": cit.get("url", ""),
+                            "url": url,
+                            "filepath": url,
                             "content": "",
                             "metadata": None,
                             "chunk_id": None,
@@ -250,18 +214,9 @@ class WebAgentHandler:
                         }
                     )
 
-                # Add inline source links at the end of the answer for web search results
-                if citations:
-                    source_links = "\n\n**情報源:**\n"
-                    seen_urls = set()
-                    for i, cit in enumerate(citations):
-                        url = cit.get("url", "")
-                        title = cit.get("title") or f"Web Source {i + 1}"
-                        if url and url not in seen_urls:
-                            seen_urls.add(url)
-                            source_links += f"- [{title}]({url})\n"
-                    if seen_urls:
-                        answer_text = answer_text.rstrip() + source_links
+                logger.info(
+                    f"Prepared {len(formatted_citations)} citations for UI display"
+                )
 
                 return json.dumps(
                     {
