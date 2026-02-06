@@ -58,7 +58,7 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-lg, 24px);
+  /* padding moved to row-level for react-window compatibility */
   position: relative;
   background: linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%);
 }
@@ -67,7 +67,7 @@
 .chat-message {
   display: flex;
   align-items: flex-start;
-  margin-bottom: var(--spacing-md, 16px);
+  padding-bottom: var(--spacing-md, 16px);
   animation: messageSlideIn 0.3s ease-out;
 }
 
@@ -828,9 +828,7 @@
     max-width: 140px;
   }
 
-  .chat-messages {
-    padding: var(--spacing-md);
-  }
+  /* padding is handled at row level for react-window */
 
   .chat-footer {
     padding: var(--spacing-sm) var(--spacing-md);

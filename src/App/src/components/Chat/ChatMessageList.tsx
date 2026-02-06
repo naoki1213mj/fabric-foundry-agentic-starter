@@ -1,11 +1,10 @@
 import { Body1, Subtitle2 } from "@fluentui/react-components";
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AutoSizer } from "react-virtualized-auto-sizer";
 import {
     List,
     useDynamicRowHeight,
-    type DynamicRowHeight,
     type ListImperativeAPI,
     type RowComponentProps,
 } from "react-window";
@@ -56,13 +55,15 @@ type ChatRowProps = {
   onResendUserMessage?: (content: string) => void;
   reasoningContent: string;
   toolEvents: ToolEvent[];
-  dynamicRowHeight: DynamicRowHeight;
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
   isReasoningExpanded: boolean;
   onReasoningToggle: (expanded: boolean) => void;
   isToolExpanded: boolean;
   onToolToggle: (expanded: boolean) => void;
+  totalItemCount: number;
 };
+
+const ROW_PADDING_X = 24; // horizontal padding for each row (replaces List-level padding)
 
 const ChatMessageRow = ({
   index,
@@ -77,62 +78,58 @@ const ChatMessageRow = ({
     parseCitationFromMessage,
     onEditUserMessage,
     onResendUserMessage,
-    reasoningContent,
-    toolEvents,
-    dynamicRowHeight,
     chatMessageStreamEndRef,
-    isReasoningExpanded,
-    onReasoningToggle,
-    isToolExpanded,
-    onToolToggle,
+    totalItemCount,
   } = rowProps;
 
   const item = items[index];
-  const rowRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    if (!rowRef.current) return;
-    return dynamicRowHeight.observeRowElements([rowRef.current]);
-  }, [dynamicRowHeight]);
-
   if (!item) return null;
+
+  // Add top padding to first row, bottom padding to last row (replaces List container padding)
+  const isFirst = index === 0;
+  const isLast = index === totalItemCount - 1;
+  const rowStyle: React.CSSProperties = {
+    ...style,
+    width: "100%",
+    boxSizing: "border-box" as const,
+    paddingLeft: ROW_PADDING_X,
+    paddingRight: ROW_PADDING_X,
+    ...(isFirst ? { paddingTop: ROW_PADDING_X } : {}),
+    ...(isLast ? { paddingBottom: ROW_PADDING_X } : {}),
+  };
 
   if (item.type === "message") {
     const isLastAssistantMessage = item.messageIndex === lastAssistantIndex;
     const isStreaming = isLastAssistantMessage && generatingResponse;
 
     return (
-      <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
-        <div ref={rowRef}>
-          <div className={`chat-message ${item.message.role} ${generatingResponse ? "no-animate" : ""}`.trim()}>
-            <ChatMessageComponent
-              message={item.message}
-              index={item.messageIndex}
-              isLastAssistantMessage={isLastAssistantMessage}
-              generatingResponse={isStreaming}
-              parseCitationFromMessage={parseCitationFromMessage}
-              onEditUserMessage={onEditUserMessage}
-              onResendUserMessage={onResendUserMessage}
-            />
-          </div>
+      <div style={rowStyle} {...ariaAttributes}>
+        <div className={`chat-message ${item.message.role} ${generatingResponse ? "no-animate" : ""}`.trim()}>
+          <ChatMessageComponent
+            message={item.message}
+            index={item.messageIndex}
+            isLastAssistantMessage={isLastAssistantMessage}
+            generatingResponse={isStreaming}
+            parseCitationFromMessage={parseCitationFromMessage}
+            onEditUserMessage={onEditUserMessage}
+            onResendUserMessage={onResendUserMessage}
+          />
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ ...style, width: "100%" }} {...ariaAttributes}>
-      <div ref={rowRef}>
-        {item.type === "thinking" && (
-          <ThinkingSkeleton />
-        )}
+    <div style={rowStyle} {...ariaAttributes}>
+      {item.type === "thinking" && (
+        <ThinkingSkeleton />
+      )}
 
-        {item.type === "anchor" && (
-          <div style={{ height: 1 }}>
-            <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
-          </div>
-        )}
-      </div>
+      {item.type === "anchor" && (
+        <div style={{ height: 1 }}>
+          <div data-testid="streamendref-id" ref={chatMessageStreamEndRef} />
+        </div>
+      )}
     </div>
   );
 };
@@ -241,13 +238,13 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
     onResendUserMessage,
     reasoningContent,
     toolEvents,
-    dynamicRowHeight,
     chatMessageStreamEndRef,
     isReasoningExpanded,
     onReasoningToggle: setIsReasoningExpanded,
     isToolExpanded,
     onToolToggle: setIsToolExpanded,
-  }), [virtualItems, lastAssistantIndex, generatingResponse, parseCitationFromMessage, onEditUserMessage, onResendUserMessage, reasoningContent, toolEvents, dynamicRowHeight, chatMessageStreamEndRef, isReasoningExpanded, isToolExpanded]);
+    totalItemCount: virtualItems.length,
+  }), [virtualItems, lastAssistantIndex, generatingResponse, parseCitationFromMessage, onEditUserMessage, onResendUserMessage, reasoningContent, toolEvents, chatMessageStreamEndRef, isReasoningExpanded, isToolExpanded]);
 
   if (!hasMessages) {
     return (
@@ -255,7 +252,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         className="chat-messages"
         ref={containerRef}
         onScroll={onScroll}
-        style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--spacing-lg, 24px)" }}
       >
         {/* Loading skeleton while fetching messages */}
         {Boolean(isFetchingMessages) && (
@@ -292,6 +289,7 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
         className="chat-messages"
         ref={containerRef}
         onScroll={onScroll}
+        style={{ padding: "var(--spacing-lg, 24px)" }}
       >
         <div className="initial-msg">
           <Subtitle2>{t("chat.noSearchResultsTitle")}</Subtitle2>
