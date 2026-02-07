@@ -126,7 +126,9 @@ class TestCORSOrigins:
 
     def test_custom_cors_origins(self, monkeypatch):
         """Custom CORS origins should be parsed from comma-separated string."""
-        monkeypatch.setenv("CORS_ALLOWED_ORIGINS", "https://app.example.com,https://admin.example.com")
+        monkeypatch.setenv(
+            "CORS_ALLOWED_ORIGINS", "https://app.example.com,https://admin.example.com"
+        )
         from app import build_app
 
         app = build_app()
@@ -152,7 +154,16 @@ class TestHealthResponseSchema:
         """Health response should contain all expected fields."""
         response = test_client.get("/health")
         data = response.json()
-        required_fields = ["status", "version", "build_date", "timestamp", "environment", "model", "platform", "database"]
+        required_fields = [
+            "status",
+            "version",
+            "build_date",
+            "timestamp",
+            "environment",
+            "model",
+            "platform",
+            "database",
+        ]
         for field in required_fields:
             assert field in data, f"Missing field: {field}"
 
@@ -168,4 +179,5 @@ class TestHealthResponseSchema:
         data = response.json()
         # Should not raise
         from datetime import datetime
+
         datetime.fromisoformat(data["timestamp"])

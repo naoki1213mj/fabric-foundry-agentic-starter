@@ -128,8 +128,8 @@ source ~/.bashrc
 
 ```bash
 # このカスタマイズプロジェクトの場合:
-git clone https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai.git
-cd hackathon202601-stu-se-agentic-ai
+git clone https://github.com/naoki1213mj/fabric-foundry-agentic-starter.git
+cd fabric-foundry-agentic-starter
 
 # またはオリジナル Solution Accelerator の場合:
 # git clone https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator.git

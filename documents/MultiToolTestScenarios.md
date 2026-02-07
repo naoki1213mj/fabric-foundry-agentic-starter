@@ -143,7 +143,7 @@ INFO:agent_framework:Function name: calculate_yoy_growth
 # ログをダウンロード
 $ts = Get-Date -Format "yyyyMMddHHmmss"
 $logPath = ".debug_logs/test_logs_$ts.zip"
-az webapp log download --name api-daj6dri4yf3k3z --resource-group rg-agent-unified-data-acce-eastus-001 --log-file $logPath
+az webapp log download --name api-<your-suffix> --resource-group <your-resource-group> --log-file $logPath
 Expand-Archive -Path $logPath -DestinationPath ".debug_logs/test_logs_$ts" -Force
 
 # ツール呼び出しをフィルタ
@@ -181,7 +181,7 @@ Get-Content ".debug_logs/test_logs_$ts/LogFiles/*docker.log" |
 
 ```bash
 # シナリオ1 - ターン1
-curl -X POST https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat \
+curl -X POST https://api-<your-suffix>.azurewebsites.net/api/chat \
   -H "Content-Type: application/json" \
   -d '{
     "query": "Mountain-100の最新の売上データを教えてください",
@@ -199,13 +199,13 @@ $body = @{
     stream = $false
 } | ConvertTo-Json
 
-Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
+Invoke-RestMethod -Uri "https://api-<your-suffix>.azurewebsites.net/api/chat" `
     -Method POST -Body $body -ContentType "application/json" -TimeoutSec 120
 ```
 
 ### 3. UIからのテスト
 
-1. https://app-daj6dri4yf3k3z.azurewebsites.net にアクセス
+1. https://app-<your-suffix>.azurewebsites.net にアクセス
 2. シナリオの各ターンを順番に入力
 3. 応答を確認後、ログスクリプトを実行して検証
 

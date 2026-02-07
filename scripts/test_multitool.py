@@ -11,6 +11,7 @@ Usage:
 
 import asyncio
 import json
+import os
 import time
 import uuid
 from datetime import datetime
@@ -19,7 +20,7 @@ from typing import Any
 import httpx
 
 # テスト設定
-API_BASE_URL = "https://api-daj6dri4yf3k3z.azurewebsites.net"
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 TIMEOUT = 180  # 秒
 
 
@@ -332,7 +333,7 @@ async def main():
     print("🔍 トレース確認方法")
     print("=" * 70)
     print("""
-1. Azure Portal → Application Insights (appi-daj6dri4yf3k3z)
+1. Azure Portal → Application Insights (appi-<your-suffix>)
    → Transaction search → 過去30分のリクエストを検索
 
 2. Kusto クエリ（Log Analytics）:

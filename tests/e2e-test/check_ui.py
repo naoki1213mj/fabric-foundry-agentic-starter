@@ -1,3 +1,4 @@
+import os
 import time
 
 from playwright.sync_api import sync_playwright
@@ -5,7 +6,7 @@ from playwright.sync_api import sync_playwright
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page()
-    page.goto("https://app-daj6dri4yf3k3z.azurewebsites.net/")
+    page.goto(os.environ.get("FRONTEND_URL", "https://localhost:3000"))
     time.sleep(3)
     # Get textarea elements
     textareas = page.locator("textarea").all()

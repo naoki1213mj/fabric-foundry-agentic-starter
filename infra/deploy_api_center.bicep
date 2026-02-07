@@ -80,7 +80,7 @@ resource mcpServerApi 'Microsoft.ApiCenter/services/workspaces/apis@2024-03-01' 
     '''
     kind: 'rest'
     termsOfService: {
-      url: 'https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai'
+      url: 'https://github.com/naoki1213mj/fabric-foundry-agentic-starter'
     }
     contacts: [
       {

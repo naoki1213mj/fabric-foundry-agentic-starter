@@ -86,7 +86,7 @@
 
 ```powershell
 # ACR名を設定
-$ACR_NAME = "crda672axowukix3"
+$ACR_NAME = "<your-acr-name>"
 
 # Secrets の値を取得
 az acr show --name $ACR_NAME --query loginServer -o tsv
@@ -103,9 +103,9 @@ az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv
 | `AZURE_CLIENT_ID` | サービスプリンシパルのClient ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
 | `AZURE_TENANT_ID` | Azure AD テナント ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
 | `AZURE_SUBSCRIPTION_ID` | Azure サブスクリプション ID | `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` |
-| `FRONTEND_APP_NAME` | Frontend App Service名 | `app-daj6dri4yf3k3z` |
-| `API_APP_NAME` | API App Service名 | `api-daj6dri4yf3k3z` |
-| `RESOURCE_GROUP` | リソースグループ名 | `rg-agent-unified-data-acce-eastus-001` |
+| `FRONTEND_APP_NAME` | Frontend App Service名 | `app-<your-suffix>` |
+| `API_APP_NAME` | API App Service名 | `api-<your-suffix>` |
+| `RESOURCE_GROUP` | リソースグループ名 | `<your-resource-group>` |
 
 ## 3. OIDC認証の設定（推奨）
 
@@ -153,13 +153,13 @@ az ad app federated-credential create \
 az role assignment create \
   --assignee $APP_ID \
   --role "Contributor" \
-  --scope "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/rg-agent-unified-data-acce-eastus-001"
+  --scope "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<your-resource-group>"
 
 # ACRへのPush権限
 az role assignment create \
   --assignee $APP_ID \
   --role "AcrPush" \
-  --scope "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/rg-agent-unified-data-acce-eastus-001/providers/Microsoft.ContainerRegistry/registries/<ACR_NAME>"
+  --scope "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<your-resource-group>/providers/Microsoft.ContainerRegistry/registries/<ACR_NAME>"
 ```
 
 ## 4. GitHub Environment の設定（オプション）
@@ -209,7 +209,7 @@ az role assignment create \
 
 ```powershell
 # PowerShellで実行
-$ACR_NAME = "crda672axowukix3"
+$ACR_NAME = "<your-acr-name>"
 
 Write-Host "ACR_LOGIN_SERVER:" -ForegroundColor Cyan
 az acr show --name $ACR_NAME --query loginServer -o tsv
@@ -236,9 +236,9 @@ az account show --query tenantId -o tsv
 1. リポジトリの **Settings > Secrets and variables > Actions** に移動
 2. **Secrets** タブで `ACR_LOGIN_SERVER`, `ACR_USERNAME`, `ACR_PASSWORD` を追加
 3. **Variables** タブで以下を追加:
-   - `FRONTEND_APP_NAME`: `app-daj6dri4yf3k3z`
-   - `API_APP_NAME`: `api-daj6dri4yf3k3z`
-   - `RESOURCE_GROUP`: `rg-agent-unified-data-acce-eastus-001`
+   - `FRONTEND_APP_NAME`: `app-<your-suffix>`
+   - `API_APP_NAME`: `api-<your-suffix>`
+   - `RESOURCE_GROUP`: `<your-resource-group>`
 
 ### Step 4: ワークフローをプッシュ
 

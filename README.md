@@ -99,7 +99,7 @@ Azure デプロイ: [デプロイガイドはこちら](./documents/DeploymentGu
 - ネイティブ Windows セットアップ、WSL2 構成、クロスプラットフォーム開発ツールを含む
 <br/><br/>
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai) |
+| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/fabric-foundry-agentic-starter) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/fabric-foundry-agentic-starter) |
 
 |---|---|
 
@@ -220,7 +220,7 @@ _注: これはすべてのコストを網羅したものではありません�
 
 ## フィードバック
 
-質問がある、バグを見つけた、または機能をリクエストしたい場合は、このリポジトリで[新しい Issue を送信](https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai/issues)してください。
+質問がある、バグを見つけた、または機能をリクエストしたい場合は、このリポジトリで[新しい Issue を送信](https://github.com/naoki1213mj/fabric-foundry-agentic-starter/issues)してください。
 
 元の Solution Accelerator に関する Issue は [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues) へお願いします。
 

@@ -10,8 +10,8 @@ applyTo: "src/api/**/*.{py,cs},src/web/**/*.{ts,tsx,js}"
 
 Solution Accelerator では以下の App Service を使用：
 
-- `api-daj6dri4yf3k3z`: Backend API (Python/FastAPI) - Linux Container
-- `app-daj6dri4yf3k3z`: Frontend (React/TypeScript) - Linux Container
+- `api-<your-suffix>`: Backend API (Python/FastAPI) - Linux Container
+- `app-<your-suffix>`: Frontend (React/TypeScript) - Linux Container
 
 ## Python API パターン
 
@@ -39,7 +39,7 @@ async def chat(request: ChatRequest):
 ## 環境変数
 
 ```bash
-AZURE_OPENAI_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/
+AZURE_OPENAI_ENDPOINT=https://aisa-<your-suffix>.services.ai.azure.com/
 AZURE_OPENAI_DEPLOYMENT=gpt-5
 FABRIC_CONNECTION_STRING=...
 DEMO_MODE=false

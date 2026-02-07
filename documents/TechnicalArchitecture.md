@@ -32,41 +32,41 @@ Users can explore call insights, visualize trends, ask questions in natural lang
 
 ## Azure Resource Inventory (Production Environment)
 
-The following resources are deployed in the `rg-agent-unified-data-acce-eastus-001` resource group:
+The following resources are deployed in the `<your-resource-group>` resource group:
 
 ### Compute & Hosting
 
 | Resource | Type | SKU | Description |
 |----------|------|-----|-------------|
-| `api-daj6dri4yf3k3z` | App Service (Linux Container) | - | Python API backend running `da-api:main` from ACR |
-| `app-daj6dri4yf3k3z` | App Service (Linux Container) | - | React frontend running `da-app:main` from ACR |
-| `func-mcp-daj6dri4yf3k3z` | Azure Functions (Linux) | Python 3.12 | MCP Server for business analytics tools |
-| `asp-daj6dri4yf3k3z` | App Service Plan | - | Hosts both App Services |
-| `crda672axowukix3` | Container Registry | Premium | Stores Docker images for API and Frontend |
+| `api-<your-suffix>` | App Service (Linux Container) | - | Python API backend running `da-api:main` from ACR |
+| `app-<your-suffix>` | App Service (Linux Container) | - | React frontend running `da-app:main` from ACR |
+| `func-mcp-<your-suffix>` | Azure Functions (Linux) | Python 3.12 | MCP Server for business analytics tools |
+| `asp-<your-suffix>` | App Service Plan | - | Hosts both App Services |
+| `<your-acr-name>` | Container Registry | Premium | Stores Docker images for API and Frontend |
 
 ### AI & Machine Learning
 
 | Resource | Type | Models | Description |
 |----------|------|--------|-------------|
-| `aisa-daj6dri4yf3k3z` | Azure AI Services | - | Microsoft Foundry hub |
-| `aifp-daj6dri4yf3k3z` | Foundry Project | gpt-5 (500K TPM), gpt-4o-mini (30K TPM), text-embedding-3-large (500K TPM), text-embedding-3-small (120K TPM) | AI model deployments |
-| `search-sp-rag-australiaeast-001` | AI Search | Standard | Foundry IQ knowledge base index (product-specs-kb) |
-| Bing Grounding Connection | - | `bingglobal00149elbd` | Web search via BingGroundingAgentTool |
+| `aisa-<your-suffix>` | Azure AI Services | - | Microsoft Foundry hub |
+| `aifp-<your-suffix>` | Foundry Project | gpt-5 (500K TPM), gpt-4o-mini (30K TPM), text-embedding-3-large (500K TPM), text-embedding-3-small (120K TPM) | AI model deployments |
+| `<your-ai-search-name>` | AI Search | Standard | Foundry IQ knowledge base index (product-specs-kb) |
+| Bing Grounding Connection | - | `<your-bing-connection-name>` | Web search via BingGroundingAgentTool |
 
 ### Integration & API Management
 
 | Resource | Type | SKU | Description |
 |----------|------|-----|-------------|
-| `apim-daj6dri4yf3k3z` | API Management | Consumption | AI Gateway with token metrics, circuit breaker |
-| `apic-daj6dri4yf3k3z` | API Center | Free | Private Tool Catalog for MCP Server discovery |
+| `apim-<your-suffix>` | API Management | Consumption | AI Gateway with token metrics, circuit breaker |
+| `apic-<your-suffix>` | API Center | Free | Private Tool Catalog for MCP Server discovery |
 
 **Registered APIs in APIM:**
 
 | API Name | Path | Backend | Features |
 |----------|------|---------|----------|
-| Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` | Legacy endpoint |
-| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-daj6dri4yf3k3z.services.ai.azure.com` | **Primary endpoint for Responses API** |
-| MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` | JSON-RPC 2.0 protocol, latency tracking |
+| Azure OpenAI API | `/openai` | `aisa-<your-suffix>.openai.azure.com` | Legacy endpoint |
+| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-<your-suffix>.services.ai.azure.com` | **Primary endpoint for Responses API** |
+| MCP Server API | `/mcp` | `func-mcp-<your-suffix>.azurewebsites.net` | JSON-RPC 2.0 protocol, latency tracking |
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service | Agent responses, timeout handling |
 
 **APIM Policy Configuration:**
@@ -100,18 +100,18 @@ The following resources are deployed in the `rg-agent-unified-data-acce-eastus-0
 
 | Resource | Type | SKU | Description |
 |----------|------|-----|-------------|
-| `capagentunifieddata001` | Fabric Capacity | F4 | Fabric compute capacity |
+| `<your-fabric-capacity>` | Fabric Capacity | F4 | Fabric compute capacity |
 | SQL Database in Fabric | - | - | Customer, Product, Transaction tables + Chat history |
 
 ### Observability & Security
 
 | Resource | Type | Description |
 |----------|------|-------------|
-| `appi-daj6dri4yf3k3z` | Application Insights | APM, distributed tracing, token metrics |
-| `log-daj6dri4yf3k3z` | Log Analytics Workspace | Centralized logging |
-| `id-daj6dri4yf3k3z` | User Assigned Managed Identity | RBAC for Azure resources |
-| `daj6dri4yf3k3z-backend-app-mi` | User Assigned Managed Identity | Backend app authentication |
-| `stmcpdaj6dri4yf3k3z` | Storage Account | MCP Function storage |
+| `appi-<your-suffix>` | Application Insights | APM, distributed tracing, token metrics |
+| `log-<your-suffix>` | Log Analytics Workspace | Centralized logging |
+| `id-<your-suffix>` | User Assigned Managed Identity | RBAC for Azure resources |
+| `<your-suffix>-backend-app-mi` | User Assigned Managed Identity | Backend app authentication |
+| `stmcp<your-suffix>` | Storage Account | MCP Function storage |
 
 ---
 
@@ -128,7 +128,7 @@ Provides large language model (LLM) capabilities to support natural language que
 
 ### Foundry Agent Service
 Provides agent runtime with built-in tools:
-- **BingGroundingAgentTool**: Real-time web search using project connection (`bingglobal00149elbd`)
+- **BingGroundingAgentTool**: Real-time web search using project connection (`<your-bing-connection-name>`)
 - **Code Interpreter**: Execute Python code for data analysis
 - **Custom tools**: MCP Server integration for business analytics
 
@@ -189,8 +189,8 @@ An interactive UI where users can explore call insights, visualize trends, ask q
 
 | Service | URL |
 |---------|-----|
-| Frontend | https://app-daj6dri4yf3k3z.azurewebsites.net |
-| API | https://api-daj6dri4yf3k3z.azurewebsites.net |
-| API Health | https://api-daj6dri4yf3k3z.azurewebsites.net/health |
-| APIM Gateway | https://apim-daj6dri4yf3k3z.azure-api.net |
-| MCP Server | https://func-mcp-daj6dri4yf3k3z.azurewebsites.net/api/mcp |
+| Frontend | https://app-<your-suffix>.azurewebsites.net |
+| API | https://api-<your-suffix>.azurewebsites.net |
+| API Health | https://api-<your-suffix>.azurewebsites.net/health |
+| APIM Gateway | https://apim-<your-suffix>.azure-api.net |
+| MCP Server | https://func-mcp-<your-suffix>.azurewebsites.net/api/mcp |

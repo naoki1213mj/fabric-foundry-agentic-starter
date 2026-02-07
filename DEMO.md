@@ -330,8 +330,8 @@ Agent: [Chart.js で動的生成]
 ```bash
 # デモモードを有効化（事前定義レスポンス）
 az webapp config appsettings set \
-  --resource-group rg-agent-unified-data-acce-eastus-001 \
-  --name api-daj6dri4yf3k3z \
+  --resource-group <your-resource-group> \
+  --name <your-api-app-name> \
   --settings DEMO_MODE=true
 ```
 
@@ -349,8 +349,8 @@ az webapp config appsettings set \
 
 | 項目 | URL |
 |------|-----|
-| Frontend | <https://app-daj6dri4yf3k3z.azurewebsites.net> |
-| API Health | <https://api-daj6dri4yf3k3z.azurewebsites.net/health> |
+| Frontend | `https://app-<your-suffix>.azurewebsites.net` |
+| API Health | `https://api-<your-suffix>.azurewebsites.net/health` |
 | Azure Portal | <https://portal.azure.com> |
 
 ---

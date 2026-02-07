@@ -326,19 +326,19 @@ python <script.py>
 
 | 項目 | 値 | 備考 |
 |------|-----|------|
-| **Resource Group** | `rg-agent-unified-data-acce-eastus-001` | East US |
-| **API App Service** | `api-daj6dri4yf3k3z` | Linux Container (da-api:main) |
-| **Frontend App** | `app-daj6dri4yf3k3z` | Linux Container (da-app:main) |
-| **MCP Function** | `func-mcp-daj6dri4yf3k3z` | Python 3.12 |
-| **ACR** | `crda672axowukix3.azurecr.io` | Premium SKU |
-| **AI Foundry** | `aisa-daj6dri4yf3k3z` | AIServices |
-| **Foundry Project** | `aifp-daj6dri4yf3k3z` | |
-| **AI Search** | `search-sp-rag-australiaeast-001` | Standard SKU (Australia East) |
-| **Fabric Capacity** | `capagentunifieddata001` | F4 SKU |
-| **API Management** | `apim-daj6dri4yf3k3z` | Consumption SKU |
-| **API Center** | `apic-daj6dri4yf3k3z` | Free SKU - ツールカタログ |
-| **App Insights** | `appi-daj6dri4yf3k3z` | |
-| **Log Analytics** | `log-daj6dri4yf3k3z` | |
+| **Resource Group** | `<your-resource-group>` | East US |
+| **API App Service** | `api-<your-suffix>` | Linux Container (da-api:main) |
+| **Frontend App** | `app-<your-suffix>` | Linux Container (da-app:main) |
+| **MCP Function** | `func-mcp-<your-suffix>` | Python 3.12 |
+| **ACR** | `<your-acr-name>.azurecr.io` | Premium SKU |
+| **AI Foundry** | `aisa-<your-suffix>` | AIServices |
+| **Foundry Project** | `aifp-<your-suffix>` | |
+| **AI Search** | `<your-ai-search-name>` | Standard SKU (Australia East) |
+| **Fabric Capacity** | `<your-fabric-capacity>` | F4 SKU |
+| **API Management** | `apim-<your-suffix>` | Consumption SKU |
+| **API Center** | `apic-<your-suffix>` | Free SKU - ツールカタログ |
+| **App Insights** | `appi-<your-suffix>` | |
+| **Log Analytics** | `log-<your-suffix>` | |
 
 ### モデルデプロイメント
 
@@ -353,16 +353,16 @@ python <script.py>
 
 | API | Path | Backend |
 |-----|------|---------|
-| Azure OpenAI API | `/openai` | `aisa-daj6dri4yf3k3z.openai.azure.com` |
-| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-daj6dri4yf3k3z.services.ai.azure.com` |
-| MCP Server API | `/mcp` | `func-mcp-daj6dri4yf3k3z.azurewebsites.net` |
+| Azure OpenAI API | `/openai` | `aisa-<your-suffix>.openai.azure.com` |
+| **Foundry OpenAI API** | `/foundry-openai/openai/v1/` | `aisa-<your-suffix>.services.ai.azure.com` |
+| MCP Server API | `/mcp` | `func-mcp-<your-suffix>.azurewebsites.net` |
 | Foundry Agent API | `/foundry-agents` | Foundry Agent Service |
 
 **AzureOpenAIResponsesClient 設定（推奨）:**
 
 ```bash
 # Responses API v1 を使用するための環境変数
-AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_BASE_URL=https://apim-<your-suffix>.azure-api.net/foundry-openai/openai/v1/
 AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 ```
 
@@ -392,11 +392,11 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 
 | サービス | URL |
 |----------|-----|
-| Frontend | https://app-daj6dri4yf3k3z.azurewebsites.net |
-| API | https://api-daj6dri4yf3k3z.azurewebsites.net |
-| Health Check | https://api-daj6dri4yf3k3z.azurewebsites.net/health |
-| APIM Gateway | https://apim-daj6dri4yf3k3z.azure-api.net |
-| MCP Server | https://func-mcp-daj6dri4yf3k3z.azurewebsites.net/api/mcp |
+| Frontend | https://app-<your-suffix>.azurewebsites.net |
+| API | https://api-<your-suffix>.azurewebsites.net |
+| Health Check | https://api-<your-suffix>.azurewebsites.net/health |
+| APIM Gateway | https://apim-<your-suffix>.azure-api.net |
+| MCP Server | https://func-mcp-<your-suffix>.azurewebsites.net/api/mcp |
 
 ### ツール対応状況（実機確認済み 2026/2/5）
 
@@ -411,14 +411,14 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 
 | 項目 | 値 |
 |------|-----|
-| Connection Name | `bingglobal00149elbd` |
+| Connection Name | `<your-bing-connection-name>` |
 | Tool Pattern | `BingGroundingAgentTool` |
 | Timeout | 90秒 |
 
 **環境変数**:
 ```
-BING_PROJECT_CONNECTION_NAME=bingglobal00149elbd
-AZURE_AI_PROJECT_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z
+BING_PROJECT_CONNECTION_NAME=<your-bing-connection-name>
+AZURE_AI_PROJECT_ENDPOINT=https://aisa-<your-suffix>.services.ai.azure.com/api/projects/aifp-<your-suffix>
 ```
 
 ### Agentic Retrieval (Foundry IQ) 設定
@@ -438,7 +438,7 @@ AZURE_AI_PROJECT_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/
 
 **環境変数**:
 ```
-AI_SEARCH_ENDPOINT=https://search-sp-rag-australiaeast-001.search.windows.net
+AI_SEARCH_ENDPOINT=https://<your-ai-search-name>.search.windows.net
 AI_SEARCH_KNOWLEDGE_BASE_NAME=product-specs-kb
 AI_SEARCH_INDEX_NAME=product-specs-sharepoint-ks-index
 AI_SEARCH_REASONING_EFFORT=low
@@ -448,13 +448,13 @@ AI_SEARCH_REASONING_EFFORT=low
 
 | 項目 | 値 |
 |------|-----|
-| Database | `retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44` |
-| Server | `l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com,1433` |
+| Database | `<your-fabric-sql-database>` |
+| Server | `<your-fabric-sql-server>.database.fabric.microsoft.com,1433` |
 
 **環境変数**:
 ```
-FABRIC_SQL_DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
-FABRIC_SQL_SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com,1433
+FABRIC_SQL_DATABASE=<your-fabric-sql-database>
+FABRIC_SQL_SERVER=<your-fabric-sql-server>.database.fabric.microsoft.com,1433
 ```
 
 ---

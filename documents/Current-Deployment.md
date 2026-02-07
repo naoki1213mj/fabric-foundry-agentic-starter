@@ -39,8 +39,8 @@ git push → GitHub Actions → Docker Build → ACR Push → App Service Deploy
 │     ├─ npm ci && build          ├─ Docker build                                │
 │     ├─ Docker build             ├─ ACR push (da-api:xxx)                       │
 │     ├─ ACR push (da-app:xxx)    └─ App Service deploy                          │
-│     └─ App Service deploy            (api-daj6dri4yf3k3z)                      │
-│          (app-daj6dri4yf3k3z)                                                  │
+│     └─ App Service deploy            (api-<your-suffix>)                      │
+│          (app-<your-suffix>)                                                  │
 │                                                                                │
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -79,8 +79,8 @@ graph LR
 
 | 項目 | 値（実機確認） |
 | ---- | -------------- |
-| Name | `crda672axowukix3` |
-| Login Server | `crda672axowukix3.azurecr.io` |
+| Name | `<your-acr-name>` |
+| Login Server | `<your-acr-name>.azurecr.io` |
 | SKU | **Premium** |
 | Location | East US |
 | Frontend Image | `da-app` |
@@ -90,10 +90,10 @@ graph LR
 
 | 項目 | 値（実機確認） |
 | ---- | -------------- |
-| Frontend | `app-daj6dri4yf3k3z` |
-| API | `api-daj6dri4yf3k3z` |
-| App Service Plan | `asp-daj6dri4yf3k3z` |
-| Resource Group | `rg-agent-unified-data-acce-eastus-001` |
+| Frontend | `app-<your-suffix>` |
+| API | `api-<your-suffix>` |
+| App Service Plan | `asp-<your-suffix>` |
+| Resource Group | `<your-resource-group>` |
 | Kind | Linux Container |
 | Location | **Australia East** |
 | State | Running |
@@ -102,8 +102,8 @@ graph LR
 
 | サービス | URL |
 | -------- | --- |
-| Frontend | `https://app-daj6dri4yf3k3z.azurewebsites.net` |
-| API | `https://api-daj6dri4yf3k3z.azurewebsites.net` |
+| Frontend | `https://app-<your-suffix>.azurewebsites.net` |
+| API | `https://api-<your-suffix>.azurewebsites.net` |
 
 ## 4. GitHub Secrets 設定
 
@@ -120,9 +120,9 @@ graph LR
 
 | 変数 | 説明 | 実機の値 |
 | ---- | ---- | -------- |
-| `FRONTEND_APP_NAME` | Frontend App Service 名 | `app-daj6dri4yf3k3z` |
-| `API_APP_NAME` | API App Service 名 | `api-daj6dri4yf3k3z` |
-| `RESOURCE_GROUP` | リソースグループ名 | `rg-agent-unified-data-acce-eastus-001` |
+| `FRONTEND_APP_NAME` | Frontend App Service 名 | `app-<your-suffix>` |
+| `API_APP_NAME` | API App Service 名 | `api-<your-suffix>` |
+| `RESOURCE_GROUP` | リソースグループ名 | `<your-resource-group>` |
 
 ## 5. デプロイ手順
 
@@ -194,10 +194,10 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ```bash
 # API ログ（Azure CLI）
-az webapp log tail --name api-daj6dri4yf3k3z --resource-group rg-agent-unified-data-acce-eastus-001
+az webapp log tail --name api-<your-suffix> --resource-group <your-resource-group>
 
 # Frontend ログ
-az webapp log tail --name app-daj6dri4yf3k3z --resource-group rg-agent-unified-data-acce-eastus-001
+az webapp log tail --name app-<your-suffix> --resource-group <your-resource-group>
 ```
 
 ## 8. トラブルシューティング

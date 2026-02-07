@@ -15,8 +15,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 # 定数
-$ResourceGroup = "rg-agent-unified-data-acce-eastus-001"
-$AppName = "api-daj6dri4yf3k3z"
+$ResourceGroup = $env:RESOURCE_GROUP ?? "<your-resource-group>"
+$AppName = $env:API_APP_NAME ?? "<your-api-app-name>"
 $DebugLogsDir = ".debug_logs"
 
 # ログディレクトリの確認

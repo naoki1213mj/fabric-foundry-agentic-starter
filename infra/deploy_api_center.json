@@ -325,7 +325,7 @@
         "description": "      Model Context Protocol (MCP) Server providing business analytics tools for AI agents.\n\n      Protocol Version: 2024-11-05\n      Category: Business Analytics\n\n      Available Tools (5):\n      - calculate_yoy_growth: Calculate year-over-year growth rates\n      - calculate_rfm_score: Customer segmentation using RFM analysis\n      - identify_slow_moving_inventory: Inventory analysis for slow-moving products\n      - compare_products: Compare multiple products across various metrics\n      - analyze_customer_segment: Detailed customer segment analysis\n    ",
         "kind": "rest",
         "termsOfService": {
-          "url": "https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai"
+          "url": "https://github.com/naoki1213mj/fabric-foundry-agentic-starter"
         },
         "contacts": [
           {

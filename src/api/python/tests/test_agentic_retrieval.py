@@ -16,11 +16,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from agentic_retrieval_tool import (
-    AgenticRetrievalTool,
-    ReasoningEffort,
-    agentic_knowledge_retrieve,
-)
+from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort, agentic_knowledge_retrieve
 
 # ============================================================================
 # ReasoningEffort Enum
@@ -421,9 +417,7 @@ class TestAgenticKnowledgeRetrieve:
 
         with (
             patch.dict("sys.modules", {"chat": None}),
-            patch.object(
-                AgenticRetrievalTool, "create_from_env", return_value=mock_tool
-            ),
+            patch.object(AgenticRetrievalTool, "create_from_env", return_value=mock_tool),
         ):
             result = await agentic_knowledge_retrieve("query", reasoning_effort="ultra_high")
             assert result == "formatted result"

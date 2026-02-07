@@ -94,7 +94,7 @@ func azure functionapp publish func-mcp-aiagent-prod
 デプロイ後、API サーバーの環境変数を更新：
 
 ```bash
-MCP_SERVER_URL=https://func-mcp-aiagent-prod.azurewebsites.net/api/mcp
+MCP_SERVER_URL=https://<your-mcp-function-app>.azurewebsites.net/api/mcp
 MCP_ENABLED=true
 ```
 

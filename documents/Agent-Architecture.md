@@ -87,7 +87,7 @@ else:
 
 ```bash
 # 推奨: APIM 経由で Foundry OpenAI を使用
-AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_BASE_URL=https://apim-<your-suffix>.azure-api.net/foundry-openai/openai/v1/
 AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 ```
 
@@ -125,7 +125,7 @@ async def query_database(query: str) -> str:
 from azure.ai.agents.models import BingGroundingAgentTool
 
 bing_tool = BingGroundingAgentTool(
-    connection_id="/subscriptions/.../connections/bingglobal00149elbd"
+    connection_id="/subscriptions/.../connections/<your-bing-connection-name>"
 )
 
 # ツール登録
@@ -253,12 +253,12 @@ AGENT_MODE=multi_tool  # sql_only | multi_tool | handoff | magentic
 MULTI_AGENT_MODE=true
 
 # Responses API 使用（推奨）
-AZURE_OPENAI_BASE_URL=https://apim-daj6dri4yf3k3z.azure-api.net/foundry-openai/openai/v1/
+AZURE_OPENAI_BASE_URL=https://apim-<your-suffix>.azure-api.net/foundry-openai/openai/v1/
 AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 
 # Bing Grounding
-BING_PROJECT_CONNECTION_NAME=bingglobal00149elbd
-AZURE_AI_PROJECT_ENDPOINT=https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z
+BING_PROJECT_CONNECTION_NAME=<your-bing-connection-name>
+AZURE_AI_PROJECT_ENDPOINT=https://aisa-<your-suffix>.services.ai.azure.com/api/projects/aifp-<your-suffix>
 
 # Foundry IQ
 AI_SEARCH_KNOWLEDGE_BASE_NAME=product-specs-kb

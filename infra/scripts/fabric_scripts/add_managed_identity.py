@@ -2,18 +2,19 @@
 """Add Managed Identity user to Fabric SQL Database."""
 
 import struct
+import os
 
 import pyodbc
 from azure.identity import AzureCliCredential
 
-SERVER = "l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com"
-DATABASE = "retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44"
+SERVER = os.environ.get("FABRIC_SQL_SERVER", "<your-fabric-sql-server>.database.fabric.microsoft.com")
+DATABASE = os.environ.get("FABRIC_SQL_DATABASE", "<your-fabric-sql-database>")
 DRIVER = "{ODBC Driver 18 for SQL Server}"
 
-# Both Managed Identities to add
+# Both Managed Identities to add - update with your actual managed identity names
 MANAGED_IDENTITIES = [
-    "api-daj6dri4yf3k3z",  # System Assigned Managed Identity
-    "daj6dri4yf3k3z-backend-app-mi",  # User Assigned Managed Identity
+    os.environ.get("API_SYSTEM_MI_NAME", "<your-api-app-name>"),  # System Assigned Managed Identity
+    os.environ.get("API_USER_MI_NAME", "<your-user-assigned-mi>"),  # User Assigned Managed Identity
 ]
 
 credential = AzureCliCredential()

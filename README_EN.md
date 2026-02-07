@@ -97,7 +97,7 @@ For Local Development:
 - Includes native Windows setup, WSL2 configuration, and cross-platform development tools
 <br/><br/>
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai) |
+| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/fabric-foundry-agentic-starter) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/fabric-foundry-agentic-starter) |
 |---|---|
 
 <br/>
@@ -218,7 +218,7 @@ Check out similar solution accelerators
 
 ## Provide feedback
 
-Have questions, find a bug, or want to request a feature? [Submit a new issue](https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai/issues) on this repo.
+Have questions, find a bug, or want to request a feature? [Submit a new issue](https://github.com/naoki1213mj/fabric-foundry-agentic-starter/issues) on this repo.
 
 For issues related to the original Solution Accelerator, please visit [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/issues).
 

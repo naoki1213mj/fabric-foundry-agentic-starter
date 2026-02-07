@@ -560,7 +560,7 @@ $body = @{
     agent_mode = "multi_tool"
 } | ConvertTo-Json -Depth 10
 
-Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
+Invoke-RestMethod -Uri "https://api-<your-suffix>.azurewebsites.net/api/chat" `
     -Method POST -ContentType "application/json; charset=utf-8" `
     -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 120
 ```
@@ -574,7 +574,7 @@ $body = @{
     agent_mode = "multi_tool"
 } | ConvertTo-Json -Depth 10
 
-Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
+Invoke-RestMethod -Uri "https://api-<your-suffix>.azurewebsites.net/api/chat" `
     -Method POST -ContentType "application/json; charset=utf-8" `
     -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 120
 ```
@@ -588,7 +588,7 @@ $body = @{
     agent_mode = "multi_tool"
 } | ConvertTo-Json -Depth 10
 
-Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
+Invoke-RestMethod -Uri "https://api-<your-suffix>.azurewebsites.net/api/chat" `
     -Method POST -ContentType "application/json; charset=utf-8" `
     -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 180
 ```
@@ -613,7 +613,7 @@ $body = @{
     agent_mode = "multi_tool"
 } | ConvertTo-Json -Depth 10
 
-Invoke-RestMethod -Uri "https://api-daj6dri4yf3k3z.azurewebsites.net/api/chat" `
+Invoke-RestMethod -Uri "https://api-<your-suffix>.azurewebsites.net/api/chat" `
     -Method POST -ContentType "application/json; charset=utf-8" `
     -Body ([System.Text.Encoding]::UTF8.GetBytes($body)) -TimeoutSec 300
 ```

@@ -237,9 +237,16 @@ class TestGetConversations:
     async def test_returns_conversations_for_user(self):
         """Should return list of conversations for a user."""
         mock_result = [
-            {"conversation_id": "c1", "title": "Chat 1", "createdAt": "2026-01-01", "updatedAt": "2026-01-02"},
+            {
+                "conversation_id": "c1",
+                "title": "Chat 1",
+                "createdAt": "2026-01-01",
+                "updatedAt": "2026-01-02",
+            },
         ]
-        with patch("history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result):
+        with patch(
+            "history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result
+        ):
             result = await history_sql.get_conversations("user-1", limit=10)
             assert len(result) == 1
             assert result[0]["conversation_id"] == "c1"
@@ -247,7 +254,9 @@ class TestGetConversations:
     @pytest.mark.asyncio
     async def test_returns_all_conversations_without_user(self):
         """Without user_id, should query without user filter."""
-        with patch("history_sql.run_query_params", new_callable=AsyncMock, return_value=[]) as mock_run:
+        with patch(
+            "history_sql.run_query_params", new_callable=AsyncMock, return_value=[]
+        ) as mock_run:
             result = await history_sql.get_conversations(None, limit=10)
             assert result == []
             # Check that query does NOT contain "userId = ?"
@@ -274,9 +283,16 @@ class TestGetConversationMessages:
         """Citations stored as JSON string should be deserialized."""
         citations_json = json.dumps([{"url": "https://example.com", "title": "Test"}])
         mock_result = [
-            {"role": "assistant", "content": "Answer text", "citations": citations_json, "feedback": None},
+            {
+                "role": "assistant",
+                "content": "Answer text",
+                "citations": citations_json,
+                "feedback": None,
+            },
         ]
-        with patch("history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result):
+        with patch(
+            "history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result
+        ):
             result = await history_sql.get_conversation_messages("user-1", "conv-1")
             assert isinstance(result[0]["citations"], list)
             assert result[0]["citations"][0]["url"] == "https://example.com"
@@ -287,7 +303,9 @@ class TestGetConversationMessages:
         mock_result = [
             {"role": "user", "content": "Hello", "citations": None, "feedback": None},
         ]
-        with patch("history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result):
+        with patch(
+            "history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result
+        ):
             result = await history_sql.get_conversation_messages("user-1", "conv-1")
             assert result[0]["citations"] == []
 
@@ -295,9 +313,16 @@ class TestGetConversationMessages:
     async def test_invalid_citations_json_becomes_empty_list(self):
         """Invalid JSON in citations should fallback to empty list."""
         mock_result = [
-            {"role": "assistant", "content": "text", "citations": "not valid json{", "feedback": None},
+            {
+                "role": "assistant",
+                "content": "text",
+                "citations": "not valid json{",
+                "feedback": None,
+            },
         ]
-        with patch("history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result):
+        with patch(
+            "history_sql.run_query_params", new_callable=AsyncMock, return_value=mock_result
+        ):
             result = await history_sql.get_conversation_messages("user-1", "conv-1")
             assert result[0]["citations"] == []
 

@@ -2,12 +2,13 @@
 """Check tables in Fabric SQL Database."""
 
 import struct
+import os
 
 import pyodbc
 from azure.identity import AzureCliCredential
 
-SERVER = "l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com"
-DATABASE = "retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44"
+SERVER = os.environ.get("FABRIC_SQL_SERVER", "<your-fabric-sql-server>.database.fabric.microsoft.com")
+DATABASE = os.environ.get("FABRIC_SQL_DATABASE", "<your-fabric-sql-database>")
 DRIVER = "{ODBC Driver 18 for SQL Server}"
 
 credential = AzureCliCredential()

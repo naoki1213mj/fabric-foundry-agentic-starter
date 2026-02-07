@@ -111,7 +111,7 @@ var tags = {
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                          Client Layer                                        │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure App Service - Frontend (app-daj6dri4yf3k3z)                   │    │
+│  │ Azure App Service - Frontend (app-<your-suffix>)                   │    │
 │  │ ├─ React + TypeScript                                               │    │
 │  │ ├─ Natural Language Query Interface                                 │    │
 │  │ ├─ Agent Mode Selector (sql_only/multi_tool/handoff/magentic)      │    │
@@ -123,7 +123,7 @@ var tags = {
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                          API Layer                                           │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure App Service - API (api-daj6dri4yf3k3z)                        │    │
+│  │ Azure App Service - API (api-<your-suffix>)                        │    │
 │  │ ├─ Python FastAPI + Microsoft Agent Framework                       │    │
 │  │ ├─ AzureOpenAIResponsesClient (sql_only, multi_tool)               │    │
 │  │ ├─ AzureOpenAIChatClient (handoff, magentic - SDK制約)             │    │
@@ -131,7 +131,7 @@ var tags = {
 │  │ └─ Tool Invocation / MCP Integration                               │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure API Management (apim-daj6dri4yf3k3z) - AI Gateway             │    │
+│  │ Azure API Management (apim-<your-suffix>) - AI Gateway             │    │
 │  │ ├─ /openai → Azure OpenAI (legacy)                                 │    │
 │  │ ├─ /foundry-openai/openai/v1/ → Foundry AI Services ★ Primary     │    │
 │  │ ├─ /mcp → MCP Server (func-mcp-*)                                  │    │
@@ -141,7 +141,7 @@ var tags = {
 │  │ └─ Managed Identity Authentication                                  │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure API Center (apic-daj6dri4yf3k3z) - Tool Catalog               │    │
+│  │ Azure API Center (apic-<your-suffix>) - Tool Catalog               │    │
 │  │ ├─ Business Analytics MCP Server (16 tools / 4 categories)          │    │
 │  │ │   ├─ 売上分析 (5): calculate_yoy_growth 等                       │    │
 │  │ │   ├─ 顧客分析 (4): calculate_rfm_score 等                       │    │
@@ -154,7 +154,7 @@ var tags = {
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                       AI / Agent Layer                                       │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Microsoft Foundry (aisa-daj6dri4yf3k3z / aifp-daj6dri4yf3k3z)      │    │
+│  │ Microsoft Foundry (aisa-<your-suffix> / aifp-<your-suffix>)      │    │
 │  │ ├─ Azure OpenAI Models                                              │    │
 │  │ │   ├─ gpt-5 (500K TPM) - Primary                                  │    │
 │  │ │   ├─ gpt-4o-mini (30K TPM) - Cost Optimized                      │    │
@@ -164,7 +164,7 @@ var tags = {
 │  │ │   ├─ Index: product-specs-sharepoint-ks-index                    │    │
 │  │ │   └─ Reasoning Effort: minimal/low/medium                        │    │
 │  │ ├─ Bing Grounding (Web Search)                                     │    │
-│  │ │   ├─ Connection: bingglobal00149elbd                             │    │
+│  │ │   ├─ Connection: <your-bing-connection-name>                             │    │
 │  │ │   └─ Tool: BingGroundingAgentTool                                │    │
 │  │ └─ Foundry Guardrails                                               │    │
 │  │     ├─ Task Adherence                                               │    │
@@ -185,7 +185,7 @@ var tags = {
 │  │ └─ Conversation History → Fabric SQL DB                            │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Azure AI Search (search-sp-rag-australiaeast-001)                   │    │
+│  │ Azure AI Search (<your-ai-search-name>)                   │    │
 │  │ ├─ Standard SKU                                                     │    │
 │  │ └─ Index: product-specs-sharepoint-ks-index                        │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
@@ -194,9 +194,9 @@ var tags = {
 ┌──────────────────────────────────▼──────────────────────────────────────────┐
 │                       Data Layer (Unified Data Foundation)                   │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │ Microsoft Fabric (capagentunifieddata001) - F4 Capacity             │    │
+│  │ Microsoft Fabric (<your-fabric-capacity>) - F4 Capacity             │    │
 │  │ ├─ SQL Database in Fabric                                           │    │
-│  │ │   └─ retail_sqldatabase_daj6dri4yf3k3z-*                         │    │
+│  │ │   └─ <your-fabric-sql-database>                         │    │
 │  │ │       ├─ Business Tables: customers, products, orders, inventory │    │
 │  │ │       └─ History Tables: hst_conversations, hst_conversation_*   │    │
 │  │ ├─ OneLake (Unified Data Lake)                                     │    │
@@ -212,9 +212,9 @@ var tags = {
 │  ┌──────────────────────────────┐  ┌────────────────────────────────────┐   │
 │  │ Azure Monitor               │  │ Microsoft Defender for Cloud       │   │
 │  │ ├─ Application Insights    │  │ ├─ AI Security Posture            │   │
-│  │ │   (appi-daj6dri4yf3k3z) │  │ └─ Container Security             │   │
+│  │ │   (appi-<your-suffix>) │  │ └─ Container Security             │   │
 │  │ ├─ Log Analytics          │  └────────────────────────────────────┘   │
-│  │ │   (log-daj6dri4yf3k3z)  │                                          │
+│  │ │   (log-<your-suffix>)  │                                          │
 │  │ └─ OpenTelemetry          │  ┌────────────────────────────────────┐   │
 │  └──────────────────────────────┘  │ Managed Identity                   │   │
 │  ┌──────────────────────────────┐  │ └─ DefaultAzureCredential         │   │

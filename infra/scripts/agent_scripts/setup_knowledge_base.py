@@ -58,10 +58,10 @@ except ImportError:
 
 
 # Configuration
-SEARCH_SERVICE_NAME = "search-sp-rag-australiaeast-001"
-SEARCH_ENDPOINT = f"https://{SEARCH_SERVICE_NAME}.search.windows.net"
-SHAREPOINT_SITE_URL = "https://m365x92937852.sharepoint.com/sites/ai-demo-kb"
-TENANT_ID = "102dd85e-c138-446c-90e3-31de14acedb7"
+SEARCH_SERVICE_NAME = os.environ.get("AI_SEARCH_SERVICE_NAME", "<your-ai-search-name>")
+SEARCH_ENDPOINT = os.environ.get("AI_SEARCH_ENDPOINT", f"https://{SEARCH_SERVICE_NAME}.search.windows.net")
+SHAREPOINT_SITE_URL = os.environ.get("SHAREPOINT_SITE_URL", "<your-sharepoint-site-url>")
+TENANT_ID = os.environ.get("AZURE_TENANT_ID", "<your-tenant-id>")
 
 # Knowledge Source and Base names
 KNOWLEDGE_SOURCE_NAME = "product-specs-sharepoint-ks"

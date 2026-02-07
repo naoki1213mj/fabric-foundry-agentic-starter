@@ -24,27 +24,27 @@
 
 | 項目 | 値 |
 | ---- | -- |
-| **名前** | `rg-agent-unified-data-acce-eastus-001` |
+| **名前** | `<your-resource-group>` |
 | **リージョン** | East US |
 
 ### デプロイ済みリソース一覧
 
 | リソース | 名前 | 種類 | リージョン | SKU |
 | -------- | ---- | ---- | ---------- | --- |
-| **App Service (API)** | `api-daj6dri4yf3k3z` | Linux Container | Australia East | - |
-| **App Service (Frontend)** | `app-daj6dri4yf3k3z` | Linux Container | Australia East | - |
-| **App Service Plan** | `asp-daj6dri4yf3k3z` | - | Australia East | - |
-| **Container Registry** | `crda672axowukix3` | ACR | East US | **Premium** |
-| **Azure AI Services** | `aisa-daj6dri4yf3k3z` | AIServices | East US | S0 |
-| **AI Foundry Project** | `aifp-daj6dri4yf3k3z` | - | East US | - |
-| **Azure AI Search** | `search-sp-rag-australiaeast-001` | Cognitive Search | Australia East | **Standard** |
-| **Bing Grounding** | `bingglobal00149elbd` (connection) | Project Connection | - | - |
-| **Application Insights** | `appi-daj6dri4yf3k3z` | APM | East US | - |
-| **Log Analytics** | `log-daj6dri4yf3k3z` | Logs | East US | - |
-| **Managed Identity** | `id-daj6dri4yf3k3z` | User Assigned | Australia East | - |
-| **Fabric Capacity** | `capagentunifieddata001` | Microsoft Fabric | Australia East | **F4** |
-| **API Management** | `apim-daj6dri4yf3k3z` | AI Gateway | East US | **Consumption** |
-| **API Center** | `apic-daj6dri4yf3k3z` | Tool Catalog | East US | Free |
+| **App Service (API)** | `api-<your-suffix>` | Linux Container | Australia East | - |
+| **App Service (Frontend)** | `app-<your-suffix>` | Linux Container | Australia East | - |
+| **App Service Plan** | `asp-<your-suffix>` | - | Australia East | - |
+| **Container Registry** | `<your-acr-name>` | ACR | East US | **Premium** |
+| **Azure AI Services** | `aisa-<your-suffix>` | AIServices | East US | S0 |
+| **AI Foundry Project** | `aifp-<your-suffix>` | - | East US | - |
+| **Azure AI Search** | `<your-ai-search-name>` | Cognitive Search | Australia East | **Standard** |
+| **Bing Grounding** | `<your-bing-connection-name>` (connection) | Project Connection | - | - |
+| **Application Insights** | `appi-<your-suffix>` | APM | East US | - |
+| **Log Analytics** | `log-<your-suffix>` | Logs | East US | - |
+| **Managed Identity** | `id-<your-suffix>` | User Assigned | Australia East | - |
+| **Fabric Capacity** | `<your-fabric-capacity>` | Microsoft Fabric | Australia East | **F4** |
+| **API Management** | `apim-<your-suffix>` | AI Gateway | East US | **Consumption** |
+| **API Center** | `apic-<your-suffix>` | Tool Catalog | East US | Free |
 
 ### 現在の設定値（API App Service）
 
@@ -54,7 +54,7 @@
 | `MULTI_AGENT_MODE` | **`true`** |
 | `AZURE_OPENAI_DEPLOYMENT_MODEL` | **`gpt-5`** |
 | `FABRIC_SQL_SERVER` | `*.database.fabric.microsoft.com` |
-| `FABRIC_SQL_DATABASE` | `retail_sqldatabase_daj6dri4yf3k3z-*` |
+| `FABRIC_SQL_DATABASE` | `<your-fabric-sql-database>` |
 | `AI_SEARCH_INDEX_NAME` | `product-specs-sharepoint-ks-index` |
 
 ### Container Registry イメージ
@@ -84,9 +84,9 @@
 ### AI/エージェント
 
 - **LLM**: Azure OpenAI (**GPT-5** - 実機確認)
-- **エージェント管理**: Microsoft Foundry Agent Service (`aifp-daj6dri4yf3k3z`)
+- **エージェント管理**: Microsoft Foundry Agent Service (`aifp-<your-suffix>`)
 - **ドキュメント検索**: Foundry IQ (Agentic Retrieval) + Azure AI Search
-- **Web検索**: BingGroundingAgentTool (プロジェクトコネクション: `bingglobal00149elbd`)
+- **Web検索**: BingGroundingAgentTool (プロジェクトコネクション: `<your-bing-connection-name>`)
 - **安全性**: Foundry Guardrails
 
 ### データ

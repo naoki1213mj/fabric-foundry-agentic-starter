@@ -38,11 +38,11 @@ on:
 
 env:
   # Azure Container Registry
-  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER || 'crda672axowukix3.azurecr.io' }}
-  # App Service names
-  FRONTEND_APP_NAME: ${{ vars.FRONTEND_APP_NAME || 'app-daj6dri4yf3k3z' }}
-  API_APP_NAME: ${{ vars.API_APP_NAME || 'api-daj6dri4yf3k3z' }}
-  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP || 'rg-agent-unified-data-acce-eastus-001' }}
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  # App Service names - set via GitHub Variables
+  FRONTEND_APP_NAME: ${{ vars.FRONTEND_APP_NAME }}
+  API_APP_NAME: ${{ vars.API_APP_NAME }}
+  RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
 
 permissions:
   contents: read
@@ -380,8 +380,8 @@ jobs:
 
       - name: Update Microsoft Foundry Agents
         env:
-          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT || 'https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z' }}
-          SOLUTION_NAME: ${{ vars.SOLUTION_NAME || 'daj6dri4yf3k3z' }}
+          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT }}
+          SOLUTION_NAME: ${{ vars.SOLUTION_NAME }}
           AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: ${{ vars.AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME || 'gpt-5' }}
           USE_CASE: ${{ vars.USE_CASE || 'retail' }}
           API_APP_NAME: ${{ env.API_APP_NAME }}
@@ -395,8 +395,8 @@ jobs:
 
       - name: Update App Service Agent Names
         env:
-          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT || 'https://aisa-daj6dri4yf3k3z.services.ai.azure.com/api/projects/aifp-daj6dri4yf3k3z' }}
-          SOLUTION_NAME: ${{ vars.SOLUTION_NAME || 'daj6dri4yf3k3z' }}
+          AZURE_AI_AGENT_ENDPOINT: ${{ secrets.AZURE_AI_AGENT_ENDPOINT }}
+          SOLUTION_NAME: ${{ vars.SOLUTION_NAME }}
         run: |
           CHAT_AGENT_NAME="ChatAgent-${SOLUTION_NAME}"
           TITLE_AGENT_NAME="TitleAgent-${SOLUTION_NAME}"

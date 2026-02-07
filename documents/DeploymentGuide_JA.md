@@ -33,7 +33,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 以下のオプションから選択して、GitHub Codespaces、VS Code Dev Containers、VS Code (Web)、ローカル環境、Bicep デプロイの詳細な手順をご確認ください。
 
-| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai) |
+| [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/fabric-foundry-agentic-starter) | [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/fabric-foundry-agentic-starter) |
 |---|---|
 
 <details>
@@ -45,7 +45,7 @@ GitHub Codespaces を使用してこのソリューションを実行できま�
 
 1. ソリューションアクセラレータを開く（数分かかる場合があります）：
 
-    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/hackathon202601-stu-se-agentic-ai)
+    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/naoki1213mj/fabric-foundry-agentic-starter)
 
 2. Codespaces 作成ページでデフォルト値を受け入れます。
 3. ターミナルウィンドウが開いていない場合は開きます。
@@ -63,7 +63,7 @@ VS Code Dev Containers でこのソリューションを実行できます。[De
 1. Docker Desktop を起動します（インストールされていない場合はインストール）。
 2. プロジェクトを開く：
 
-    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai)
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/naoki1213mj/fabric-foundry-agentic-starter)
 
 3. 開いた VS Code ウィンドウで、プロジェクトファイルが表示されたら（数分かかる場合があります）、ターミナルウィンドウを開きます。
 4. [デプロイ手順](#azd-によるデプロイ)に進みます。
@@ -126,8 +126,8 @@ VS Code Web でこのソリューションを実行できます。ボタンを�
 
     ```shell
     # このカスタマイズプロジェクトの場合:
-    git clone https://github.com/naoki1213mj/hackathon202601-stu-se-agentic-ai.git
-    cd hackathon202601-stu-se-agentic-ai
+    git clone https://github.com/naoki1213mj/fabric-foundry-agentic-starter.git
+    cd fabric-foundry-agentic-starter
     
     # またはオリジナル Solution Accelerator の場合:
     # azd init -t microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator/
