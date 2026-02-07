@@ -2,7 +2,7 @@ export interface ApiError {
   status: number;
   statusText: string;
   message?: string;
-  error?: any;
+  error?: unknown;
   endpoint?: string;
   timestamp: string;
 }
@@ -11,10 +11,10 @@ export interface ErrorResponse {
   error?: {
     message?: string;
     code?: string;
-    detail?: any;
+    detail?: unknown;
   };
   message?: string;
-  detail?: any;
+  detail?: unknown;
 }
 
 export enum ErrorType {
@@ -31,7 +31,7 @@ export class ApiErrorHandler {
    */
   private static logError(error: ApiError): void {
     console.error(`Message: ${error.message || 'No message available'}`);
-    if (error.error) { 
+    if (error.error) {
       console.error('Error detail:', error.error);
     }
   }
@@ -39,7 +39,7 @@ export class ApiErrorHandler {
   /**
    * Safely extracts error message from any data type
    */
-  private static extractErrorMessage(errorData: any, status: number): string {
+  private static extractErrorMessage(errorData: unknown, status: number): string {
     try {
       // Handle null/undefined
       if (errorData == null) {
@@ -50,18 +50,20 @@ export class ApiErrorHandler {
       if (typeof errorData === 'string') {
         return errorData;
       }
-      
+
       // Handle object responses - try to find common error message patterns
-      if (typeof errorData === 'object') {
+      if (typeof errorData === 'object' && errorData !== null) {
         // Try various common error message paths
+        const errObj = errorData as Record<string, unknown>;
+        const errInner = (errObj.error as Record<string, unknown> | undefined);
         const messagePaths = [
-          errorData.error?.message,
-          errorData.message,
-          errorData.error?.detail,
-          errorData.detail,
-          errorData.error,
-          errorData.errorMessage,
-          errorData.msg
+          errInner?.message,
+          errObj.message,
+          errInner?.detail,
+          errObj.detail,
+          errObj.error,
+          errObj.errorMessage,
+          errObj.msg
         ];
 
         for (const msg of messagePaths) {
@@ -73,10 +75,10 @@ export class ApiErrorHandler {
         // If no specific message found, stringify the whole object
         return JSON.stringify(errorData, null, 2);
       }
-      
+
       // Handle other types (number, boolean, etc.)
       return String(errorData);
-      
+
     } catch (error) {
       console.warn('Failed to extract error message:', error);
       return ApiErrorHandler.getDefaultErrorMessage(status);
@@ -115,16 +117,16 @@ export class ApiErrorHandler {
   public static async handleApiError(
     response: Response,
     endpoint: string,
-    fallbackData?: any
-  ): Promise<{ hasError: boolean; message: string; data?: any }> {
-    
+    fallbackData?: unknown
+  ): Promise<{ hasError: boolean; message: string; data?: unknown }> {
+
     let errorMessage: string;
-    let errorData: any = null;
-    
+    let errorData: unknown = null;
+
     try {
       // Try to read the response body as text first (most compatible)
       const responseText = await response.text();
-      
+
       if (responseText) {
         try {
           // Try to parse as JSON
@@ -134,9 +136,9 @@ export class ApiErrorHandler {
           errorData = responseText;
         }
       }
-      
+
       errorMessage = ApiErrorHandler.extractErrorMessage(errorData, response.status);
-      
+
     } catch (readError) {
       console.warn('Failed to read error response:', readError);
       errorMessage = ApiErrorHandler.getDefaultErrorMessage(response.status);
@@ -154,15 +156,16 @@ export class ApiErrorHandler {
    * Handles network/fetch errors with logging
    */
   public static handleNetworkError(
-    error: any,
+    error: unknown,
     endpoint: string,
-    fallbackData?: any
-  ): { hasError: true; message: string; data?: any } {
-    
+    fallbackData?: unknown
+  ): { hasError: true; message: string; data?: unknown } {
+
+    const err = error as { message?: string };
     const networkError: ApiError = {
       status: 0,
       statusText: 'Network Error',
-      message: error.message || 'Network connection failed',
+      message: err.message || 'Network connection failed',
       error: error,
       endpoint,
       timestamp: new Date().toISOString()
@@ -182,15 +185,16 @@ export class ApiErrorHandler {
    * General error handler that can be used as a catch-all
    */
   public static handleGeneralError(
-    error: any,
+    error: unknown,
     endpoint: string,
-    fallbackData?: any
-  ): { hasError: true; message: string; data?: any } {
-    
+    fallbackData?: unknown
+  ): { hasError: true; message: string; data?: unknown } {
+
+    const err = error as { status?: number; statusText?: string; message?: string };
     const generalError: ApiError = {
-      status: error.status || 0,
-      statusText: error.statusText || 'Unknown Error',
-      message: error.message || 'An unexpected error occurred',
+      status: err.status || 0,
+      statusText: err.statusText || 'Unknown Error',
+      message: err.message || 'An unexpected error occurred',
       error: error,
       endpoint,
       timestamp: new Date().toISOString()
@@ -201,7 +205,7 @@ export class ApiErrorHandler {
 
     return {
       hasError: true,
-      message: error.message || 'An unexpected error occurred. Please try again.',
+      message: err.message || 'An unexpected error occurred. Please try again.',
       data: fallbackData
     };
   }

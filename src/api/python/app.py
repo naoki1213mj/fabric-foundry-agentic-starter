@@ -19,6 +19,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from chat import router as chat_router
+
+# NOTE: history.py (Cosmos DB) is legacy - all frontend calls use /historyfab (Fabric SQL).
+# The /history router is kept temporarily for backward compatibility but is not actively used.
 from history import router as history_router
 from history_sql import router as history_sql_router
 

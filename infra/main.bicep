@@ -274,10 +274,8 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
     appServicePlanId: hostingplan.outputs.name
     applicationInsightsId: aifoundry.outputs.applicationInsightsId
     userassignedIdentityId: managedIdentityModule.outputs.managedIdentityBackendAppOutput.id
-    // keyVaultName: kvault.outputs.keyvaultName
     aiServicesName: aifoundry.outputs.aiServicesName
     azureExistingAIProjectResourceId: azureExistingAIProjectResourceId
-    // aiSearchName: aifoundry.outputs.aiSearchName
     appSettings: {
       AZURE_OPENAI_DEPLOYMENT_MODEL: gptModelName
       AZURE_OPENAI_ENDPOINT: aifoundry.outputs.aiServicesTarget
@@ -289,22 +287,11 @@ module backend_docker 'deploy_backend_docker.bicep' = if (backendRuntimeStack ==
       AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: gptModelName
       AZURE_AI_MODEL_DEPLOYMENT_NAME: 'gpt-5'  // For Web Search tool (gpt-5 recommended)
       USE_CHAT_HISTORY_ENABLED: 'True'
-      // AZURE_COSMOSDB_ACCOUNT: '' //cosmosDBModule.outputs.cosmosAccountName
-      // AZURE_COSMOSDB_CONVERSATIONS_CONTAINER: '' //cosmosDBModule.outputs.cosmosContainerName
-      // AZURE_COSMOSDB_DATABASE: '' //cosmosDBModule.outputs.cosmosDatabaseName
-      // AZURE_COSMOSDB_ENABLE_FEEDBACK: '' //'True'
-      // SQLDB_DATABASE: '' //sqlDBModule.outputs.sqlDbName
-      // SQLDB_SERVER: '' //sqlDBModule.outputs.sqlServerName
-      // SQLDB_USER_MID: '' //managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
       API_UID: managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
-      // AZURE_AI_SEARCH_ENDPOINT: '' //aifoundry.outputs.aiSearchTarget
-      // AZURE_AI_SEARCH_INDEX: '' //'call_transcripts_index'
-      // AZURE_AI_SEARCH_CONNECTION_NAME: '' //aifoundry.outputs.aiSearchConnectionName
 
       USE_AI_PROJECT_CLIENT: 'True'
       DISPLAY_CHART_DEFAULT: 'False'
       APPLICATIONINSIGHTS_CONNECTION_STRING: aifoundry.outputs.applicationInsightsConnectionString
-      DUMMY_TEST: 'True'
       SOLUTION_NAME: solutionPrefix
       APP_ENV: 'Prod'
 
@@ -351,10 +338,8 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
     appServicePlanId: hostingplan.outputs.name
     applicationInsightsId: aifoundry.outputs.applicationInsightsId
     userassignedIdentityId: managedIdentityModule.outputs.managedIdentityBackendAppOutput.id
-    // keyVaultName: kvault.outputs.keyvaultName
     aiServicesName: aifoundry.outputs.aiServicesName
     azureExistingAIProjectResourceId: azureExistingAIProjectResourceId
-    // aiSearchName: aifoundry.outputs.aiSearchName
     appSettings: {
       AZURE_OPENAI_DEPLOYMENT_MODEL: gptModelName
       AZURE_OPENAI_ENDPOINT: aifoundry.outputs.aiServicesTarget
@@ -366,22 +351,11 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
       AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME: gptModelName
       AZURE_AI_MODEL_DEPLOYMENT_NAME: 'gpt-5'  // For Web Search tool (gpt-5 recommended)
       USE_CHAT_HISTORY_ENABLED: 'True'
-      // AZURE_COSMOSDB_ACCOUNT: '' //cosmosDBModule.outputs.cosmosAccountName
-      // AZURE_COSMOSDB_CONVERSATIONS_CONTAINER: '' //cosmosDBModule.outputs.cosmosContainerName
-      // AZURE_COSMOSDB_DATABASE: '' //cosmosDBModule.outputs.cosmosDatabaseName
-      // AZURE_COSMOSDB_ENABLE_FEEDBACK: '' //'True'
-      // SQLDB_DATABASE: '' //sqlDBModule.outputs.sqlDbName
-      // SQLDB_SERVER: '' //sqlDBModule.outputs.sqlServerName
-      // SQLDB_USER_MID: '' //managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
       API_UID: managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
-      // AZURE_AI_SEARCH_ENDPOINT: '' //aifoundry.outputs.aiSearchTarget
-      // AZURE_AI_SEARCH_INDEX: '' //'call_transcripts_index'
-      // AZURE_AI_SEARCH_CONNECTION_NAME: '' //aifoundry.outputs.aiSearchConnectionName
 
       USE_AI_PROJECT_CLIENT: 'True'
       DISPLAY_CHART_DEFAULT: 'False'
       APPLICATIONINSIGHTS_CONNECTION_STRING: aifoundry.outputs.applicationInsightsConnectionString
-      DUMMY_TEST: 'True'
       SOLUTION_NAME: solutionPrefix
       APP_ENV: 'Prod'
 

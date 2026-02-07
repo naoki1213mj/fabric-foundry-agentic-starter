@@ -6,7 +6,7 @@ interface CustomSpinnerProps {
   label?: string;
 }
 
-const CustomSpinner: React.FC<CustomSpinnerProps> = ({ loading, label }) => {
+const CustomSpinner: React.FC<CustomSpinnerProps> = React.memo(({ loading, label }) => {
   if (!loading) return null;
 
   return (
@@ -17,6 +17,8 @@ const CustomSpinner: React.FC<CustomSpinnerProps> = ({ loading, label }) => {
       </div>
     </div>
   );
-};
+});
+
+CustomSpinner.displayName = "CustomSpinner";
 
 export default CustomSpinner;

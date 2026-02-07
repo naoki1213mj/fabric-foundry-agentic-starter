@@ -1,4 +1,4 @@
-// ========== Key Vault ========== //
+// ========== App Service ========== //
 targetScope = 'resourceGroup'
 
 @description('Solution Name')

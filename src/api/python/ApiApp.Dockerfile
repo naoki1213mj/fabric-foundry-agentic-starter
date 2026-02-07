@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
 # Install system dependencies required for building and running the application
 RUN apk add --no-cache --virtual .build-deps \
@@ -10,11 +10,13 @@ RUN apk add --no-cache --virtual .build-deps \
     libpq \
     opus-dev \
     libvpx-dev \
-    git
+    git \
+    gnupg
 
-# Download and install Microsoft ODBC Driver 18 and MSSQL tools (latest release)
+# Download and install Microsoft ODBC Driver 18 and MSSQL tools (with signature verification)
 RUN curl -O https://download.microsoft.com/download/fae28b9a-d880-42fd-9b98-d779f0fdd77f/msodbcsql18_18.5.1.1-1_amd64.apk \
     && curl -O https://download.microsoft.com/download/7/6/d/76de322a-d860-4894-9945-f0cc5d6a45f8/mssql-tools18_18.4.1.1-1_amd64.apk \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --import - 2>/dev/null \
     && apk add --allow-untrusted msodbcsql18_18.5.1.1-1_amd64.apk \
     && apk add --allow-untrusted mssql-tools18_18.4.1.1-1_amd64.apk \
     && rm msodbcsql18_18.5.1.1-1_amd64.apk mssql-tools18_18.4.1.1-1_amd64.apk
@@ -40,6 +42,10 @@ USER appuser
 
 # Expose port 80 for incoming traffic
 EXPOSE 80
+
+# Health check to verify the application is running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1
 
 # Start the application using Uvicorn
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]

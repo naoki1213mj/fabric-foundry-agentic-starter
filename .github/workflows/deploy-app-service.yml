@@ -67,7 +67,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: src/api/python/requirements.txt
 
       - name: Install uv
         run: pip install uv
@@ -170,7 +172,7 @@ jobs:
         with:
           image-ref: '${{ env.ACR_LOGIN_SERVER }}/da-app:${{ steps.meta.outputs.version }}'
           format: 'table'
-          exit-code: '0'
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
       - name: Output image info
@@ -232,7 +234,7 @@ jobs:
         with:
           image-ref: '${{ env.ACR_LOGIN_SERVER }}/da-api:${{ steps.meta.outputs.version }}'
           format: 'table'
-          exit-code: '0'
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
       - name: Output image info

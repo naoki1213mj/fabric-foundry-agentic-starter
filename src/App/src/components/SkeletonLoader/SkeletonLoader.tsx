@@ -52,7 +52,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 /**
  * Skeleton for chat message loading state
  */
-export const MessageSkeleton: React.FC<{ isUser?: boolean }> = ({ isUser = false }) => {
+export const MessageSkeleton: React.FC<{ isUser?: boolean }> = React.memo(({ isUser = false }) => {
   return (
     <div className={`message-skeleton ${isUser ? "message-skeleton-user" : "message-skeleton-assistant"}`}>
       {!isUser && (
@@ -65,12 +65,14 @@ export const MessageSkeleton: React.FC<{ isUser?: boolean }> = ({ isUser = false
       </div>
     </div>
   );
-};
+});
+
+MessageSkeleton.displayName = "MessageSkeleton";
 
 /**
  * Skeleton for thinking/processing state
  */
-export const ThinkingSkeleton: React.FC = () => {
+export const ThinkingSkeleton: React.FC = React.memo(() => {
   return (
     <div className="thinking-skeleton">
       <div className="thinking-skeleton-header">
@@ -87,6 +89,8 @@ export const ThinkingSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+ThinkingSkeleton.displayName = "ThinkingSkeleton";
 
 export default SkeletonLoader;

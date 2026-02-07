@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { fetchCitationContent as fetchCitationContentApi } from "../api/api";
 import type { Citation } from "../types/AppTypes";
 
 export interface CitationState {
-  activeCitation?: any;
+  activeCitation?: Citation | null;
   showCitation: boolean;
   currentConversationIdForCitation?: string;
   loadingCitation: boolean;
@@ -32,7 +32,7 @@ const citationSlice = createSlice({
     setCitation: (
       state,
       action: PayloadAction<{
-        activeCitation?: any;
+        activeCitation?: Citation | null;
         showCitation: boolean;
         currentConversationIdForCitation?: string;
       }>

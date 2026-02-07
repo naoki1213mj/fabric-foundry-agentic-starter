@@ -21,7 +21,7 @@ httpClient.setBaseURL(baseURL);
 httpClient.addRequestInterceptor((config) => {
   const userId = getUserId();
   if (userId && config.headers) {
-    (config.headers as any)['X-Ms-Client-Principal-Id'] = userId;
+    (config.headers as Record<string, string>)['X-Ms-Client-Principal-Id'] = userId;
   }
   return config;
 });
@@ -31,7 +31,7 @@ export type UserInfo = {
   expires_on: string;
   id_token: string;
   provider_name: string;
-  user_claims: any[];
+  user_claims: Array<{ typ: string; val: string }>;
   user_id: string;
 };
 
@@ -40,13 +40,12 @@ export async function getUserInfo(): Promise<UserInfo[]> {
   if (!response.ok) {
     // Use new error handling system
     await ApiErrorHandler.handleApiError(response, '/.auth/me');
-    // console.error("No identity provider found. Access to chat will be blocked.");
     return [];
   }
   const payload = await response.json();
   const userClaims = payload[0]?.user_claims || [];
   const objectIdClaim = userClaims.find(
-    (claim: any) =>
+    (claim: { typ: string; val: string }) =>
       claim.typ === "http://schemas.microsoft.com/identity/claims/objectidentifier"
   );
   const userId = objectIdClaim?.val;
@@ -99,6 +98,7 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
     return messages;
 
   } catch (error) {
+    console.warn("Failed to read conversation messages:", error);
     return [];
   }
 };

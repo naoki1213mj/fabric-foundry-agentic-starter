@@ -1,3 +1,13 @@
+"""
+DEPRECATED: Legacy Cosmos DB conversation history module.
+
+This module uses Azure Cosmos DB for conversation storage and is no longer actively used.
+All frontend calls have been migrated to history_sql.py (Fabric SQL Database, /historyfab).
+This file is kept for backward compatibility only.
+
+Migration: history_sql.py provides the same functionality using Fabric SQL Database.
+"""
+
 import logging
 import os
 import uuid

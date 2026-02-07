@@ -94,11 +94,12 @@ export const getGridStyles = (
     }
     return styles;
   } catch (e) {
+    console.warn("Failed to compute chart grid styles:", e);
     return styles;
   }
 };
 
-export function isLastSevenDaysRange(dateToCheck: any) {
+export function isLastSevenDaysRange(dateToCheck: Date) {
   // Get the current date
   const currentDate = new Date();
   // Calculate the date 2 days ago
@@ -254,7 +255,7 @@ export const tryGetRaiPrettyError = (errorMessage: string) => {
       }
     }
   } catch (e) {
-    // console.error('Failed to parse the error:', e)
+    console.warn("Failed to parse RAI error:", e);
   }
   return errorMessage
 }
@@ -272,7 +273,7 @@ export const parseErrorMessage = (errorMessage: string) => {
       let newErrorMessage = errorCodeMessage + ' ' + innerErrorString
       errorMessage = newErrorMessage
     } catch (e) {
-      // console.error('Error parsing inner error message: ', e)
+      console.warn("Error parsing inner error message:", e);
     }
   }
 

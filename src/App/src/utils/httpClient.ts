@@ -194,11 +194,11 @@ class HttpClient {
         }
 
         return interceptedResponse;
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (timeoutId) clearTimeout(timeoutId);
 
         // Don't log abort errors
-        if (error.name === 'AbortError') {
+        if (error instanceof Error && error.name === 'AbortError') {
           throw error;
         }
 

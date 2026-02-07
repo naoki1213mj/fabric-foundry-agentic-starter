@@ -94,7 +94,7 @@ export interface ChartLayout {
   width?: string;
 }
 export interface ChartDataItem {
-  [x: string]: any;
+  [x: string]: string | number | boolean | undefined;
   name: string;
   count: number;
   value: string;

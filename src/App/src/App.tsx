@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
   const [panelWidths, setPanelWidths] = useState<Record<string, number>>({
     ...defaultSingleColumnConfig,
   });
-  const [showClearAllConfirmationDialog, setChowClearAllConfirmationDialog] =
+  const [showClearAllConfirmationDialog, setShowClearAllConfirmationDialog] =
     useState(false);
   const [clearing, setClearing] = React.useState(false);
   const [clearingError, setClearingError] = React.useState(false);
@@ -201,7 +201,7 @@ const Dashboard: React.FC = () => {
   }, [dispatch, hasMoreRecords, offset, OFFSET_INCREMENT]);
 
   const onClearAllChatHistory = async () => {
-    setChowClearAllConfirmationDialog(false);
+    setShowClearAllConfirmationDialog(false);
     dispatch(clearCitation());
     setClearing(true);
     try {
@@ -242,11 +242,11 @@ const Dashboard: React.FC = () => {
   };
 
   const onClickClearAllOption = () => {
-    setChowClearAllConfirmationDialog((prevFlag) => !prevFlag);
+    setShowClearAllConfirmationDialog((prevFlag) => !prevFlag);
   };
 
   const onHideClearAllDialog = () => {
-    setChowClearAllConfirmationDialog((prevFlag) => !prevFlag);
+    setShowClearAllConfirmationDialog((prevFlag) => !prevFlag);
     setTimeout(() => {
       setClearingError(false);
     }, 1000);
