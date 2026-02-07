@@ -16,7 +16,7 @@ const copyToClipboard = async (text: string): Promise<boolean> => {
       await navigator.clipboard.writeText(text);
       return true;
     } catch {
-      // Fall through to fallback
+      /* expected — clipboard API may fail, fall through to fallback */
     }
   }
 

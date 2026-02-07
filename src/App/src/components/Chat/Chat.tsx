@@ -48,12 +48,25 @@ const Chat: React.FC<ChatProps> = ({
   const { isFetchingConvMessages } = useAppSelector((state) => state.chatHistory);
   const questionInputRef = useRef<HTMLTextAreaElement>(null);
   const [isChartLoading, setIsChartLoading] = useState(false);
-  const [agentMode, setAgentMode] = useState<AgentMode>("multi_tool");
-  const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>("low");
-  const [modelType, setModelType] = useState<ModelType>("gpt-5");
-  const [temperature, setTemperature] = useState<number>(0.7);
-  const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>("medium");
-  const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>("auto");
+  const [agentMode, setAgentMode] = useState<AgentMode>(() =>
+    (localStorage.getItem("chat_agentMode") as AgentMode) || "multi_tool"
+  );
+  const [reasoningEffort, setReasoningEffort] = useState<ReasoningEffort>(() =>
+    (localStorage.getItem("chat_reasoningEffort") as ReasoningEffort) || "low"
+  );
+  const [modelType, setModelType] = useState<ModelType>(() =>
+    (localStorage.getItem("chat_modelType") as ModelType) || "gpt-5"
+  );
+  const [temperature, setTemperature] = useState<number>(() => {
+    const stored = localStorage.getItem("chat_temperature");
+    return stored ? Number(stored) : 0.7;
+  });
+  const [modelReasoningEffort, setModelReasoningEffort] = useState<ModelReasoningEffort>(() =>
+    (localStorage.getItem("chat_modelReasoningEffort") as ModelReasoningEffort) || "medium"
+  );
+  const [reasoningSummary, setReasoningSummary] = useState<ReasoningSummary>(() =>
+    (localStorage.getItem("chat_reasoningSummary") as ReasoningSummary) || "auto"
+  );
   const [toolEvents, setToolEvents] = useState<ToolEvent[]>([]);
   const [reasoningContent, setReasoningContent] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -64,6 +77,14 @@ const Chat: React.FC<ChatProps> = ({
   const autoScrollEnabledRef = useRef(true);
   const isStreamingRef = useRef(false);
   const listApiRef = useRef<ListImperativeAPI | null>(null);
+
+  // Persist settings to localStorage
+  useEffect(() => { localStorage.setItem("chat_agentMode", agentMode); }, [agentMode]);
+  useEffect(() => { localStorage.setItem("chat_reasoningEffort", reasoningEffort); }, [reasoningEffort]);
+  useEffect(() => { localStorage.setItem("chat_modelType", modelType); }, [modelType]);
+  useEffect(() => { localStorage.setItem("chat_temperature", String(temperature)); }, [temperature]);
+  useEffect(() => { localStorage.setItem("chat_modelReasoningEffort", modelReasoningEffort); }, [modelReasoningEffort]);
+  useEffect(() => { localStorage.setItem("chat_reasoningSummary", reasoningSummary); }, [reasoningSummary]);
 
   // Memoized computed values
   const currentConversationId = useMemo(() =>
@@ -231,7 +252,7 @@ const Chat: React.FC<ChatProps> = ({
         }
       }
     } catch {
-      // Error parsing citations
+      /* expected — citations may not be valid JSON */
     }
     return [];
   }, []);

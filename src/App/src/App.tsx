@@ -238,7 +238,7 @@ const Dashboard: React.FC = () => {
         dispatch(setMessages(result.messages));
       }
     } catch {
-      // Error fetching conversation messages
+      /* expected — conversation may not exist or have messages */
     }
   };
 
@@ -292,10 +292,10 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       <ErrorBoundary>
-        <div className="main-container">
+        <main className="main-container">
           {/* LEFT PANEL:  CHAT */}
           {panelShowStates?.[panels.CHAT] && (
-            <div
+            <section
               style={{
                 flex: `1 1 ${panelWidths[panels.CHAT]}%`,
                 width: `${panelWidths[panels.CHAT]}%`,
@@ -306,23 +306,24 @@ const Dashboard: React.FC = () => {
               panels={panels}
               panelShowStates={panelShowStates}
             />
-          </div>
+          </section>
         )}
         {citation.showCitation && citation.currentConversationIdForCitation !== "" && (
-          <div
+          <aside
+            aria-label="Citation details"
             style={{
               flex: `1 1 ${panelWidths[panels.CHATHISTORY] || 17}%`,
               width: `${panelWidths[panels.CHATHISTORY] || 17}%`,
             }}
           >
             <CitationPanel activeCitation={citation.activeCitation}  />
-
-          </div>
+          </aside>
         )}
         {/* RIGHT PANEL: CHAT HISTORY */}
         {panelShowStates?.[panels.CHAT] &&
           panelShowStates?.[panels.CHATHISTORY] && (
-            <div
+            <aside
+              aria-label="Chat history"
               style={{
                 flex: `0 0 ${panelWidths[panels.CHATHISTORY]}%`,
                 width: `${panelWidths[panels.CHATHISTORY]}%`,
@@ -338,11 +339,9 @@ const Dashboard: React.FC = () => {
                 onSelectConversation={onSelectConversation}
                 showClearAllConfirmationDialog={showClearAllConfirmationDialog}
               />
-              {/* {useAppContext?.state.isChatHistoryOpen &&
-            useAppContext?.state.isCosmosDBAvailable?.status !== CosmosDBStatus.NotConfigured && <ChatHistoryPanel />} */}
-            </div>
+            </aside>
           )}
-        </div>
+        </main>
       </ErrorBoundary>
     </FluentProvider>
   );

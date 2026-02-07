@@ -70,7 +70,7 @@ jobs:
         run: pip install pip-audit
 
       - name: Scan Python dependencies
-        continue-on-error: true
+        continue-on-error: true  # Informational - do not block CI on known dependency vulnerabilities
         run: |
           echo "### 🐍 Python Dependency Scan" >> $GITHUB_STEP_SUMMARY
           if [ -f "src/api/python/requirements.txt" ]; then
@@ -86,7 +86,7 @@ jobs:
           node-version: '20'
 
       - name: Scan npm dependencies
-        continue-on-error: true
+        continue-on-error: true  # Informational - do not block CI on known dependency vulnerabilities
         working-directory: src/App
         run: |
           echo "### 📦 npm Dependency Scan" >> $GITHUB_STEP_SUMMARY

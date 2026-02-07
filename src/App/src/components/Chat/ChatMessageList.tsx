@@ -306,6 +306,9 @@ export const ChatMessageList: React.FC<ChatMessageListProps> = ({
 
   return (
     <div
+      role="log"
+      aria-live="polite"
+      aria-label="Chat messages"
       style={{
         flex: 1,
         minHeight: 0,

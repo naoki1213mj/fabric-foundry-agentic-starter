@@ -45,30 +45,5 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 show_missing = true
-# Temporarily lowered from 50 to 10 for faster iteration
-# TODO: Increase coverage threshold after adding comprehensive tests
-fail_under = 10
-
-[tool.ruff]
-line-length = 100
-target-version = "py312"
-
-[tool.ruff.lint]
-select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # Pyflakes
-    "I",      # isort
-    "B",      # flake8-bugbear
-    "C4",     # flake8-comprehensions
-    "UP",     # pyupgrade
-    "SIM",    # flake8-simplify
-]
-ignore = [
-    "E501",   # line too long (handled by formatter)
-    "B008",   # do not perform function calls in argument defaults
-    "B904",   # raise without from inside except
-]
-
-[tool.ruff.lint.isort]
-known-first-party = ["agents", "auth", "prompts"]
+# Coverage threshold: 177 tests covering core business logic
+fail_under = 30

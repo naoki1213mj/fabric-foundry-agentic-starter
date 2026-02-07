@@ -9,8 +9,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   properties: {
     createMode: 'default'
     accessPolicies: [
-      {        
-        objectId: managedIdentityObjectId        
+      {
+        objectId: managedIdentityObjectId
         permissions: {
           certificates: [
             'all'
@@ -59,7 +59,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   properties: {
     principalId: managedIdentityObjectId
     roleDefinitionId:kvAdminRole.id
-    principalType: 'ServicePrincipal' 
+    principalType: 'ServicePrincipal'
   }
 }
 

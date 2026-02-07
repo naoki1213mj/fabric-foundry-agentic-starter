@@ -17,14 +17,13 @@ RUN apk add --no-cache \
     libstdc++
 
 # Download and install Microsoft ODBC Driver 18 and MSSQL tools
-# Import Microsoft GPG key and verify package signatures
+# Import Microsoft GPG signing key for Alpine apk package verification
 RUN curl -O https://download.microsoft.com/download/fae28b9a-d880-42fd-9b98-d779f0fdd77f/msodbcsql18_18.5.1.1-1_amd64.apk \
     && curl -O https://download.microsoft.com/download/7/6/d/76de322a-d860-4894-9945-f0cc5d6a45f8/mssql-tools18_18.4.1.1-1_amd64.apk \
-    && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --import - 2>/dev/null \
-    && gpg --export microsoft@microsoft.com | abuild-keygen -n -q 2>/dev/null || true \
-    && cp /etc/apk/keys/* /etc/apk/keys/ 2>/dev/null || true \
-    && apk add --allow-untrusted msodbcsql18_18.5.1.1-1_amd64.apk \
-    && apk add --allow-untrusted mssql-tools18_18.4.1.1-1_amd64.apk \
+    && curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+       | gpg --dearmor > /etc/apk/keys/microsoft.gpg \
+    && apk add msodbcsql18_18.5.1.1-1_amd64.apk \
+    && apk add mssql-tools18_18.4.1.1-1_amd64.apk \
     && rm -f msodbcsql18_18.5.1.1-1_amd64.apk mssql-tools18_18.4.1.1-1_amd64.apk
 
 # Set the working directory inside the container

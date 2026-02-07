@@ -14,12 +14,11 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 import uvicorn
+from chat import router as chat_router
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-from chat import router as chat_router
 from history_sql import router as history_sql_router
 
 load_dotenv()

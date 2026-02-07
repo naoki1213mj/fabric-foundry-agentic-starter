@@ -15,9 +15,8 @@ from datetime import datetime
 from decimal import Decimal
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 import history_sql
+import pytest
 from history_sql import SqlQueryTool, _generate_fallback_title_from_message, generate_fallback_title
 from utils import track_event_if_configured
 

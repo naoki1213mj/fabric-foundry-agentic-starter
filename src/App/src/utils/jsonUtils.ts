@@ -3,6 +3,7 @@
  * Functions for parsing, sanitizing, and manipulating JSON strings
  */
 
+const __DEV__ = process.env.NODE_ENV === 'development';
 /**
  * Remove a specific key from JSON object recursively
  * Internal helper function for parseChartContent
@@ -29,7 +30,7 @@ function removeKeyFromJSON(jsonString: string, keyToRemove: string): string {
     const result = removeKeyRecursive(obj);
     return JSON.stringify(result);
   } catch (error) {
-    console.error('Error parsing JSON:', error);
+    if (__DEV__) console.error('Error parsing JSON:', error);
     return jsonString;
   }
 }
@@ -72,7 +73,7 @@ function sanitizeJSONString(jsonString: string): string {
       JSON.parse(sanitized);
       return sanitized;
     } catch {
-      // JSON invalid, proceed with sanitization
+      /* expected — invalid JSON, proceed with sanitization */
     }
 
     // **STEP 2: Handle escaped JSON strings (e.g., "{\"type\":\"bar\"...}")**
@@ -92,7 +93,7 @@ function sanitizeJSONString(jsonString: string): string {
       JSON.parse(sanitized);
       return sanitized;
     } catch {
-      // Still invalid, continue with complex sanitization
+      /* expected — still invalid, continue with complex sanitization */
     }
 
     // **STEP 5: Remove function declarations with balanced brackets**
@@ -230,7 +231,7 @@ function sanitizeJSONString(jsonString: string): string {
       JSON.parse(sanitized);
       return sanitized;
     } catch (finalError) {
-      console.error("Parse error:", finalError instanceof Error ? finalError.message : String(finalError));
+      if (__DEV__) console.error("Parse error:", finalError instanceof Error ? finalError.message : String(finalError));
 
       // Try to extract valid JSON object
       try {
@@ -257,15 +258,15 @@ function sanitizeJSONString(jsonString: string): string {
           }
         }
       } catch (extractError) {
-        console.error("Extraction attempt also failed");
+        if (__DEV__) console.error("Extraction attempt also failed");
       }
 
       // Return original string as last resort
-      console.warn("Returning original string - all repair attempts failed");
+      if (__DEV__) console.warn("Returning original string - all repair attempts failed");
       return jsonString;
     }
   } catch (error) {
-    console.error("Unexpected error during sanitization:", error);
+    if (__DEV__) console.error("Unexpected error during sanitization:", error);
     return jsonString;
   }
 }
@@ -310,20 +311,20 @@ export function parseChartContent(rawContent: string): unknown {
         try {
           chartResponse.answer = parseNestedAnswer(answerValue);
         } catch (nestedError) {
-          console.error("Nested parse error:", nestedError instanceof Error ? nestedError.message : String(nestedError));
+          if (__DEV__) console.error("Nested parse error:", nestedError instanceof Error ? nestedError.message : String(nestedError));
         }
       }
     }
 
     return chartResponse;
   } catch {
-    console.error("Failed to parse raw content, trying sanitization...");
+    if (__DEV__) console.error("Failed to parse raw content, trying sanitization...");
 
     const sanitized = removeKeyFromJSON(sanitizeJSONString(updatedJsonstring), 'tooltip');
     try {
       return JSON.parse(sanitized);
     } catch (sanitizeError) {
-      console.error("JSON parse failed after sanitization:", sanitizeError instanceof Error ? sanitizeError.message : String(sanitizeError));
+      if (__DEV__) console.error("JSON parse failed after sanitization:", sanitizeError instanceof Error ? sanitizeError.message : String(sanitizeError));
       return "Chart can't be generated, please try again.";
     }
   }

@@ -57,7 +57,7 @@ export const parseToolEvents = (
       cleanedText = cleanedText.replace(match[0], "");
     } catch (e) {
       // Skip malformed tool events
-      console.warn("Failed to parse tool event:", e);
+      if (process.env.NODE_ENV === 'development') console.warn("Failed to parse tool event:", e);
     }
   }
 

@@ -55,17 +55,13 @@ from agent_framework import (  # NOTE: HostedWebSearchTool requires OpenAI's web
 # - Supports Thread management for server-side conversation context
 # - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
 from agent_framework.azure import AzureOpenAIChatClient, AzureOpenAIResponsesClient
+
+# Agentic Retrieval with Foundry IQ
+from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
-
-# Agentic Retrieval with Foundry IQ
-from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
-
-# Local imports - tool handlers
-from agents.web_agent import WebAgentHandler
-from auth.auth_utils import get_authenticated_user_details
 
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
@@ -73,6 +69,10 @@ from knowledge_base_tool import KnowledgeBaseTool
 
 # MCP client for business analytics tools
 from mcp_client import get_mcp_tools
+
+# Local imports - tool handlers
+from agents.web_agent import WebAgentHandler
+from auth.auth_utils import get_authenticated_user_details
 
 # Import prompts from separate module for better maintainability
 from prompts import (

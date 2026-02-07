@@ -123,7 +123,7 @@ const unwrapChartsArray = (jsonStr: string): ChartObject[] | null => {
       ) as ChartObject[];
     }
   } catch {
-    // Not valid JSON or not a charts wrapper
+    /* expected — not valid JSON or not a charts wrapper */
   }
   return null;
 };
@@ -197,7 +197,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
         });
       }
     } catch {
-      // Invalid JSON in code block, skip
+      /* expected — invalid JSON in code block, skip */
     }
   }
 
@@ -244,7 +244,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
           jsonPositions.push({ start: startIndex, end: endIndex + 1, json: parsed });
         }
       } catch {
-        // Invalid JSON, skip
+        /* expected — invalid JSON, skip */
       }
     }
   }

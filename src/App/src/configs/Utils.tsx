@@ -94,7 +94,7 @@ export const getGridStyles = (
     }
     return styles;
   } catch (e) {
-    console.warn("Failed to compute chart grid styles:", e);
+    if (process.env.NODE_ENV === 'development') console.warn("Failed to compute chart grid styles:", e);
     return styles;
   }
 };
@@ -187,21 +187,11 @@ export async function loadConfig() {
     const configData = await response.json();
     return configData;
   } catch (error) {
-    // console.error("Error loading config:", error);
     throw error;
   }
 }
 
-export const generateUUIDv4 = () => {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
+export const generateUUIDv4 = (): string => crypto.randomUUID();
 
 
 export function normalize(
@@ -255,7 +245,7 @@ export const tryGetRaiPrettyError = (errorMessage: string) => {
       }
     }
   } catch (e) {
-    console.warn("Failed to parse RAI error:", e);
+    if (process.env.NODE_ENV === 'development') console.warn("Failed to parse RAI error:", e);
   }
   return errorMessage
 }
@@ -273,7 +263,7 @@ export const parseErrorMessage = (errorMessage: string) => {
       let newErrorMessage = errorCodeMessage + ' ' + innerErrorString
       errorMessage = newErrorMessage
     } catch (e) {
-      console.warn("Error parsing inner error message:", e);
+      if (process.env.NODE_ENV === 'development') console.warn("Error parsing inner error message:", e);
     }
   }
 

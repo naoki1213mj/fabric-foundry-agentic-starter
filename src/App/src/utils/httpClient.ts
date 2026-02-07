@@ -17,7 +17,7 @@ export interface RequestConfig extends RequestInit {
   };
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   ok: boolean;
   status: number;
   data?: T;

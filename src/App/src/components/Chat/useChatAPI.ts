@@ -173,7 +173,7 @@ export const useChatAPI = ({
           }
         }
       } catch {
-        // Fall through to default
+        /* expected — fall through to default message */
       }
       return "Chart can not be generated, please try again.";
     }
@@ -233,7 +233,7 @@ export const useChatAPI = ({
           runningText.value = text;
         }
       } catch {
-        // Not JSON, continue processing as stream
+        /* expected — not JSON, continue processing as stream */
       }
 
       if (!isChartResponseReceived) {
@@ -266,7 +266,7 @@ export const useChatAPI = ({
               }
             }
           } catch {
-            // Skip malformed chunks
+            /* expected — skip malformed chunks */
           }
         }
 
@@ -332,7 +332,7 @@ export const useChatAPI = ({
         return [newMessage, errorMessage];
       }
     } catch {
-      // Error parsing chart response
+      /* expected — error parsing chart response */
     }
     return [];
   }, [createAndDispatchMessage, extractChartData]);

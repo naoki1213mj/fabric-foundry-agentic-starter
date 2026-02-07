@@ -59,7 +59,7 @@ jobs:
         run: |
           echo "🎨 Checking code formatting..."
           ruff format src/api/python --check --diff
-        continue-on-error: true  # Warning only for now
+        continue-on-error: false
 
   # ============================================
   # Python Unit Tests
@@ -130,7 +130,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MINIMUM_GREEN: 60
           MINIMUM_ORANGE: 40
-        continue-on-error: true
+        continue-on-error: true  # Coverage comment may fail on forks
 
   # ============================================
   # Frontend Lint (ESLint + TypeScript)

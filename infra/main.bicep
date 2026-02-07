@@ -30,15 +30,6 @@ param backendRuntimeStack string
 ])
 param usecase string
 
-// @minLength(1)
-// @description('Location for the Content Understanding service deployment:')
-// @allowed(['swedencentral', 'australiaeast'])
-// @metadata({
-//   azd: {
-//     type: 'location'
-//   }
-// })
-// param contentUnderstandingLocation string = 'swedencentral'
 var contentUnderstandingLocation = ''
 
 @minLength(1)
@@ -72,17 +63,6 @@ param gptDeploymentCapacity int = 30
 @description('Optional. The tags to apply to all deployed Azure resources.')
 param tags resourceInput<'Microsoft.Resources/resourceGroups@2025-04-01'>.tags = {}
 
-// @minLength(1)
-// @description('Name of the Text Embedding model to deploy:')
-// @allowed([
-//   'text-embedding-ada-002'
-// ])
-// param embeddingModel string = 'text-embedding-ada-002'
-
-// @minValue(10)
-// @description('Capacity of the Embedding Model deployment')
-// param embeddingDeploymentCapacity int = 80
-
 param imageTag string = 'latest_v2'
 
 param AZURE_LOCATION string=''
@@ -93,10 +73,6 @@ var uniqueId = toLower(uniqueString(subscription().id, environmentName, solution
 @metadata({
   azd:{
     type: 'location'
-    // usageName: [
-    //   'OpenAI.Standard.gpt-4o-mini,30'
-    //   // 'OpenAI.GlobalStandard.text-embedding-ada-002,80'
-    // ]
   }
 })
 @description('Location for AI Foundry deployment. This is the location where the AI Foundry resources will be deployed.')
@@ -174,16 +150,9 @@ module managedIdentityModule 'deploy_managed_identity.bicep' = {
   scope: resourceGroup(resourceGroup().name)
 }
 
-// ==========Key Vault Module ========== //
-// module kvault 'deploy_keyvault.bicep' = {
-//   name: 'deploy_keyvault'
-//   params: {
-//     keyvaultName: '${abbrs.security.keyVault}${solutionPrefix}'
-//     solutionLocation: solutionLocation
-//     managedIdentityObjectId:managedIdentityModule.outputs.managedIdentityOutput.objectId
-//   }
-//   scope: resourceGroup(resourceGroup().name)
-// }
+// ==========Key Vault Module (deployed separately via CLI) ========== //
+// Key Vault is deployed via 'az deployment group create' using deploy_keyvault.bicep
+// See .dev-logs for deployment details
 
 // ==========AI Foundry and related resources ========== //
 module aifoundry 'deploy_ai_foundry.bicep' = {
@@ -191,15 +160,11 @@ module aifoundry 'deploy_ai_foundry.bicep' = {
   params: {
     solutionName: solutionPrefix
     solutionLocation: aiDeploymentsLocation
-    // keyVaultName: kvault.outputs.keyvaultName
-    // cuLocation: contentUnderstandingLocation
     deploymentType: deploymentType
     gptModelName: gptModelName
     gptModelVersion: gptModelVersion
     // azureOpenAIApiVersion: azureOpenAIApiVersion
     gptDeploymentCapacity: gptDeploymentCapacity
-    // embeddingModel: embeddingModel
-    // embeddingDeploymentCapacity: embeddingDeploymentCapacity
     managedIdentityObjectId: managedIdentityModule.outputs.managedIdentityOutput.objectId
     existingLogAnalyticsWorkspaceId: existingLogAnalyticsWorkspaceId
     azureExistingAIProjectResourceId: azureExistingAIProjectResourceId
@@ -207,53 +172,6 @@ module aifoundry 'deploy_ai_foundry.bicep' = {
   }
   scope: resourceGroup(resourceGroup().name)
 }
-
-// ==========CS API Module ========== //
-// module csapi 'deploy_csapi_app_service.bicep' = {
-//    name: 'deployCsApiModule'
-//   params: {
-//     location: resourceGroup().location
-//     siteName: '${environmentName}-csapi-${uniqueString(resourceGroup().id)}'
-//     keyVaultName: '${environmentName}-csapi-${uniqueString(resourceGroup().id)}-kv'
-//     openAiSecretName: 'AZURE_OPENAI_KEY'
-//     sqlSecretName: 'FABRIC_SQL_CONNECTION_STRING'
-//     openAiSecretValue: ''
-//     sqlSecretValue: ''
-//     skuName: 'P1v2'
-//   }
-// }
-
-
-// // ========== Cosmos DB module ========== //
-// module cosmosDBModule 'deploy_cosmos_db.bicep' = {
-//   name: 'deploy_cosmos_db'
-//   params: {
-//     accountName: '${abbrs.databases.cosmosDBDatabase}${solutionPrefix}'
-//     solutionLocation: secondaryLocation
-//     keyVaultName: kvault.outputs.keyvaultName
-//   }
-//   scope: resourceGroup(resourceGroup().name)
-// }
-
-// //========== SQL DB module ========== //
-// module sqlDBModule 'deploy_sql_db.bicep' = {
-//   name: 'deploy_sql_db'
-//   params: {
-//     serverName: '${abbrs.databases.sqlDatabaseServer}${solutionPrefix}'
-//     sqlDBName: '${abbrs.databases.sqlDatabase}${solutionPrefix}'
-//     solutionLocation: secondaryLocation
-//     keyVaultName: kvault.outputs.keyvaultName
-//     managedIdentityName: managedIdentityModule.outputs.managedIdentityOutput.name
-//     sqlUsers: [
-//       {
-//         principalId: managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
-//         principalName: managedIdentityModule.outputs.managedIdentityBackendAppOutput.name
-//         databaseRoles: ['db_datareader', 'db_datawriter']
-//       }
-//     ]
-//   }
-//   scope: resourceGroup(resourceGroup().name)
-// }
 
 module hostingplan 'deploy_app_service_plan.bicep' = {
   name: 'deploy_app_service_plan'
@@ -391,7 +309,7 @@ module backend_csapi_docker 'deploy_backend_csapi_docker.bicep' = if (backendRun
   scope: resourceGroup(resourceGroup().name)
 }
 
-var landingText = usecase == 'Retail-sales-analysis' ? 'You can ask questions around sales, products and orders.' : 'You can ask questions around customer policies, claims and communications.'
+var landingText = 'You can ask questions around sales, products and orders.'
 
 // ========== APIM Gateway (AI Gateway for Azure OpenAI) ========== //
 module apimModule 'deploy_apim.bicep' = if (enableApimGateway) {
@@ -459,28 +377,17 @@ output RESOURCE_GROUP_LOCATION string = solutionLocation
 output ENVIRONMENT_NAME string = environmentName
 output AZURE_CONTENT_UNDERSTANDING_LOCATION string = contentUnderstandingLocation
 output AZURE_SECONDARY_LOCATION string = secondaryLocation
-//output APPINSIGHTS_INSTRUMENTATIONKEY string = backend_docker.outputs.appInsightInstrumentationKey
 output APPINSIGHTS_INSTRUMENTATIONKEY string = backendRuntimeStack == 'python' ? backend_docker!.outputs.appInsightInstrumentationKey : backend_csapi_docker!.outputs.appInsightInstrumentationKey
 output AZURE_AI_PROJECT_CONN_STRING string = aifoundry.outputs.projectEndpoint
 output AZURE_AI_AGENT_API_VERSION string = azureAiAgentApiVersion
 output AZURE_AI_PROJECT_NAME string = aifoundry.outputs.aiProjectName
-// output AZURE_COSMOSDB_ACCOUNT string = cosmosDBModule.outputs.cosmosAccountName
-// output AZURE_COSMOSDB_CONVERSATIONS_CONTAINER string = 'conversations'
-// output AZURE_COSMOSDB_DATABASE string = 'db_conversation_history'
-// output AZURE_COSMOSDB_ENABLE_FEEDBACK string = 'True'
 output AZURE_OPENAI_DEPLOYMENT_MODEL string = gptModelName
 output AZURE_OPENAI_DEPLOYMENT_MODEL_CAPACITY int = gptDeploymentCapacity
 output AZURE_OPENAI_ENDPOINT string = aifoundry.outputs.aiServicesTarget
 output AZURE_OPENAI_MODEL_DEPLOYMENT_TYPE string = deploymentType
-// output AZURE_OPENAI_EMBEDDING_MODEL string = embeddingModel
-// output AZURE_OPENAI_EMBEDDING_MODEL_CAPACITY int = embeddingDeploymentCapacity
 output AZURE_OPENAI_API_VERSION string = azureOpenAIApiVersion
 output AZURE_OPENAI_RESOURCE string = aifoundry.outputs.aiServicesName
-//output REACT_APP_LAYOUT_CONFIG string = backend_docker.outputs.reactAppLayoutConfig
 output REACT_APP_LAYOUT_CONFIG string = backendRuntimeStack == 'python' ? backend_docker!.outputs.reactAppLayoutConfig : backend_csapi_docker!.outputs.reactAppLayoutConfig
-// output SQLDB_DATABASE string = sqlDBModule.outputs.sqlDbName
-// output SQLDB_SERVER string = sqlDBModule.outputs.sqlServerName
-// output SQLDB_USER_MID string = managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
 output API_UID string = managedIdentityModule.outputs.managedIdentityBackendAppOutput.clientId
 output USE_AI_PROJECT_CLIENT string = 'False'
 output USE_CHAT_HISTORY_ENABLED string = 'True'
@@ -491,11 +398,9 @@ output ACR_NAME string = acrName
 output AZURE_ENV_IMAGETAG string = imageTag
 
 output AI_SERVICE_NAME string = aifoundry.outputs.aiServicesName
-//output API_APP_NAME string = backend_docker.outputs.appName
 output API_APP_NAME string = backendRuntimeStack == 'python' ? backend_docker!.outputs.appName : backend_csapi_docker!.outputs.appName
 output API_PID string = managedIdentityModule.outputs.managedIdentityBackendAppOutput.objectId
 
-//output API_APP_URL string = backend_docker.outputs.appUrl
 output API_APP_URL string = backendRuntimeStack == 'python' ? backend_docker!.outputs.appUrl : backend_csapi_docker!.outputs.appUrl
 output WEB_APP_URL string = frontend_docker.outputs.appUrl
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = aifoundry.outputs.applicationInsightsConnectionString

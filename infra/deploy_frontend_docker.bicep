@@ -10,7 +10,6 @@ param appSettings object = {}
 param appServicePlanId string
 
 var imageName = 'DOCKER|${acrName}.azurecr.io/da-app:${imageTag}'
-//var name = '${solutionName}-app'
 param name string
 module appService 'deploy_app_service.bicep' = {
   name: '${name}-app-module'
@@ -22,7 +21,7 @@ module appService 'deploy_app_service.bicep' = {
     appSettings: union(
       appSettings,
       {
-        APPINSIGHTS_INSTRUMENTATIONKEY: reference(applicationInsightsId, '2015-05-01').InstrumentationKey
+        APPINSIGHTS_INSTRUMENTATIONKEY: reference(applicationInsightsId, '2020-02-02').InstrumentationKey
       }
     )
   }

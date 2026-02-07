@@ -15,7 +15,6 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort, agentic_knowledge_retrieve
 
 # ============================================================================
