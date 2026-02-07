@@ -9,6 +9,8 @@ and cleanup.
 import logging
 import os
 import time
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
 import uvicorn
@@ -48,6 +50,29 @@ BUILD_DATE = "2026-02-04"
 BUILD_INFO = "Application Insights logging integration"
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Manage application lifespan: startup and shutdown events."""
+    logger.info(f"Application starting: v{APP_VERSION}")
+    yield
+    # Cleanup: close aiohttp sessions used by singleton tools
+    logger.info("Application shutting down, cleaning up resources...")
+    try:
+        from chat import get_agentic_retrieval_tool, get_knowledge_base_tool
+
+        kb_tool = get_knowledge_base_tool()
+        if kb_tool and hasattr(kb_tool, "close"):
+            await kb_tool.close()
+            logger.info("KnowledgeBaseTool session closed")
+
+        ar_tool = get_agentic_retrieval_tool()
+        if ar_tool and hasattr(ar_tool, "close"):
+            await ar_tool.close()
+            logger.info("AgenticRetrievalTool session closed")
+    except Exception as e:
+        logger.warning(f"Error during cleanup: {e}")
+
+
 def build_app() -> FastAPI:
     """
     Creates and configures the FastAPI application instance.
@@ -55,6 +80,7 @@ def build_app() -> FastAPI:
     fastapi_app = FastAPI(
         title="Agentic Applications for Unified Data Foundation Solution Accelerator",
         version=APP_VERSION,
+        lifespan=lifespan,
     )
 
     # CORS configuration - restrict origins in production

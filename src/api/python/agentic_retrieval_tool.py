@@ -378,7 +378,21 @@ async def agentic_knowledge_retrieve(
     Returns:
         Formatted search results with citations and relevance scores
     """
-    tool = AgenticRetrievalTool.create_from_env()
+    # Prefer singleton from chat module to reuse aiohttp session
+    tool: AgenticRetrievalTool | None = None
+    owns_tool = False
+    try:
+        from chat import get_agentic_retrieval_tool
+
+        tool = get_agentic_retrieval_tool()
+    except ImportError:
+        pass
+
+    if tool is None:
+        # Fallback: create a temporary instance (standalone usage)
+        tool = AgenticRetrievalTool.create_from_env()
+        owns_tool = True
+
     if not tool:
         return "ナレッジベースが設定されていません。"
 
@@ -392,4 +406,6 @@ async def agentic_knowledge_retrieve(
         result = await tool.retrieve_formatted(query, effort)
         return result
     finally:
-        await tool.close()
+        # Only close if we created the instance ourselves
+        if owns_tool:
+            await tool.close()

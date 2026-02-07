@@ -1773,8 +1773,27 @@ async def conversation(request: Request):
         if not query:
             return JSONResponse(content={"error": "Query is required"}, status_code=400)
 
+        # Input validation: query length limit
+        MAX_QUERY_LENGTH = 10000
+        if len(query) > MAX_QUERY_LENGTH:
+            return JSONResponse(
+                content={"error": f"Query exceeds maximum length of {MAX_QUERY_LENGTH} characters"},
+                status_code=400,
+            )
+
         if not conversation_id:
             return JSONResponse(content={"error": "Conversation ID is required"}, status_code=400)
+
+        # Validate conversation_id format (UUID)
+        import uuid
+
+        try:
+            uuid.UUID(conversation_id)
+        except ValueError:
+            return JSONResponse(
+                content={"error": "Invalid conversation_id format (expected UUID)"},
+                status_code=400,
+            )
 
         agent_mode = request_json.get(
             "agent_mode"
