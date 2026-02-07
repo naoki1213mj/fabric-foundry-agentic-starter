@@ -55,14 +55,18 @@ from agent_framework import (  # NOTE: HostedWebSearchTool requires OpenAI's web
 # - Supports Thread management for server-side conversation context
 # - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
 from agent_framework.azure import AzureOpenAIChatClient, AzureOpenAIResponsesClient
-
-# Agentic Retrieval with Foundry IQ
-from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
 from azure.identity import DefaultAzureCredential
 from azure.monitor.events.extension import track_event
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+
+# Agentic Retrieval with Foundry IQ
+from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
+
+# Local imports - tool handlers
+from agents.web_agent import WebAgentHandler
+from auth.auth_utils import get_authenticated_user_details
 
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
@@ -70,10 +74,6 @@ from knowledge_base_tool import KnowledgeBaseTool
 
 # MCP client for business analytics tools
 from mcp_client import get_mcp_tools
-
-# Local imports - tool handlers
-from agents.web_agent import WebAgentHandler
-from auth.auth_utils import get_authenticated_user_details
 
 # Import prompts from separate module for better maintainability
 from prompts import (
@@ -499,6 +499,115 @@ async def get_db_connection():
     return conn
 
 
+def _cleanup_db_connection():
+    """Close and reset the per-request database connection (ContextVar-based)."""
+    import contextlib
+
+    conn = _db_connection_var.get()
+    if conn:
+        with contextlib.suppress(Exception):
+            conn.close()
+        _db_connection_var.set(None)
+
+
+async def _load_conversation_history(
+    user_id: str, conversation_id: str, label: str = ""
+) -> list[dict]:
+    """Load conversation history with timeout. Returns list of message dicts."""
+    history_messages: list[dict] = []
+    try:
+        messages = await asyncio.wait_for(
+            get_conversation_messages(user_id, conversation_id), timeout=3.0
+        )
+        if messages:
+            recent_messages = messages[-6:] if len(messages) > 6 else messages
+            for msg in recent_messages:
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+                if isinstance(content, str) and content:
+                    history_messages.append({"role": role, "content": content})
+            logger.info(f"{label}Loaded {len(history_messages)} messages from conversation history")
+    except TimeoutError:
+        logger.warning(f"{label}Conversation history fetch timed out, continuing without history")
+    except Exception as e:
+        logger.warning(f"{label}Could not load conversation history: {e}")
+    return history_messages
+
+
+def _build_query_with_history(query: str, history_messages: list[dict]) -> str:
+    """Build query string with conversation history context."""
+    if history_messages:
+        history_context = "\n".join(
+            [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
+        )
+        return f"""## 会話履歴（参考にしてください）
+{history_context}
+
+## 現在の質問
+{query}"""
+    return query
+
+
+def _build_reasoning_options(label: str = "") -> dict:
+    """Build GPT-5 reasoning options from model params."""
+    model_params = get_model_params()
+    reasoning_options: dict = {}
+    if model_params["model"] == "gpt-5":
+        reasoning_opts: dict = {}
+        if model_params["model_reasoning_effort"]:
+            reasoning_opts["effort"] = model_params["model_reasoning_effort"]
+        if model_params["reasoning_summary"] and model_params["reasoning_summary"] != "off":
+            reasoning_opts["summary"] = model_params["reasoning_summary"]
+        if reasoning_opts:
+            reasoning_options["reasoning"] = reasoning_opts
+            logger.info(f"{label}GPT-5 reasoning options: {reasoning_opts}")
+    return reasoning_options
+
+
+def _create_responses_or_chat_client(credential, deployment_name: str | None, label: str = ""):
+    """Create AzureOpenAIResponsesClient (preferred) or AzureOpenAIChatClient (fallback)."""
+    base_url = get_responses_api_base_url()
+    use_responses_client = USE_RESPONSES_CLIENT and base_url is not None
+
+    if not deployment_name:
+        raise ValueError(
+            "Azure OpenAI deployment name is required. "
+            "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
+        )
+
+    if use_responses_client:
+        logger.info(
+            f"{label}Using AzureOpenAIResponsesClient: deployment={deployment_name}, "
+            f"base_url={base_url}"
+        )
+        return AzureOpenAIResponsesClient(
+            base_url=base_url,
+            deployment_name=deployment_name,
+            credential=credential,
+        )
+    else:
+        endpoint = get_openai_endpoint()
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
+
+        if not endpoint:
+            raise ValueError(
+                "Azure OpenAI endpoint is required. "
+                "Set AZURE_OPENAI_BASE_URL (preferred for Foundry API), "
+                "APIM_GATEWAY_URL, or AZURE_OPENAI_ENDPOINT"
+            )
+
+        logger.info(
+            f"{label}Using AzureOpenAIChatClient (fallback): deployment={deployment_name}, "
+            f"endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
+        )
+        return AzureOpenAIChatClient(
+            credential=credential,
+            deployment_name=deployment_name,
+            endpoint=endpoint,
+            api_version=api_version,
+        )
+
+
 @tool(approval_mode="never_require")
 async def run_sql_query(
     sql_query: Annotated[str, "The SQL query to execute against the Fabric database"],
@@ -806,36 +915,13 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
     これにより、複合的なクエリ（例：「売上データを分析して、最新トレンドと比較」）に対応可能。
     """
     try:
-        # Get conversation history for multi-turn support (with timeout)
-        history_messages = []
-        try:
-            import asyncio
-
-            # Set a short timeout (3 seconds) to avoid blocking
-            messages = await asyncio.wait_for(
-                get_conversation_messages(user_id, conversation_id), timeout=3.0
-            )
-            if messages:
-                # Convert to format suitable for agent (last N messages for context)
-                # Limit to last 6 messages to reduce token usage
-                recent_messages = messages[-6:] if len(messages) > 6 else messages
-                for msg in recent_messages:
-                    role = msg.get("role", "user")
-                    content = msg.get("content", "")
-                    if isinstance(content, str) and content:
-                        history_messages.append({"role": role, "content": content})
-                logger.info(f"Loaded {len(history_messages)} messages from conversation history")
-        except TimeoutError:
-            logger.warning("Conversation history fetch timed out, continuing without history")
-        except Exception as e:
-            logger.warning(f"Could not load conversation history: {e}")
-            # Continue without history
+        # Get conversation history for multi-turn support
+        history_messages = await _load_conversation_history(user_id, conversation_id)
 
         # Use sync credential - SDK requires synchronous token acquisition
         credential = DefaultAzureCredential()
 
-        # Get Azure OpenAI configuration from environment variables
-        # SDK 1.0.0b260130 requires explicit deployment_name and endpoint
+        # Get Azure OpenAI configuration
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
@@ -891,19 +977,9 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         logger.info("Workflow configured with Manager + 3 Specialists (SQL, Web, Doc)")
 
         # Build the full prompt with conversation history
+        full_query = _build_query_with_history(query, history_messages)
         if history_messages:
-            # Format history as context for the agent
-            history_context = "\n".join(
-                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
-            )
-            full_query = f"""## 会話履歴（参考にしてください）
-{history_context}
-
-## 現在の質問
-{query}"""
             logger.info(f"Including {len(history_messages)} messages in context")
-        else:
-            full_query = query
 
         last_message_id: str | None = None
         last_executor_id: str | None = None
@@ -1019,13 +1095,7 @@ async def stream_multi_agent_response(conversation_id: str, query: str, user_id:
         logger.error(f"Error in MagenticBuilder workflow: {e}", exc_info=True)
         raise
     finally:
-        global _db_connection
-        if _db_connection:
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                _db_connection.close()
-            _db_connection = None
+        _cleanup_db_connection()
 
 
 async def stream_single_agent_response(
@@ -1046,88 +1116,14 @@ async def stream_single_agent_response(
     """
     try:
         # Load conversation history for multi-turn support
-        history_messages = []
-        try:
-            import asyncio
+        history_messages = await _load_conversation_history(user_id, conversation_id)
 
-            messages = await asyncio.wait_for(
-                get_conversation_messages(user_id, conversation_id), timeout=3.0
-            )
-            if messages:
-                # Last 6 messages for context
-                recent_messages = messages[-6:] if len(messages) > 6 else messages
-                for msg in recent_messages:
-                    role = msg.get("role", "user")
-                    content = msg.get("content", "")
-                    if isinstance(content, str) and content:
-                        history_messages.append({"role": role, "content": content})
-                logger.info(f"Loaded {len(history_messages)} messages from conversation history")
-        except TimeoutError:
-            logger.warning("Conversation history fetch timed out, continuing without history")
-        except Exception as e:
-            logger.warning(f"Could not load conversation history: {e}")
-
-        # Use sync credential - SDK requires synchronous token acquisition
+        # Create AI client (ResponsesClient preferred, ChatClient fallback)
         credential = DefaultAzureCredential()
-
-        # Get Azure OpenAI configuration from environment variables
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-
-        # Determine which client to use based on configuration
-        base_url = get_responses_api_base_url()
-        use_responses_client = USE_RESPONSES_CLIENT and base_url is not None
-
-        if use_responses_client:
-            # Use AzureOpenAIResponsesClient for APIM Foundry API
-            logger.info(
-                f"Using AzureOpenAIResponsesClient: deployment={deployment_name}, "
-                f"base_url={base_url}"
-            )
-
-            if not deployment_name:
-                raise ValueError(
-                    "Azure OpenAI deployment name is required. "
-                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
-                )
-
-            # Create ResponsesClient with base_url (no api-version needed)
-            responses_client = AzureOpenAIResponsesClient(
-                base_url=base_url,
-                deployment_name=deployment_name,
-                credential=credential,
-            )
-            client = responses_client
-        else:
-            # Fallback to AzureOpenAIChatClient (Chat Completions API)
-            endpoint = get_openai_endpoint()
-            api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
-
-            logger.info(
-                f"Using AzureOpenAIChatClient (fallback): deployment={deployment_name}, "
-                f"endpoint={endpoint}, via_apim={USE_APIM_GATEWAY}"
-            )
-
-            if not deployment_name:
-                raise ValueError(
-                    "Azure OpenAI deployment name is required. "
-                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
-                )
-            if not endpoint:
-                raise ValueError(
-                    "Azure OpenAI endpoint is required. "
-                    "Set AZURE_OPENAI_BASE_URL (preferred for Foundry API), "
-                    "APIM_GATEWAY_URL, or AZURE_OPENAI_ENDPOINT"
-                )
-
-            # Create ChatClient with explicit configuration
-            client = AzureOpenAIChatClient(
-                credential=credential,
-                deployment_name=deployment_name,
-                endpoint=endpoint,
-                api_version=api_version,
-            )
+        client = _create_responses_or_chat_client(credential, deployment_name)
 
         # Initialize tool handlers (ensure singletons are created)
         web_handler = get_web_agent_handler()
@@ -1139,7 +1135,6 @@ async def stream_single_agent_response(
         # Add web search tool
         # NOTE: HostedWebSearchTool requires OpenAI's web_search_preview which is not
         # available in Azure OpenAI. Using custom search_web for now.
-        # When Azure OpenAI supports web_search_preview, we can enable HostedWebSearchTool.
         if web_handler:
             all_tools.append(search_web)
             logger.info("Web search tool enabled (custom implementation via WebAgentHandler)")
@@ -1161,25 +1156,8 @@ async def stream_single_agent_response(
 
         logger.info(f"Available tools: {len(all_tools)} tools configured")
 
-        # Create a single intelligent agent with ALL tools
-        # This is the RECOMMENDED mode for most queries because:
-        # 1. Single LLM call handles tool selection
-        # 2. Can call multiple tools and INTEGRATE results
-        # 3. Fast and flexible
-        # プロンプトは prompts/unified_agent.py から読み込み
-
         # Build reasoning options for GPT-5 models
-        model_params = get_model_params()
-        reasoning_options = {}
-        if model_params["model"] == "gpt-5":
-            reasoning_opts = {}
-            if model_params["model_reasoning_effort"]:
-                reasoning_opts["effort"] = model_params["model_reasoning_effort"]
-            if model_params["reasoning_summary"] and model_params["reasoning_summary"] != "off":
-                reasoning_opts["summary"] = model_params["reasoning_summary"]
-            if reasoning_opts:
-                reasoning_options["reasoning"] = reasoning_opts
-                logger.info(f"GPT-5 reasoning options: {reasoning_opts}")
+        reasoning_options = _build_reasoning_options()
 
         agent = client.as_agent(
             name="unified_assistant",
@@ -1189,19 +1167,7 @@ async def stream_single_agent_response(
         )
 
         # Build the full prompt with conversation history for multi-turn support
-        if history_messages:
-            # Format history as context for the agent
-            history_context = "\n".join(
-                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
-            )
-            full_query = f"""## 会話履歴（参考にしてください）
-{history_context}
-
-## 現在の質問
-{query}"""
-            logger.info(f"Including {len(history_messages)} messages in context")
-        else:
-            full_query = query
+        full_query = _build_query_with_history(query, history_messages)
 
         logger.info(f"Unified agent processing query: {query[:100]}...")
 
@@ -1213,13 +1179,7 @@ async def stream_single_agent_response(
         logger.error(f"Error in single agent response: {e}", exc_info=True)
         raise
     finally:
-        global _db_connection
-        if _db_connection:
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                _db_connection.close()
-            _db_connection = None
+        _cleanup_db_connection()
 
 
 async def stream_sql_only_response(conversation_id: str, query: str, user_id: str = "anonymous"):
@@ -1231,86 +1191,19 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
     """
     try:
         # Load conversation history for multi-turn support
-        history_messages = []
-        try:
-            import asyncio
+        history_messages = await _load_conversation_history(user_id, conversation_id, "SQL-only")
 
-            messages = await asyncio.wait_for(
-                get_conversation_messages(user_id, conversation_id), timeout=3.0
-            )
-            if messages:
-                recent_messages = messages[-6:] if len(messages) > 6 else messages
-                for msg in recent_messages:
-                    role = msg.get("role", "user")
-                    content = msg.get("content", "")
-                    if isinstance(content, str) and content:
-                        history_messages.append({"role": role, "content": content})
-                logger.info(f"SQL-only: Loaded {len(history_messages)} messages from history")
-        except TimeoutError:
-            logger.warning("SQL-only: History fetch timed out")
-        except Exception as e:
-            logger.warning(f"SQL-only: Could not load history: {e}")
-
+        # Create AI client (ResponsesClient preferred, ChatClient fallback)
         credential = DefaultAzureCredential()
         deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_MODEL") or os.getenv(
             "AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
         )
-
-        # Determine which client to use based on configuration
-        base_url = get_responses_api_base_url()
-        use_responses_client = USE_RESPONSES_CLIENT and base_url is not None
-
-        if use_responses_client:
-            # Use AzureOpenAIResponsesClient for APIM Foundry API
-            logger.info(f"SQL-only: Using ResponsesClient with base_url={base_url}")
-
-            if not deployment_name:
-                raise ValueError(
-                    "Azure OpenAI deployment name is required. "
-                    "Set AZURE_OPENAI_DEPLOYMENT_MODEL or AZURE_OPENAI_CHAT_DEPLOYMENT_NAME"
-                )
-
-            client = AzureOpenAIResponsesClient(
-                base_url=base_url,
-                deployment_name=deployment_name,
-                credential=credential,
-            )
-        else:
-            # Fallback to AzureOpenAIChatClient
-            endpoint = get_openai_endpoint()
-            api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
-
-            if not deployment_name or not endpoint:
-                raise ValueError(
-                    "Azure OpenAI configuration missing. "
-                    "Set deployment name and AZURE_OPENAI_BASE_URL, APIM_GATEWAY_URL, "
-                    "or AZURE_OPENAI_ENDPOINT"
-                )
-
-            logger.info(f"SQL-only: Using ChatClient with endpoint={endpoint}")
-
-            client = AzureOpenAIChatClient(
-                credential=credential,
-                deployment_name=deployment_name,
-                endpoint=endpoint,
-                api_version=api_version,
-            )
+        client = _create_responses_or_chat_client(credential, deployment_name, "SQL-only")
 
         # Build reasoning options for GPT-5 models
-        model_params = get_model_params()
-        reasoning_options = {}
-        if model_params["model"] == "gpt-5":
-            reasoning_opts = {}
-            if model_params["model_reasoning_effort"]:
-                reasoning_opts["effort"] = model_params["model_reasoning_effort"]
-            if model_params["reasoning_summary"] and model_params["reasoning_summary"] != "off":
-                reasoning_opts["summary"] = model_params["reasoning_summary"]
-            if reasoning_opts:
-                reasoning_options["reasoning"] = reasoning_opts
-                logger.info(f"SQL-only GPT-5 reasoning options: {reasoning_opts}")
+        reasoning_options = _build_reasoning_options("SQL-only")
 
         # SQL-only agent - fastest mode
-        # プロンプトは prompts/sql_agent.py から読み込み（簡易版）
         agent = client.as_agent(
             name="sql_analyst",
             instructions=SQL_AGENT_PROMPT_MINIMAL,
@@ -1318,19 +1211,8 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
             default_options=reasoning_options if reasoning_options else None,
         )
 
-        # Build the full prompt with conversation history for multi-turn support
-        if history_messages:
-            history_context = "\n".join(
-                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
-            )
-            full_query = f"""## 会話履歴（参考にしてください）
-{history_context}
-
-## 現在の質問
-{query}"""
-            logger.info(f"SQL-only: Including {len(history_messages)} messages in context")
-        else:
-            full_query = query
+        # Build the full prompt with conversation history
+        full_query = _build_query_with_history(query, history_messages)
 
         logger.info(f"SQL-only agent processing query: {query[:100]}...")
 
@@ -1342,13 +1224,7 @@ async def stream_sql_only_response(conversation_id: str, query: str, user_id: st
         logger.error(f"Error in SQL-only response: {e}", exc_info=True)
         raise
     finally:
-        global _db_connection
-        if _db_connection:
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                _db_connection.close()
-            _db_connection = None
+        _cleanup_db_connection()
 
 
 async def stream_handoff_response(conversation_id: str, query: str, user_id: str = "anonymous"):
@@ -1371,25 +1247,7 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
     """
     try:
         # Load conversation history for multi-turn support
-        history_messages = []
-        try:
-            import asyncio
-
-            messages = await asyncio.wait_for(
-                get_conversation_messages(user_id, conversation_id), timeout=3.0
-            )
-            if messages:
-                recent_messages = messages[-6:] if len(messages) > 6 else messages
-                for msg in recent_messages:
-                    role = msg.get("role", "user")
-                    content = msg.get("content", "")
-                    if isinstance(content, str) and content:
-                        history_messages.append({"role": role, "content": content})
-                logger.info(f"Handoff: Loaded {len(history_messages)} messages from history")
-        except TimeoutError:
-            logger.warning("Handoff: History fetch timed out")
-        except Exception as e:
-            logger.warning(f"Handoff: Could not load history: {e}")
+        history_messages = await _load_conversation_history(user_id, conversation_id, "Handoff")
 
         # Initialize tool handlers (ensure singletons are created)
         web_handler = get_web_agent_handler()
@@ -1497,19 +1355,8 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
 
         workflow = builder.build()
 
-        # Build the full prompt with conversation history for multi-turn support
-        if history_messages:
-            history_context = "\n".join(
-                [f"{msg['role'].upper()}: {msg['content']}" for msg in history_messages]
-            )
-            full_query = f"""## 会話履歴（参考にしてください）
-{history_context}
-
-## 現在の質問
-{query}"""
-            logger.info(f"Handoff: Including {len(history_messages)} messages in context")
-        else:
-            full_query = query
+        # Build the full prompt with conversation history
+        full_query = _build_query_with_history(query, history_messages)
 
         logger.info(f"Handoff workflow processing query: {query[:100]}...")
 
@@ -1545,13 +1392,7 @@ async def stream_handoff_response(conversation_id: str, query: str, user_id: str
         logger.error(f"Error in Handoff workflow: {e}", exc_info=True)
         raise
     finally:
-        global _db_connection
-        if _db_connection:
-            import contextlib
-
-            with contextlib.suppress(Exception):
-                _db_connection.close()
-            _db_connection = None
+        _cleanup_db_connection()
 
 
 # ============================================================================
