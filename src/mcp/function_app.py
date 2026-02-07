@@ -31,8 +31,8 @@ try:
 except ImportError:
     logger.warning("azure-monitor-opentelemetry not installed")
 
-# Initialize Function App (ANONYMOUS for internal use, secured by network isolation)
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+# Initialize Function App (FUNCTION auth level - secured by function key + APIM subscription)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 # Initialize MCP Handler
 mcp_handler = MCPHandler()

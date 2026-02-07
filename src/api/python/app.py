@@ -24,6 +24,9 @@ from history_sql import router as history_sql_router
 
 load_dotenv()
 
+# Constants
+MAX_REQUEST_BODY_BYTES = 1 * 1024 * 1024  # 1 MB
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -46,8 +49,8 @@ except ImportError:
 
 # Application version - updated for CI/CD pipeline validation
 APP_VERSION = "2.11.0"
-BUILD_DATE = "2026-02-04"
-BUILD_INFO = "Application Insights logging integration"
+BUILD_DATE = "2026-02-07"
+BUILD_INFO = "P0-P4 audit: KeyVault, MCP auth, ErrorBoundary"
 
 
 @asynccontextmanager
@@ -85,8 +88,11 @@ def build_app() -> FastAPI:
     """
     fastapi_app = FastAPI(
         title="Agentic Applications for Unified Data Foundation Solution Accelerator",
+        description="Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI API",
         version=APP_VERSION,
         lifespan=lifespan,
+        docs_url="/docs",
+        redoc_url="/redoc",
     )
 
     # CORS configuration - restrict origins in production
@@ -108,13 +114,14 @@ def build_app() -> FastAPI:
     @fastapi_app.middleware("http")
     async def log_requests(request: Request, call_next):
         """Log all incoming requests with timing information."""
-        # Reject oversized requests (1 MB limit)
-        max_body_size = 1 * 1024 * 1024  # 1 MB
+        # Reject oversized requests
         content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > max_body_size:
+        if content_length and int(content_length) > MAX_REQUEST_BODY_BYTES:
             return JSONResponse(
                 status_code=413,
-                content={"error": "Request body too large. Maximum size is 1 MB."},
+                content={
+                    "error": f"Request body too large. Maximum size is {MAX_REQUEST_BODY_BYTES // (1024 * 1024)} MB."
+                },
             )
         start_time = time.time()
         request_id = request.headers.get("x-request-id", "unknown")

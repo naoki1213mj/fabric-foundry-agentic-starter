@@ -1,0 +1,58 @@
+# Root-level .dockerignore
+# Prevents unnecessary files from being included in Docker build context
+
+# Version control
+**/.git
+**/.gitignore
+
+# Documentation
+**/README.md
+**/AGENTS.md
+**/ARCHITECTURE.md
+**/DEMO.md
+**/CONTRIBUTING.md
+**/CODE_OF_CONDUCT.md
+**/SECURITY.md
+**/TRANSPARENCY_FAQ.md
+**/LICENSE
+**/next-steps.md
+**/documents
+
+# Development
+**/.dev-logs
+**/.debug_logs
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/.vscode
+**/.devcontainer
+
+# IDE
+**/.idea
+**/*.swp
+**/*.swo
+**/.DS_Store
+
+# CI/CD
+**/.github
+**/.azdo
+
+# IaC
+**/infra
+
+# Tests
+**/tests
+**/e2e-test
+
+# Build artifacts
+**/node_modules
+**/build
+**/dist
+**/*.egg-info
+
+# Misc
+**/*.md
+**/*.log
+**/ruff.toml

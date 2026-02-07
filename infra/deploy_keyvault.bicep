@@ -41,7 +41,9 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       family: 'A'
       name: 'standard'
     }
-    softDeleteRetentionInDays: 7
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 90
+    enablePurgeProtection: true
     tenantId: subscription().tenantId
   }
 }

@@ -38,9 +38,7 @@ export const MessageReactions: React.FC<MessageReactionsProps> = ({
     }
 
     // TODO: Send reaction to API for analytics
-    if (messageId && newReaction) {
-      console.debug(`Reaction ${newReaction} for message ${messageId}`);
-    }
+    // Reaction tracking will be handled via Application Insights
   };
 
   return (
