@@ -514,10 +514,10 @@ src/api/python/
 │   ├── test_app_advanced.py         # Health DB分岐・CORS・スキーマ (9件)
 │   ├── test_agentic_retrieval.py    # Agentic Retrieval Tool (27件)
 │   ├── test_chat.py                 # チャットロジックテスト (37件)
-│   ├── test_history_sql.py          # Fabric SQL テスト (10件)
+│   ├── test_history_sql.py          # Fabric SQL テスト (14件)
 │   ├── test_history_sql_functions.py # 履歴業務ロジック (30件)
 │   ├── test_mcp_client.py           # MCP クライアントテスト (8件)
-│   ├── test_sql_agent.py            # SQL Agent テスト (12件)
+│   ├── test_sql_agent.py            # SQL Agent テスト (13件)
 │   ├── test_utils.py                # ユーティリティテスト (11件)
 │   └── test_web_agent.py            # Web Agent テスト (14件)
 ├── pyproject.toml                   # pytest/ruff 設定

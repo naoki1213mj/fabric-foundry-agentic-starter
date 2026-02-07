@@ -76,7 +76,7 @@ Microsoft Foundry Agents coordinate orchestration and retrieval to deliver fast,
 | **AI Gateway** | APIM integration (Circuit Breaker / Token metrics) |
 | **Dark mode** | Full dark/light mode + Chart.js support |
 | **Security** | XSS protection / SQL injection prevention / Guardrails / Managed Identity |
-| **Testing** | **172 unit tests** (10 files) + GitHub Actions CI/CD |
+| **Testing** | **177 unit tests** (10 files) + GitHub Actions CI/CD |
 
 See [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) for the full list of customizations.
 
@@ -242,4 +242,4 @@ You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits
 
 BY ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT THE SOFTWARE IS NOT DESIGNED OR INTENDED TO SUPPORT ANY USE IN WHICH A SERVICE INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE COULD RESULT IN THE DEATH OR SERIOUS BODILY INJURY OF ANY PERSON OR IN PHYSICAL OR ENVIRONMENTAL DAMAGE (COLLECTIVELY, “HIGH-RISK USE”), AND THAT YOU WILL ENSURE THAT, IN THE EVENT OF ANY INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE, THE SAFETY OF PEOPLE, PROPERTY, AND THE ENVIRONMENT ARE NOT REDUCED BELOW A LEVEL THAT IS REASONABLY, APPROPRIATE, AND LEGAL, WHETHER IN GENERAL OR IN A SPECIFIC INDUSTRY. BY ACCESSING THE SOFTWARE, YOU FURTHER ACKNOWLEDGE THAT YOUR HIGH-RISK USE OF THE SOFTWARE IS AT YOUR OWN RISK.
 
-<!-- v2.0.0: 2026-02-07 -->
+<!-- v2.1.0: 2026-02-08 -->

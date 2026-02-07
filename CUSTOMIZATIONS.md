@@ -78,15 +78,21 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 
 | 機能 | 説明 |
 |------|------|
-| **SQL インジェクション対策** | パラメータライズドクエリへの移行 |
+| **SQL インジェクション対策** | キーワードブロックリスト + SELECT-only制限 + セミコロン拒否 |
 | **XSS 対策** | DOMPurify による HTML サニタイズ (`sanitizeAndProcessLinks()`) |
+| **CORS 強化** | `allow_credentials` 条件付き、メソッド明示、オリジン制限 |
+| **リクエストサイズ制限** | 1MB 超過で 413 レスポンス |
+| **Key Vault** | RBAC モード、シークレット管理、App Service KV参照 |
 | **資格情報管理** | ハードコード削除 → `DefaultAzureCredential` 統一 |
-| **入力バリデーション** | conversation_id / user_id の検証強化 |
-| **CVE-2024-47081 修正** | `requests` パッケージ更新 |
+| **入力バリデーション** | conversation_id / user_id / sort_order ホワイトリスト検証 |
+| **DB 接続リトライ** | 指数バックオフ付きリトライ（max 3回） |
+| **httpx 接続プーリング** | AsyncClient シングルトンで TCP ハンドシェイク削減 |
+| **asyncio.to_thread** | pyodbc.connect / cursor.execute のイベントループ保護 |
 | **ErrorBoundary** | React ErrorBoundary でクラッシュ防止 |
-| **リトライ・バックオフ** | API 通信の自動リトライ |
+| **セマンティック HTML** | main / section / aside 要素 + aria 属性で a11y 向上 |
+| **localStorage 永続化** | 6つの設定状態をブラウザに保存 |
+| **console ガード** | `__DEV__` フラグで本番ビルドのログ出力を抑制 |
 | **Keepalive** | 15秒間隔で Azure App Service 230秒タイムアウトを回避 |
-| **リソースクリーンアップ** | aiohttp セッションライフサイクル管理 |
 | **Managed Identity** | 全サービス間を DefaultAzureCredential で認証 |
 | **Foundry Guardrails** | Task Adherence / Prompt Shields / Groundedness Detection |
 
@@ -105,7 +111,7 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 | 機能 | 説明 |
 |------|------|
 | **GitHub Actions** | Build & Deploy（Docker → ACR → App Service）、Test & Lint、Security Scan |
-| **Python テスト** | **172 ユニットテスト（pytest、10ファイル）** |
+| **Python テスト** | **177 ユニットテスト（pytest、10ファイル）** |
 | **テスト対象** | FastAPI / Chat / SQL Agent / Agentic Retrieval / History SQL / MCP Client / Web Agent / ユーティリティ |
 | **Ruff Lint** | PR マージ条件として必須 |
 | **テストスクリプト** | `.\scripts\test.ps1` でワンコマンド実行 |
@@ -132,7 +138,7 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 | src/ 変更行数 | +22,285 / -4,093（180ファイル） |
 | infra/ 変更行数 | +30,645 / -19,533（77ファイル） |
 | tests/scripts/docs 変更行数 | +11,652 / -96（57ファイル） |
-| ユニットテスト | **172テスト / 10ファイル** |
+| ユニットテスト | **177テスト / 10ファイル** |
 | エージェントモード | 4種類 |
 | 統合ツール | 19個（SQL + Doc + Web + MCP×16） |
 
