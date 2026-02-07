@@ -42,7 +42,7 @@ RUN apk del .build-deps gnupg
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy the backend application code into the container
-COPY ./ .
+COPY --chown=appuser:appgroup ./ .
 
 # Switch to non-root user
 USER appuser

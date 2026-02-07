@@ -312,35 +312,47 @@ jobs:
     if: always() && (needs.deploy-frontend.result == 'success' || needs.deploy-api.result == 'success')
     steps:
       - name: Wait for deployment to stabilize
-        run: sleep 60
+        run: sleep 90
 
       - name: Health check - Frontend
         if: needs.deploy-frontend.result == 'success'
         run: |
           FRONTEND_URL="https://${{ env.FRONTEND_APP_NAME }}.azurewebsites.net"
           echo "Checking Frontend: $FRONTEND_URL"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" --max-time 30 || echo "000")
-          echo "Frontend HTTP Status: $HTTP_STATUS"
-          if [[ "$HTTP_STATUS" == "200" || "$HTTP_STATUS" == "302" ]]; then
-            echo "✅ Frontend is healthy"
-          else
-            echo "❌ Frontend returned status: $HTTP_STATUS"
-            exit 1
-          fi
+          for i in 1 2 3; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" --max-time 30) || HTTP_STATUS="000"
+            echo "Attempt $i - Frontend HTTP Status: $HTTP_STATUS"
+            if [[ "$HTTP_STATUS" == "200" || "$HTTP_STATUS" == "302" ]]; then
+              echo "✅ Frontend is healthy"
+              exit 0
+            fi
+            if [[ $i -lt 3 ]]; then
+              echo "Retrying in 30s..."
+              sleep 30
+            fi
+          done
+          echo "❌ Frontend returned status: $HTTP_STATUS after 3 attempts"
+          exit 1
 
       - name: Health check - API
         if: needs.deploy-api.result == 'success'
         run: |
           API_URL="https://${{ env.API_APP_NAME }}.azurewebsites.net/health"
           echo "Checking API: $API_URL"
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL" --max-time 30 || echo "000")
-          echo "API HTTP Status: $HTTP_STATUS"
-          if [[ "$HTTP_STATUS" == "200" ]]; then
-            echo "✅ API is healthy"
-          else
-            echo "❌ API returned status: $HTTP_STATUS"
-            exit 1
-          fi
+          for i in 1 2 3; do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL" --max-time 30) || HTTP_STATUS="000"
+            echo "Attempt $i - API HTTP Status: $HTTP_STATUS"
+            if [[ "$HTTP_STATUS" == "200" ]]; then
+              echo "✅ API is healthy"
+              exit 0
+            fi
+            if [[ $i -lt 3 ]]; then
+              echo "Retrying in 30s..."
+              sleep 30
+            fi
+          done
+          echo "❌ API returned status: $HTTP_STATUS after 3 attempts"
+          exit 1
 
       - name: Summary
         run: |
