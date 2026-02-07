@@ -54,26 +54,27 @@ Unified Data Foundation + Agentic AI で
 ```
 「アーキテクチャを説明します：
 
-┌─────────────────────────────────────────────────┐
-│           OrchestratorAgent                      │
-│        （意図分析・ルーティング）                │
-└──────────┬────────────┬────────────┬────────────┘
-           │            │            │
-     ┌─────▼─────┐ ┌────▼────┐ ┌────▼─────┐
-     │ SqlAgent  │ │WebAgent │ │ DocAgent │
-     │ (DB分析)  │ │(Web検索)│ │(文書検索)│
-     └─────┬─────┘ └────┬────┘ └────┬─────┘
-           │            │            │
-     ┌─────▼─────┐ ┌────▼────┐ ┌────▼──────┐
-     │SQL in    │ │  Bing   │ │ AI Search │
-     │Fabric    │ │Grounding│ │(SharePoint)│
-     └──────────┘ └─────────┘ └───────────┘
+┌───────────────────────────────────────────────────────────┐
+│           OrchestratorAgent                                    │
+│        （意図分析・ルーティング）                            │
+└─────┬──────────┬──────────┬──────────┬──────────┘
+      │          │          │          │
+┌────▼────┐ ┌───▼────┐ ┌───▼───┐ ┌───▼─────┐
+│ SqlAgent  │ │WebAgent  │ │DocAgent│ │MCP Tools  │
+│ (DB分析)  │ │(Web検索) │ │(文書検索)│ │(16分析ツール)│
+└────┬────┘ └───┬────┘ └───┬───┘ └───┬─────┘
+      │          │          │          │
+┌────▼────┐ ┌───▼────┐ ┌───▼─────┐ ┌───▼─────┐
+│SQL in    │ │  Bing    │ │ AI Search │ │Azure     │
+│Fabric    │ │Grounding │ │(SharePoint)│ │Functions  │
+└─────────┘ └────────┘ └──────────┘ └─────────┘
 
 1️⃣ Microsoft Fabric - 統合データ基盤（OneLake）
 2️⃣ SQL Database in Fabric - 構造化データ（売上、顧客、注文）
 3️⃣ Azure AI Search - 非構造化データ（製品仕様書、マニュアル）
-4️⃣ Foundry Agent Service - セキュアなエージェントランタイム
-5️⃣ Agent Framework - マルチエージェント協調
+4️⃣ MCP Server - 16のビジネス分析ツール（Azure Functions）
+5️⃣ Foundry Agent Service - セキュアなエージェントランタイム
+6️⃣ Agent Framework - マルチエージェント協調
 
 ユーザーの質問を自動判別し、適切なエージェントにルーティング。
 データのサイロを解消し、自然言語でクエリできます。」
@@ -82,6 +83,7 @@ Unified Data Foundation + Agentic AI で
 **ポイント**:
 
 - ✅ マルチエージェント構成を強調
+- ✅ 4ツール統合（SQL/Web/Doc/MCP）を明確に
 - ✅ 各コンポーネントの役割を明確に
 
 ---
@@ -189,6 +191,31 @@ Agent: 「自転車業界の2026年トレンドです：
 
 ---
 
+#### シーン5: ビジネス分析（MCP Tools）
+
+```
+User: 「上位顧客のRFM分析と在庫回転率を計算して」
+
+[ツール使用状況: calculate_rfm_score → calculate_inventory_turnover]
+
+Agent: 「📊 RFM分析結果：
+       - チャンピオン顧客: 23社（R:5 F:5 M:5）
+       - 優良顧客: 45社（R:4+ F:4+ M:3+）
+       - 休眠リスク: 12社（R:1 F:2 M:3+）
+       
+       📦 在庫回転率：
+       - Touring Bike: 8.2回/年（良好）
+       - Mountain-200: 5.1回/年（標準）
+       - Road-150: 3.8回/年（要改善）」
+```
+
+**話しながらデモ**:
+> 「MCP Server 上の16の分析ツールを自動呼び出し。
+> RFM分析、前年比計算、在庫回転率など
+> 高度な分析も自然言語で実行できます。」
+
+---
+
 ### 7:00-9:00 セキュリティデモ（Guardrails）
 
 **スライド**: 「エンタープライズ品質のセキュリティ」
@@ -237,8 +264,9 @@ Agent: [Task Adherence 発動]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ Fabric + Foundry + Agent Framework の深い統合
-✅ SQL, NoSQL, ドキュメント, Web を1つのエージェントで
+✅ SQL, ドキュメント, Web, MCP分析ツールを1つのエージェントで
 ✅ Guardrails でエンタープライズ品質のセキュリティ
+✅ 172ユニットテスト + CI/CD で本番品質
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Why Now - Agentic AI の実用化フェーズ
@@ -332,6 +360,7 @@ az webapp config appsettings set \
 | 質問 | 回答 |
 |------|------|
 | コストは？ | Fabric F2 + OpenAI 従量課金で月額約¥30,000〜 |
-| セキュリティは？ | Guardrails + Managed Identity + RBAC |
+| セキュリティは？ | Guardrails + Managed Identity + RBAC + DOMPurify (XSS対策) |
+| テストは？ | 172ユニットテスト + GitHub Actions CI/CD |
 | 既存システム連携は？ | Fabric Shortcut や API で連携可能 |
 | 導入期間は？ | azd up で30分、本番は2-4週間 |

@@ -3,7 +3,7 @@
 **English** | [日本語](README.md)
 
 > **🛠️ About this project**  
-> This repository is a customized project based on [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator), serving as a PoC starter kit, reference architecture, and demo environment for Agentic AI solutions.
+> This repository is a customized project based on [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator), serving as a PoC starter kit, reference architecture, and demo environment for Agentic AI solutions. See [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) for details on customizations.
 
 <br/>
 This solution accelerator empowers organizations to make faster, smarter decisions at scale by leveraging agentic AI solutions built on a unified data foundation with Microsoft Fabric. With seamless integration of Microsoft Foundry agents and Agent Framework orchestration, teams can design intelligent workflows that automate routine processes, streamline operations, and enable natural language querying across enterprise datasets. This ensures that governed, high-quality data is accessible not only to technical specialists but also to business users, creating a shared environment where insights are surfaced more easily and decisions are grounded in trusted information. By unifying data access and applying AI in the flow of work, organizations gain the agility to respond rapidly to changing business needs, foster collaboration across teams, and drive innovation with greater confidence.
@@ -66,6 +66,20 @@ Microsoft Foundry Agents coordinate orchestration and retrieval to deliver fast,
 
 </details>
 
+### Feature highlights
+
+| Category | Features |
+|----------|----------|
+| **Multi-tool** | SQL / Doc (Foundry IQ) / Web (Bing Grounding) / MCP (16 analytics tools) |
+| **Agent modes** | sql_only / multi_tool / handoff / magentic selectable from UI |
+| **GPT-5** | Reasoning visualization, Reasoning Effort UI control |
+| **AI Gateway** | APIM integration (Circuit Breaker / Token metrics) |
+| **Dark mode** | Full dark/light mode + Chart.js support |
+| **Security** | XSS protection / SQL injection prevention / Guardrails / Managed Identity |
+| **Testing** | **172 unit tests** (10 files) + GitHub Actions CI/CD |
+
+See [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) for the full list of customizations.
+
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/quick-deploy.png" width="48" />
 Quick deploy
@@ -118,6 +132,8 @@ _Note: This is not meant to outline all costs as selected SKUs, scaled use, cust
 | [Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/overview) | Hosts the frontend and backend API services. | B1/P1v2 Tier; fixed monthly cost per plan. | [Pricing](https://azure.microsoft.com/pricing/details/app-service/) |
 | [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-intro) | Stores and serves container images used by Azure App Service. | Basic/Premium Tier; fixed daily cost per registry. | [Pricing](https://azure.microsoft.com/pricing/details/container-registry/) |
 | [Azure Monitor / Log Analytics](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-overview) | Collects and analyzes telemetry and logs from services and containers. | Pay-as-you-go; charges based on data ingestion volume. | [Pricing](https://azure.microsoft.com/pricing/details/monitor/) |
+| [Azure API Management](https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts) | AI Gateway with token metrics, authentication, and circuit breaking. | Consumption Tier; pay-as-you-go. | [Pricing](https://azure.microsoft.com/pricing/details/api-management/) |
+| [Azure API Center](https://learn.microsoft.com/en-us/azure/api-center/overview) | Tool catalog and governance for MCP Server and AI APIs. | Free Tier | [Pricing](https://azure.microsoft.com/pricing/details/api-center/) |
 | [SQL Database in Fabric](https://learn.microsoft.com/en-us/fabric/fundamentals/microsoft-fabric-overview) | Stores structured data including insights, metadata, and chat history. | F2 capacity; fixed monthly cost per capacity. | [Pricing](https://azure.microsoft.com/en-us/pricing/details/microsoft-fabric/) |
 |
 
@@ -226,4 +242,4 @@ You acknowledge the Software is not subject to SOC 1 and SOC 2 compliance audits
 
 BY ACCESSING OR USING THE SOFTWARE, YOU ACKNOWLEDGE THAT THE SOFTWARE IS NOT DESIGNED OR INTENDED TO SUPPORT ANY USE IN WHICH A SERVICE INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE COULD RESULT IN THE DEATH OR SERIOUS BODILY INJURY OF ANY PERSON OR IN PHYSICAL OR ENVIRONMENTAL DAMAGE (COLLECTIVELY, “HIGH-RISK USE”), AND THAT YOU WILL ENSURE THAT, IN THE EVENT OF ANY INTERRUPTION, DEFECT, ERROR, OR OTHER FAILURE OF THE SOFTWARE, THE SAFETY OF PEOPLE, PROPERTY, AND THE ENVIRONMENT ARE NOT REDUCED BELOW A LEVEL THAT IS REASONABLY, APPROPRIATE, AND LEGAL, WHETHER IN GENERAL OR IN A SPECIFIC INDUSTRY. BY ACCESSING THE SOFTWARE, YOU FURTHER ACKNOWLEDGE THAT YOUR HIGH-RISK USE OF THE SOFTWARE IS AT YOUR OWN RISK.
 
-<!-- CI/CD Test: 2026-01-15 23:49:23 -->
+<!-- v2.0.0: 2026-02-07 -->

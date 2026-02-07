@@ -3,7 +3,7 @@
 [English](README_EN.md) | **日本語**
 
 > **🛠️ 本プロジェクトについて**  
-> このリポジトリは [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) をベースに、Agentic AI の PoC をすぐに開始できるリファレンスアーキテクチャ＆デモ環境としてカスタマイズしたプロジェクトです。
+> このリポジトリは [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) をベースに、Agentic AI の PoC をすぐに開始できるリファレンスアーキテクチャ＆デモ環境としてカスタマイズしたプロジェクトです。カスタマイズの詳細は [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) を参照してください。
 
 <br/>
 
@@ -67,6 +67,20 @@ Fabric のデータ基盤とシームレスに統合し、パフォーマンス�
 Microsoft Foundry エージェントがオーケストレーションと検索を調整し、迅速でコンテキストに即した回答を提供してインサイトを加速。企業データアセット全体への統一アクセスを可能にする直感的な自然言語クエリ機能を実現
 
 </details>
+
+### 追加機能ハイライト
+
+| カテゴリ | 機能 |
+|-----------|------|
+| **マルチツール** | SQL / Doc (Foundry IQ) / Web (Bing Grounding) / MCP (16分析ツール) |
+| **エージェントモード** | sql_only / multi_tool / handoff / magentic を UI から切替 |
+| **GPT-5** | Reasoning 可視化、Reasoning Effort UI制御 |
+| **AI Gateway** | APIM 統合 (Circuit Breaker / トークンメトリクス) |
+| **ダークモード** | 完全なダーク/ライトモード + Chart.js 対応 |
+| **セキュリティ** | XSS対策 / SQLインジェクション対策 / Guardrails / Managed Identity |
+| **テスト** | **172 ユニットテスト** (10ファイル) + GitHub Actions CI/CD |
+
+詳細は [CUSTOMIZATIONS.md](CUSTOMIZATIONS.md) を参照。
 
 <br /><br />
 <h2><img src="./documents/Images/ReadMe/quick-deploy.png" width="48" />
@@ -138,7 +152,7 @@ _注: これはすべてのコストを網羅したものではありません�
 |![image](./documents/Images/ReadMe/ui.png)|
 |---|
 
-r/>
+<br/>
 
 サンプルデータは、このアクセラレータが様々な業界の営業分析シナリオでどのように使用できるかを示しています。
 このシナリオでは、組織が営業調査のためにトップパフォーマンス製品を分析しています。以前は、営業アナリストはデータサイロ全体に散在する異種の営業データと顧客データを手作業で調べる必要がありました。このソリューションアクセラレータを活用することで、アナリストは Microsoft Fabric の統合データにアクセスし、顧客と営業パフォーマンスデータの包括的なビューを得られるようになりました。この機能により、アナリストはデータを照会できます（例: 「前年比で最も収益成長が高い顧客セグメントはどれか」、「人口統計別のトップパフォーマンス製品は何か」）。
@@ -231,4 +245,4 @@ r/>
 
 本ソフトウェアにアクセスまたは使用することにより、本ソフトウェアがサービスの中断、欠陥、エラー、またはその他の障害が人の死亡または重傷、または物理的または環境的損害（総称して「高リスク使用」）をもたらす可能性のある使用をサポートするために設計または意図されていないこと、および本ソフトウェアの中断、欠陥、エラー、またはその他の障害が発生した場合、人、財産、および環境の安全性が、一般的にまたは特定の業界において合理的、適切、かつ合法的なレベルを下回らないようにすることを認めます。本ソフトウェアにアクセスすることにより、本ソフトウェアの高リスク使用は自己責任で行うことをさらに認めます。
 
-<!-- CI/CD Test: 2026-01-15 23:49:23 -->
+<!-- v2.0.0: 2026-02-07 -->

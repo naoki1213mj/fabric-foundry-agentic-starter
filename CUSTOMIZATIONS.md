@@ -2,7 +2,7 @@
 
 > **ベースリポジトリ**: [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
 >
-> 元のSolution Acceleratorに対して **235コミット、src/ +20,189行、infra/ +30,982行** の追加開発を行いました。
+> 元のSolution Acceleratorに対して **619コミット、src/ +22,285行、infra/ +30,645行** の追加開発を行いました。
 
 ---
 
@@ -78,10 +78,15 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 
 | 機能 | 説明 |
 |------|------|
-| **XSS 対策** | DOMPurify による HTML サニタイズ |
+| **SQL インジェクション対策** | パラメータライズドクエリへの移行 |
+| **XSS 対策** | DOMPurify による HTML サニタイズ (`sanitizeAndProcessLinks()`) |
+| **資格情報管理** | ハードコード削除 → `DefaultAzureCredential` 統一 |
+| **入力バリデーション** | conversation_id / user_id の検証強化 |
+| **CVE-2024-47081 修正** | `requests` パッケージ更新 |
 | **ErrorBoundary** | React ErrorBoundary でクラッシュ防止 |
 | **リトライ・バックオフ** | API 通信の自動リトライ |
 | **Keepalive** | 15秒間隔で Azure App Service 230秒タイムアウトを回避 |
+| **リソースクリーンアップ** | aiohttp セッションライフサイクル管理 |
 | **Managed Identity** | 全サービス間を DefaultAzureCredential で認証 |
 | **Foundry Guardrails** | Task Adherence / Prompt Shields / Groundedness Detection |
 
@@ -100,7 +105,8 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 | 機能 | 説明 |
 |------|------|
 | **GitHub Actions** | Build & Deploy（Docker → ACR → App Service）、Test & Lint、Security Scan |
-| **Python テスト** | 37 ユニットテスト（pytest、4ファイル） |
+| **Python テスト** | **172 ユニットテスト（pytest、10ファイル）** |
+| **テスト対象** | FastAPI / Chat / SQL Agent / Agentic Retrieval / History SQL / MCP Client / Web Agent / ユーティリティ |
 | **Ruff Lint** | PR マージ条件として必須 |
 | **テストスクリプト** | `.\scripts\test.ps1` でワンコマンド実行 |
 
@@ -108,11 +114,13 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 
 | 対象 | 内容 |
 |------|------|
+| **chat.py DRY** | 共有ヘルパー関数抽出（ストリーミング / エラーハンドリング） |
 | **Chat.tsx** | 1ファイル → 5サブコンポーネントに分割 |
 | **ChatMessage.tsx** | 529行 → 77行（AssistantMessage/UserMessage 分離） |
 | **useChatAPI.ts** | Chat.tsx から API ロジックを分離 |
 | **chatHistoryUtils.ts** | ChatHistoryListItemCell からユーティリティ関数を抽出 |
 | **LazyImage / Chart.js** | React.lazy + Suspense で遅延読み込み |
+| **TypeScript any型排除** | 16ファイルで `any` を適切な型に置換 |
 
 ---
 
@@ -120,11 +128,11 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 
 | 指標 | 値 |
 |------|-----|
-| 追加コミット数 | 235 |
-| src/ 変更行数 | +20,189 / -7,773 |
-| infra/ 変更行数 | +30,982 / -16,311 |
-| 変更ファイル数 | src/ 195ファイル、infra/ 91ファイル |
-| ユニットテスト | 37テスト / 4ファイル |
+| 追加コミット数 | 619 |
+| src/ 変更行数 | +22,285 / -4,093（180ファイル） |
+| infra/ 変更行数 | +30,645 / -19,533（77ファイル） |
+| tests/scripts/docs 変更行数 | +11,652 / -96（57ファイル） |
+| ユニットテスト | **172テスト / 10ファイル** |
 | エージェントモード | 4種類 |
 | 統合ツール | 19個（SQL + Doc + Web + MCP×16） |
 
