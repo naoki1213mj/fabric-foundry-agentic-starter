@@ -145,18 +145,36 @@ PRを作成すると、以下が自動実行されます：
 src/api/python/
 ├── tests/
 │   ├── __init__.py
-│   ├── conftest.py         # 共通のフィクスチャ
-│   ├── test_app.py         # app.py のテスト (8件)
-│   ├── test_chat.py        # chat.py のテスト (37件)
-│   ├── test_history_sql.py # history_sql.py のテスト (10件)
-│   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
-│   ├── test_utils.py       # ユーティリティのテスト (11件)
-│   └── test_web_agent.py   # web_agent.py のテスト (14件)
-│   └── test_web_agent.py   # Web Agent テスト (14件)
-├── app.py                  # 合計: 88テスト / 6ファイル
+│   ├── conftest.py                  # 共通のフィクスチャ
+│   ├── test_app.py                  # app.py のテスト (8件)
+│   ├── test_app_advanced.py         # Health DB分岐・CORS・スキーマ (9件)
+│   ├── test_agentic_retrieval.py    # Agentic Retrieval Tool (27件)
+│   ├── test_chat.py                 # chat.py のテスト (37件)
+│   ├── test_history_sql.py          # history_sql.py のテスト (10件)
+│   ├── test_history_sql_functions.py # 履歴業務ロジック (30件)
+│   ├── test_mcp_client.py           # MCP クライアントテスト (8件)
+│   ├── test_sql_agent.py            # SQL Agent テスト (12件)
+│   ├── test_utils.py                # ユーティリティのテスト (11件)
+│   └── test_web_agent.py            # Web Agent テスト (14件)
+├── app.py                           # 合計: 172テスト / 10ファイル
 ├── chat.py
 └── history_sql.py
 ```
+
+### 各テストファイルの詳細
+
+| ファイル | 対象 | テスト種別 | 内容 |
+|----------|------|-----------|------|
+| test_app.py | app.py | ユニット | APP_VERSION, build_app, CORS, /health, /, router登録 |
+| test_app_advanced.py | app.py | 統合 | /health DB分岐(connected/unavailable/degraded), CORS origins, レスポンススキーマ |
+| test_agentic_retrieval.py | agentic_retrieval_tool.py | ユニット | ReasoningEffort enum, create_from_env, URL構築, _parse_retrieve_response, retrieve_formatted |
+| test_chat.py | chat.py | ユニット | create_tool_event, select_agent_mode, is_chart_request, ContextVar管理, endpoint URL, /chat validation |
+| test_history_sql.py | history_sql.py | ユニット | DB接続文字列, UUID, JSON直列化, SQLインジェクション防止 |
+| test_history_sql_functions.py | history_sql.py | ユニット+統合 | track_event, SqlQueryTool, generate_fallback_title, get_conversations, delete_conversation認可, rename_conversation |
+| test_mcp_client.py | mcp_client.py | ユニット | call_mcp_tool, get_mcp_tools, ツールラッパー |
+| test_sql_agent.py | agents/sql_agent.py | ユニット | init, run_sql_query（型変換, エラー, cursor close, 日本語）, get_tools |
+| test_utils.py | 汎用 | ユニット | JSON直列化, 環境変数, 入力バリデーション, レスポンスフォーマット |
+| test_web_agent.py | agents/web_agent.py | ユニット | init, is_configured, web_search, bing_grounding, get_tools |
 
 ### テストの命名規則
 

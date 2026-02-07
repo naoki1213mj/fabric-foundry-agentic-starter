@@ -122,20 +122,24 @@ git push
 | `.\scripts\test.ps1 -TestOnly` | テストのみ |
 | `.\scripts\test.ps1 -TestOnly -Coverage` | カバレッジ付き |
 
-### テストファイルの場所（88テスト / 6ファイル）
+### テストファイルの場所（172テスト / 10ファイル）
 
 ```
 src/api/python/
 ├── tests/
-│   ├── conftest.py         # 共通フィクスチャ・モック
-│   ├── test_app.py         # FastAPI アプリテスト (8件)
-│   ├── test_chat.py        # チャットロジックテスト (37件)
-│   ├── test_history_sql.py # Fabric SQL テスト (10件)
-│   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
-│   ├── test_utils.py       # ユーティリティテスト (11件)
-│   └── test_web_agent.py   # Web Agent テスト (14件)
-├── pyproject.toml          # pytest/ruff 設定
-└── requirements-test.txt   # テスト用パッケージ
+│   ├── conftest.py                  # 共通フィクスチャ・モック
+│   ├── test_app.py                  # FastAPI アプリテスト (8件)
+│   ├── test_app_advanced.py         # Health DB分岐・CORS・スキーマ (9件)
+│   ├── test_agentic_retrieval.py    # Agentic Retrieval Tool (27件)
+│   ├── test_chat.py                 # チャットロジックテスト (37件)
+│   ├── test_history_sql.py          # Fabric SQL テスト (10件)
+│   ├── test_history_sql_functions.py # 履歴業務ロジック (30件)
+│   ├── test_mcp_client.py           # MCP クライアントテスト (8件)
+│   ├── test_sql_agent.py            # SQL Agent テスト (12件)
+│   ├── test_utils.py                # ユーティリティテスト (11件)
+│   └── test_web_agent.py            # Web Agent テスト (14件)
+├── pyproject.toml                   # pytest/ruff 設定
+└── requirements-test.txt            # テスト用パッケージ
 ```
 
 ### 新機能追加時のテスト
