@@ -12,11 +12,10 @@ import time
 from datetime import UTC, datetime
 
 import uvicorn
+from chat import router as chat_router
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-
-from chat import router as chat_router
 from history import router as history_router
 from history_sql import router as history_sql_router
 
@@ -57,9 +56,12 @@ def build_app() -> FastAPI:
         version=APP_VERSION,
     )
 
+    # CORS configuration - restrict origins in production
+    allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*").split(",")
+
     fastapi_app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -107,15 +109,40 @@ def build_app() -> FastAPI:
         """
         Health check endpoint with extended diagnostics.
         Returns application status, version, and environment info.
+        Checks DB connectivity when FABRIC_SQL_SERVER is configured.
         """
+        health_status = "healthy"
+        db_status = "not_configured"
+
+        fabric_server = os.getenv("FABRIC_SQL_SERVER")
+        if fabric_server:
+            try:
+                from history_sql import get_fabric_db_connection
+
+                conn = await get_fabric_db_connection()
+                if conn:
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT 1")
+                    cursor.close()
+                    conn.close()
+                    db_status = "connected"
+                else:
+                    db_status = "unavailable"
+                    health_status = "degraded"
+            except Exception as e:
+                logger.warning(f"Health check DB probe failed: {e}")
+                db_status = "unavailable"
+                health_status = "degraded"
+
         return {
-            "status": "healthy",
+            "status": health_status,
             "version": APP_VERSION,
             "build_date": BUILD_DATE,
             "timestamp": datetime.now(UTC).isoformat(),
             "environment": os.getenv("AZURE_ENV_NAME", "development"),
             "model": os.getenv("AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME", "unknown"),
             "platform": "Microsoft Foundry",
+            "database": db_status,
         }
 
     @fastapi_app.get("/")

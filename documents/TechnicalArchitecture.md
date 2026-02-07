@@ -93,7 +93,7 @@ The following resources are deployed in the `rg-agent-unified-data-acce-eastus-0
 
 | API Name | Tools | Description |
 |----------|-------|-------------|
-| Business Analytics MCP Server | 5 tools | YoY分析, RFM分析, 在庫分析, 季節トレンド, 地域分析 |
+| Business Analytics MCP Server | 16 tools (4 categories) | 売上分析(5), 顧客分析(4), 在庫分析(3), 製品比較(4) |
 | Azure OpenAI API | - | Chat Completions, Embeddings endpoints |
 
 ### Data Platform
@@ -159,22 +159,20 @@ Provides centralized governance for AI APIs:
 
 ### API Center (Private Tool Catalog)
 Provides centralized API governance and discovery:
-- **MCP Server registration**: Business Analytics MCP Server with 5 tools
-  - `analyze_yoy_performance` - 前年同期比成長率分析
-  - `analyze_rfm_segments` - 顧客RFMセグメンテーション
-  - `analyze_inventory` - 在庫最適化分析
-  - `analyze_seasonal_trends` - 季節性トレンド分析
-  - `analyze_regional_performance` - 地域別パフォーマンス分析
+- **MCP Server registration**: Business Analytics MCP Server with 16 tools (4 categories)
+  - 売上分析: `calculate_yoy_growth`, `calculate_mom_growth`, `calculate_moving_average`, `calculate_abc_analysis`, `calculate_sales_forecast`
+  - 顧客分析: `calculate_rfm_score`, `classify_customer_segment`, `calculate_clv`, `recommend_next_action`
+  - 在庫分析: `calculate_inventory_turnover`, `calculate_reorder_point`, `identify_slow_moving_inventory`
+  - 製品比較: `compare_products`, `calculate_price_performance`, `suggest_alternatives`, `calculate_bundle_discount`
 - **Azure OpenAI registration**: Chat Completions and Embeddings APIs
 - **Workspace management**: Default workspace for Agentic AI application
 
 ### MCP Server (Azure Functions)
-Model Context Protocol server providing business analytics tools via JSON-RPC 2.0:
-- `analyze_yoy_performance`: Year-over-year growth calculation
-- `analyze_rfm_segments`: Customer RFM segmentation
-- `analyze_inventory`: Inventory analysis (turnover, reorder point, slow-moving)
-- `analyze_seasonal_trends`: Seasonal trend analysis
-- `analyze_regional_performance`: Regional performance comparison
+Model Context Protocol server providing 16 business analytics tools (4 categories) via JSON-RPC 2.0:
+- 売上分析: `calculate_yoy_growth`, `calculate_mom_growth`, `calculate_moving_average`, `calculate_abc_analysis`, `calculate_sales_forecast`
+- 顧客分析: `calculate_rfm_score`, `classify_customer_segment`, `calculate_clv`, `recommend_next_action`
+- 在庫分析: `calculate_inventory_turnover`, `calculate_reorder_point`, `identify_slow_moving_inventory`
+- 製品比較: `compare_products`, `calculate_price_performance`, `suggest_alternatives`, `calculate_bundle_discount`
 
 ### App Service  
 Hosts the web application and API layer that interfaces with the AI services and storage layers. Manages user sessions and handles REST calls. Both API and Frontend are containerized and deployed from Azure Container Registry.

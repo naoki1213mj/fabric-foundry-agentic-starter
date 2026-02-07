@@ -55,14 +55,14 @@
     },
     "publisherEmail": {
       "type": "string",
-      "defaultValue": "hackathon@contoso.com",
+      "defaultValue": "admin@contoso.com",
       "metadata": {
         "description": "Publisher email for APIM (required)"
       }
     },
     "publisherName": {
       "type": "string",
-      "defaultValue": "Agentic AI Hackathon",
+      "defaultValue": "Agentic AI PoC",
       "metadata": {
         "description": "Publisher name for APIM (required)"
       }
@@ -327,7 +327,7 @@
         "publisherName": "[parameters('publisherName')]"
       },
       "tags": {
-        "environment": "hackathon",
+        "environment": "poc",
         "purpose": "ai-gateway",
         "workload": "agentic-ai",
         "managedIdentityId": "[parameters('managedIdentityObjectId')]"

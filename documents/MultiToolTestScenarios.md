@@ -73,15 +73,15 @@ INFO:agents.web_agent:Performing Web Search via Foundry
 | ターン | ユーザー入力 | 期待されるツール呼び出し |
 |--------|--------------|------------------------|
 | 1 | 「全顧客の購買履歴を取得してください」 | `run_sql_query` |
-| 2 | 「RFM分析を実行して、優良顧客を特定してください」 | `mcp_rfm_analysis` |
+| 2 | 「RFM分析を実行して、優良顧客を特定してください」 | `calculate_rfm_score` |
 | 3 | 「優良顧客向けのキャンペーン施策を提案してください」 | LLMによる提案 |
 
 **ログ検証ポイント**:
 ```
 INFO:agent_framework:Function name: run_sql_query
 INFO:chat:SQL query executed successfully
-INFO:agent_framework:Function name: mcp_rfm_analysis
-INFO:mcp_client:MCP tool mcp_rfm_analysis executed successfully
+INFO:agent_framework:Function name: calculate_rfm_score
+INFO:mcp_client:MCP tool calculate_rfm_score executed successfully
 ```
 
 ---
@@ -122,7 +122,7 @@ INFO:chat:SQL query executed successfully
 | 1 | 「先月の売上トップ10製品を教えてください」 | `run_sql_query` |
 | 2 | 「1位の製品の仕様を教えてください」 | `search_documents` |
 | 3 | 「この製品カテゴリの市場動向を調べてください」 | `search_web` |
-| 4 | "前年同月比を計算してください」 | `analyze_yoy_performance` |
+| 4 | “前年同月比を計算してください」 | `calculate_yoy_growth` |
 | 5 | 「すべての情報を統合してエグゼクティブサマリーを作成してください」 | LLMによる統合分析 |
 
 **ログ検証ポイント**:
@@ -130,7 +130,7 @@ INFO:chat:SQL query executed successfully
 INFO:agent_framework:Function name: run_sql_query
 INFO:agent_framework:Function name: search_documents
 INFO:agent_framework:Function name: search_web
-INFO:agent_framework:Function name: analyze_yoy_performance
+INFO:agent_framework:Function name: calculate_yoy_growth
 ```
 
 ---

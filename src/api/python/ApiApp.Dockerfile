@@ -29,8 +29,14 @@ COPY ./requirements.txt .
 RUN pip install --upgrade pip setuptools wheel \
     && pip install --no-cache-dir --pre -r requirements.txt && rm -rf /root/.cache
 
+# Create non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 # Copy the backend application code into the container
 COPY ./ .
+
+# Switch to non-root user
+USER appuser
 
 # Expose port 80 for incoming traffic
 EXPOSE 80

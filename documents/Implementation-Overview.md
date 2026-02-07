@@ -70,7 +70,7 @@
 
 ### バックエンド
 
-- **言語**: Python 3.11
+- **言語**: Python 3.12
 - **フレームワーク**: FastAPI
 - **AIフレームワーク**: agent-framework-core
 - **認証**: Azure Managed Identity (DefaultAzureCredential)

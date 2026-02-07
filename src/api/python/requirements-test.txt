@@ -19,3 +19,6 @@ starlette[full]>=0.45.0
 
 # Code quality (also used in CI)
 ruff>=0.8.0
+
+# Type stubs
+types-requests>=2.32.0

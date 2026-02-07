@@ -3,7 +3,7 @@
 [English](README_EN.md) | **日本語**
 
 > **🛠️ 本プロジェクトについて**  
-> このリポジトリは [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) をベースに、Hackathon 向けにカスタマイズしたプロジェクトです。
+> このリポジトリは [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator) をベースに、Agentic AI の PoC をすぐに開始できるリファレンスアーキテクチャ＆デモ環境としてカスタマイズしたプロジェクトです。
 
 <br/>
 

@@ -54,10 +54,10 @@
       "value": "${ENABLE_APIM_GATEWAY=false}"
     },
     "apimPublisherEmail": {
-      "value": "${APIM_PUBLISHER_EMAIL=hackathon@contoso.com}"
+      "value": "${APIM_PUBLISHER_EMAIL=admin@contoso.com}"
     },
     "apimPublisherName": {
-      "value": "${APIM_PUBLISHER_NAME=Agentic AI Hackathon}"
+      "value": "${APIM_PUBLISHER_NAME=Agentic AI PoC}"
     },
     "mcpServerEndpoint": {
       "value": "${MCP_SERVER_ENDPOINT=}"

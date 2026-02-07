@@ -63,11 +63,11 @@
 │  │                                 │  │                                 │                   │
 │  │  APIs:                          │  │  Tool Catalog:                  │                   │
 │  │  ├─ /openai                     │  │  ├─ Business Analytics MCP     │                   │
-│  │  │   → Azure OpenAI (legacy)    │  │  │   ├─ YoY Analysis           │                   │
-│  │  ├─ /foundry-openai/openai/v1/  │  │  │   ├─ RFM Segmentation       │                   │
-│  │  │   → Foundry AI Services ★    │  │  │   ├─ 在庫分析               │                   │
-│  │  ├─ /mcp                        │  │  │   ├─ 季節トレンド           │                   │
-│  │  │   → MCP Server               │  │  │   └─ 地域パフォーマンス     │                   │
+│  │  │   → Azure OpenAI (legacy)    │  │  │   (16 tools / 4 categories) │                   │
+│  │  ├─ /foundry-openai/openai/v1/  │  │  │   売上5/顧客4/在庫3/製品4   │                   │
+│  │  │   → Foundry AI Services ★    │  │  │                             │                   │
+│  │  ├─ /mcp                        │  │  │                             │                   │
+│  │  │   → MCP Server               │  │  └─ Azure OpenAI API           │                   │
 │  │  └─ /foundry-agents             │  │  └─ Azure OpenAI API           │                   │
 │  │      → Foundry Agent Service    │  │                                 │                   │
 │  │                                 │  └─────────────────────────────────┘                   │
@@ -172,15 +172,30 @@
 │  │  │  (pyodbc)           │  │  (Agentic RAG)      │  │  AgentTool          │         │    │
 │  │  └─────────────────────┘  └─────────────────────┘  └─────────────────────┘         │    │
 │  │                                                                                      │    │
-│  │  MCP Tools (via APIM Gateway):                                                      │    │
+│  │  MCP Tools (via APIM Gateway) - 16 Business Analytics Tools:                        │    │
 │  │  ┌─────────────────────────────────────────────────────────────────────────────┐    │    │
 │  │  │  MCP Server (func-mcp-daj6dri4yf3k3z)                                       │    │    │
 │  │  │                                                                             │    │    │
-│  │  │  ├─ analyze_yoy_performance()     - 前年比分析                              │    │    │
-│  │  │  ├─ analyze_rfm_segments()        - 顧客セグメンテーション (RFM)            │    │    │
-│  │  │  ├─ analyze_inventory()           - 在庫最適化分析                          │    │    │
-│  │  │  ├─ analyze_seasonal_trends()     - 季節トレンド分析                        │    │    │
-│  │  │  └─ analyze_regional_performance()- 地域パフォーマンス分析                  │    │    │
+│  │  │  売上分析 (5):                                                              │    │    │
+│  │  │  ├─ calculate_yoy_growth()          - 前年同期比成長率                      │    │    │
+│  │  │  ├─ calculate_mom_growth()          - 前月比成長率                          │    │    │
+│  │  │  ├─ calculate_moving_average()      - 移動平均                             │    │    │
+│  │  │  ├─ calculate_abc_analysis()        - ABC分析（パレート）                   │    │    │
+│  │  │  └─ calculate_sales_forecast()      - 売上予測                             │    │    │
+│  │  │  顧客分析 (4):                                                              │    │    │
+│  │  │  ├─ calculate_rfm_score()           - RFMスコア計算                         │    │    │
+│  │  │  ├─ classify_customer_segment()     - セグメント分類                        │    │    │
+│  │  │  ├─ calculate_clv()                 - 顧客生涯価値                          │    │    │
+│  │  │  └─ recommend_next_action()         - Next Best Action                     │    │    │
+│  │  │  在庫分析 (3):                                                              │    │    │
+│  │  │  ├─ calculate_inventory_turnover()  - 在庫回転率                            │    │    │
+│  │  │  ├─ calculate_reorder_point()       - 発注点算出                            │    │    │
+│  │  │  └─ identify_slow_moving_inventory()- 滞留在庫特定                          │    │    │
+│  │  │  製品比較 (4):                                                              │    │    │
+│  │  │  ├─ compare_products()              - 製品比較                              │    │    │
+│  │  │  ├─ calculate_price_performance()   - 価格性能比                            │    │    │
+│  │  │  ├─ suggest_alternatives()          - 代替製品提案                          │    │    │
+│  │  │  └─ calculate_bundle_discount()     - バンドル割引                          │    │    │
 │  │  │                                                                             │    │    │
 │  │  │  Protocol: JSON-RPC 2.0 over HTTP                                           │    │    │
 │  │  │  Endpoint: https://apim-*/mcp → https://func-mcp-*/api/mcp                  │    │    │
@@ -265,7 +280,7 @@ graph TB
 │  │  │  └─ SQL         │  │  ├─ SQL         │  │  Specialists:   │  │  Specialists:   │ │   │
 │  │  │                 │  │  ├─ Doc         │  │  ├─ SQL Agent   │  │  ├─ SQL Agent   │ │   │
 │  │  │                 │  │  ├─ Web         │  │  ├─ Doc Agent   │  │  ├─ Doc Agent   │ │   │
-│  │  │                 │  │  └─ MCP(5)      │  │  └─ Web Agent   │  │  └─ Web Agent   │ │   │
+│  │  │                 │  │  └─ MCP(16)     │  │  └─ Web Agent   │  │  └─ Web Agent   │ │   │
 │  │  └─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────────┘ │   │
 │  │                                                                                      │   │
 │  │  Note: handoff/magentic は HandoffBuilder/MagenticBuilder SDK が                     │   │
@@ -426,7 +441,7 @@ graph TB
 │  │  │     ├─ Version: 1.0.0                                                      │    │   │
 │  │  │     ├─ Lifecycle: Production                                               │    │   │
 │  │  │     ├─ Endpoint: https://apim-*/mcp                                        │    │   │
-│  │  │     └─ Tools: 5 (下記参照)                                                 │    │   │
+│  │  │     └─ Tools: 16 (4カテゴリ: 売上5, 顧客4, 在庫3, 製品4)              │    │   │
 │  │  │                                                                             │    │   │
 │  │  │  2. Azure OpenAI API                                                       │    │   │
 │  │  │     ├─ Type: REST API (OpenAPI 3.0)                                        │    │   │
@@ -436,42 +451,31 @@ graph TB
 │  │  └─────────────────────────────────────────────────────────────────────────────┘    │   │
 │  │                                                                                      │   │
 │  │  ┌─────────────────────────────────────────────────────────────────────────────┐    │   │
-│  │  │  MCP Server ツール一覧                                                      │    │   │
+│  │  │  MCP Server ツール一覧 (16ツール / 4カテゴリ)                        │    │   │
 │  │  │                                                                             │    │   │
-│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
-│  │  │  │ Tool: analyze_yoy_performance                                        │ │    │   │
-│  │  │  │ Description: 前年同期比（Year-over-Year）売上成長率を分析            │ │    │   │
-│  │  │  │ Input: { period: string, category?: string }                         │ │    │   │
-│  │  │  │ Output: { yoy_growth: number, breakdown: array }                     │ │    │   │
-│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │  売上分析 (5):                                                              │    │   │
+│  │  │  ├─ calculate_yoy_growth         - 前年同期比成長率                         │    │   │
+│  │  │  ├─ calculate_mom_growth         - 前月比成長率                             │    │   │
+│  │  │  ├─ calculate_moving_average     - 移動平均                                │    │   │
+│  │  │  ├─ calculate_abc_analysis       - ABC分析（パレート）                      │    │   │
+│  │  │  └─ calculate_sales_forecast     - 売上予測                                │    │   │
 │  │  │                                                                             │    │   │
-│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
-│  │  │  │ Tool: analyze_rfm_segments                                           │ │    │   │
-│  │  │  │ Description: 顧客のRFM分析（Recency/Frequency/Monetary）              │ │    │   │
-│  │  │  │ Input: { customer_ids?: array, period?: string }                     │ │    │   │
-│  │  │  │ Output: { segments: array, distribution: object }                    │ │    │   │
-│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │  顧客分析 (4):                                                              │    │   │
+│  │  │  ├─ calculate_rfm_score          - RFMスコア計算                            │    │   │
+│  │  │  ├─ classify_customer_segment    - セグメント分類                           │    │   │
+│  │  │  ├─ calculate_clv               - 顧客生涯価値                             │    │   │
+│  │  │  └─ recommend_next_action        - Next Best Action                        │    │   │
 │  │  │                                                                             │    │   │
-│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
-│  │  │  │ Tool: analyze_inventory                                              │ │    │   │
-│  │  │  │ Description: 在庫最適化分析（回転率、発注点、滞留在庫）               │ │    │   │
-│  │  │  │ Input: { product_ids?: array, threshold?: number }                   │ │    │   │
-│  │  │  │ Output: { turnover_rates: array, recommendations: array }            │ │    │   │
-│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │  在庫分析 (3):                                                              │    │   │
+│  │  │  ├─ calculate_inventory_turnover - 在庫回転率                               │    │   │
+│  │  │  ├─ calculate_reorder_point      - 発注点算出                               │    │   │
+│  │  │  └─ identify_slow_moving_inventory - 滞留在庫特定                           │    │   │
 │  │  │                                                                             │    │   │
-│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
-│  │  │  │ Tool: analyze_seasonal_trends                                        │ │    │   │
-│  │  │  │ Description: 季節性トレンド分析（月別・四半期別パターン）              │ │    │   │
-│  │  │  │ Input: { category?: string, years?: number }                         │ │    │   │
-│  │  │  │ Output: { seasonal_index: array, peak_periods: array }               │ │    │   │
-│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
-│  │  │                                                                             │    │   │
-│  │  │  ┌───────────────────────────────────────────────────────────────────────┐ │    │   │
-│  │  │  │ Tool: analyze_regional_performance                                   │ │    │   │
-│  │  │  │ Description: 地域別パフォーマンス分析（売上・成長率・シェア）         │ │    │   │
-│  │  │  │ Input: { regions?: array, metric?: string }                          │ │    │   │
-│  │  │  │ Output: { regional_data: array, rankings: array }                    │ │    │   │
-│  │  │  └───────────────────────────────────────────────────────────────────────┘ │    │   │
+│  │  │  製品比較 (4):                                                              │    │   │
+│  │  │  ├─ compare_products             - 製品比較                                │    │   │
+│  │  │  ├─ calculate_price_performance  - 価格性能比                               │    │   │
+│  │  │  ├─ suggest_alternatives         - 代替製品提案                             │    │   │
+│  │  │  └─ calculate_bundle_discount    - バンドル割引                             │    │   │
 │  │  └─────────────────────────────────────────────────────────────────────────────┘    │   │
 │  └──────────────────────────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘

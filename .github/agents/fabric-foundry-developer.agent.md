@@ -21,7 +21,7 @@ description: Fabric + Foundry + Agent Framework 開発の専門家
 
 ### Deployment
 - Azure Developer CLI (azd)
-- Azure Container Apps
+- Azure App Service
 - Bicep IaC
 
 ## 行動原則

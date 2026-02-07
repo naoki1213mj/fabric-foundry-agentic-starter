@@ -19,7 +19,7 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
                                                                     ├─ SQL Tool (Fabric SQL DB)
                                                                     ├─ Doc Tool (Foundry IQ / Agentic RAG)
                                                                     ├─ Web Tool (Bing Grounding)
-                                                                    └─ MCP Tools (5つのビジネス分析)
+                                                                    └─ MCP Tools (16のビジネス分析)
 ```
 
 ---
@@ -34,7 +34,7 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 | **SQL Tool** | Fabric SQL Database への自然言語クエリ（スキーマ自動認識） |
 | **Doc Tool (Foundry IQ)** | Agentic Retrieval による製品仕様書 RAG 検索。Reasoning Effort を UI で調整可能（minimal/low/medium） |
 | **Web Tool** | Bing Grounding によるリアルタイム Web 検索。出典リンク付き |
-| **MCP Tools** | Azure Functions 上の MCP Server（前年比/RFM/在庫/季節性/地域分析の5ツール） |
+| **MCP Tools** | Azure Functions 上の MCP Server（16ツール / 4カテゴリ: 売上分析・顧客分析・在庫分析・製品比較） |
 | **マルチターン会話** | Fabric SQL DB での会話履歴永続化（CosmosDB から移行） |
 
 ### 2. GPT-5 対応
@@ -126,7 +126,7 @@ Client (React) → APIM (AI Gateway) → FastAPI → Agent Framework → 4ツー
 | 変更ファイル数 | src/ 195ファイル、infra/ 91ファイル |
 | ユニットテスト | 37テスト / 4ファイル |
 | エージェントモード | 4種類 |
-| 統合ツール | 8個（SQL + Doc + Web + MCP×5） |
+| 統合ツール | 19個（SQL + Doc + Web + MCP×16） |
 
 ---
 

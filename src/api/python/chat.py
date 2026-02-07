@@ -55,19 +55,14 @@ from agent_framework import (  # NOTE: HostedWebSearchTool requires OpenAI's web
 # - Supports Thread management for server-side conversation context
 # - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
 from agent_framework.azure import AzureOpenAIChatClient, AzureOpenAIResponsesClient
-from azure.identity import DefaultAzureCredential
-from azure.monitor.events.extension import track_event
-from azure.monitor.opentelemetry import configure_azure_monitor
-from dotenv import load_dotenv
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse, StreamingResponse
 
 # Agentic Retrieval with Foundry IQ
 from agentic_retrieval_tool import AgenticRetrievalTool, ReasoningEffort
-
-# Local imports - tool handlers
-from agents.web_agent import WebAgentHandler
-from auth.auth_utils import get_authenticated_user_details
+from azure.identity import DefaultAzureCredential
+from azure.monitor.events.extension import track_event
+from dotenv import load_dotenv
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse, StreamingResponse
 
 # Use Fabric SQL history instead of CosmosDB for multi-turn conversation support
 from history_sql import get_conversation_messages
@@ -75,6 +70,10 @@ from knowledge_base_tool import KnowledgeBaseTool
 
 # MCP client for business analytics tools
 from mcp_client import get_mcp_tools
+
+# Local imports - tool handlers
+from agents.web_agent import WebAgentHandler
+from auth.auth_utils import get_authenticated_user_details
 
 # Import prompts from separate module for better maintainability
 from prompts import (
@@ -417,13 +416,7 @@ async def stream_with_tool_events(agent_stream):
         set_tool_event_queue(None)
 
 
-# Check if the Application Insights Instrumentation Key is set in the environment variables
-instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-if instrumentation_key:
-    configure_azure_monitor(connection_string=instrumentation_key)
-    logging.info("Application Insights configured with the provided Instrumentation Key")
-else:
-    logging.warning("No Application Insights Instrumentation Key found. Skipping configuration")
+# Note: Application Insights is configured in app.py (single initialization point)
 
 # Suppress noisy loggers
 logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
@@ -491,18 +484,19 @@ def get_responses_api_base_url() -> str | None:
 # These tools are used by agents in the HandoffBuilder workflow
 # ============================================================================
 
-# Global database connection for tools
-_db_connection = None
+# Global database connection for tools (thread-safe via ContextVar)
+_db_connection_var: ContextVar[object | None] = ContextVar("_db_connection", default=None)
 
 
 async def get_db_connection():
     """Get or create database connection for tools."""
-    global _db_connection
-    if _db_connection is None:
+    conn = _db_connection_var.get()
+    if conn is None:
         from history_sql import get_fabric_db_connection
 
-        _db_connection = await get_fabric_db_connection()
-    return _db_connection
+        conn = await get_fabric_db_connection()
+        _db_connection_var.set(conn)
+    return conn
 
 
 @tool(approval_mode="never_require")
@@ -537,6 +531,14 @@ async def run_sql_query(
     await emit_tool_event("run_sql_query", "started", "SQLクエリを実行中...")
 
     try:
+        # SQL injection protection: only allow SELECT statements
+        sql_stripped = sql_query.strip().upper()
+        if not sql_stripped.startswith("SELECT"):
+            await emit_tool_event(
+                "run_sql_query", "error", "SELECT以外のクエリは許可されていません"
+            )
+            return json.dumps({"error": "Only SELECT queries are allowed"}, ensure_ascii=False)
+
         conn = await get_db_connection()
         if not conn:
             await emit_tool_event("run_sql_query", "error", "DB接続エラー")
@@ -569,8 +571,10 @@ async def run_sql_query(
 
     except Exception as e:
         logger.error(f"Error executing SQL query: {e}")
-        await emit_tool_event("run_sql_query", "error", str(e))
-        return json.dumps({"error": str(e)}, ensure_ascii=False)
+        await emit_tool_event("run_sql_query", "error", "SQLクエリの実行に失敗しました")
+        return json.dumps(
+            {"error": "An error occurred while executing the SQL query"}, ensure_ascii=False
+        )
 
 
 @tool(approval_mode="never_require")
@@ -619,8 +623,8 @@ async def search_web(
         return result  # Already JSON string
     except Exception as e:
         logger.error(f"Error in web search: {e}")
-        await emit_tool_event("search_web", "error", str(e))
-        return json.dumps({"error": str(e)}, ensure_ascii=False)
+        await emit_tool_event("search_web", "error", "Web検索に失敗しました")
+        return json.dumps({"error": "An error occurred during web search"}, ensure_ascii=False)
 
 
 @tool(approval_mode="never_require")
@@ -707,8 +711,8 @@ async def search_documents(
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:
         logger.error(f"Error in document search: {e}")
-        await emit_tool_event("search_documents", "error", str(e))
-        return json.dumps({"error": str(e)}, ensure_ascii=False)
+        await emit_tool_event("search_documents", "error", "ドキュメント検索に失敗しました")
+        return json.dumps({"error": "An error occurred during document search"}, ensure_ascii=False)
 
 
 # ============================================================================

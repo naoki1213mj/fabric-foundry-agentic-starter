@@ -163,17 +163,36 @@ async def search_documents(query: str, reasoning_effort: str = "low") -> str:
 
 ### MCP Tools
 
-**役割**: MCP Server (Azure Functions) 経由のビジネス分析ツール
+**役割**: MCP Server (Azure Functions) 経由のビジネス分析ツール（16ツール / 4カテゴリ）
 
 ```python
-# JSON-RPC 2.0 で MCP Server を呼び出し
-mcp_tools = [
-    "analyze_yoy_performance",      # 前年比分析
-    "analyze_rfm_segments",         # 顧客RFM
-    "analyze_inventory",            # 在庫最適化
-    "analyze_seasonal_trends",      # 季節トレンド
-    "analyze_regional_performance", # 地域分析
-]
+# JSON-RPC 2.0 で MCP Server を呼び出し（16ツール）
+mcp_tools = {
+    "売上分析": [
+        "calculate_yoy_growth",          # 前年同期比成長率
+        "calculate_mom_growth",          # 前月比成長率
+        "calculate_moving_average",      # 移動平均
+        "calculate_abc_analysis",        # ABC分析（パレート）
+        "calculate_sales_forecast",      # 売上予測
+    ],
+    "顧客分析": [
+        "calculate_rfm_score",           # RFMスコア計算
+        "classify_customer_segment",     # セグメント分類
+        "calculate_clv",                 # 顧客生涯価値
+        "recommend_next_action",         # Next Best Action
+    ],
+    "在庫分析": [
+        "calculate_inventory_turnover",  # 在庫回転率
+        "calculate_reorder_point",       # 発注点算出
+        "identify_slow_moving_inventory",# 滞留在庫特定
+    ],
+    "製品比較": [
+        "compare_products",              # 製品比較
+        "calculate_price_performance",   # 価格性能比
+        "suggest_alternatives",          # 代替製品提案
+        "calculate_bundle_discount",     # バンドル割引
+    ],
+}
 ```
 
 ---
@@ -199,7 +218,7 @@ sequenceDiagram
     D-->>A: 仕様書データ
     A->>W: search_web("自転車市場動向 2025")
     W-->>A: Web検索結果 + citations
-    A->>M: analyze_yoy_performance(sales_data)
+    A->>M: calculate_yoy_growth(sales_data)
     M-->>A: 前年比分析結果
     A->>A: 結果統合
     A-->>U: 統合レスポンス

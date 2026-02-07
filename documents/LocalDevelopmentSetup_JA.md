@@ -296,8 +296,10 @@ source .venv/bin/activate  # Linux
 .venv\Scripts\activate  # Windows PowerShell
 
 # 依存関係をインストール
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
+
+> **Note**: `uv` がインストールされていない場合は `pip install uv` で先にインストールしてください。
 
 #### 4A.4. Python バックエンド API の実行
 
@@ -468,7 +470,7 @@ python -m venv .venv
 # アクティブ化して再インストール
 source .venv/bin/activate  # Linux
 # または .venv\Scripts\Activate.ps1  # Windows
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 #### 権限の問題 (Linux)
@@ -489,6 +491,7 @@ New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name
 
 # SSL 証明書の問題
 pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org uv
+uv pip install -r requirements.txt
 ```
 
 ### 環境変数の問題

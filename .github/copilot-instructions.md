@@ -1,10 +1,26 @@
-# Azure Agentic AI Hackathon 2025 - Fabric + Foundry Configuration
+# Agentic AI PoC Starter Kit - Fabric + Foundry Configuration
 
-> **Mission**: Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI アプリで、TDM が10分で意思決定できる「Why Microsoft, Why Now」デモを実現する
+> **Mission**: Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI の PoC を即座に開始できるリファレンスアーキテクチャ＆デモ環境を提供する
+>
+> **用途**: PoC スターターキット / リファレンスアーキテクチャ / デモ環境
 >
 > **Base**: [microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator](https://github.com/microsoft/agentic-applications-for-unified-data-foundation-solution-accelerator)
 >
-> **Last Updated**: 2026/2/6
+> **Last Updated**: 2026/2/7
+
+---
+
+## 📝 開発ログ運用（必須）
+
+**セッション開始時**:
+1. `.dev-logs/project-understanding.md` を読んでプロジェクト全体を把握
+2. `.dev-logs/sessions/` の最新ログを読んで直近の作業を確認
+
+**セッション終了時**:
+1. `.dev-logs/sessions/YYYY-MM-DD_session-name.md` にログを保存
+2. 重要な変更があれば `project-understanding.md` を更新
+
+詳細は AGENTS.md の「開発ログ運用ルール」セクションを参照。
 
 ---
 
@@ -67,7 +83,7 @@ Solution Accelerator 構成例:
 var tags = {
   workload: 'aiagent'
   environment: 'prod'
-  costCenter: 'CC-HACKATHON'
+  costCenter: 'CC-POC'
   owner: 'team-ai@contoso.com'
   architecture: 'fabric-foundry'
   solutionAccelerator: 'unified-data-foundation'
@@ -77,14 +93,15 @@ var tags = {
 
 ---
 
-## 🎯 審査基準への対応
+## 🎯 PoC 提案時の訴求ポイント
 
-| 基準 | 対応方法 | 技術要素 |
-|------|----------|----------|
-| **Why Microsoft** | Unified Data Foundation | Fabric + Foundry + Agent Framework |
-| **Why Now** | Agentic AI の統合プラットフォーム | Agent Framework GA + Foundry Agent Service |
-| **技術統合** | 5領域カバー | AI App + Data + Infra + Security + GitHub |
-| **ACRインパクト** | エンタープライズAI消費 | Fabric F4 / OpenAI PTU |
+| 訴求点 | 説明 | 技術要素 |
+|--------|------|----------|
+| **Why Microsoft** | 統合データ基盤 + AI を一気通貫で提供 | Fabric + Foundry + Agent Framework |
+| **Why Now** | Agentic AI が GA 水準に到達 | Agent Framework GA + Foundry Agent Service |
+| **即時 PoC 開始** | azd up 一発でエンドツーエンド環境が立ち上がる | Bicep IaC + GitHub Actions |
+| **業界カスタマイズ** | 様々な業界シナリオに容易に横展開可能 | プロンプト・スキーマ・ツール差替え |
+| **エンタープライズ Ready** | セキュリティ・ガバナンス・可観測性を内蔵 | Guardrails + APIM + App Insights |
 
 ---
 
@@ -125,12 +142,11 @@ var tags = {
 │  └─────────────────────────────────────────────────────────────────────┘    │
 │  ┌─────────────────────────────────────────────────────────────────────┐    │
 │  │ Azure API Center (apic-daj6dri4yf3k3z) - Tool Catalog               │    │
-│  │ ├─ Business Analytics MCP Server (5 tools)                         │    │
-│  │ │   ├─ analyze_yoy_performance (前年比分析)                        │    │
-│  │ │   ├─ analyze_rfm_segments (顧客RFM)                              │    │
-│  │ │   ├─ analyze_inventory (在庫最適化)                              │    │
-│  │ │   ├─ analyze_seasonal_trends (季節トレンド)                      │    │
-│  │ │   └─ analyze_regional_performance (地域分析)                     │    │
+│  │ ├─ Business Analytics MCP Server (16 tools / 4 categories)          │    │
+│  │ │   ├─ 売上分析 (5): calculate_yoy_growth 等                       │    │
+│  │ │   ├─ 顧客分析 (4): calculate_rfm_score 等                       │    │
+│  │ │   ├─ 在庫分析 (3): calculate_inventory_turnover 等               │    │
+│  │ │   └─ 製品比較 (4): compare_products 等                           │    │
 │  │ └─ Azure OpenAI API                                                │    │
 │  └─────────────────────────────────────────────────────────────────────┘    │
 └──────────────────────────────────┬──────────────────────────────────────────┘
@@ -162,7 +178,7 @@ var tags = {
 │  │ │   ├─ SQL Tool → Fabric SQL Database                              │    │
 │  │ │   ├─ Doc Tool → Foundry IQ (Agentic Retrieval)                  │    │
 │  │ │   ├─ Web Tool → Bing Grounding                                   │    │
-│  │ │   └─ MCP Tools → Business Analytics (5 tools)                   │    │
+│  │ │   └─ MCP Tools → Business Analytics (16 tools)                  │    │
 │  │ ├─ Workflow Orchestration                                           │    │
 │  │ │   ├─ HandoffBuilder (専門家委譲)                                 │    │
 │  │ │   └─ MagenticBuilder (マネージャー統合)                          │    │

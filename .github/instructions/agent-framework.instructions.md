@@ -7,7 +7,7 @@ applyTo: "src/**/*agent*.{py,cs},src/**/*tool*.{py,cs}"
 ## ChatAgent パターン
 
 ```python
-from agent_framework import ChatAgent, ai_function
+from agent_framework import ChatAgent, tool
 from agent_framework.azure import AzureOpenAIResponsesClient
 from azure.identity import DefaultAzureCredential
 
@@ -25,14 +25,14 @@ class SalesAnalystAgent(ChatAgent):
             model="gpt-4o"
         )
 
-    @ai_function
+    @tool(approval_mode="never_require")
     async def query_sales(self, query: str) -> str:
         """Fabricの売上データをクエリする"""
         # SQL Database in Fabric への接続
         result = await self.execute_fabric_query(query)
         return result
 
-    @ai_function
+    @tool(approval_mode="never_require")
     async def get_top_products(self, limit: int = 10) -> str:
         """トップ製品を取得する"""
         sql = f"SELECT TOP {limit} * FROM products ORDER BY sales DESC"

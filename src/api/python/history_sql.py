@@ -4,7 +4,7 @@ import logging
 import os
 import struct
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -15,7 +15,6 @@ from agent_framework.exceptions import ServiceResponseException
 from azure.ai.projects.aio import AIProjectClient
 from azure.identity.aio import AzureCliCredential
 from azure.monitor.events.extension import track_event
-from azure.monitor.opentelemetry import configure_azure_monitor
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
 from opentelemetry import trace
@@ -31,19 +30,7 @@ router = APIRouter()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Check if the Application Insights Instrumentation Key is set in the environment variables
-instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-if instrumentation_key:
-    # Configure Application Insights if the Instrumentation Key is found
-    configure_azure_monitor(connection_string=instrumentation_key)
-    logging.info(
-        "Historyfab API: Application Insights configured with the provided Instrumentation Key"
-    )
-else:
-    # Log a warning if the Instrumentation Key is not found
-    logging.warning(
-        "Historyfab API: No Application Insights Instrumentation Key found. Skipping configuration"
-    )
+# Note: Application Insights is configured in app.py (single initialization point)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -452,7 +439,7 @@ async def delete_conversation(user_id: str, conversation_id: str) -> bool:
             query_m = "DELETE FROM hst_conversations where userId = ?  and conversation_id = ?"
             await run_nonquery_params(query_m, params)
         else:
-            params = conversation_id
+            params = (conversation_id,)
             # Delete associated messages first (if applicable)
             query_m = "DELETE FROM hst_conversation_messages where conversation_id = ?"
             await run_nonquery_params(query_m, params)
@@ -705,7 +692,7 @@ async def create_conversation(user_id, title="", conversation_id=None):
         if existing_conversation and len(existing_conversation) > 0:
             return existing_conversation
 
-        utc_now = datetime.utcnow().isoformat()
+        utc_now = datetime.now(UTC).isoformat()
         query = "INSERT INTO hst_conversations (userId, conversation_id, title, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)"
         params = (user_id, conversation_id, title, utc_now, utc_now)
         resp = await run_nonquery_params(query, params)
@@ -747,7 +734,7 @@ async def create_message(uuid, conversation_id, user_id, input_message: dict):
             logger.error("Conversation not found for ID: %s", conversation_id)
             return None
 
-        utc_now = datetime.utcnow().isoformat()
+        utc_now = datetime.now(UTC).isoformat()
         feedback = ""
 
         # Extract citations from input_message

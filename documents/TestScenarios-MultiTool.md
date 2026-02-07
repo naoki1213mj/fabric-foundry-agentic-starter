@@ -29,13 +29,23 @@
 │  └─────────────────────┘  └─────────────────────┘  └─────────────────────┘                 │
 │                                                                                              │
 │  ┌─────────────────────────────────────────────────────────────────────────────────────┐    │
-│  │  MCP Tools (5 Business Analytics Tools)                                             │    │
+│  │  MCP Tools (16 Business Analytics Tools / 4 Categories)                             │    │
 │  │                                                                                      │    │
-│  │  analyze_yoy_performance    - 前年同期比成長率分析                                  │    │
-│  │  analyze_rfm_segments       - 顧客RFMセグメンテーション                             │    │
-│  │  analyze_inventory          - 在庫最適化分析（回転率・発注点・滞留）                │    │
-│  │  analyze_seasonal_trends    - 季節性トレンド分析                                    │    │
-│  │  analyze_regional_performance - 地域別パフォーマンス分析                            │    │
+│  │  売上分析 (5):                                                                      │    │
+│  │  calculate_yoy_growth / calculate_mom_growth / calculate_moving_average              │    │
+│  │  calculate_abc_analysis / calculate_sales_forecast                                  │    │
+│  │                                                                                      │    │
+│  │  顧客分析 (4):                                                                      │    │
+│  │  calculate_rfm_score / classify_customer_segment / calculate_clv                    │    │
+│  │  recommend_next_action                                                              │    │
+│  │                                                                                      │    │
+│  │  在庫分析 (3):                                                                      │    │
+│  │  calculate_inventory_turnover / calculate_reorder_point                              │    │
+│  │  identify_slow_moving_inventory                                                      │    │
+│  │                                                                                      │    │
+│  │  製品比較 (4):                                                                      │    │
+│  │  compare_products / calculate_price_performance / suggest_alternatives               │    │
+│  │  calculate_bundle_discount                                                          │    │
 │  └─────────────────────────────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -167,11 +177,11 @@ EUの最新自転車安全規制（EN規格）についてWeb検索して、
 
 1. `run_sql_query`: 2025年1月の売上サマリー
 2. `run_sql_query`: 2024年1月の売上サマリー（比較用）
-3. `analyze_yoy_performance`: 前年比成長率計算
+3. `calculate_yoy_growth`: 前年比成長率計算
 4. `run_sql_query`: 顧客購買データ
-5. `analyze_rfm_segments`: RFMセグメント分析
+5. `calculate_rfm_score`: RFMセグメント分析
 6. `run_sql_query`: 在庫データ
-7. `analyze_inventory`: 在庫回転率分析
+7. `calculate_inventory_turnover`: 在庫回転率分析
 
 **期待される回答内容**:
 
@@ -281,14 +291,14 @@ Mountain Bikeカテゴリの売上トップ3製品について、
 
 1. `run_sql_query`: 月次売上・利益データ
 2. `run_sql_query`: 前年同月データ（比較用）
-3. `analyze_yoy_performance`: 前年比計算
+3. `calculate_yoy_growth`: 前年比計算
 4. `run_sql_query`: カテゴリ別売上
-5. MCP計算: ABC分析（売上パレート）
+5. `calculate_abc_analysis`: ABC分析（売上パレート）
 6. `run_sql_query`: 顧客購買データ
-7. `analyze_rfm_segments`: RFMセグメント
-8. MCP計算: CLV計算
+7. `calculate_rfm_score`: RFMセグメント
+8. `calculate_clv`: CLV計算
 9. `run_sql_query`: 在庫データ
-10. `analyze_inventory`: 在庫回転率・発注点
+10. `calculate_inventory_turnover`: 在庫回転率・発注点
 11. `search_documents`: 主力製品仕様
 12. `search_web`: "bicycle industry trends 2025"
 13. `search_web`: "bicycle market competitors analysis"
@@ -406,8 +416,8 @@ Mountain Bikeカテゴリの売上トップ3製品について、
 **期待される処理フロー**:
 
 1. `run_sql_query`: 地域別・月別売上データ（24ヶ月）
-2. `analyze_regional_performance`: 地域別KPI計算
-3. `analyze_seasonal_trends`: 季節性指数計算
+2. `calculate_yoy_growth`: 地域別KPI計算
+3. `calculate_moving_average`: 季節性指数計算
 4. クロス分析（地域×季節）
 
 **期待される回答内容**:
@@ -436,7 +446,7 @@ VIP顧客（年間購入額上位10名）について、
 **期待される処理フロー**:
 
 1. `run_sql_query`: VIP顧客TOP10と購買履歴
-2. `analyze_rfm_segments`: RFMスコア計算
+2. `calculate_rfm_score`: RFMスコア計算
 3. `run_sql_query`: 各顧客の購入製品一覧
 4. `search_documents`: 購入製品の仕様
 5. `search_documents`: 関連製品・上位モデルの仕様
@@ -497,7 +507,7 @@ VIP顧客（年間購入額上位10名）について、
 ユーザー: 在庫回転率が低い製品を特定して
 ```
 
-→ `run_sql_query` + `analyze_inventory`
+→ `run_sql_query` + `identify_slow_moving_inventory`
 
 **ターン2**:
 

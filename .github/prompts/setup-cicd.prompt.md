@@ -21,7 +21,7 @@ GitHub Actions + Azure OIDC認証でCI/CDパイプラインをセットアップ
 az login
 
 # アプリ登録を作成
-az ad app create --display-name "hackathon-github-oidc"
+az ad app create --display-name "github-oidc"
 
 # 出力されるappIdを記録
 APP_ID="<出力されたappId>"
@@ -92,7 +92,7 @@ GitHubリポジトリの Settings > Secrets and variables > Actions > Variables 
 
 | Name | Value | 取得コマンド |
 |------|-------|-------------|
-| `AZURE_CLIENT_ID` | `<APP_ID>` | `az ad app list --display-name "hackathon-github-oidc" --query "[0].appId" -o tsv` |
+| `AZURE_CLIENT_ID` | `<APP_ID>` | `az ad app list --display-name "github-oidc" --query "[0].appId" -o tsv` |
 | `AZURE_TENANT_ID` | `<TENANT_ID>` | `az account show --query tenantId -o tsv` |
 | `AZURE_SUBSCRIPTION_ID` | `<SUBSCRIPTION_ID>` | `az account show --query id -o tsv` |
 

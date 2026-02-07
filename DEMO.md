@@ -1,6 +1,6 @@
-# DEMO.md - 10分デモ台本
+# DEMO.md - デモ台本
 
-> **Mission**: TDM を10分で納得させる「Why Microsoft, Why Now」デモ
+> **Mission**: Agentic AI × 統合データ基盤の価値を10分で体感してもらう
 
 ---
 
@@ -150,13 +150,15 @@ Agent: 「Adventure Works Touring Bike の仕様です：
 
 **話しながらデモ**:
 > 「これが **Agentic Retrieval（Foundry IQ）** です。
-> 
+>
 > UI左側の **Doc Search (Foundry IQ)** ドロップダウンで
 > Reasoning Effort を選択できます：
+>
+>
 > - **Minimal**: 高速・直接検索（LLMなし）
 > - **Low**: シングルパス推論（バランス型、推奨）
-> - **Medium**: 反復検索（最高品質）
-> 
+>- **Medium**: 反復検索（最高品質）
+>
 > LLMがクエリを分解・最適化し、
 > Azure AI Search の Knowledge Base から
 > 最適な結果を取得しています。

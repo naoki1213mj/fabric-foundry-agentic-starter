@@ -13,7 +13,7 @@ param appServicePlanId string
 param appImageName string
 param userassignedIdentityId string = ''
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
+resource appService 'Microsoft.Web/sites@2022-09-01' = {
   name: solutionName
   location: solutionLocation
   identity: userassignedIdentityId == '' ? {
@@ -23,12 +23,14 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
     userAssignedIdentities: {
       '${userassignedIdentityId}': {}
     }
-  }  
+  }
   properties: {
     serverFarmId: appServicePlanId
+    httpsOnly: true
     siteConfig: {
       alwaysOn: true
       ftpsState: 'Disabled'
+      minTlsVersion: '1.2'
       linuxFxVersion: appImageName
     }
   }
@@ -68,4 +70,3 @@ resource configLogs 'Microsoft.Web/sites/config@2022-03-01' = {
 
 output identityPrincipalId string = appService.identity.principalId
 output appUrl string = 'https://${solutionName}.azurewebsites.net'
-

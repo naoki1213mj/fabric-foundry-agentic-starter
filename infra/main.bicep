@@ -106,7 +106,7 @@ param aiDeploymentsLocation string
 param enableApimGateway bool = false
 
 @description('Publisher email for APIM (required when enableApimGateway is true)')
-param apimPublisherEmail string = 'hackathon@contoso.com'
+param apimPublisherEmail string = 'admin@contoso.com'
 
 // ========== Fabric SQL Database Parameters ========== //
 @description('Fabric SQL Database Server (format: servername.database.fabric.microsoft.com,1433)')
@@ -130,7 +130,7 @@ param aiSearchKnowledgeBaseName string = ''
 param aiSearchReasoningEffort string = 'low'
 
 @description('Publisher name for APIM (required when enableApimGateway is true)')
-param apimPublisherName string = 'Agentic AI Hackathon'
+param apimPublisherName string = 'Agentic AI PoC'
 
 @description('MCP Server endpoint URL (Azure Functions)')
 param mcpServerEndpoint string = ''

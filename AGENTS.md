@@ -2,7 +2,7 @@
 
 ## ミッション
 
-**Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI アプリで、TDM を10分で納得させる**
+**Microsoft Fabric + Foundry + Agent Framework を活用した Agentic AI の PoC スターターキット & リファレンスアーキテクチャ**
 
 ## Solution Accelerator をベースにカスタマイズ
 
@@ -279,14 +279,15 @@ python <script.py>
 
 **Copilotへの指示**: ログ取得時は `.debug_logs/` に直接保存してください。
 
-## 審査基準
+## PoC 訴求ポイント
 
-| 基準 | 対応 |
-|------|------|
-| Why Microsoft | Fabric + Foundry + Agent Framework |
-| Why Now | Agent Framework GA + Guardrails |
-| 技術統合 | 5領域カバー |
-| ACR | Fabric F4 + OpenAI PTU/従量課金 |
+| 訴求点 | 説明 |
+|--------|------|
+| Why Microsoft | Fabric + Foundry + Agent Framework の統合データ基盤 |
+| Why Now | Agent Framework GA + Guardrails で本番品質が実現 |
+| 即時 PoC | azd up 一発でエンドツーエンド環境構築 |
+| 業界横展開 | プロンプト・スキーマ・ツール差替えで容易にカスタマイズ |
+| エンタープライズ | Guardrails + APIM + App Insights で運用品質 |
 
 ---
 
@@ -378,7 +379,7 @@ AZURE_OPENAI_DEPLOYMENT_MODEL=gpt-5
 
 | API | 説明 |
 |-----|------|
-| Business Analytics MCP Server | 5つのビジネス分析ツール (YoY, RFM等) |
+| Business Analytics MCP Server | 16ツール / 4カテゴリ (売上5, 顧客4, 在庫3, 製品4) |
 | Azure OpenAI API | Chat Completions, Embeddings |
 
 ### エンドポイント
@@ -449,3 +450,68 @@ AI_SEARCH_REASONING_EFFORT=low
 FABRIC_SQL_DATABASE=retail_sqldatabase_daj6dri4yf3k3z-c9a4f960-6dfe-4e75-8ef6-ac9ef3f35e44
 FABRIC_SQL_SERVER=l3mc2ebyyfwejehdghpbjlhnw4-moiagz2ftahudlx3khcgjqxfqa.database.fabric.microsoft.com,1433
 ```
+
+---
+
+## 📝 開発ログ運用ルール（重要）
+
+### 概要
+
+開発セッションごとのログを `.dev-logs/` フォルダに保存し、次回セッションで参照します。
+これにより、開発の経緯・意図・決定事項が蓄積され、同じ調査や試行錯誤を繰り返しません。
+
+### フォルダ構成
+
+```
+.dev-logs/
+├── README.md                    # 運用ルール
+├── project-understanding.md     # プロジェクト全体の理解（随時更新）
+└── sessions/                    # セッションごとのログ
+    ├── 2026-02-07_initial-review.md
+    └── YYYY-MM-DD_session-name.md
+```
+
+### Copilot Agent への指示
+
+**セッション開始時（必須）:**
+
+1. `.dev-logs/project-understanding.md` を読んでプロジェクト全体を把握
+2. `.dev-logs/sessions/` の最新ログを読んで直近の作業を確認
+3. 前回の申し送り事項を確認
+
+**セッション中:**
+
+- 重要な変更・決定・問題をメモ（セッションログに反映するため）
+- 大きな技術決定があれば `project-understanding.md` も更新
+
+**セッション終了時（必須）:**
+
+1. `.dev-logs/sessions/YYYY-MM-DD_session-name.md` にセッションログを保存
+2. 内容: 実施内容、変更ファイル、発見・気づき、次回への申し送り
+3. 重要な変更があれば `project-understanding.md` を更新
+
+### ログのテンプレート
+
+```markdown
+# セッションログ: YYYY-MM-DD セッション名
+
+## セッション情報
+- **日時**: YYYY-MM-DD
+- **目的**: セッションの目的
+
+## 実施内容
+- 何をしたか
+
+## 変更ファイル
+- ファイルパスと変更概要
+
+## 発見・気づき
+- 重要な発見
+
+## 次回への申し送り
+- 引き継ぎ事項
+```
+
+**やってはいけないこと:**
+- セッションログを書かずに終了する
+- `project-understanding.md` を読まずに作業を開始する

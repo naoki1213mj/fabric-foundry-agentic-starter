@@ -31,7 +31,7 @@ applyTo: "**/.github/workflows/*.yml,**/azure.yaml,**/*.bicep"
 az login
 
 # アプリ登録を作成
-az ad app create --display-name "hackathon-github-oidc"
+az ad app create --display-name "github-oidc"
 
 # 出力されたappIdを記録
 APP_ID="<出力されたappId>"

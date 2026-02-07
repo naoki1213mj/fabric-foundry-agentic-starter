@@ -53,6 +53,9 @@ src/api/python/acr-build/
 multi_*
 *.zip
 
+# 開発ログ（ローカル専用、Git管理外）
+.dev-logs/
+
 # 一時ファイル・デバッグ用
 temp_*.json
 temp_*.txt

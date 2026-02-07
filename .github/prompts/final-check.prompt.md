@@ -15,18 +15,18 @@ curl $API_ENDPOINT/health
 curl $FRONTEND_ENDPOINT
 ```
 
-## 2. 審査基準確認
+## 2. 訴求ポイント確認
 
-| 基準 | 確認事項 | チェック |
-|------|----------|----------|
+| ポイント | 確認事項 | チェック |
+|----------|----------|----------|
 | Why MS | Fabric + Foundry + Agent Framework | [ ] |
 | Why Now | Agent Framework GA / Guardrails | [ ] |
 | 統合 | AI + Data + Infra + Security + GitHub | [ ] |
-| ACR | Fabric F2 + OpenAI 従量課金 | [ ] |
+| 即時 PoC | azd up 一発でエンドツーエンド環境構築 | [ ] |
 
 ## 3. デモシナリオ
 
-- [ ] 30秒ピッチ暗記
+- [ ] デモシナリオ確認
 - [ ] 自然言語クエリのデモ
 - [ ] Guardrails発動デモ
 - [ ] DEMO_MODE確認
