@@ -1,37 +1,20 @@
-###############################################################################
-# Stage 1: Build — install Python dependencies with build tools
-###############################################################################
-FROM python:3.12-alpine AS builder
+FROM python:3.12-alpine
 
-# Install build-only system dependencies
+# Install system dependencies required for building and running the application
 RUN apk add --no-cache --virtual .build-deps \
     build-base \
     libffi-dev \
     openssl-dev \
     unixodbc-dev \
-    git
+    git \
+    gnupg
 
-WORKDIR /build
-
-# Copy only the requirements file first to leverage Docker layer caching
-COPY ./requirements.txt .
-
-# Install Python dependencies into a target directory for clean copy
-RUN pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir --pre --target /build/deps -r requirements.txt
-
-###############################################################################
-# Stage 2: Runtime — minimal image with only runtime dependencies
-###############################################################################
-FROM python:3.12-alpine
-
-# Install runtime-only system dependencies
+# Install runtime dependencies that must persist after build-deps removal
 RUN apk add --no-cache \
     curl \
     unixodbc \
     libffi \
-    libstdc++ \
-    gnupg
+    libstdc++
 
 # Download and install Microsoft ODBC Driver 18 and MSSQL tools
 RUN curl -O https://download.microsoft.com/download/fae28b9a-d880-42fd-9b98-d779f0fdd77f/msodbcsql18_18.5.1.1-1_amd64.apk \
@@ -39,14 +22,21 @@ RUN curl -O https://download.microsoft.com/download/fae28b9a-d880-42fd-9b98-d779
     && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --import - 2>/dev/null \
     && apk add --allow-untrusted msodbcsql18_18.5.1.1-1_amd64.apk \
     && apk add --allow-untrusted mssql-tools18_18.4.1.1-1_amd64.apk \
-    && rm msodbcsql18_18.5.1.1-1_amd64.apk mssql-tools18_18.4.1.1-1_amd64.apk \
-    && apk del gnupg
+    && rm msodbcsql18_18.5.1.1-1_amd64.apk mssql-tools18_18.4.1.1-1_amd64.apk
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy Python dependencies from builder stage
-COPY --from=builder /build/deps /usr/local/lib/python3.12/site-packages/
+# Copy only the requirements file first to leverage Docker layer caching
+COPY ./requirements.txt .
+
+# Install Python dependencies (--pre flag enables prerelease packages like azure-ai-agents)
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir --pre -r requirements.txt \
+    && rm -rf /root/.cache
+
+# Remove build dependencies to reduce image size
+RUN apk del .build-deps gnupg
 
 # Create non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
