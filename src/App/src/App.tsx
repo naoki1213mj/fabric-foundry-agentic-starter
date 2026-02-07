@@ -25,6 +25,7 @@ import {
 import { clearChat, setMessages } from "./store/chatSlice";
 import { clearCitation } from "./store/citationSlice";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
+import type { Conversation } from "./types/AppTypes";
 
 // Preload Chart.js for faster chart rendering (non-blocking)
 import("chart.js").catch(() => { /* ignore preload errors */ });
@@ -134,7 +135,7 @@ const Dashboard: React.FC = () => {
       .unwrap()
       .then((res) => {
         const displayName: string =
-          res[0]?.user_claims?.find((claim: any) => claim.typ === "name")?.val ?? "";
+          res[0]?.user_claims?.find((claim: { typ: string; val: string }) => claim.typ === "name")?.val ?? "";
         setName(displayName);
       })
       .catch(() => {
@@ -189,7 +190,7 @@ const Dashboard: React.FC = () => {
     isInitialFetchStarted.current = true;
     const result = await dispatch(fetchChatHistory(offset));
     if (result.payload) {
-      const payload = result.payload as { conversations: any[] | null; offset: number };
+      const payload = result.payload as { conversations: Conversation[] | null; offset: number };
       const conversations = payload.conversations;
       if (conversations && conversations.length === OFFSET_INCREMENT) {
         setOffset((offset) => (offset += OFFSET_INCREMENT));

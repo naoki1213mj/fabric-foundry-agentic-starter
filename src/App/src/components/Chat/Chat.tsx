@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ListImperativeAPI } from "react-window";
 import {
-  setSelectedConversationId,
-  startNewConversation,
+    setSelectedConversationId,
+    startNewConversation,
 } from "../../store/appSlice";
 import { fetchConversationMessages } from "../../store/chatHistorySlice";
 import {
-  clearChat,
-  setMessages,
-  setUserMessage as setUserMessageAction,
+    clearChat,
+    setMessages,
+    setUserMessage as setUserMessageAction,
 } from "../../store/chatSlice";
 import { clearCitation } from "../../store/citationSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  type AgentMode,
-  type ModelReasoningEffort,
-  type ModelType,
-  type ReasoningEffort,
-  type ReasoningSummary,
-  type ToolEvent
+    type AgentMode,
+    type Citation,
+    type ModelReasoningEffort,
+    type ModelType,
+    type ReasoningEffort,
+    type ReasoningSummary,
+    type ToolEvent
 } from "../../types/AppTypes";
 import "./Chat.css";
 import { ChatHeader } from "./ChatHeader";
@@ -207,13 +208,13 @@ const Chat: React.FC<ChatProps> = ({
   }, [sendChatMessageRaw, enableAutoScroll]);
 
   // Citation parser - handles both legacy and new formats
-  const parseCitationFromMessage = useCallback((citations: any) => {
+  const parseCitationFromMessage = useCallback((citations: string | Citation[] | undefined): Citation[] => {
     if (!citations) return [];
 
     try {
       // If citations is already an array, use it directly
       if (Array.isArray(citations)) {
-        return citations.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+        return citations.filter((c: Citation) => c?.url?.trim() || c?.title?.trim());
       }
 
       // If citations is a JSON string, parse it
@@ -221,12 +222,12 @@ const Chat: React.FC<ChatProps> = ({
         // Try parsing as a JSON array (new format: "[{...}, {...}]")
         const parsed = JSON.parse(citations);
         if (Array.isArray(parsed)) {
-          return parsed.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+          return parsed.filter((c: Citation) => c?.url?.trim() || c?.title?.trim());
         }
 
         // Legacy format: "citations": [...] inside a larger object
         if (parsed?.citations && Array.isArray(parsed.citations)) {
-          return parsed.citations.filter((c: any) => c?.url?.trim() || c?.title?.trim());
+          return parsed.citations.filter((c: Citation) => c?.url?.trim() || c?.title?.trim());
         }
       }
     } catch {

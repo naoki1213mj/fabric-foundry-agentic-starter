@@ -1,5 +1,5 @@
 import i18n from "../i18n";
-import { Conversation } from "../types/AppTypes";
+import { type ChartConfigItem, Conversation } from "../types/AppTypes";
 
 export const colors: { [key: string]: string } = {
   positive: "#6576F9",
@@ -43,7 +43,7 @@ export const getNormalizedHeight = (height: number) => {
 };
 
 export const getGridStyles = (
-  chartsList: any,
+  chartsList: ChartConfigItem[],
   widgetsGapInPercentage: number
 ) => {
   const styles: {
@@ -67,7 +67,7 @@ export const getGridStyles = (
       }
       if (isWidthExists) {
         const sortedCharts = [...chartsList].sort(
-          (a, b) => a?.layout?.column - b?.layout?.column
+          (a, b) => (a?.layout?.column ?? 0) - (b?.layout?.column ?? 0)
         );
         const value = sortedCharts.reduce(
           (acc, current) =>
@@ -76,7 +76,7 @@ export const getGridStyles = (
             getCustomWidgetsWidth(
               sortedCharts.length,
               widgetsGapInPercentage,
-              current?.layout?.width
+              current?.layout?.width ? parseFloat(current.layout.width) : undefined
             ) +
             "% ",
           ""
@@ -88,7 +88,7 @@ export const getGridStyles = (
       );
       if (heightValObj) {
         styles.gridTemplateRows =
-          getNormalizedHeight(heightValObj?.layout?.height) + "vh";
+          getNormalizedHeight(heightValObj?.layout?.height ?? 50) + "vh";
       }
       return styles;
     }

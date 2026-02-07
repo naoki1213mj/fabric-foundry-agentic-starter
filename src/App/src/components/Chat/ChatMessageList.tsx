@@ -8,7 +8,7 @@ import {
     type ListImperativeAPI,
     type RowComponentProps,
 } from "react-window";
-import type { ChatMessage, ToolEvent } from "../../types/AppTypes";
+import type { ChatMessage, Citation, ToolEvent } from "../../types/AppTypes";
 import ChatMessageComponent from "../ChatMessage/ChatMessage";
 import { ReasoningIndicator } from "../ReasoningIndicator";
 import { MessageSkeleton, ThinkingSkeleton } from "../SkeletonLoader";
@@ -28,7 +28,7 @@ interface ChatMessageListProps {
   isChartLoading: boolean;
   toolEvents: ToolEvent[];
   reasoningContent: string;  // Concatenated reasoning text (streaming delta)
-  parseCitationFromMessage: (citations: any) => any[];
+  parseCitationFromMessage: (citations: string | Citation[] | undefined) => Citation[];
   chatMessageStreamEndRef: React.RefObject<HTMLDivElement>;
   containerRef?: React.MutableRefObject<HTMLDivElement | null>;
   listApiRef?: React.MutableRefObject<ListImperativeAPI | null>;
@@ -50,7 +50,7 @@ type ChatRowProps = {
   items: VirtualItem[];
   lastAssistantIndex: number;
   generatingResponse: boolean;
-  parseCitationFromMessage: (citations: any) => any[];
+  parseCitationFromMessage: (citations: string | Citation[] | undefined) => Citation[];
   onEditUserMessage?: (content: string) => void;
   onResendUserMessage?: (content: string) => void;
   reasoningContent: string;

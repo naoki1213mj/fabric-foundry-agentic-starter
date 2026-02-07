@@ -91,7 +91,7 @@ export const ChatHistoryListItemCell: React.FC<
     }
   };
 
-  const onEdit = (e: any) => {
+  const onEdit = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
     e.preventDefault();
     e.stopPropagation();
     setEdit(true);
@@ -99,11 +99,11 @@ export const ChatHistoryListItemCell: React.FC<
     setEditTitle(item?.title);
   };
 
-  const handleSelectItem = (e: any) => {
+  const handleSelectItem = (e: React.SyntheticEvent) => {
     if (isSelected) {
       return;
     }
-    if (e?.target?.tagName === "INPUT") {
+    if ((e?.target as HTMLElement)?.tagName === "INPUT") {
       e.preventDefault();
       e.stopPropagation();
     } else {
@@ -114,7 +114,7 @@ export const ChatHistoryListItemCell: React.FC<
   const truncatedTitleText = truncateTitle(item?.title);
   const timestamp = formatTimestamp(item?.updatedAt || item?.date);
 
-  const handleSaveEdit = async (e: any) => {
+  const handleSaveEdit = async (e: { preventDefault: () => void; stopPropagation: () => void }) => {
     e.preventDefault();
     e.stopPropagation();
     if (errorRename || renameLoading || editTitle.trim() === "") {
@@ -145,18 +145,18 @@ export const ChatHistoryListItemCell: React.FC<
     }
   };
 
-  const chatHistoryTitleOnChange = (e: any) => {
-    setEditTitle(e.target.value);
+  const chatHistoryTitleOnChange = (_e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+    setEditTitle(newValue ?? '');
   };
 
-  const cancelEditTitle = (e: any) => {
+  const cancelEditTitle = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
     e.preventDefault();
     e.stopPropagation();
     setEdit(false);
     setEditTitle("");
   };
 
-  const handleKeyPressEdit = (e: any) => {
+  const handleKeyPressEdit = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       return handleSaveEdit(e);
     }

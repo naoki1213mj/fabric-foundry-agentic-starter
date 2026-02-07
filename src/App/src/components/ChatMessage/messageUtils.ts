@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import type { ChartObject, Citation } from '../../types/AppTypes';
 
 /**
  * Ensure a date string is treated as UTC.
@@ -48,9 +49,9 @@ export const looksLikeChartJson = (content: string): boolean => {
 /**
  * Helper function to deduplicate charts based on their data
  */
-export const deduplicateCharts = (charts: any[]): any[] => {
+export const deduplicateCharts = (charts: ChartObject[]): ChartObject[] => {
   const seen = new Set<string>();
-  const unique: any[] = [];
+  const unique: ChartObject[] = [];
 
   for (const chart of charts) {
     let signature = '';
@@ -58,7 +59,7 @@ export const deduplicateCharts = (charts: any[]): any[] => {
       const type = chart.type || chart.chartType || '';
       const labels = chart.data?.labels?.join(',') || '';
       const firstDataset = chart.data?.datasets?.[0];
-      const dataValues = firstDataset?.data?.join(',') || '';
+      const dataValues = firstDataset && Array.isArray(firstDataset.data) ? (firstDataset.data as unknown[]).join(',') : '';
       signature = type + '|' + labels + '|' + dataValues;
     } catch {
       signature = JSON.stringify(chart);
@@ -113,13 +114,13 @@ export const extractTextExcludingChart = (content: string): string => {
  * Unwrap {"charts": [...]} wrapper into individual chart objects.
  * Also handles nested wrappers inside code blocks or raw JSON.
  */
-const unwrapChartsArray = (jsonStr: string): any[] | null => {
+const unwrapChartsArray = (jsonStr: string): ChartObject[] | null => {
   try {
     const parsed = JSON.parse(jsonStr);
     if (parsed && typeof parsed === 'object' && 'charts' in parsed && Array.isArray(parsed.charts)) {
       return parsed.charts.filter(
-        (c: any) => c && typeof c === 'object' && ('type' in c || 'chartType' in c) && 'data' in c
-      );
+        (c: unknown) => c && typeof c === 'object' && ('type' in (c as Record<string, unknown>) || 'chartType' in (c as Record<string, unknown>)) && 'data' in (c as Record<string, unknown>)
+      ) as ChartObject[];
     }
   } catch {
     // Not valid JSON or not a charts wrapper
@@ -130,8 +131,8 @@ const unwrapChartsArray = (jsonStr: string): any[] | null => {
 /**
  * Extract Chart.js JSON(s) from mixed text/JSON content
  */
-export const extractChartsFromText = (content: string): { textPart: string; charts: any[] } => {
-  const charts: any[] = [];
+export const extractChartsFromText = (content: string): { textPart: string; charts: ChartObject[] } => {
+  const charts: ChartObject[] = [];
   let textPart = content;
 
   // STEP 0: Try to detect {"charts": [...]} wrapper in code blocks or raw JSON
@@ -149,7 +150,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
   if (charts.length === 0) {
     const chartsKeyPattern = /\{\s*"charts"\s*:\s*\[/g;
     let rawMatch;
-    const wrapperPositions: { start: number; end: number; charts: any[] }[] = [];
+    const wrapperPositions: { start: number; end: number; charts: ChartObject[] }[] = [];
     while ((rawMatch = chartsKeyPattern.exec(content)) !== null) {
       let braceCount = 0;
       let endIndex = -1;
@@ -182,7 +183,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
   // STEP 1: First try to extract from Markdown code blocks (```json ... ```)
   const codeBlockPattern = /```json\s*([\s\S]*?)```/g;
   let codeBlockMatch;
-  const codeBlockPositions: { start: number; end: number; json: any }[] = [];
+  const codeBlockPositions: { start: number; end: number; json: ChartObject }[] = [];
 
   while ((codeBlockMatch = codeBlockPattern.exec(content)) !== null) {
     const jsonStr = codeBlockMatch[1].trim();
@@ -214,7 +215,7 @@ export const extractChartsFromText = (content: string): { textPart: string; char
 
   // STEP 2: Fallback - Find raw JSON using bracket counting
   const chartTypePattern = /\{\s*"type"\s*:\s*"(bar|pie|line|doughnut|horizontalBar|radar|polarArea|scatter|bubble)"/g;
-  const jsonPositions: { start: number; end: number; json: any }[] = [];
+  const jsonPositions: { start: number; end: number; json: ChartObject }[] = [];
 
   let match;
   while ((match = chartTypePattern.exec(content)) !== null) {
@@ -293,7 +294,7 @@ export const convertLegacyCitationMarkers = (text: string): string => {
  * Matches [N] not already followed by ( (which would be [N](url)), and not
  * preceded by [ (which would be [[N]]).
  */
-export const linkInlineCitations = (text: string, citations: any[]): string => {
+export const linkInlineCitations = (text: string, citations: Citation[]): string => {
   if (!citations || citations.length === 0) return text;
 
   return text.replace(/(?<!\[)\[(\d+)\](?!\(|\])/g, (match, numStr) => {

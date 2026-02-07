@@ -1,8 +1,9 @@
 import {
     Chart as ChartJS,
+    registerables,
+    type ChartConfiguration,
     type ChartTypeRegistry,
     type Plugin,
-    registerables,
 } from "chart.js";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 
@@ -54,7 +55,7 @@ const backgroundPlugin: Plugin = {
   beforeDraw: (chart) => {
     const ctx = chart.ctx;
     const { width, height } = chart;
-    const bgColor = (chart.config.options as any)?._bgColor;
+    const bgColor = (chart.config.options as Record<string, unknown>)?._bgColor as string | undefined;
     if (bgColor) {
       ctx.save();
       ctx.fillStyle = bgColor;
@@ -82,8 +83,12 @@ ChartJS.register(...registerables, backgroundPlugin);
 
 interface ChartProps {
   chartContent: {
-    data: any;
-    options: any;
+    data: {
+      labels?: (string | number)[];
+      datasets?: Array<Record<string, unknown>>;
+      [key: string]: unknown;
+    };
+    options?: Record<string, unknown>;
     type: string;
   };
 }
@@ -107,8 +112,8 @@ const getChartDataSignature = (chartContent: ChartProps["chartContent"]): string
   try {
     const type = chartContent?.type || '';
     const labels = chartContent?.data?.labels?.join(',') || '';
-    const datasets = chartContent?.data?.datasets?.map((ds: any) =>
-      ds?.data?.join(',') || ''
+    const datasets = chartContent?.data?.datasets?.map((ds: Record<string, unknown>) =>
+      Array.isArray(ds?.data) ? (ds.data as unknown[]).join(',') : ''
     ).join('|') || '';
     return `${type}:${labels}:${datasets}`;
   } catch {
@@ -144,23 +149,27 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   const colors = getChartColors(themeMode);
 
   // Apply theme colors to all scales dynamically
-  const themedScales: Record<string, any> = {};
-  const originalScales = chartContent?.options?.scales || {};
+  const themedScales: Record<string, Record<string, unknown>> = {};
+  const originalScales = (chartContent?.options?.scales || {}) as Record<string, Record<string, unknown>>;
 
   // Process all scales (x, y, y1, y2, etc.)
   for (const scaleKey of Object.keys(originalScales)) {
+    const scale = originalScales[scaleKey];
+    const ticks = (scale?.ticks ?? {}) as Record<string, unknown>;
+    const grid = (scale?.grid ?? {}) as Record<string, unknown>;
+    const title = (scale?.title ?? {}) as Record<string, unknown>;
     themedScales[scaleKey] = {
-      ...originalScales[scaleKey],
+      ...scale,
       ticks: {
-        ...originalScales[scaleKey]?.ticks,
+        ...ticks,
         color: colors.textColor,
       },
       grid: {
-        ...originalScales[scaleKey]?.grid,
+        ...grid,
         color: colors.gridColor,
       },
       title: {
-        ...originalScales[scaleKey]?.title,
+        ...title,
         color: colors.textColor,
       },
     };
@@ -202,20 +211,20 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       // Dark mode support for text colors - apply to all scales
       scales: themedScales,
       plugins: {
-        ...chartContent?.options?.plugins,
+        ...((chartContent?.options?.plugins ?? {}) as Record<string, unknown>),
         legend: {
-          ...chartContent?.options?.plugins?.legend,
+          ...(((chartContent?.options?.plugins as Record<string, unknown>)?.legend ?? {}) as Record<string, unknown>),
           labels: {
-            ...chartContent?.options?.plugins?.legend?.labels,
+            ...((((chartContent?.options?.plugins as Record<string, unknown>)?.legend as Record<string, unknown>)?.labels ?? {}) as Record<string, unknown>),
             color: colors.legendColor,
           },
         },
         title: {
-          ...chartContent?.options?.plugins?.title,
+          ...(((chartContent?.options?.plugins as Record<string, unknown>)?.title ?? {}) as Record<string, unknown>),
           color: colors.textColor,
         },
         tooltip: {
-          ...chartContent?.options?.plugins?.tooltip,
+          ...(((chartContent?.options?.plugins as Record<string, unknown>)?.tooltip ?? {}) as Record<string, unknown>),
           backgroundColor: colors.tooltipBg,
           titleColor: colors.tooltipText,
           bodyColor: colors.tooltipText,
@@ -227,13 +236,13 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
   };
 
     // Restore tooltip callback if it’s missing or a string placeholder
-    const tooltipCallbacks =
-      chartConfigData.options?.plugins?.tooltip?.callbacks;
+    const plugins = chartConfigData.options?.plugins as Record<string, Record<string, unknown>> | undefined;
+    const tooltipCallbacks = plugins?.tooltip?.callbacks as Record<string, unknown> | undefined;
     const tooltipCb = tooltipCallbacks?.label;
 
     if (typeof tooltipCb !== "function") {
       if (tooltipCallbacks) {
-        tooltipCallbacks.label = (tooltipItem: any) => {
+        tooltipCallbacks.label = (tooltipItem: { label?: string; raw?: unknown }) => {
           try {
             const label = tooltipItem.label || "";
             const value =
@@ -248,7 +257,7 @@ const ChatChart: React.FC<ChartProps> = memo(({ chartContent }) => {
       }
     }
 
-    const myChart = new ChartJS(chartRefCurrent, chartConfigData);
+    const myChart = new ChartJS(chartRefCurrent, chartConfigData as unknown as ChartConfiguration);
     chartInstanceRef.current = myChart;
 
     const resizeObserver = new ResizeObserver(() => {

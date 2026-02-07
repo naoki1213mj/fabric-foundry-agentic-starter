@@ -7,9 +7,10 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { clearCitation } from '../../store/citationSlice';
 import { useAppDispatch } from '../../store/hooks';
+import type { Citation } from '../../types/AppTypes';
 import "./CitationPanel.css";
 interface Props {
-    activeCitation: any
+    activeCitation: Citation | null | undefined
 }
 
 const CitationPanel = memo(({ activeCitation }: Props) => {

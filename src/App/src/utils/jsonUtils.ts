@@ -10,22 +10,22 @@
 function removeKeyFromJSON(jsonString: string, keyToRemove: string): string {
   try {
     const obj = JSON.parse(jsonString);
-    
-    const removeKeyRecursive = (obj: any): any => {
+
+    const removeKeyRecursive = (obj: unknown): unknown => {
       if (Array.isArray(obj)) {
-        return obj.map((item: any) => removeKeyRecursive(item));
+        return obj.map((item: unknown) => removeKeyRecursive(item));
       } else if (obj !== null && typeof obj === 'object') {
-        const newObj: Record<string, any> = {};
+        const newObj: Record<string, unknown> = {};
         for (const key in obj) {
           if (obj.hasOwnProperty(key) && key !== keyToRemove) {
-            newObj[key] = removeKeyRecursive(obj[key]);
+            newObj[key] = removeKeyRecursive((obj as Record<string, unknown>)[key]);
           }
         }
         return newObj;
       }
       return obj;
     };
-    
+
     const result = removeKeyRecursive(obj);
     return JSON.stringify(result);
   } catch (error) {
@@ -41,7 +41,7 @@ function findMatchingBracket(str: string, startIndex: number): number {
   let depth = 0;
   const openBracket = str[startIndex];
   const closeBracket = openBracket === '{' ? '}' : ')';
-  
+
   for (let i = startIndex; i < str.length; i++) {
     if (str[i] === openBracket || (openBracket === '(' && str[i] === '{')) {
       depth++;
@@ -79,7 +79,7 @@ function sanitizeJSONString(jsonString: string): string {
     if (sanitized.startsWith('"{') && sanitized.endsWith('}"')) {
       sanitized = sanitized.slice(1, -1);
     }
-    
+
     // **STEP 3: ALWAYS unescape backslashes**
     sanitized = sanitized.replace(/\\"/g, '"');
     sanitized = sanitized.replace(/\\\\/g, '\\');
@@ -100,28 +100,28 @@ function sanitizeJSONString(jsonString: string): string {
     while (pos < sanitized.length) {
       const functionMatch = sanitized.substring(pos).match(/:\s*function\s*\w*\s*\(/);
       if (!functionMatch) break;
-      
+
       const functionStart = pos + functionMatch.index!;
       const parenStart = sanitized.indexOf('(', functionStart);
       if (parenStart === -1) break;
-      
+
       const parenEnd = findMatchingBracket(sanitized, parenStart);
       if (parenEnd === -1) break;
-      
+
       const braceStart = sanitized.indexOf('{', parenEnd);
       if (braceStart === -1 || braceStart > parenEnd + 10) {
         pos = parenEnd + 1;
         continue;
       }
-      
+
       const braceEnd = findMatchingBracket(sanitized, braceStart);
       if (braceEnd === -1) break;
-      
-      sanitized = 
-        sanitized.substring(0, functionStart) + 
-        ': "[Function]"' + 
+
+      sanitized =
+        sanitized.substring(0, functionStart) +
+        ': "[Function]"' +
         sanitized.substring(braceEnd + 1);
-      
+
       pos = functionStart + 13;
     }
 
@@ -130,19 +130,19 @@ function sanitizeJSONString(jsonString: string): string {
     while (pos < sanitized.length) {
       const arrowMatch = sanitized.substring(pos).match(/:\s*\([^)]*\)\s*=>\s*\{/);
       if (!arrowMatch) break;
-      
+
       const arrowStart = pos + arrowMatch.index!;
       const braceStart = sanitized.indexOf('{', arrowStart);
       if (braceStart === -1) break;
-      
+
       const braceEnd = findMatchingBracket(sanitized, braceStart);
       if (braceEnd === -1) break;
-      
-      sanitized = 
-        sanitized.substring(0, arrowStart) + 
-        ': "[Function]"' + 
+
+      sanitized =
+        sanitized.substring(0, arrowStart) +
+        ': "[Function]"' +
         sanitized.substring(braceEnd + 1);
-      
+
       pos = arrowStart + 13;
     }
 
@@ -151,33 +151,33 @@ function sanitizeJSONString(jsonString: string): string {
     while (pos < sanitized.length) {
       const funcMatch = sanitized.substring(pos).match(/\bfunction\s*\w*\s*\(/);
       if (!funcMatch) break;
-      
+
       const funcStart = pos + funcMatch.index!;
       if (funcStart > 0 && sanitized.substring(Math.max(0, funcStart - 10), funcStart).includes(':')) {
         pos = funcStart + 1;
         continue;
       }
-      
+
       const parenStart = sanitized.indexOf('(', funcStart);
       if (parenStart === -1) break;
-      
+
       const parenEnd = findMatchingBracket(sanitized, parenStart);
       if (parenEnd === -1) break;
-      
+
       const braceStart = sanitized.indexOf('{', parenEnd);
       if (braceStart === -1 || braceStart > parenEnd + 10) {
         pos = parenEnd + 1;
         continue;
       }
-      
+
       const braceEnd = findMatchingBracket(sanitized, braceStart);
       if (braceEnd === -1) break;
-      
-      sanitized = 
-        sanitized.substring(0, funcStart) + 
-        '"[Function]"' + 
+
+      sanitized =
+        sanitized.substring(0, funcStart) +
+        '"[Function]"' +
         sanitized.substring(braceEnd + 1);
-      
+
       pos = funcStart + 12;
     }
 
@@ -190,24 +190,24 @@ function sanitizeJSONString(jsonString: string): string {
     sanitized = sanitized.replace(/:\s*'([^']*)'/g, ': "$1"');
     sanitized = sanitized.replace(/,(\s*[}\]])/g, '$1');
     sanitized = sanitized.replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
-    
+
     // Count all brackets
     const openBraces = (sanitized.match(/\{/g) || []).length;
     const closeBraces = (sanitized.match(/\}/g) || []).length;
     const openBrackets = (sanitized.match(/\[/g) || []).length;
     const closeBrackets = (sanitized.match(/\]/g) || []).length;
-    
+
     // **AUTO-REPAIR: Add missing closing brackets**
     if (openBraces > closeBraces) {
       const missing = openBraces - closeBraces;
       sanitized += '}'.repeat(missing);
     }
-    
+
     if (openBrackets > closeBrackets) {
       const missing = openBrackets - closeBrackets;
       sanitized += ']'.repeat(missing);
     }
-    
+
     // **AUTO-REPAIR: Remove excess closing brackets**
     if (closeBraces > openBraces) {
       let excess = closeBraces - openBraces;
@@ -216,7 +216,7 @@ function sanitizeJSONString(jsonString: string): string {
         excess--;
       }
     }
-    
+
     if (closeBrackets > openBrackets) {
       let excess = closeBrackets - openBrackets;
       while (excess > 0 && sanitized.endsWith(']')) {
@@ -224,7 +224,7 @@ function sanitizeJSONString(jsonString: string): string {
         excess--;
       }
     }
-    
+
     // **FINAL PARSE TEST**
     try {
       JSON.parse(sanitized);
@@ -238,7 +238,7 @@ function sanitizeJSONString(jsonString: string): string {
         if (firstBraceIndex !== -1) {
           let depth = 0;
           let endIndex = -1;
-          
+
           for (let i = firstBraceIndex; i < sanitized.length; i++) {
             if (sanitized[i] === '{') depth++;
             else if (sanitized[i] === '}') {
@@ -249,7 +249,7 @@ function sanitizeJSONString(jsonString: string): string {
               }
             }
           }
-          
+
           if (endIndex !== -1) {
             const extracted = sanitized.substring(firstBraceIndex, endIndex + 1);
             JSON.parse(extracted); // Test if valid
@@ -259,7 +259,7 @@ function sanitizeJSONString(jsonString: string): string {
       } catch (extractError) {
         console.error("Extraction attempt also failed");
       }
-      
+
       // Return original string as last resort
       console.warn("Returning original string - all repair attempts failed");
       return jsonString;
@@ -274,7 +274,7 @@ function sanitizeJSONString(jsonString: string): string {
  * Parse nested answer string (handles double-escaped JSON)
  * Internal helper function for parseChartContent
  */
-function parseNestedAnswer(answerValue: string): any {
+function parseNestedAnswer(answerValue: string): unknown {
   const updatedJsonstring = removeKeyFromJSON(answerValue, 'tooltip');
   try {
     // Attempt 1: Direct parse
@@ -282,14 +282,14 @@ function parseNestedAnswer(answerValue: string): any {
   } catch {
     // Attempt 2: Sanitize then parse
     const sanitized = sanitizeJSONString(updatedJsonstring);
-    
+
     const openBraces = (sanitized.match(/\{/g) || []).length;
     const closeBraces = (sanitized.match(/\}/g) || []).length;
-    
+
     if (openBraces !== closeBraces) {
       throw new Error("Sanitization produced unbalanced braces");
     }
-    
+
     return JSON.parse(sanitized);
   }
 }
@@ -297,15 +297,15 @@ function parseNestedAnswer(answerValue: string): any {
 /**
  * Parse chart content from raw response string
  */
-export function parseChartContent(rawContent: string): any {
+export function parseChartContent(rawContent: string): unknown {
   const updatedJsonstring = removeKeyFromJSON(rawContent, 'tooltip');
   try {
     const chartResponse = JSON.parse(updatedJsonstring);
-    
+
     // Handle nested escaped JSON in "answer" field
     if (chartResponse && typeof chartResponse === "object" && "answer" in chartResponse) {
       const answerValue = chartResponse.answer;
-      
+
       if (typeof answerValue === "string") {
         try {
           chartResponse.answer = parseNestedAnswer(answerValue);
@@ -314,11 +314,11 @@ export function parseChartContent(rawContent: string): any {
         }
       }
     }
-    
+
     return chartResponse;
   } catch {
     console.error("Failed to parse raw content, trying sanitization...");
-    
+
     const sanitized = removeKeyFromJSON(sanitizeJSONString(updatedJsonstring), 'tooltip');
     try {
       return JSON.parse(sanitized);

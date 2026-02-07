@@ -6,7 +6,8 @@ import {
 import {
     ChatMessage,
     Conversation,
-    ConversationRequest
+    ConversationRequest,
+    Feedback,
 } from "../types/AppTypes";
 import { createErrorResponse, getUserId, setUserId } from "../utils/apiUtils";
 import { ApiErrorHandler } from "../utils/errorHandler";
@@ -66,14 +67,14 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
 
     if (!response.ok) {
       // Return fallback data (maintaining current behavior)
-      return historyReadResponse.messages.map((msg: any) => ({
-        id: msg.id,
-        role: msg.role,
-        content: msg.content,
-        date: msg.createdAt,
-        feedback: msg.feedback ?? undefined,
-        context: msg.context,
-        contentType: msg.contentType,
+      return historyReadResponse.messages.map((msg: Record<string, unknown>) => ({
+        id: msg.id as string,
+        role: msg.role as string,
+        content: msg.content as string,
+        date: msg.createdAt as string,
+        feedback: (msg.feedback ?? undefined) as Feedback | undefined,
+        context: msg.context as string | undefined,
+        contentType: msg.contentType as "text" | "image" | undefined,
       }));
     }
 
@@ -81,16 +82,16 @@ export const historyRead = async (convId: string): Promise<ChatMessage[]> => {
     const messages: ChatMessage[] = [];
 
     if (Array.isArray(payload?.messages)) {
-      payload.messages.forEach((msg: any) => {
+      payload.messages.forEach((msg: Record<string, unknown>) => {
         const message: ChatMessage = {
-          id: msg.id,
-          role: msg.role,
-          content: msg.content,
-          date: msg.createdAt,
-          feedback: msg.feedback ?? undefined,
-          context: msg.context,
-          citations: msg.citations,
-          contentType: msg.contentType,
+          id: msg.id as string,
+          role: msg.role as string,
+          content: msg.content as string,
+          date: msg.createdAt as string,
+          feedback: (msg.feedback ?? undefined) as Feedback | undefined,
+          context: msg.context as string | undefined,
+          citations: msg.citations as string | undefined,
+          contentType: msg.contentType as "text" | "image" | undefined,
         };
         messages.push(message);
       });
@@ -130,13 +131,13 @@ export const historyList = async (
       return null;
     }
 
-    const conversations: Conversation[] = payload.map((conv: any) => {
+    const conversations: Conversation[] = payload.map((conv: Record<string, unknown>) => {
       const conversation: Conversation = {
         // Use conversationId as fallback if id is not available
-        id: conv.id || conv.conversation_id,
-        title: conv.title,
-        date: conv.createdAt,
-        updatedAt: conv?.updatedAt,
+        id: (conv.id || conv.conversation_id) as string,
+        title: conv.title as string,
+        date: conv.createdAt as string,
+        updatedAt: conv?.updatedAt as string | undefined,
         messages: [],
       };
       return conversation;
@@ -149,13 +150,13 @@ export const historyList = async (
 
     // Return fallback data (maintaining current behavior)
     const conversations: Conversation[] = historyListResponse.map(
-      (conv: any) => {
+      (conv: Record<string, unknown>) => {
         const conversation: Conversation = {
           // Use conversationId as fallback if id is not available
-          id: conv.id || conv.conversation_id,
-          title: conv.title,
-          date: conv.createdAt,
-          updatedAt: conv?.updatedAt,
+          id: (conv.id || conv.conversation_id) as string,
+          title: conv.title as string,
+          date: conv.createdAt as string,
+          updatedAt: conv?.updatedAt as string | undefined,
           messages: [],
         };
         return conversation;
@@ -221,9 +222,9 @@ export async function callConversationApi(
 
     return response;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Log network errors
-    if (error.name !== 'AbortError') {
+    if (error instanceof Error && error.name !== 'AbortError') {
       ApiErrorHandler.handleNetworkError(error, endpoint);
     }
     throw error; // Re-throw to maintain current behavior
@@ -282,7 +283,7 @@ export const historyDeleteAll = async (): Promise<Response> => {
   }
 };
 
-export const fetchCitationContent = async (body: any) => {
+export const fetchCitationContent = async (body: Record<string, unknown>) => {
   const endpoint = `/api/fetch-azure-search-content`;
 
   try {
@@ -299,9 +300,9 @@ export const fetchCitationContent = async (body: any) => {
     const data = await response.json();
     return data;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Use new error handling system
-    if (error.message && !error.message.includes('Failed to fetch')) {
+    if (error instanceof Error && error.message && !error.message.includes('Failed to fetch')) {
       // If it's already our formatted error, just re-throw
       throw error;
     } else {

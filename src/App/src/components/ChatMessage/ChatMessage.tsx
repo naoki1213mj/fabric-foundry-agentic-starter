@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { ChartDataResponse, ChatMessage as ChatMessageType } from "../../types/AppTypes";
+import { ChartDataResponse, ChatMessage as ChatMessageType, type Citation } from "../../types/AppTypes";
 import { AssistantMessage } from "./AssistantMessage";
 import { ChartMessage } from "./ChartMessage";
 import { ErrorMessage } from "./ErrorMessage";
@@ -10,7 +10,7 @@ interface ChatMessageProps {
   index: number;
   isLastAssistantMessage: boolean;
   generatingResponse: boolean;
-  parseCitationFromMessage: (citations: any) => any[];
+  parseCitationFromMessage: (citations: string | Citation[] | undefined) => Citation[];
   onEditUserMessage?: (content: string) => void;
   onResendUserMessage?: (content: string) => void;
 }
@@ -39,7 +39,7 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = memo(({
 
   // Handle chart messages - object content
   if (message.role === "assistant" && typeof message.content === "object" && message.content !== null) {
-    const content = message.content as Record<string, any>;
+    const content = message.content as Record<string, unknown>;
     if (("type" in content || "chartType" in content) && "data" in content) {
       try {
         return (

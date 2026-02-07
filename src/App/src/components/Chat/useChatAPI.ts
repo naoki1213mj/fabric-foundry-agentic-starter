@@ -2,38 +2,38 @@ import { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { generateUUIDv4 } from "../../configs/Utils";
 import {
-  setSelectedConversationId,
+    setSelectedConversationId,
 } from "../../store/appSlice";
 import {
-  addNewConversation,
-  updateConversation,
+    addNewConversation,
+    updateConversation,
 } from "../../store/chatHistorySlice";
 import {
-  addMessages,
-  sendMessage,
-  setGeneratingResponse,
-  setStreamingFlag,
-  setUserMessage as setUserMessageAction,
-  updateMessageById,
+    addMessages,
+    sendMessage,
+    setGeneratingResponse,
+    setStreamingFlag,
+    setUserMessage as setUserMessageAction,
+    updateMessageById,
 } from "../../store/chatSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { store } from "../../store/store";
 import {
-  type AgentMode,
-  type ChartDataResponse,
-  type ChatMessage,
-  type Conversation,
-  type ConversationRequest,
-  type ModelReasoningEffort,
-  type ModelType,
-  type ParsedChunk,
-  type ReasoningEffort,
-  type ReasoningSummary,
-  type ToolEvent,
+    type AgentMode,
+    type ChartDataResponse,
+    type ChatMessage,
+    type Conversation,
+    type ConversationRequest,
+    type ModelReasoningEffort,
+    type ModelType,
+    type ParsedChunk,
+    type ReasoningEffort,
+    type ReasoningSummary,
+    type ToolEvent,
 } from "../../types/AppTypes";
 import {
-  isMalformedChartJSON,
-  parseChartContent,
+    isMalformedChartJSON,
+    parseChartContent,
 } from "../../utils/jsonUtils";
 import { isChartQuery, parseReasoningContent, parseToolEvents } from "./chatUtils";
 
@@ -143,10 +143,10 @@ export const useChatAPI = ({
   // Helper function to extract chart data from response
   const extractChartData = useCallback((
     chartResponse: ChartDataResponse | string
-  ): ChartDataResponse | string | { charts: any[] } => {
+  ): ChartDataResponse | string | { charts: ChartDataResponse[] } => {
     if (typeof chartResponse === "object" && chartResponse !== null) {
       // Handle {"charts": [...]} wrapper - pass through as-is
-      if ("charts" in chartResponse && Array.isArray((chartResponse as any).charts)) {
+      if ("charts" in chartResponse && Array.isArray((chartResponse as Record<string, unknown>).charts)) {
         return chartResponse;
       }
       if ("answer" in chartResponse) {
@@ -295,7 +295,7 @@ export const useChatAPI = ({
       chartResponse = extractChartData(chartResponse);
 
       // Handle {"charts": [...]} array - keep as string for AssistantMessage to render
-      if (typeof chartResponse === "object" && chartResponse !== null && "charts" in chartResponse && Array.isArray((chartResponse as any).charts)) {
+      if (typeof chartResponse === "object" && chartResponse !== null && "charts" in chartResponse && Array.isArray((chartResponse as Record<string, unknown>).charts)) {
         const textMessage = createAndDispatchMessage(
           ASSISTANT,
           JSON.stringify(chartResponse) as unknown as ChartDataResponse

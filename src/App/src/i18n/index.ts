@@ -5,7 +5,7 @@ import { ja } from "./locales/ja";
 
 // ブラウザの言語設定を取得
 const getBrowserLanguage = (): string => {
-  const browserLang = navigator.language || (navigator as any).userLanguage;
+  const browserLang = navigator.language || (navigator as unknown as { userLanguage?: string }).userLanguage;
   // 日本語の場合は 'ja'、それ以外は 'en' をデフォルトに
   return browserLang?.startsWith("ja") ? "ja" : "ja"; // デフォルトを日本語に設定
 };

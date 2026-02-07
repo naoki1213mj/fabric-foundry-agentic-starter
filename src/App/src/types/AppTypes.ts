@@ -91,7 +91,9 @@ export type AppConfig = Record<
 export interface ChartLayout {
   row: number;
   col: number;
+  column?: number;
   width?: string;
+  height?: number;
 }
 export interface ChartDataItem {
   [x: string]: string | number | boolean | undefined;
@@ -124,10 +126,23 @@ export type ChatResponseChoice = {
   messages: ChatMessage[];
 };
 
+/** A single Chart.js chart configuration object */
+export interface ChartObject {
+  type: string;
+  chartType?: string;
+  data: {
+    labels?: (string | number)[];
+    datasets?: Array<Record<string, unknown>>;
+    [key: string]: unknown;
+  };
+  options?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 export type ChartDataResponse = {
   answer: string;
-  data: any,
-  options: any,
+  data: Record<string, unknown>,
+  options: Record<string, unknown>,
   type: string
 };
 
@@ -135,19 +150,19 @@ export type ChatResponse = {
   id: string;
   model: string;
   created: number;
-  object: ChatCompletionType | any;
+  object: ChatCompletionType | string;
   choices: ChatResponseChoice[];
   history_metadata: {
     conversation_id: string;
     title: string;
     date: string;
   };
-  error?: any;
+  error?: unknown;
   chartType?: string;
-  chartOptions: any;
+  chartOptions: Record<string, unknown>;
   chartData: {
-    datasets?: any[];
-    labels: any[];
+    datasets?: Array<Record<string, unknown>>;
+    labels: (string | number)[];
   };
 };
 

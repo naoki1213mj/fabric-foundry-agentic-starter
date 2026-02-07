@@ -8,7 +8,7 @@ import "./Citations.css";
 
 interface Props {
     answer: AskResponse;
-    onSpeak?: any;
+    onSpeak?: () => void;
     isActive?: boolean;
     index: number;
 }

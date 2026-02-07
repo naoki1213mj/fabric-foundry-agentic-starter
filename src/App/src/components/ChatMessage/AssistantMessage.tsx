@@ -3,21 +3,21 @@ import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import supersub from 'remark-supersub';
-import { ChartDataResponse, ChatMessage as ChatMessageType } from '../../types/AppTypes';
+import { ChartDataResponse, type ChartObject, ChatMessage as ChatMessageType, type Citation } from '../../types/AppTypes';
 import Citations from '../Citations/Citations';
 import { ChartLoadingSkeleton, StreamingChartIndicator } from './ChartMessage';
 import { CopyButton } from './CopyButton';
 import { MessageReactions } from './MessageReactions';
 import {
-  containsHtml,
-  convertLegacyCitationMarkers,
-  extractChartsFromText,
-  extractTextExcludingChart,
-  formatTimestamp,
-  linkInlineCitations,
-  looksLikeChartJson,
-  sanitizeAndProcessLinks,
-  stripHtmlTags
+    containsHtml,
+    convertLegacyCitationMarkers,
+    extractChartsFromText,
+    extractTextExcludingChart,
+    formatTimestamp,
+    linkInlineCitations,
+    looksLikeChartJson,
+    sanitizeAndProcessLinks,
+    stripHtmlTags
 } from './messageUtils';
 
 // Lazy load ChatChart component (includes heavy Chart.js library)
@@ -28,7 +28,7 @@ export interface AssistantMessageProps {
   index: number;
   isLastAssistantMessage: boolean;
   generatingResponse: boolean;
-  parseCitationFromMessage: (citations: any) => any[];
+  parseCitationFromMessage: (citations: string | Citation[] | undefined) => Citation[];
 }
 
 export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
@@ -112,13 +112,13 @@ export const AssistantMessage: React.FC<AssistantMessageProps> = memo(({
   // If parsed successfully and it's a chart object
   if (parsedContent && typeof parsedContent === "object") {
     let chartData = null;
-    let multiCharts: any[] | null = null;
+    let multiCharts: ChartObject[] | null = null;
 
     // Multiple charts wrapper {"charts": [{type, data}, ...]}
     if ("charts" in parsedContent && Array.isArray(parsedContent.charts)) {
       const validCharts = parsedContent.charts.filter(
-        (c: any) => c && typeof c === "object" && ("type" in c || "chartType" in c) && "data" in c
-      );
+        (c: unknown) => c && typeof c === "object" && ("type" in (c as Record<string, unknown>) || "chartType" in (c as Record<string, unknown>)) && "data" in (c as Record<string, unknown>)
+      ) as ChartObject[];
       if (validCharts.length > 0) {
         multiCharts = validCharts;
       }
