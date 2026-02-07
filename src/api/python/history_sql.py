@@ -8,13 +8,14 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
+import cachetools
 import pyodbc
 from agent_framework import ChatAgent
 from agent_framework.azure import AzureAIClient
 from agent_framework.exceptions import ServiceResponseException
 from azure.ai.projects.aio import AIProjectClient
 from azure.identity.aio import AzureCliCredential
-from azure.monitor.events.extension import track_event
+from azure.monitor.events.extension import track_event  # noqa: F401 - re-exported
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
 from opentelemetry import trace
@@ -26,14 +27,9 @@ from auth.azure_credential_utils import get_azure_credential_async
 
 router = APIRouter()
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Note: Application Insights is configured in app.py (single initialization point)
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 
 # Suppress INFO logs from 'azure.core.pipeline.policies.http_logging_policy'
 logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(logging.WARNING)
@@ -48,23 +44,7 @@ AGENT_NAME_TITLE = os.getenv("AGENT_NAME_TITLE")
 
 # Database configuration
 
-
-def track_event_if_configured(event_name: str, event_data: dict):
-    """
-    Track an event with Application Insights if configured.
-
-    Args:
-        event_name (str): The name of the event to track.
-        event_data (dict): The data to associate with the event.
-    """
-    instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-    if instrumentation_key:
-        track_event(event_name, event_data)
-    else:
-        logging.warning(
-            "Skipping track_event for %s as Application Insights is not configured",
-            event_name,
-        )
+from utils import track_event_if_configured  # noqa: E402
 
 
 async def get_fabric_db_connection():
@@ -103,21 +83,21 @@ async def get_fabric_db_connection():
                     )
                     SQL_COPT_SS_ACCESS_TOKEN = 1256
                     connection_string = f"DRIVER={driver18};SERVER={server};DATABASE={database};"
-                    conn = pyodbc.connect(
+                    conn = await asyncio.to_thread(
+                        pyodbc.connect,
                         connection_string,
                         attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct},
                     )
                 finally:
                     await credential.close()
             else:
-                # connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={api_uid};Authentication=ActiveDirectoryMSI;"
                 logging.info("FABRIC-SQL: Attempting connection with Driver 18...")
                 logging.info(
                     "FABRIC-SQL: Connection string (masked): SERVER=%s;DATABASE=%s",
                     server,
                     database,
                 )
-                conn = pyodbc.connect(fabric_sql_connection_string18)
+                conn = await asyncio.to_thread(pyodbc.connect, fabric_sql_connection_string18)
                 logging.info("FABRIC-SQL: Connection successful with Driver 18")
         except Exception as e:
             logging.error("FABRIC-SQL: Driver 18 connection failed with error: %s", str(e))
@@ -131,7 +111,8 @@ async def get_fabric_db_connection():
                     )
                     SQL_COPT_SS_ACCESS_TOKEN = 1256
                     connection_string = f"DRIVER={driver17};SERVER={server};DATABASE={database};"
-                    conn = pyodbc.connect(
+                    conn = await asyncio.to_thread(
+                        pyodbc.connect,
                         connection_string,
                         attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct},
                     )
@@ -139,13 +120,44 @@ async def get_fabric_db_connection():
                     await credential.close()
             else:
                 logging.info("FABRIC-SQL: Attempting fallback connection with Driver 17...")
-                conn = pyodbc.connect(fabric_sql_connection_string17)
+                conn = await asyncio.to_thread(pyodbc.connect, fabric_sql_connection_string17)
                 logging.info("FABRIC-SQL: Connection successful with Driver 17")
 
         return conn
     except pyodbc.Error as e:
         logging.info("FABRIC-SQL:Failed to connect Fabric SQL Database: %s", e)
         return None
+
+
+async def get_db_connection_with_retry(max_retries: int = 3, base_delay: float = 1.0):
+    """
+    Get database connection with exponential backoff retry.
+
+    Retries transient failures (network timeouts, service unavailable)
+    while immediately failing on configuration errors.
+
+    Args:
+        max_retries: Maximum number of retry attempts.
+        base_delay: Base delay in seconds (doubles each retry).
+
+    Returns:
+        Connection object or None if all retries fail.
+    """
+    for attempt in range(max_retries):
+        conn = await get_fabric_db_connection()
+        if conn is not None:
+            return conn
+        if attempt < max_retries - 1:
+            delay = base_delay * (2**attempt)
+            logging.warning(
+                "FABRIC-SQL: Connection attempt %d/%d failed, retrying in %.1fs...",
+                attempt + 1,
+                max_retries,
+                delay,
+            )
+            await asyncio.sleep(delay)
+    logging.error("FABRIC-SQL: All %d connection attempts failed", max_retries)
+    return None
 
 
 async def run_nonquery_params(sql_query, params: tuple[Any, ...] = ()):
@@ -159,7 +171,7 @@ async def run_nonquery_params(sql_query, params: tuple[Any, ...] = ()):
     Returns:
         bool: True if the operation was successful, False otherwise.
     """
-    conn = await get_fabric_db_connection()
+    conn = await get_db_connection_with_retry()
     if not conn:
         logging.error("Error executing SQL query: DB connection not available")
         return False
@@ -194,7 +206,7 @@ async def run_query_params(sql_query, params: tuple[Any, ...] = ()):
         list: List of dictionaries containing query results, or None if an error occurs.
     """
     # Connect to the database
-    conn = await get_fabric_db_connection()
+    conn = await get_db_connection_with_retry()
     if not conn:
         logging.error("Error executing SQL query: DB connection not available")
         return None
@@ -229,9 +241,14 @@ async def run_query_params(sql_query, params: tuple[Any, ...] = ()):
     return await asyncio.to_thread(_execute_query)
 
 
-# Global connection cache for SqlQueryTool
-# This allows the tool to be pickled while still accessing the connection
-_connection_cache: dict = {}
+# Global connection cache for SqlQueryTool with TTL eviction
+# Connections expire after 10 minutes to prevent stale/leaked connections.
+# cachetools.TTLCache auto-evicts expired entries on access.
+_CONNECTION_CACHE_TTL = 600  # seconds
+_CONNECTION_CACHE_MAX = 64
+_connection_cache: cachetools.TTLCache = cachetools.TTLCache(
+    maxsize=_CONNECTION_CACHE_MAX, ttl=_CONNECTION_CACHE_TTL
+)
 
 
 class SqlQueryTool(BaseModel):
@@ -276,20 +293,25 @@ class SqlQueryTool(BaseModel):
                     {"error": "Database connection not available"}, ensure_ascii=False
                 )
 
-            cursor = conn.cursor()
-            cursor.execute(sql_query)
-            columns = [desc[0] for desc in cursor.description]
-            result = []
-            for row in cursor.fetchall():
-                row_dict = {}
-                for col_name, value in zip(columns, row, strict=False):
-                    if isinstance(value, (datetime, date)):
-                        row_dict[col_name] = value.isoformat()
-                    elif isinstance(value, Decimal):
-                        row_dict[col_name] = float(value)
-                    else:
-                        row_dict[col_name] = value
-                result.append(row_dict)
+            def _execute():
+                nonlocal cursor
+                cursor = conn.cursor()
+                cursor.execute(sql_query)
+                columns = [desc[0] for desc in cursor.description]
+                result = []
+                for row in cursor.fetchall():
+                    row_dict = {}
+                    for col_name, value in zip(columns, row, strict=False):
+                        if isinstance(value, (datetime, date)):
+                            row_dict[col_name] = value.isoformat()
+                        elif isinstance(value, Decimal):
+                            row_dict[col_name] = float(value)
+                        else:
+                            row_dict[col_name] = value
+                    result.append(row_dict)
+                return result
+
+            result = await asyncio.to_thread(_execute)
 
             # Agent Framework expects a string, not a list
             return json.dumps(result, ensure_ascii=False)
@@ -303,6 +325,13 @@ class SqlQueryTool(BaseModel):
 
 # Configuration variable
 USE_CHAT_HISTORY_ENABLED = os.getenv("USE_CHAT_HISTORY_ENABLED", "true").lower() == "true"
+
+
+def _validate_sort_order(sort_order: str) -> str:
+    """Validate and sanitize sort_order to prevent SQL injection."""
+    if sort_order.upper() not in ("ASC", "DESC"):
+        return "DESC"
+    return sort_order.upper()
 
 
 async def get_conversations(user_id, limit, sort_order="DESC", offset=0):
@@ -321,6 +350,7 @@ async def get_conversations(user_id, limit, sort_order="DESC", offset=0):
     Raises:
         Exception: If an error occurs during conversation retrieval.
     """
+    sort_order = _validate_sort_order(sort_order)
     try:
         query = ""
         params = ()
@@ -349,6 +379,7 @@ async def get_conversation_messages(user_id: str, conversation_id: str, sort_ord
     Returns:
         list: List of message dictionaries with deserialized citations, or None if an error occurs.
     """
+    sort_order = _validate_sort_order(sort_order)
     try:
         if not conversation_id:
             logger.warning("No conversation_id found, cannot retrieve conversation messages.")
@@ -763,7 +794,6 @@ async def create_message(uuid, conversation_id, user_id, input_message: dict):
         content = input_message["content"]
         if isinstance(content, dict):
             content = json.dumps(content)
-            print(content)
         params = (
             user_id,
             conversation_id,

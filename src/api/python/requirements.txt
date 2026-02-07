@@ -21,12 +21,9 @@ agent-framework-core==1.0.0b260130
 azure-identity==1.26.0b1
 azure-ai-agents==1.2.0b5
 azure-ai-projects==2.0.0b3
-azure-cosmos==4.9.0
-
 # Additional utilities
 openai>=2.8.0
 pyodbc==5.2.0
-pandas==2.3.3
 
 # OpenTelemetry (versions aligned with agent-framework and azure-monitor dependencies)
 # Note: azure-monitor-opentelemetry 1.8.4 requires specific opentelemetry versions

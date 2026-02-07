@@ -9,11 +9,20 @@ export const throttle = <T extends (...args: Parameters<T>) => void>(
   delay: number
 ) => {
   let lastCall = 0;
+  let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     const now = Date.now();
-    if (now - lastCall >= delay) {
+    const remaining = delay - (now - lastCall);
+    if (remaining <= 0) {
+      if (timer) { clearTimeout(timer); timer = null; }
       lastCall = now;
       fn(...args);
+    } else if (!timer) {
+      timer = setTimeout(() => {
+        lastCall = Date.now();
+        timer = null;
+        fn(...args);
+      }, remaining);
     }
   };
 };

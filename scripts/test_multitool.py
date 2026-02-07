@@ -85,9 +85,21 @@ TOOL_INDICATORS = {
     "classify_customer_segment": ["セグメント", "VIP", "優良顧客", "一般顧客", "分類"],
     "calculate_clv": ["CLV", "顧客生涯価値", "LTV", "価値"],
     "search_documents": [
-        "製品仕様", "ドキュメント", "仕様書", "スペック", "仕様", "Specification",
-        "フレーム", "サスペンション", "重量", "材質", "Size", "サイズ",
-        "knowledge base", "ナレッジベース", "検索結果",
+        "製品仕様",
+        "ドキュメント",
+        "仕様書",
+        "スペック",
+        "仕様",
+        "Specification",
+        "フレーム",
+        "サスペンション",
+        "重量",
+        "材質",
+        "Size",
+        "サイズ",
+        "knowledge base",
+        "ナレッジベース",
+        "検索結果",
     ],
     "compare_products": ["比較", "vs", "製品比較", "Mountain-100", "Mountain-200"],
     "calculate_price_performance": ["コスパ", "コストパフォーマンス", "価格性能比"],
@@ -201,12 +213,12 @@ async def run_scenario(scenario: dict[str, Any]) -> dict[str, Any]:
     conversation_id = f"test-{scenario['id']}-{uuid.uuid4().hex[:8]}"
     reasoning_effort = scenario.get("reasoning_effort", "low")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"🧪 {scenario['name']}")
     print(f"   難易度: {scenario['difficulty']}")
     print(f"   reasoning_effort: {reasoning_effort}")
     print(f"   会話ID: {conversation_id}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"📝 クエリ: {scenario['query'][:60]}...")
 
     result = {
@@ -236,9 +248,7 @@ async def run_scenario(scenario: dict[str, Any]) -> dict[str, Any]:
             result["chunk_count"] = response.get("chunk_count", 0)
 
             # ツール使用分析
-            result["tool_analysis"] = analyze_tool_usage(
-                full_text, scenario["expected_tools"]
-            )
+            result["tool_analysis"] = analyze_tool_usage(full_text, scenario["expected_tools"])
 
             print(f"✅ 成功 ({result['elapsed_seconds']:.1f}秒)")
             print(f"   レスポンス長: {result['response_length']} bytes")
@@ -305,11 +315,7 @@ async def main():
     print("-" * 70)
     for r in results:
         status = "✅" if r["success"] else "❌"
-        tool_coverage = (
-            f"{r['tool_analysis']['coverage']:.0%}"
-            if r["tool_analysis"]
-            else "N/A"
-        )
+        tool_coverage = f"{r['tool_analysis']['coverage']:.0%}" if r["tool_analysis"] else "N/A"
         time_str = f"{r['elapsed_seconds']:.1f}s"
         print(f"{r['scenario_name']:<30} {status:<8} {time_str:<10} {tool_coverage}")
 

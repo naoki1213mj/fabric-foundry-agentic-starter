@@ -344,7 +344,7 @@ export const useChatAPI = ({
   ) => {
     if (generatingResponse || !question.trim()) return;
 
-    const isChart = isChartQuery(userMessage);
+    const isChart = isChartQuery(question);
     const isChatReq = isChart ? "graph" : "Text";
     const newMessage: ChatMessage = {
       id: generateUUIDv4(),
@@ -424,7 +424,7 @@ export const useChatAPI = ({
 
           const errorMessage = createAndDispatchMessage(ERROR, errorMsg);
           updatedMessages = [newMessage, errorMessage];
-        } else if (isChartQuery(userMessage)) {
+        } else if (isChart) {
           if (streamMessage.content) {
             updatedMessages = [newMessage, streamMessage];
           } else {
@@ -449,7 +449,7 @@ export const useChatAPI = ({
           : [newMessage];
 
         const isNewConv = !selectedConversationId;
-        const latestMessages = [...messages, ...updatedMessages];
+        const latestMessages = [...store.getState().chat.messages, ...updatedMessages];
         saveToDB(updatedMessages, conversationId, latestMessages, "error", isNewConv);
       } else {
         // Network error or other failure - display error in chat UI
@@ -471,7 +471,6 @@ export const useChatAPI = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps -- messages is intentionally excluded; we use store.getState() for latest state
   }, [
     generatingResponse,
-    userMessage,
     agentMode,
     reasoningEffort,
     modelType,

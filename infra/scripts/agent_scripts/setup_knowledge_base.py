@@ -30,7 +30,6 @@ Environment Variables (or use azd env):
 import os
 import subprocess
 import sys
-from typing import Optional
 
 import requests
 
@@ -59,7 +58,9 @@ except ImportError:
 
 # Configuration
 SEARCH_SERVICE_NAME = os.environ.get("AI_SEARCH_SERVICE_NAME", "<your-ai-search-name>")
-SEARCH_ENDPOINT = os.environ.get("AI_SEARCH_ENDPOINT", f"https://{SEARCH_SERVICE_NAME}.search.windows.net")
+SEARCH_ENDPOINT = os.environ.get(
+    "AI_SEARCH_ENDPOINT", f"https://{SEARCH_SERVICE_NAME}.search.windows.net"
+)
 SHAREPOINT_SITE_URL = os.environ.get("SHAREPOINT_SITE_URL", "<your-sharepoint-site-url>")
 TENANT_ID = os.environ.get("AZURE_TENANT_ID", "<your-tenant-id>")
 
@@ -71,7 +72,7 @@ KNOWLEDGE_BASE_NAME = "product-specs-kb"
 API_VERSION = "2025-11-01-preview"
 
 
-def get_azd_env_value(key: str) -> Optional[str]:
+def get_azd_env_value(key: str) -> str | None:
     """Get value from azd environment."""
     try:
         result = subprocess.run(
@@ -88,9 +89,7 @@ def get_azd_env_value(key: str) -> Optional[str]:
 def get_search_admin_key() -> str:
     """Get Azure AI Search admin key."""
     # Try environment variable first
-    key = os.environ.get("AI_SEARCH_ADMIN_KEY") or get_azd_env_value(
-        "AI_SEARCH_ADMIN_KEY"
-    )
+    key = os.environ.get("AI_SEARCH_ADMIN_KEY") or get_azd_env_value("AI_SEARCH_ADMIN_KEY")
     if key:
         return key
 
@@ -124,9 +123,7 @@ def get_search_admin_key() -> str:
 
 def get_sharepoint_credentials() -> tuple[str, str]:
     """Get SharePoint app credentials."""
-    app_id = os.environ.get("SHAREPOINT_APP_ID") or get_azd_env_value(
-        "SHAREPOINT_APP_ID"
-    )
+    app_id = os.environ.get("SHAREPOINT_APP_ID") or get_azd_env_value("SHAREPOINT_APP_ID")
     app_secret = os.environ.get("SHAREPOINT_APP_SECRET") or get_azd_env_value(
         "SHAREPOINT_APP_SECRET"
     )
@@ -152,9 +149,7 @@ def check_existing_knowledge_sources(headers: dict) -> list:
     return []
 
 
-def create_sharepoint_knowledge_source(
-    headers: dict, app_id: str, app_secret: str
-) -> dict:
+def create_sharepoint_knowledge_source(headers: dict, app_id: str, app_secret: str) -> dict:
     """Create SharePoint indexed knowledge source."""
     url = f"{SEARCH_ENDPOINT}/knowledgesources/{KNOWLEDGE_SOURCE_NAME}?api-version={API_VERSION}"
 
@@ -234,9 +229,7 @@ def create_knowledge_base(
     # Extract OpenAI endpoint from Foundry endpoint
     import re
 
-    match = re.match(
-        r"https://([^.]+)\.services\.ai\.azure\.com", foundry_project_endpoint
-    )
+    match = re.match(r"https://([^.]+)\.services\.ai\.azure\.com", foundry_project_endpoint)
     openai_resource_uri = f"https://{match.group(1)}.openai.azure.com" if match else ""
 
     body = {
@@ -265,7 +258,9 @@ def create_knowledge_base(
     if response.status_code in [200, 201]:
         print("   ✅ Knowledge Base created successfully")
         kb_data = response.json()
-        mcp_endpoint = f"{SEARCH_ENDPOINT}/knowledgebases/{KNOWLEDGE_BASE_NAME}/mcp?api-version={API_VERSION}"
+        mcp_endpoint = (
+            f"{SEARCH_ENDPOINT}/knowledgebases/{KNOWLEDGE_BASE_NAME}/mcp?api-version={API_VERSION}"
+        )
         print(f"   📡 MCP Endpoint: {mcp_endpoint}")
         return kb_data
     else:
@@ -293,9 +288,7 @@ def create_project_connection(project_endpoint: str, mcp_endpoint: str) -> dict:
     resource_group = get_azd_env_value("AZURE_RESOURCE_GROUP")
 
     if not subscription_id or not resource_group:
-        print(
-            "\n⚠️  Cannot create project connection: missing subscription or resource group"
-        )
+        print("\n⚠️  Cannot create project connection: missing subscription or resource group")
         print("Please run this step manually in Azure Portal")
         return {}
 
@@ -362,9 +355,7 @@ def update_environment_variables(mcp_endpoint: str, connection_name: str):
 
     for key, value in env_vars.items():
         try:
-            subprocess.run(
-                ["azd", "env", "set", key, value], check=True, capture_output=True
-            )
+            subprocess.run(["azd", "env", "set", key, value], check=True, capture_output=True)
             print(f"   ✅ {key}={value}")
         except subprocess.CalledProcessError:
             print(f"   ⚠️  Failed to set {key} (set manually if needed)")
@@ -419,7 +410,9 @@ def main():
     kb_result = create_knowledge_base(headers, model_deployment, project_endpoint)
 
     if kb_result:
-        mcp_endpoint = f"{SEARCH_ENDPOINT}/knowledgebases/{KNOWLEDGE_BASE_NAME}/mcp?api-version={API_VERSION}"
+        mcp_endpoint = (
+            f"{SEARCH_ENDPOINT}/knowledgebases/{KNOWLEDGE_BASE_NAME}/mcp?api-version={API_VERSION}"
+        )
 
         # Create project connection
         conn_result = create_project_connection(project_endpoint, mcp_endpoint)

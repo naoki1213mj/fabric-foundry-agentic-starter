@@ -17,12 +17,9 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from chat import router as chat_router
-
-# NOTE: history.py (Cosmos DB) is legacy - all frontend calls use /historyfab (Fabric SQL).
-# The /history router is kept temporarily for backward compatibility but is not actively used.
-from history import router as history_router
 from history_sql import router as history_sql_router
 
 load_dotenv()
@@ -72,6 +69,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         if ar_tool and hasattr(ar_tool, "close"):
             await ar_tool.close()
             logger.info("AgenticRetrievalTool session closed")
+
+        # Close shared MCP httpx client
+        from mcp_client import close_httpx_client
+
+        await close_httpx_client()
+        logger.info("MCP httpx client closed")
     except Exception as e:
         logger.warning(f"Error during cleanup: {e}")
 
@@ -89,11 +92,15 @@ def build_app() -> FastAPI:
     # CORS configuration - restrict origins in production
     allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*").split(",")
 
+    # Note: allow_credentials=True with allow_origins=["*"] is rejected by browsers.
+    # Only enable credentials when specific origins are configured.
+    allow_creds = allowed_origins != ["*"]
+
     fastapi_app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
+        allow_credentials=allow_creds,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],
     )
 
@@ -101,6 +108,14 @@ def build_app() -> FastAPI:
     @fastapi_app.middleware("http")
     async def log_requests(request: Request, call_next):
         """Log all incoming requests with timing information."""
+        # Reject oversized requests (1 MB limit)
+        max_body_size = 1 * 1024 * 1024  # 1 MB
+        content_length = request.headers.get("content-length")
+        if content_length and int(content_length) > max_body_size:
+            return JSONResponse(
+                status_code=413,
+                content={"error": "Request body too large. Maximum size is 1 MB."},
+            )
         start_time = time.time()
         request_id = request.headers.get("x-request-id", "unknown")
 
@@ -131,7 +146,6 @@ def build_app() -> FastAPI:
 
     # Include routers
     fastapi_app.include_router(chat_router, prefix="/api", tags=["chat"])
-    fastapi_app.include_router(history_router, prefix="/history", tags=["history"])
     fastapi_app.include_router(history_sql_router, prefix="/historyfab", tags=["historyfab"])
 
     @fastapi_app.get("/health")

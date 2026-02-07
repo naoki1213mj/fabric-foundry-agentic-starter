@@ -7,6 +7,7 @@ Provides the run_sql_query tool implementation.
 
 import json
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,32 @@ class SqlAgentHandler:
         try:
             if not self.conn:
                 return json.dumps({"error": "Database connection not available"})
+
+            # SQL injection protection: only allow SELECT statements
+            sql_stripped = sql_query.strip().upper()
+            if not sql_stripped.startswith("SELECT"):
+                return json.dumps({"error": "Only SELECT queries are allowed"})
+
+            dangerous_keywords = [
+                "INSERT",
+                "UPDATE",
+                "DELETE",
+                "DROP",
+                "CREATE",
+                "ALTER",
+                "EXEC",
+                "EXECUTE",
+                "TRUNCATE",
+                "MERGE",
+                "GRANT",
+                "REVOKE",
+                "INTO",
+            ]
+            if ";" in sql_query:
+                return json.dumps({"error": "Semicolons are not allowed in queries"})
+            for kw in dangerous_keywords:
+                if re.search(rf"\b{kw}\b", sql_stripped):
+                    return json.dumps({"error": f"Dangerous SQL keyword detected: {kw}"})
 
             cursor = self.conn.cursor()
             cursor.execute(sql_query)

@@ -36,11 +36,11 @@ class TestMCPClient:
             }
         )
 
-        with patch("mcp_client.httpx.AsyncClient") as mock_client:
-            mock_instance = AsyncMock()
-            mock_client.return_value.__aenter__.return_value = mock_instance
-            mock_instance.post.return_value = mock_response
+        mock_client = AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client.is_closed = False
 
+        with patch("mcp_client._get_httpx_client", return_value=mock_client):
             result = await call_mcp_tool("test_tool", {"arg": "value"})
             assert result == '{"result": "success"}'
 
@@ -51,11 +51,11 @@ class TestMCPClient:
             {"jsonrpc": "2.0", "id": 1, "error": {"code": -32601, "message": "Method not found"}}
         )
 
-        with patch("mcp_client.httpx.AsyncClient") as mock_client:
-            mock_instance = AsyncMock()
-            mock_client.return_value.__aenter__.return_value = mock_instance
-            mock_instance.post.return_value = mock_response
+        mock_client = AsyncMock()
+        mock_client.post.return_value = mock_response
+        mock_client.is_closed = False
 
+        with patch("mcp_client._get_httpx_client", return_value=mock_client):
             result = await call_mcp_tool("unknown_tool", {})
             result_dict = json.loads(result)
             assert "error" in result_dict
@@ -65,11 +65,11 @@ class TestMCPClient:
         """call_mcp_tool should handle timeout."""
         import httpx
 
-        with patch("mcp_client.httpx.AsyncClient") as mock_client:
-            mock_instance = AsyncMock()
-            mock_client.return_value.__aenter__.return_value = mock_instance
-            mock_instance.post.side_effect = httpx.TimeoutException("Timeout")
+        mock_client = AsyncMock()
+        mock_client.post.side_effect = httpx.TimeoutException("Timeout")
+        mock_client.is_closed = False
 
+        with patch("mcp_client._get_httpx_client", return_value=mock_client):
             result = await call_mcp_tool("test_tool", {})
             result_dict = json.loads(result)
             assert "error" in result_dict

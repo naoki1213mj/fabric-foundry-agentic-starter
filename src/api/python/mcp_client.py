@@ -23,6 +23,26 @@ MCP_ENABLED = os.getenv("MCP_ENABLED", "true").lower() == "true"
 # Cache for MCP tools (loaded once at startup)
 _mcp_tool_definitions: list[dict] | None = None
 
+# Shared httpx client for MCP server communication (reuses TCP connections)
+_httpx_client: httpx.AsyncClient | None = None
+
+
+def _get_httpx_client() -> httpx.AsyncClient:
+    """Get or create the shared httpx.AsyncClient."""
+    global _httpx_client
+    if _httpx_client is None or _httpx_client.is_closed:
+        _httpx_client = httpx.AsyncClient(timeout=30.0)
+    return _httpx_client
+
+
+async def close_httpx_client() -> None:
+    """Close the shared httpx client. Call during application shutdown."""
+    global _httpx_client
+    if _httpx_client is not None and not _httpx_client.is_closed:
+        await _httpx_client.aclose()
+        _httpx_client = None
+
+
 # MCP tool name to display label mapping for tool events
 MCP_TOOL_LABELS = {
     "calculate_yoy_growth": "前年比成長率を計算中",
@@ -50,19 +70,21 @@ async def fetch_mcp_tools() -> list[dict]:
         return _mcp_tool_definitions
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.post(
-                MCP_SERVER_URL, json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"}
-            )
-            response.raise_for_status()
-            result = response.json()
-            if "result" in result and "tools" in result["result"]:
-                _mcp_tool_definitions = result["result"]["tools"]
-                logger.info(f"Loaded {len(_mcp_tool_definitions)} tools from MCP server")
-                return _mcp_tool_definitions
-            else:
-                logger.warning(f"Unexpected MCP response: {result}")
-                return []
+        client = _get_httpx_client()
+        response = await client.post(
+            MCP_SERVER_URL,
+            json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+            timeout=10.0,
+        )
+        response.raise_for_status()
+        result = response.json()
+        if "result" in result and "tools" in result["result"]:
+            _mcp_tool_definitions = result["result"]["tools"]
+            logger.info(f"Loaded {len(_mcp_tool_definitions)} tools from MCP server")
+            return _mcp_tool_definitions
+        else:
+            logger.warning(f"Unexpected MCP response: {result}")
+            return []
     except Exception as e:
         logger.warning(f"Failed to fetch MCP tools: {e}")
         return []
@@ -90,32 +112,32 @@ async def call_mcp_tool(tool_name: str, arguments: dict) -> str:
         await emit_tool_event(tool_name, "started", f"{tool_label}...")
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                MCP_SERVER_URL,
-                json={
-                    "jsonrpc": "2.0",
-                    "id": 1,
-                    "method": "tools/call",
-                    "params": {"name": tool_name, "arguments": arguments},
-                },
-            )
-            response.raise_for_status()
-            result = response.json()
+        client = _get_httpx_client()
+        response = await client.post(
+            MCP_SERVER_URL,
+            json={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "tools/call",
+                "params": {"name": tool_name, "arguments": arguments},
+            },
+        )
+        response.raise_for_status()
+        result = response.json()
 
-            # Emit completion event
-            if emit_tool_event:
-                await emit_tool_event(tool_name, "completed", "完了")
+        # Emit completion event
+        if emit_tool_event:
+            await emit_tool_event(tool_name, "completed", "完了")
 
-            if "result" in result:
-                content = result["result"].get("content", [])
-                if content and len(content) > 0:
-                    return content[0].get("text", json.dumps(result["result"]))
-                return json.dumps(result["result"])
-            elif "error" in result:
-                return json.dumps({"error": result["error"]}, ensure_ascii=False)
-            else:
-                return json.dumps(result, ensure_ascii=False)
+        if "result" in result:
+            content = result["result"].get("content", [])
+            if content and len(content) > 0:
+                return content[0].get("text", json.dumps(result["result"]))
+            return json.dumps(result["result"])
+        elif "error" in result:
+            return json.dumps({"error": result["error"]}, ensure_ascii=False)
+        else:
+            return json.dumps(result, ensure_ascii=False)
     except httpx.TimeoutException:
         if emit_tool_event:
             await emit_tool_event(tool_name, "error", "タイムアウト")

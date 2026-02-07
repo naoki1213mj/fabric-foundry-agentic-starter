@@ -18,12 +18,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 import history_sql
-from history_sql import (
-    SqlQueryTool,
-    _generate_fallback_title_from_message,
-    generate_fallback_title,
-    track_event_if_configured,
-)
+from history_sql import SqlQueryTool, _generate_fallback_title_from_message, generate_fallback_title
+from utils import track_event_if_configured
 
 # ============================================================================
 # track_event_if_configured
@@ -36,14 +32,14 @@ class TestTrackEventIfConfigured:
     def test_skips_when_not_configured(self, monkeypatch):
         """Should not call track_event if APPLICATIONINSIGHTS_CONNECTION_STRING is empty."""
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
-        with patch("history_sql.track_event") as mock_track:
+        with patch("utils.track_event") as mock_track:
             track_event_if_configured("test_event", {"key": "value"})
             mock_track.assert_not_called()
 
     def test_calls_track_event_when_configured(self, monkeypatch):
         """Should call track_event when connection string is set."""
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "InstrumentationKey=test-key")
-        with patch("history_sql.track_event") as mock_track:
+        with patch("utils.track_event") as mock_track:
             track_event_if_configured("test_event", {"key": "value"})
             mock_track.assert_called_once_with("test_event", {"key": "value"})
 

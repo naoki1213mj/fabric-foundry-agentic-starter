@@ -156,3 +156,85 @@ class TestErrorHandling:
 
         with pytest.raises(pyodbc.Error):
             mock_pyodbc_connection["cursor"].execute("SELECT * FROM large_table")
+
+
+class TestGetDbConnectionWithRetry:
+    """Tests for get_db_connection_with_retry."""
+
+    @pytest.mark.asyncio
+    async def test_success_on_first_attempt(self):
+        """Should return connection immediately when first attempt succeeds."""
+        from unittest.mock import AsyncMock, patch
+
+        mock_conn = object()
+        with patch(
+            "history_sql.get_fabric_db_connection",
+            new_callable=AsyncMock,
+            return_value=mock_conn,
+        ) as mock_get:
+            from history_sql import get_db_connection_with_retry
+
+            result = await get_db_connection_with_retry()
+            assert result is mock_conn
+            assert mock_get.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_success_on_retry(self):
+        """Should retry and succeed on second attempt."""
+        from unittest.mock import AsyncMock, patch
+
+        mock_conn = object()
+        with (
+            patch(
+                "history_sql.get_fabric_db_connection",
+                new_callable=AsyncMock,
+                side_effect=[None, mock_conn],
+            ) as mock_get,
+            patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep,
+        ):
+            from history_sql import get_db_connection_with_retry
+
+            result = await get_db_connection_with_retry(max_retries=3, base_delay=0.1)
+            assert result is mock_conn
+            assert mock_get.call_count == 2
+            mock_sleep.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_all_attempts_fail(self):
+        """Should return None after all retries exhausted."""
+        from unittest.mock import AsyncMock, patch
+
+        with (
+            patch(
+                "history_sql.get_fabric_db_connection",
+                new_callable=AsyncMock,
+                return_value=None,
+            ) as mock_get,
+            patch("asyncio.sleep", new_callable=AsyncMock),
+        ):
+            from history_sql import get_db_connection_with_retry
+
+            result = await get_db_connection_with_retry(max_retries=2, base_delay=0.1)
+            assert result is None
+            assert mock_get.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_exponential_backoff_delays(self):
+        """Should use exponential backoff delays between retries."""
+        from unittest.mock import AsyncMock, patch
+
+        with (
+            patch(
+                "history_sql.get_fabric_db_connection",
+                new_callable=AsyncMock,
+                return_value=None,
+            ),
+            patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep,
+        ):
+            from history_sql import get_db_connection_with_retry
+
+            await get_db_connection_with_retry(max_retries=3, base_delay=1.0)
+            assert mock_sleep.call_count == 2
+            # First retry: 1.0 * 2^0 = 1.0, Second retry: 1.0 * 2^1 = 2.0
+            mock_sleep.assert_any_call(1.0)
+            mock_sleep.assert_any_call(2.0)

@@ -56,7 +56,6 @@ from agent_framework import (  # NOTE: HostedWebSearchTool requires OpenAI's web
 # - Supports Hosted tools (MCP, CodeInterpreter, WebSearch, FileSearch)
 from agent_framework.azure import AzureOpenAIChatClient, AzureOpenAIResponsesClient
 from azure.identity import DefaultAzureCredential
-from azure.monitor.events.extension import track_event
 from dotenv import load_dotenv
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -112,8 +111,6 @@ USE_RESPONSES_CLIENT = bool(AZURE_OPENAI_BASE_URL)  # Re-enabled with APIM polic
 
 router = APIRouter()
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize tool handlers (singletons)
@@ -423,12 +420,7 @@ logging.getLogger("azure.core.pipeline.policies.http_logging_policy").setLevel(l
 logging.getLogger("azure.identity.aio._internal").setLevel(logging.WARNING)
 logging.getLogger("azure.monitor.opentelemetry.exporter.export._base").setLevel(logging.WARNING)
 
-
-def track_event_if_configured(event_name: str, event_data: dict):
-    """Track event to Application Insights if configured."""
-    instrumentation_key = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-    if instrumentation_key:
-        track_event(event_name, event_data)
+from utils import track_event_if_configured  # noqa: E402
 
 
 def get_openai_endpoint() -> str | None:
@@ -492,9 +484,9 @@ async def get_db_connection():
     """Get or create database connection for tools."""
     conn = _db_connection_var.get()
     if conn is None:
-        from history_sql import get_fabric_db_connection
+        from history_sql import get_db_connection_with_retry
 
-        conn = await get_fabric_db_connection()
+        conn = await get_db_connection_with_retry()
         _db_connection_var.set(conn)
     return conn
 
@@ -648,28 +640,62 @@ async def run_sql_query(
             )
             return json.dumps({"error": "Only SELECT queries are allowed"}, ensure_ascii=False)
 
+        # Block dangerous SQL keywords that could be embedded in SELECT statements
+        dangerous_keywords = [
+            "INSERT",
+            "UPDATE",
+            "DELETE",
+            "DROP",
+            "CREATE",
+            "ALTER",
+            "EXEC",
+            "EXECUTE",
+            "TRUNCATE",
+            "MERGE",
+            "GRANT",
+            "REVOKE",
+            "INTO",  # SELECT INTO
+        ]
+        # Also block semicolons to prevent statement chaining
+        if ";" in sql_query:
+            await emit_tool_event("run_sql_query", "error", "セミコロンは許可されていません")
+            return json.dumps(
+                {"error": "Semicolons are not allowed in queries"}, ensure_ascii=False
+            )
+        for kw in dangerous_keywords:
+            # Check for keyword as a whole word (surrounded by non-alphanumeric chars or at boundaries)
+            if re.search(rf"\b{kw}\b", sql_stripped):
+                await emit_tool_event("run_sql_query", "error", f"禁止キーワード: {kw}")
+                return json.dumps(
+                    {"error": f"Dangerous SQL keyword detected: {kw}"}, ensure_ascii=False
+                )
+
         conn = await get_db_connection()
         if not conn:
             await emit_tool_event("run_sql_query", "error", "DB接続エラー")
             return json.dumps({"error": "Database connection not available"}, ensure_ascii=False)
 
-        cursor = conn.cursor()
-        cursor.execute(sql_query)
-        columns = [desc[0] for desc in cursor.description]
-        result = []
+        def _execute_query():
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            columns = [desc[0] for desc in cursor.description]
+            result = []
 
-        for row in cursor.fetchall():
-            row_dict = {}
-            for col_name, value in zip(columns, row, strict=False):
-                if isinstance(value, (datetime, date)):
-                    row_dict[col_name] = value.isoformat()
-                elif isinstance(value, Decimal):
-                    row_dict[col_name] = float(value)
-                else:
-                    row_dict[col_name] = value
-            result.append(row_dict)
+            for row in cursor.fetchall():
+                row_dict = {}
+                for col_name, value in zip(columns, row, strict=False):
+                    if isinstance(value, (datetime, date)):
+                        row_dict[col_name] = value.isoformat()
+                    elif isinstance(value, Decimal):
+                        row_dict[col_name] = float(value)
+                    else:
+                        row_dict[col_name] = value
+                result.append(row_dict)
 
-        cursor.close()
+            cursor.close()
+            return result
+
+        result = await asyncio.to_thread(_execute_query)
         logger.info(f"SQL query executed successfully, returned {len(result)} rows")
 
         # Emit tool completion event

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 """Load retail data into Fabric SQL Database."""
 
-import struct
 import os
+import struct
 
 import pyodbc
 from azure.identity import AzureCliCredential
 
-SERVER = os.environ.get("FABRIC_SQL_SERVER", "<your-fabric-sql-server>.database.fabric.microsoft.com")
+SERVER = os.environ.get(
+    "FABRIC_SQL_SERVER", "<your-fabric-sql-server>.database.fabric.microsoft.com"
+)
 DATABASE = os.environ.get("FABRIC_SQL_DATABASE", "<your-fabric-sql-database>")
 DRIVER = "{ODBC Driver 18 for SQL Server}"
 
@@ -20,9 +22,7 @@ def get_connection():
 
     SQL_COPT_SS_ACCESS_TOKEN = 1256
     conn_string = f"DRIVER={DRIVER};SERVER={SERVER};DATABASE={DATABASE};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30"
-    conn = pyodbc.connect(
-        conn_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct}
-    )
+    conn = pyodbc.connect(conn_string, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
     return conn
 
 
@@ -31,7 +31,7 @@ def execute_sql_file(conn, filepath):
     print(f"Loading SQL from: {filepath}")
     cursor = conn.cursor()
 
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         content = f.read()
 
     # Split by GO statements or semicolons for batch execution
@@ -104,5 +104,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
     main()

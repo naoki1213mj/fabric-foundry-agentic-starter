@@ -110,15 +110,26 @@ class TestSqlAgentRunQuery:
 
     @pytest.mark.asyncio
     async def test_query_execution_error_returns_error_json(self):
+        """Non-SELECT queries should return error JSON."""
+        mock_conn = MagicMock()
+
+        handler = SqlAgentHandler(mock_conn)
+        result = await handler.run_sql_query("SELEC 1")
+        data = json.loads(result)
+        assert "error" in data
+        assert "SELECT" in data["error"]
+
+    @pytest.mark.asyncio
+    async def test_query_syntax_error_returns_error_json(self):
         """Query execution failures should return error JSON, not raise."""
         mock_cursor = MagicMock()
-        mock_cursor.execute.side_effect = Exception("Syntax error near 'SELEC'")
+        mock_cursor.execute.side_effect = Exception("Syntax error near 'FROM'")
 
         mock_conn = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
 
         handler = SqlAgentHandler(mock_conn)
-        result = await handler.run_sql_query("SELEC 1")
+        result = await handler.run_sql_query("SELECT * FORM t")
         data = json.loads(result)
         assert "error" in data
         assert "Syntax error" in data["error"]

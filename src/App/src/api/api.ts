@@ -209,15 +209,9 @@ export async function callConversationApi(
     });
 
     if (!response.ok) {
-      // Handle error with new system but still throw (maintaining current behavior)
+      // Read body once and parse — ReadableStream can only be consumed once
       const errorInfo = await ApiErrorHandler.handleApiError(response, endpoint);
-
-      try {
-        const errorData = await response.json();
-        throw new Error(JSON.stringify(errorData.error));
-      } catch (parseError) {
-        throw new Error(errorInfo.message);
-      }
+      throw new Error(errorInfo.message);
     }
 
     return response;
