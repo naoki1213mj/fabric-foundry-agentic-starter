@@ -511,9 +511,11 @@ src/api/python/
 ├── tests/
 │   ├── conftest.py         # 共通フィクスチャ・モック
 │   ├── test_app.py         # FastAPI アプリテスト (8件)
+│   ├── test_chat.py        # チャットロジックテスト (37件)
 │   ├── test_history_sql.py # Fabric SQL テスト (10件)
 │   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
-│   └── test_utils.py       # ユーティリティテスト (11件)
+│   ├── test_utils.py       # ユーティリティテスト (11件)
+│   └── test_web_agent.py   # Web Agent テスト (14件)
 ├── pyproject.toml          # pytest/ruff 設定
 └── requirements-test.txt   # テスト依存パッケージ
 ```

@@ -147,10 +147,13 @@ src/api/python/
 │   ├── __init__.py
 │   ├── conftest.py         # 共通のフィクスチャ
 │   ├── test_app.py         # app.py のテスト (8件)
+│   ├── test_chat.py        # chat.py のテスト (37件)
 │   ├── test_history_sql.py # history_sql.py のテスト (10件)
 │   ├── test_mcp_client.py  # MCP クライアントテスト (8件)
-│   └── test_utils.py       # ユーティリティのテスト (11件)
-├── app.py                  # 合計: 37テスト / 4ファイル
+│   ├── test_utils.py       # ユーティリティのテスト (11件)
+│   └── test_web_agent.py   # web_agent.py のテスト (14件)
+│   └── test_web_agent.py   # Web Agent テスト (14件)
+├── app.py                  # 合計: 88テスト / 6ファイル
 ├── chat.py
 └── history_sql.py
 ```
